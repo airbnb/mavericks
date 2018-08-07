@@ -1,0 +1,27 @@
+buildscript {
+    ext.kotlinVersion = '1.2.60'
+    ext.supportLibVersion = '27.1.1'
+
+    repositories {
+        jcenter()
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.1.4'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlinVersion"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        maven {
+            url "https://jitpack.io"
+        }
+        flatDir {
+            dirs 'libs'
+        }
+    }
+}
