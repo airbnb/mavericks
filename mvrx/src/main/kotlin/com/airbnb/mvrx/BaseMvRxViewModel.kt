@@ -14,7 +14,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import java.util.*
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 import kotlin.reflect.KVisibility
@@ -90,8 +89,12 @@ abstract class BaseMvRxViewModel<S : MvRxState> : ViewModel() {
      */
     @SuppressLint("VisibleForTests")
     fun validateState() {
-        if (Looper.myLooper() == Looper.getMainLooper()) throw IllegalStateException("validateState should not be called from the main thread.")
-        if (state::class.visibility != KVisibility.PUBLIC) throw IllegalStateException("Your state class must be public.")
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            throw IllegalStateException("validateState should not be called from the main thread.")
+        }
+        if (state::class.visibility != KVisibility.PUBLIC) {
+            throw IllegalStateException("Your state class ${state::class.qualifiedName} must be public.")
+        }
         state::class.assertImmutability()
         val bundle = state.persistState(assertCollectionPersistability = true)
         bundle.restorePersistedState(initialState)

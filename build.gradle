@@ -2,6 +2,7 @@ buildscript {
     ext.kotlinVersion = '1.2.60'
     ext.supportLibVersion = '27.1.1'
     ext.lifecycleVersion = '1.1.1'
+    ext.robolectricVersion = '3.8'
 
     repositories {
         jcenter()
@@ -17,12 +18,7 @@ buildscript {
 allprojects {
     repositories {
         google()
-        jcenter()
-        maven {
-            url "https://jitpack.io"
-        }
-        flatDir {
-            dirs 'libs'
-        }
+        mavenCentral()
+        maven { url "https://jitpack.io" }
     }
 }
