@@ -1,7 +1,7 @@
 package com.airbnb.mvrx
 
 import android.arch.lifecycle.Lifecycle
-import junit.framework.Assert.assertEquals
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
