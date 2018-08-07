@@ -1,0 +1,48 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+version '0.0.1'
+
+sourceCompatibility = 1.8
+
+android {
+    compileSdkVersion 27
+    resourcePrefix 'mvrx_'
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 27
+        versionCode 1
+        versionName "0.0.1"
+    }
+    lintOptions {
+        abortOnError true
+        textReport true
+        textOutput 'stdout'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+}
+
+androidExtensions {
+    experimental = true
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    implementation "com.android.support:appcompat-v7:$supportLibVersion"
+    implementation "android.arch.lifecycle:extensions:$lifecycleVersion"
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    implementation "io.reactivex.rxjava2:rxjava:2.2.0"
+    testImplementation "org.mockito:mockito-core:2.15.0"
+    testImplementation 'junit:junit:4.12'
+    testImplementation "org.robolectric:robolectric:3.5.1"
+}
