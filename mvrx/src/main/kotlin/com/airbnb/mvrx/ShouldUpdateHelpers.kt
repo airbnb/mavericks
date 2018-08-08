@@ -9,3 +9,7 @@ fun <S : Any> propertyWhitelist(vararg whitelist: KProperty1<S, *>): (S, S) -> B
 fun <S : Any, T : Async<*>> onSuccess(property: KProperty1<S, T>): (S, S) -> Boolean = { oldState, newState ->
     property.get(oldState) !is Success<*> && property.get(newState) is Success<*>
 }
+
+fun <S : Any, T : Async<*>> onFail(property: KProperty1<S, T>): (S, S) -> Boolean = { oldState, newState ->
+    property.get(oldState) !is Fail<*> && property.get(newState) is Fail<*>
+}

@@ -4,19 +4,17 @@
     app:startDestination="@id/main">
     <fragment
         android:id="@+id/main"
-        android:name="com.airbnb.mvrx.sample.MainFragment"
-        android:label="Main">
+        android:name="com.airbnb.mvrx.sample.MainFragment">
         <action
             android:id="@+id/action_mainFragment_to_dadJokes"
             app:destination="@id/dadJokes"
-            app:enterAnim="@anim/nav_default_enter_anim"
+            app:enterAnim="@anim/anim_enter"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
-            app:popExitAnim="@anim/nav_default_pop_exit_anim"/>
+            app:popExitAnim="@anim/anim_pop_exit"/>
     </fragment>
 
     <fragment
         android:id="@+id/dadJokes"
-        android:name="com.airbnb.mvrx.sample.DadJokesFragment"
-        android:label="Dad Jokes"/>
+        android:name="com.airbnb.mvrx.sample.DadJokesFragment"/>
 </navigation>

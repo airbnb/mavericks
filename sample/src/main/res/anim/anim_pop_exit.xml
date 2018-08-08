@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+    <alpha
+        android:duration="75"
+        android:fromAlpha="1"
+        android:toAlpha="0"/>
+
+    <translate
+        android:duration="150"
+        android:fromYDelta="0%p"
+        android:interpolator="@android:interpolator/accelerate_quint"
+        android:toYDelta="10%p"/>
+</set>

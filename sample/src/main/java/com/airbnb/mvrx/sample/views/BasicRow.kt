@@ -9,18 +9,19 @@ import com.airbnb.epoxy.CallbackProp
 import com.airbnb.epoxy.ModelView
 import com.airbnb.epoxy.TextProp
 import com.airbnb.mvrx.sample.R
-import com.airbnb.mvrx.sample.core.bindView
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)
 class BasicRow @JvmOverloads constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    private val titleView: TextView by bindView(R.id.title)
-    private val subtitleView: TextView by bindView(R.id.subtitle)
+    private val titleView: TextView
+    private val subtitleView: TextView
 
     init {
         inflate(context, R.layout.basic_row, this)
+        titleView = findViewById(R.id.title)
+        subtitleView = findViewById(R.id.subtitle)
         orientation = VERTICAL
     }
 

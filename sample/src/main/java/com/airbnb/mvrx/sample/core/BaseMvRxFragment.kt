@@ -1,6 +1,7 @@
 package com.airbnb.mvrx.sample.core
 
 import android.os.Bundle
+import android.support.design.widget.CoordinatorLayout
 import android.support.v4.app.Fragment
 import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
@@ -22,8 +23,9 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
 
     override val mvrxViewModelStore by lazy { MvRxViewModelStore(viewModelStore) }
 
-    protected val recyclerView: EpoxyRecyclerView by bindView(R.id.recycler_view)
-    protected val toolbar: Toolbar by bindView(R.id.toolbar)
+    protected lateinit var recyclerView: EpoxyRecyclerView
+    protected lateinit var toolbar: Toolbar
+    protected lateinit var coordinatorLayout: CoordinatorLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,12 +36,23 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_base_mvrx, container, false)
+        return inflater.inflate(R.layout.fragment_base_mvrx, container, false).apply {
+            recyclerView = findViewById(R.id.recycler_view)
+            toolbar = findViewById(R.id.toolbar)
+            coordinatorLayout = findViewById(R.id.coordinator_layout)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        recyclerView.buildModelsWith { it.buildModels() }
+        recyclerView.buildModelsWith {
+            it.buildModels()
+        }
         toolbar.setupWithNavController(findNavController())
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // TODO: make this behavior automatic.
         invalidate()
     }
 

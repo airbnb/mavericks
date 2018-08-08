@@ -7,7 +7,6 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.airbnb.epoxy.ModelView
 import com.airbnb.epoxy.TextProp
-import com.airbnb.mvrx.sample.core.bindView
 import com.airbnb.mvrx.sample.R
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)
@@ -17,11 +16,13 @@ class Marquee @JvmOverloads constructor(
         defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
-    private val titleView: TextView by bindView(R.id.title)
-    private val subtitleView: TextView by bindView(R.id.subtitle)
+    private val titleView: TextView
+    private val subtitleView: TextView
 
     init {
         inflate(context, R.layout.marquee, this)
+        titleView = findViewById(R.id.title)
+        subtitleView = findViewById(R.id.subtitle)
         orientation = VERTICAL
     }
 

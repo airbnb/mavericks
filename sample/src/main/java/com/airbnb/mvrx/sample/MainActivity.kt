@@ -2,7 +2,6 @@ package com.airbnb.mvrx.sample
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import androidx.navigation.findNavController
 import com.airbnb.mvrx.MvRxViewModelStore
 import com.airbnb.mvrx.MvRxViewModelStoreOwner
 
@@ -46,6 +45,4 @@ class MainActivity : AppCompatActivity(), MvRxViewModelStoreOwner {
         super.onSaveInstanceState(outState)
         mvrxViewModelStore.saveViewModels(outState)
     }
-
-    override fun onSupportNavigateUp() = findNavController(R.id.nav_host_fragment).navigateUp()
 }

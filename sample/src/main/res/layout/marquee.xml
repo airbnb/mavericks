@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:paddingLeft="@dimen/padding_horizontal"
         android:paddingRight="@dimen/padding_horizontal"
-        android:paddingTop="80dp"
+        android:paddingTop="48dp"
         android:textColor="@color/text_color"
         android:textSize="32sp"
         android:textStyle="bold"
