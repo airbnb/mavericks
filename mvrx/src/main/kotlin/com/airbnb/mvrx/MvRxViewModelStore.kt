@@ -7,6 +7,8 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import com.airbnb.mvrx.MvRxViewModelProvider.createDefaultViewModel
 import java.util.UUID
+import kotlin.collections.HashMap
+import kotlin.collections.set
 import kotlin.reflect.full.companionObjectInstance
 
 /**
@@ -73,11 +75,13 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
      * [android.support.v4.app.FragmentActivity.onCreate].
      */
     fun restoreViewModels(activity: FragmentActivity, savedInstanceState: Bundle?) {
+        savedInstanceState ?: return
         val args = activity.intent.extras?.get(MvRx.KEY_ARG)
         restoreViewModels(map, activity, savedInstanceState, args)
     }
 
     fun restoreViewModels(fragment: Fragment, savedInstanceState: Bundle?) {
+        savedInstanceState ?: return
         val args = fragment.arguments?.get(MvRx.KEY_ARG)
         restoreViewModels(map, fragment.requireActivity(), savedInstanceState, args)
     }
