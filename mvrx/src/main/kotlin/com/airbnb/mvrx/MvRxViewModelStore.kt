@@ -6,8 +6,6 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import com.airbnb.mvrx.MvRxViewModelProvider.createDefaultViewModel
-import java.util.UUID
-import kotlin.collections.HashMap
 import kotlin.collections.set
 import kotlin.reflect.full.companionObjectInstance
 
@@ -63,7 +61,6 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
             }
             .let {
                 outState.putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, it)
-                outState.putString(KEY_MVRX_PROCESS_UUID, processUuid)
                 outState.putSerializable(KEY_MVRX_ACTIVITY_SCOPED_FRAGMENT_ARGS, fragmentArgsForActivityViewModelState)
             }
     }
@@ -89,9 +86,7 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
     fun restoreViewModels(map: MutableMap<String, ViewModel>, activity: FragmentActivity, savedInstanceState: Bundle?, ownerArgs: Any? = null) {
         savedInstanceState ?: return
         val viewModelsState = savedInstanceState.getBundle(KEY_MVRX_SAVED_INSTANCE_STATE)
-        val uuid = savedInstanceState.getString(KEY_MVRX_PROCESS_UUID)
-        // No need to restore state if we are in the same process
-        if (processUuid == uuid) return
+        if (map.isNotEmpty()) return
         restoreFragmentArgsFromSavedInstanceState(savedInstanceState)
         viewModelsState?.keySet()?.forEach {
             // In the case that we are restoring an Activity ViewModel created by a Fragment, `ownerArgs` will be those of the Activity. So we
@@ -148,9 +143,7 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
 
     companion object {
         private const val KEY_MVRX_SAVED_INSTANCE_STATE = "mvrx:saved_instance_state"
-        private const val KEY_MVRX_PROCESS_UUID = "mvrx:process_uuid"
         private const val KEY_MVRX_ACTIVITY_SCOPED_FRAGMENT_ARGS = "mvrx:activity_scoped_fragment_args"
-        private val processUuid = UUID.randomUUID().toString()
 
         /**
          * mMap is private in ViewModelStore but we need to access it to save state.
