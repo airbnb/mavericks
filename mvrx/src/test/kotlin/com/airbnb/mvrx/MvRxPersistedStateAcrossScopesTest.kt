@@ -40,9 +40,6 @@ class MvRxPersistedStateAcrossScopesTest : MvRxBaseTest() {
         val activitySaveInstanceState = Bundle()
         activity.mvrxViewModelStore.saveViewModels(activitySaveInstanceState)
 
-        // Force it to think this happened in a different process
-        activitySaveInstanceState.putString("mvrx:process_uuid", "foo")
-
         val activityStoreInNewProcess = MvRxViewModelStore(ViewModelStore())
         val outMap = mutableMapOf<String, ViewModel>()
         activityStoreInNewProcess.restoreViewModels(outMap, activity, activitySaveInstanceState)

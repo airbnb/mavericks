@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import com.airbnb.mvrx.MvRxViewModelProvider.createDefaultViewModel
-import java.util.UUID
 import kotlin.collections.set
 import kotlin.reflect.full.companionObjectInstance
 
@@ -145,7 +144,6 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
     companion object {
         private const val KEY_MVRX_SAVED_INSTANCE_STATE = "mvrx:saved_instance_state"
         private const val KEY_MVRX_ACTIVITY_SCOPED_FRAGMENT_ARGS = "mvrx:activity_scoped_fragment_args"
-        private val processUuid = UUID.randomUUID().toString()
 
         /**
          * mMap is private in ViewModelStore but we need to access it to save state.

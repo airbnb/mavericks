@@ -24,6 +24,11 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
         test.java.srcDirs += 'src/test/kotlin'
     }
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 androidExtensions {
@@ -42,6 +47,6 @@ dependencies {
 
     testImplementation "org.mockito:mockito-core:2.15.0"
     testImplementation 'junit:junit:4.12'
-    testImplementation "org.robolectric:robolectric:3.5.1"
+    testImplementation "org.robolectric:robolectric:$robolectricVersion"
     testImplementation "org.robolectric:shadows-supportv4:$robolectricVersion"
 }

@@ -2,7 +2,6 @@
 @file:Suppress("UtilityClassWithPublicConstructor")
 package com.airbnb.mvrx
 
-import android.os.Build
 import io.reactivex.Scheduler
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.annotations.NonNull
@@ -12,16 +11,12 @@ import io.reactivex.plugins.RxJavaPlugins
 import org.junit.BeforeClass
 import org.junit.Ignore
 import org.junit.runner.RunWith
-import org.robolectric.annotation.Config
+import org.robolectric.RobolectricTestRunner
 import org.robolectric.shadows.ShadowLog
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 
-@Config(packageName = MvRxTestRunner.PACKAGE_NAME,
-        sdk = [Build.VERSION_CODES.LOLLIPOP],
-        manifest = MvRxTestRunner.MANIFEST_PATH,
-        constants = BuildConfig::class)
-@RunWith(MvRxTestRunner::class)
+@RunWith(RobolectricTestRunner::class)
 @Ignore
 abstract class MvRxBaseTest {
     companion object {

@@ -90,10 +90,9 @@ class MvRxPersistedViewModelTest : MvRxBaseTest() {
         val map = mutableMapOf("vm" to viewModel)
         val bundle = Bundle()
         store.saveViewModels(map, bundle)
-        // Force it to think this happened in a different process
-        bundle.putString("mvrx:process_uuid", "foo")
         val outMap = mutableMapOf<String, ViewModel>()
-        store.restoreViewModels(outMap, activity, bundle, args)
+        val newStore = MvRxViewModelStore(ViewModelStore())
+        newStore.restoreViewModels(outMap, activity, bundle, args)
         @Suppress("UNCHECKED_CAST")
         val restoredViewModel: VM = outMap.getValue("vm") as VM
         assertNotEquals(viewModel, restoredViewModel)
