@@ -17,6 +17,10 @@ android {
     buildToolsVersion '27.0.3'
 }
 
+androidExtensions {
+    experimental = true
+}
+
 dependencies {
     implementation project(':mvrx')
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"

@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <set xmlns:android="http://schemas.android.com/apk/res/android"
-    android:interpolator="@android:interpolator/decelerate_quint">
+    android:interpolator="@android:interpolator/decelerate_quad">
     <scale
-        android:fromXScale="0.99"
-        android:fromYScale="0.99"
+        android:fromXScale="0.95"
+        android:fromYScale="0.95"
         android:toXScale="1"
         android:toYScale="1"
         android:pivotX="50%p"
@@ -11,9 +11,9 @@
         android:duration="100"/>
 
     <alpha
-        android:fromAlpha="0.6"
+        android:fromAlpha="1"
         android:toAlpha="1"
-        android:duration="150"/>
+        android:duration="100"/>
 
     <translate
         android:fromYDelta="3%p"

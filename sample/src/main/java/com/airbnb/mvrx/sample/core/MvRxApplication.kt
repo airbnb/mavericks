@@ -1,6 +1,9 @@
-package com.airbnb.mvrx.sample
+package com.airbnb.mvrx.sample.core
 
 import android.app.Application
+import android.os.Handler
+import android.os.HandlerThread
+import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.sample.network.DadJokeService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -10,6 +13,8 @@ import org.koin.dsl.module.applicationContext
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.moshi.MoshiConverterFactory
+
+
 
 
 class MvRxApplication : Application() {
@@ -29,5 +34,14 @@ class MvRxApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin(this, listOf(dadJokeServiceModule))
+        setupAsyncEpoxy()
+    }
+
+    private fun setupAsyncEpoxy() {
+        val handlerThread = HandlerThread("epoxy")
+        handlerThread.start()
+        val handler = Handler(handlerThread.looper)
+        EpoxyController.defaultDiffingHandler = handler
+        EpoxyController.defaultModelBuildingHandler = handler
     }
 }

@@ -6,15 +6,57 @@
         android:id="@+id/main"
         android:name="com.airbnb.mvrx.sample.MainFragment">
         <action
-            android:id="@+id/action_mainFragment_to_dadJokes"
-            app:destination="@id/dadJokes"
+            android:id="@+id/action_mainFragment_to_dadJokeIndex"
+            app:destination="@id/dadJokeIndex"
             app:enterAnim="@anim/anim_enter"
-            app:exitAnim="@anim/nav_default_exit_anim"
-            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:exitAnim="@anim/anim_exit"
+            app:popEnterAnim="@anim/anim_pop_enter"
+            app:popExitAnim="@anim/anim_pop_exit"/>
+        <action
+            android:id="@+id/action_main_to_flowIntroFragment"
+            app:destination="@id/flowIntroFragment"
+            app:enterAnim="@anim/anim_enter"
+            app:exitAnim="@anim/anim_exit"
+            app:popEnterAnim="@anim/anim_pop_enter"
+            app:popExitAnim="@anim/anim_pop_exit"/>
+        <action
+            android:id="@+id/action_main_to_helloWorldFragment"
+            app:destination="@id/helloWorldFragment"
+            app:enterAnim="@anim/anim_enter"
+            app:exitAnim="@anim/anim_exit"
+            app:popEnterAnim="@anim/anim_pop_enter"
             app:popExitAnim="@anim/anim_pop_exit"/>
     </fragment>
 
     <fragment
-        android:id="@+id/dadJokes"
-        android:name="com.airbnb.mvrx.sample.DadJokesFragment"/>
+        android:id="@+id/dadJokeIndex"
+        android:name="com.airbnb.mvrx.sample.features.dadjoke.DadJokeIndexFragment">
+        <action
+            android:id="@+id/action_dadJokeIndex_to_dadJokeDetailFragment"
+            app:destination="@id/dadJokeDetailFragment"
+            app:enterAnim="@anim/anim_enter"
+            app:exitAnim="@anim/anim_exit"
+            app:popEnterAnim="@anim/anim_pop_enter"
+            app:popExitAnim="@anim/anim_pop_exit"/>
+    </fragment>
+    <fragment
+        android:id="@+id/flowIntroFragment"
+        android:name="com.airbnb.mvrx.sample.features.flow.FlowIntroFragment">
+        <action
+            android:id="@+id/action_flowIntroFragment_to_flowCounterFragment"
+            app:destination="@id/flowCounterFragment"
+            app:enterAnim="@anim/anim_enter"
+            app:exitAnim="@anim/anim_exit"
+            app:popEnterAnim="@anim/anim_pop_enter"
+            app:popExitAnim="@anim/anim_pop_exit"/>
+    </fragment>
+    <fragment
+        android:id="@+id/flowCounterFragment"
+        android:name="com.airbnb.mvrx.sample.features.flow.FlowCounterFragment"/>
+    <fragment
+        android:id="@+id/helloWorldFragment"
+        android:name="com.airbnb.mvrx.sample.features.HelloWorldFragment"/>
+    <fragment
+        android:id="@+id/dadJokeDetailFragment"
+        android:name="com.airbnb.mvrx.sample.features.dadjoke.DadJokeDetailFragment"/>
 </navigation>

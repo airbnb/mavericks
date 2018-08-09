@@ -1,6 +1,8 @@
 package com.airbnb.mvrx.sample.core
 
 import android.os.Bundle
+import android.os.Parcelable
+import android.support.annotation.IdRes
 import android.support.design.widget.CoordinatorLayout
 import android.support.v4.app.Fragment
 import android.support.v7.widget.Toolbar
@@ -12,6 +14,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.epoxy.EpoxyRecyclerView
 import com.airbnb.mvrx.BaseMvRxViewModel
+import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.MvRxViewModelStore
@@ -19,10 +22,11 @@ import com.airbnb.mvrx.sample.R
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 
-abstract class BaseMvRxFragment : Fragment(), MvRxView {
+abstract class BaseFragment : Fragment(), MvRxView {
 
     override val mvrxViewModelStore by lazy { MvRxViewModelStore(viewModelStore) }
 
+    @Suppress("MemberVisibilityCanBePrivate")
     protected lateinit var recyclerView: EpoxyRecyclerView
     protected lateinit var toolbar: Toolbar
     protected lateinit var coordinatorLayout: CoordinatorLayout
@@ -40,22 +44,13 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
             recyclerView = findViewById(R.id.recycler_view)
             toolbar = findViewById(R.id.toolbar)
             coordinatorLayout = findViewById(R.id.coordinator_layout)
+
+            recyclerView.buildModelsWith {
+                it.buildModels()
+            }
+            toolbar.setupWithNavController(findNavController())
         }
     }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        recyclerView.buildModelsWith {
-            it.buildModels()
-        }
-        toolbar.setupWithNavController(findNavController())
-    }
-
-    override fun onStart() {
-        super.onStart()
-        // TODO: make this behavior automatic.
-        invalidate()
-    }
-
     /**
      *
      */
@@ -74,7 +69,7 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
             shouldUpdate: ((S, S) -> Boolean)? = null,
             observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
             subscriber: ((S) -> Unit)? = null
-    ) = subscribe(this@BaseMvRxFragment, shouldUpdate, observerScheduler, subscriber ?: { if (readyToInvalidate()) invalidate() })
+    ) = subscribe(this@BaseFragment, shouldUpdate, observerScheduler, subscriber ?: { if (readyToInvalidate()) invalidate() })
 
     /**
      * Subscribes to all state updates for the given viewModel. The subscriber will receive the previous state and the new state.
@@ -85,9 +80,19 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
             shouldUpdate: ((S, S) -> Boolean)? = null,
             observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
             subscriber: (S, S) -> Unit
-    ) = subscribeWithHistory(this@BaseMvRxFragment, shouldUpdate, observerScheduler, subscriber)
+    ) = subscribeWithHistory(this@BaseFragment, shouldUpdate, observerScheduler, subscriber)
 
     open fun EpoxyController.buildModels() {
 
+    }
+
+    protected fun navigateTo(@IdRes actionId: Int, arg: Parcelable? = null) {
+        /**
+         * If we put a parcelable arg in [MvRx.KEY_ARG] then MvRx will attempt to call a secondary
+         * constructor on any MvRxState objects and pass in this arg directly.
+         * @see [com.airbnb.mvrx.sample.features.dadjoke.DadJokeDetailState]
+         */
+        val bundle = arg?.let { Bundle().apply { putParcelable(MvRx.KEY_ARG, it) } }
+        findNavController().navigate(actionId, bundle)
     }
 }
