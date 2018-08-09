@@ -48,7 +48,7 @@ fun <T, VM : BaseMvRxViewModel<S>, S : MvRxState> T.existingViewModel(
     keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : Fragment,
         T : MvRxView = lazy {
-    val factory = MvRxFactory { throw IllegalStateException("ViewModel for ${requireActivity()}[$keyFactory] does not exist yet!") }
+    val factory = MvRxFactory { throw IllegalStateException("ViewModel for ${requireActivity()}[${keyFactory()}] does not exist yet!") }
     ViewModelProviders.of(requireActivity(), factory).get(keyFactory(), viewModelClass.java)
         .apply { subscribe(requireActivity(), shouldUpdate = shouldUpdate, subscriber = { if (readyToInvalidate()) invalidate() }) }
 }
