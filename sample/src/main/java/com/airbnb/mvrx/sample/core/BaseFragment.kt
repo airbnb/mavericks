@@ -13,14 +13,10 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.epoxy.EpoxyRecyclerView
-import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.MvRx
-import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.MvRxViewModelStore
 import com.airbnb.mvrx.sample.R
-import io.reactivex.Scheduler
-import io.reactivex.android.schedulers.AndroidSchedulers
 
 abstract class BaseFragment : Fragment(), MvRxView {
 
@@ -51,36 +47,17 @@ abstract class BaseFragment : Fragment(), MvRxView {
             toolbar.setupWithNavController(findNavController())
         }
     }
-    /**
-     *
-     */
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        mvrxViewModelStore.saveViewModels(outState)
+    }
+
     override fun readyToInvalidate() = isAdded && view != null
 
     override fun invalidate() {
         recyclerView.requestModelBuild()
     }
-
-    /**
-     * Subscribes to all state updates for the given viewModel.
-     *
-     * Use shouldUpdate if you only want to subscribe to a subset of all updates. There are some standard ones in ShouldUpdateHelpers.
-     */
-    fun <S : MvRxState> BaseMvRxViewModel<S>.subscribe(
-            shouldUpdate: ((S, S) -> Boolean)? = null,
-            observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
-            subscriber: ((S) -> Unit)? = null
-    ) = subscribe(this@BaseFragment, shouldUpdate, observerScheduler, subscriber ?: { if (readyToInvalidate()) invalidate() })
-
-    /**
-     * Subscribes to all state updates for the given viewModel. The subscriber will receive the previous state and the new state.
-     *
-     * Use shouldUpdate if you only want to subscribe to a subset of all updates. There are some standard ones in ShouldUpdateHelpers.
-     */
-    fun <S : MvRxState> BaseMvRxViewModel<S>.subscribeWithHistory(
-            shouldUpdate: ((S, S) -> Boolean)? = null,
-            observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
-            subscriber: (S, S) -> Unit
-    ) = subscribeWithHistory(this@BaseFragment, shouldUpdate, observerScheduler, subscriber)
 
     open fun EpoxyController.buildModels() {
 

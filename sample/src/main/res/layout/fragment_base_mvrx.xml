@@ -35,17 +35,5 @@
 
         </android.support.design.widget.CoordinatorLayout>
 
-        <FrameLayout
-            android:id="@+id/footer_container"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            />
-
     </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/modal_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
 </FrameLayout>
