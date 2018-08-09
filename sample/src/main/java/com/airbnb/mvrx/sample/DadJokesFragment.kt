@@ -21,6 +21,7 @@ import com.airbnb.mvrx.sample.models.Joke
 import com.airbnb.mvrx.sample.models.JokesResponse
 import com.airbnb.mvrx.sample.network.DadJokeService
 import com.airbnb.mvrx.sample.views.basicRow
+import com.airbnb.mvrx.sample.views.loadingRow
 import com.airbnb.mvrx.sample.views.marquee
 import com.airbnb.mvrx.withState
 import org.koin.android.ext.android.inject
@@ -85,9 +86,10 @@ class DadJokesFragment : BaseMvRxFragment() {
             }
         }
 
-        basicRow {
-            id("loading ${state.jokes.size}")
-            title("Loading")
+        loadingRow {
+            // Changing the ID will force it to rebind when new data is loaded even if it is
+            // still on screen.
+            id("loading${state.jokes.size}")
             onBind { _, _, _ -> viewModel.fetchNextPage() }
         }
     }
