@@ -17,7 +17,8 @@ buildscript {
         classpath 'com.android.tools.build:gradle:3.1.4'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlinVersion"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion" }
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+    }
 }
 
 allprojects {

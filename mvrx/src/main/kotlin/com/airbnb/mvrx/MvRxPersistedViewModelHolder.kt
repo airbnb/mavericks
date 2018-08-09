@@ -1,5 +1,6 @@
 package com.airbnb.mvrx
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
@@ -10,4 +11,5 @@ import kotlinx.android.parcel.Parcelize
  *
  * @see MvRxViewModelStore
  */
+@SuppressLint("ParcelCreator")
 @Parcelize data class MvRxPersistedViewModelHolder(val viewModelClass: String, val stateClass: String, val state: Bundle) : Parcelable

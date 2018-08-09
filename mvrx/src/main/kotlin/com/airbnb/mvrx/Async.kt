@@ -1,6 +1,6 @@
 package com.airbnb.mvrx
 
-import java.util.Objects
+import java.util.Arrays
 
 /**
  * The T generic is unused for some classes but since it is sealed and useful for Success and Fail,
@@ -83,7 +83,7 @@ data class Fail<out T>(val error: Throwable) : Async<T>(complete = true, shouldL
                 error.stackTrace[0] == otherError.stackTrace[0]
     }
 
-    override fun hashCode(): Int = Objects.hash(error::class, error.message, error.stackTrace[0])
+    override fun hashCode(): Int = Arrays.hashCode(arrayOf(error::class, error.message, error.stackTrace[0]))
 }
 
 /**
