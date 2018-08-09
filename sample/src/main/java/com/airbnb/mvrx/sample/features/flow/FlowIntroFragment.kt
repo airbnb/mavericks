@@ -7,13 +7,12 @@ import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.views.basicRow
 import com.airbnb.mvrx.sample.views.marquee
-import com.airbnb.mvrx.withState
 
 class FlowIntroFragment : BaseFragment() {
 
     private val viewModel by activityViewModel(FlowViewModel::class)
 
-    override fun EpoxyController.buildModels() = withState(viewModel) { state ->
+    override fun EpoxyController.buildModels() {
         marquee {
             id("marquee")
             title("Intro")

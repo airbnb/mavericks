@@ -1,5 +1,6 @@
 package com.airbnb.mvrx.sample.features.dadjoke
 
+import android.annotation.SuppressLint
 import android.os.Parcelable
 import android.support.v4.app.FragmentActivity
 import com.airbnb.epoxy.EpoxyController
@@ -20,6 +21,7 @@ import com.airbnb.mvrx.withState
 import kotlinx.android.parcel.Parcelize
 import org.koin.android.ext.android.inject
 
+@SuppressLint("ParcelCreator")
 @Parcelize
 data class DadJokeDetailArgs(val id: String) : Parcelable
 
