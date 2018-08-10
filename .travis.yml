@@ -1,15 +1,17 @@
-# language: android
+language: android
 
-# android:
-#   components:
-#   - tools
-#   - platform-tools
-#   - build-tools-27.0.3
-#   - android-27
-#   - extra-google-google_play_services
-#   - extra-android-m2repository
-#   - extra-android-support
-#   - extra-google-m2repository
+android:
+  components:
+  - tools
+  - platform-tools
+  - build-tools-27.0.3
+  - android-27
+  - emulator
+  - "system-images;android-24;default;armeabi-v7a"
+  # - extra-google-google_play_services
+  # - extra-android-m2repository
+  # - extra-android-support
+  # - extra-google-m2repository
 
 jdk:
 - oraclejdk8
@@ -19,9 +21,9 @@ branches:
   - gh-pages
 
 before_install:
-- export ANDROID_HOME=$HOME/sdk
-- export PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/tools
-- ./setup_sdk.sh
+# - export ANDROID_HOME=$HOME/sdk
+# - export PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/tools
+# - ./setup_sdk.sh
 
 
 notifications:
