@@ -4,14 +4,15 @@ android:
   components:
   - tools
   - platform-tools
+  - tools
   - build-tools-27.0.3
   - android-27
   - emulator
-  - sys-img-armeabi-v7a-android-27
+  - sys-img-armeabi-v7a-android-22
   # - extra-google-google_play_services
-  # - extra-android-m2repository
-  # - extra-android-support
-  # - extra-google-m2repository
+  - extra-android-m2repository
+  - extra-android-support
+  - extra-google-m2repository
 
 jdk:
 - oraclejdk8
