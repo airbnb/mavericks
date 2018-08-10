@@ -85,6 +85,9 @@ inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activityViewM
  */
 @Suppress("FunctionName")
 inline fun <reified S : MvRxState, T : Fragment> T.activityViewModelInitialStateProvider(keyFactory: () -> String): S {
+
+
+
     val args: Any? = arguments?.get(MvRx.KEY_ARG)
     val activity = requireActivity()
     if (activity is MvRxViewModelStoreOwner) {
