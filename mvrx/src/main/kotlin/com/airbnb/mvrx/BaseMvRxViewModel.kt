@@ -105,7 +105,7 @@ abstract class BaseMvRxViewModel<S : MvRxState> : ViewModel() {
      */
     fun <T> Single<T>.execute(
         stateReducer: S.(Async<T>) -> S
-    ) = toObservable().execute({ it }, stateReducer)
+    ) = toObservable().execute({ it }, null, stateReducer)
 
     /**
      * Helper to map an Single to an Async property on the state object.
@@ -117,25 +117,27 @@ abstract class BaseMvRxViewModel<S : MvRxState> : ViewModel() {
     fun <T, V> Single<T>.execute(
         mapper: (T) -> V,
         stateReducer: S.(Async<V>) -> S
-    ) = toObservable().execute(mapper, stateReducer)
+    ) = toObservable().execute(mapper, null, stateReducer)
 
     /**
      * Helper to map an observable to an Async property on the state object.
      */
     fun <T> Observable<T>.execute(
         stateReducer: S.(Async<T>) -> S
-    ) = execute({ it }, stateReducer)
+    ) = execute({ it }, null, stateReducer)
 
     /**
      * Execute an observable and wrap its progression with AsyncData reduced to the global state.
      *
      * @param mapper A map converting the observable type to the desired AsyncData type.
+     * @param successMetaData A map that provides metadata to set on the Success result
      * @param stateReducer A reducer that is applied to the current state and should return the
      *                     new state. Because the state is the receiver and it likely a data
      *                     class, an implementation may look like: `{ copy(response = it) }`.
      */
     fun <T, V> Observable<T>.execute(
         mapper: (T) -> V,
+        successMetaData: ((T) -> Any)? = null,
         stateReducer: S.(Async<V>) -> S
     ): Disposable {
         // This will ensure that Loading is dispatched immediately rather than being posted to `backgroundScheduler` before emitting Loading.
@@ -143,8 +145,11 @@ abstract class BaseMvRxViewModel<S : MvRxState> : ViewModel() {
 
         return observeOn(backgroundScheduler)
             .subscribeOn(backgroundScheduler)
-            .map(mapper)
-            .map { Success(it) as Async<V> }
+            .map {
+                val success = Success(mapper(it))
+                success.metadata = successMetaData?.invoke(it)
+                success as Async<V>
+            }
             .onErrorReturn { Fail(it) }
             .subscribe { asyncData -> setState { stateReducer(asyncData) } }
             .disposeOnClear()

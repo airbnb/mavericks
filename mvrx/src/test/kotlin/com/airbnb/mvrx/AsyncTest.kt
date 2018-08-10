@@ -2,6 +2,8 @@ package com.airbnb.mvrx
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import com.airbnb.mvrx.Async.Companion.getMetadata
+import com.airbnb.mvrx.Async.Companion.setMetadata
 import org.junit.Test
 
 class AsyncTest : MvRxBaseTest() {
@@ -24,5 +26,14 @@ class AsyncTest : MvRxBaseTest() {
     @Test
     fun successValueIsCorrect() {
         assertEquals(5, Success(5)())
+    }
+
+    @Test
+    fun successHasMetadata() {
+        val success = Success(5)
+        assertNull(success.getMetadata<String>())
+
+        success.setMetadata("hi")
+        assertEquals("hi", success.getMetadata())
     }
 }
