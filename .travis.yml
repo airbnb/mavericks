@@ -20,8 +20,8 @@ branches:
 
 env:
 - ANDROID_HOME=$HOME/sdk
+- PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools/bin
 before_install:
-- export PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools/bin
 - ./setup_sdk.sh
 
 
