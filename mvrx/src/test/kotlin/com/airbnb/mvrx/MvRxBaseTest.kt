@@ -2,6 +2,10 @@
 @file:Suppress("UtilityClassWithPublicConstructor")
 package com.airbnb.mvrx
 
+import android.os.Bundle
+import android.os.Parcelable
+import android.support.v4.app.Fragment
+import android.support.v7.app.AppCompatActivity
 import io.reactivex.Scheduler
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.annotations.NonNull
@@ -11,7 +15,9 @@ import io.reactivex.plugins.RxJavaPlugins
 import org.junit.BeforeClass
 import org.junit.Ignore
 import org.junit.runner.RunWith
+import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.android.controller.ActivityController
 import org.robolectric.shadows.ShadowLog
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
@@ -36,5 +42,24 @@ abstract class MvRxBaseTest {
             RxJavaPlugins.setInitIoSchedulerHandler { immediate }
             RxAndroidPlugins.setInitMainThreadSchedulerHandler { immediate }
         }
+    }
+
+    protected inline fun <reified T : Fragment, reified A : AppCompatActivity> createFragment(
+            savedInstanceState: Bundle? = null,
+            args: Parcelable? = null
+    ): Pair<ActivityController<A>, T> {
+        val controller = Robolectric.buildActivity(A::class.java)
+                .create(savedInstanceState)
+                .start()
+                .resume()
+                .visible()
+        val activity = controller.get()
+
+        val fragment = T::class.java.newInstance().apply {
+            arguments = Bundle().apply { putParcelable(MvRx.KEY_ARG, args) }
+        }
+
+        activity.supportFragmentManager.beginTransaction().add(fragment, "TAG").commitNow()
+        return controller to fragment
     }
 }

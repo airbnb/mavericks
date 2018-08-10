@@ -2,22 +2,21 @@ package com.airbnb.mvrx
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.parcel.Parcelize
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import org.robolectric.Robolectric
-import org.robolectric.android.controller.ActivityController
 
 @Parcelize
-data class ViewModelStoreTestArgs(val foo: String) : Parcelable
+data class ViewModelStoreTestArgs(val count: Int = 2) : Parcelable
 
-data class ViewModelStoreTestState(val foo: String = "Default") : MvRxState {
-    constructor(args: ViewModelStoreTestArgs) : this(foo = args.foo)
+data class ViewModelStoreTestState(val notPersistedCount: Int = 1, @PersistState val persistedCount: Int = 1) : MvRxState {
+    constructor(args: ViewModelStoreTestArgs) : this(args.count, args.count)
 }
 
-class ViewModelStoreTestViewModel(override val initialState: ViewModelStoreTestState) : TestMvRxViewModel<ViewModelStoreTestState>()
+class ViewModelStoreTestViewModel(override val initialState: ViewModelStoreTestState) : TestMvRxViewModel<ViewModelStoreTestState>() {
+    fun setCount(count: Int) = setState { copy(persistedCount = count, notPersistedCount = count) }
+}
 
 class NoRestoreActivity : AppCompatActivity(), MvRxViewModelStoreOwner {
     override val mvrxViewModelStore by lazy { MvRxViewModelStore(viewModelStore) }
@@ -68,7 +67,7 @@ class MvRxViewModelStoreTest : MvRxBaseTest() {
     fun testActivityViewModelCanUseDefaultConstructor() {
         val (_, fragment) = createFragment<ViewModelStoreTestFragment, TestActivity>()
         withState(fragment.viewModelActivity) { state ->
-            assertEquals("Default", state.foo)
+            assertEquals(1, state.notPersistedCount)
         }
     }
 
@@ -76,23 +75,76 @@ class MvRxViewModelStoreTest : MvRxBaseTest() {
     fun testFragmentViewModelCanUseDefaultConstructor() {
         val (_, fragment) = createFragment<ViewModelStoreTestFragment, TestActivity>()
         withState(fragment.viewModelFragment) { state ->
-            assertEquals("Default", state.foo)
+            assertEquals(1, state.notPersistedCount)
         }
     }
 
     @Test
     fun testActivityViewModelCanBeSetFromArgs() {
-        val (_, fragment) = createFragment<ViewModelStoreTestFragment, TestActivity>(args = ViewModelStoreTestArgs("From Args"))
+        val (_, fragment) = createFragment<ViewModelStoreTestFragment, TestActivity>(args = ViewModelStoreTestArgs(3))
         withState(fragment.viewModelActivity) { state ->
-            assertEquals("From Args", state.foo)
+            assertEquals(3, state.notPersistedCount)
         }
     }
 
     @Test
     fun testFragmentViewModelCanBeSetFromArgs() {
-        val (_, fragment) = createFragment<ViewModelStoreTestFragment, TestActivity>(args = ViewModelStoreTestArgs("From Args"))
+        val (_, fragment) = createFragment<ViewModelStoreTestFragment, TestActivity>(args = ViewModelStoreTestArgs(3))
         withState(fragment.viewModelFragment) { state ->
-            assertEquals("From Args", state.foo)
+            assertEquals(3, state.notPersistedCount)
+        }
+    }
+
+
+    @Test
+    fun testPersistedStateForActivityViewModelWhenSetFromFragmentArgs() {
+        val (controller, fragment) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(args = ViewModelStoreTestArgs(3))
+        fragment.viewModelActivity
+        val bundle = Bundle()
+        controller.saveInstanceState(bundle)
+        val (_, fragment2) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(savedInstanceState = bundle)
+        withState(fragment2.viewModelActivity) { state ->
+            assertEquals(3, state.notPersistedCount)
+            assertEquals(3, state.persistedCount)
+        }
+    }
+
+    @Test
+    fun testPersistedStateForActivityViewModel() {
+        val (controller, fragment) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>()
+        fragment.viewModelActivity.setCount(3)
+        val bundle = Bundle()
+        controller.saveInstanceState(bundle)
+        val (_, fragment2) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(savedInstanceState = bundle)
+        withState(fragment2.viewModelActivity) { state ->
+            assertEquals(1, state.notPersistedCount)
+            assertEquals(3, state.persistedCount)
+        }
+    }
+
+    @Test
+    fun testPersistedStateForFragmentViewModelWhenSetFromFragmentArgs() {
+        val (controller, fragment) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(args = ViewModelStoreTestArgs(3))
+        fragment.viewModelFragment
+        val bundle = Bundle()
+        controller.saveInstanceState(bundle)
+        val (_, fragment2) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(savedInstanceState = bundle)
+        withState(fragment2.viewModelFragment) { state ->
+            assertEquals(3, state.notPersistedCount)
+            assertEquals(3, state.persistedCount)
+        }
+    }
+
+    @Test
+    fun testPersistedStateForFragmentViewModel() {
+        val (controller, fragment) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>()
+        fragment.viewModelFragment.setCount(3)
+        val bundle = Bundle()
+        controller.saveInstanceState(bundle)
+        val (_, fragment2) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(savedInstanceState = bundle)
+        withState(fragment2.viewModelFragment) { state ->
+            assertEquals(1, state.notPersistedCount)
+            assertEquals(3, state.persistedCount)
         }
     }
 
@@ -109,24 +161,5 @@ class MvRxViewModelStoreTest : MvRxBaseTest() {
         val bundle = Bundle()
         controller.saveInstanceState(bundle)
         createFragment<ViewModelStoreTestFragment, NoSaveActivity>(savedInstanceState = bundle)
-    }
-
-    private inline fun <reified T : Fragment, reified A : AppCompatActivity> createFragment(
-            savedInstanceState: Bundle? = null,
-            args: Parcelable? = null
-    ): Pair<ActivityController<A>, T> {
-        val controller = Robolectric.buildActivity(A::class.java)
-                .create(savedInstanceState)
-                .start()
-                .resume()
-                .visible()
-        val activity = controller.get()
-
-        val fragment = T::class.java.newInstance().apply {
-            arguments = Bundle().apply { putParcelable(MvRx.KEY_ARG, args) }
-        }
-
-        activity.supportFragmentManager.beginTransaction().add(fragment, "TAG").commitNow()
-        return controller to fragment
     }
 }
