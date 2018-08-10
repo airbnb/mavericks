@@ -30,10 +30,10 @@ import kotlin.reflect.full.isSupertypeOf
 inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragmentViewModel(
     viewModelClass: KClass<VM>,
     noinline shouldUpdate: ((S, S) -> Boolean)? = null,
-    crossinline keyFactory: () -> String = { viewModelClass.java.name },
-    noinline stateFactory: () -> S = ::_fragmentViewModelInitialStateProvider
+    crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : Fragment,
         T : MvRxView = lazy {
+    val stateFactory: () -> S = ::_fragmentViewModelInitialStateProvider
     MvRxViewModelProvider.get(viewModelClass, this, keyFactory(), stateFactory)
         .apply { subscribe(requireActivity(), shouldUpdate = shouldUpdate, subscriber = { if (readyToInvalidate()) invalidate() }) }
 }
@@ -63,10 +63,10 @@ fun <T, VM : BaseMvRxViewModel<S>, S : MvRxState> T.existingViewModel(
 inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activityViewModel(
     viewModelClass: KClass<VM>,
     noinline shouldUpdate: ((S, S) -> Boolean)? = null,
-    noinline keyFactory: () -> String = { viewModelClass.java.name },
-    noinline stateFactory: () -> S = { activityViewModelInitialStateProvider(keyFactory) }
+    noinline keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : Fragment,
         T : MvRxView = lazy {
+    val stateFactory: () -> S = { _activityViewModelInitialStateProvider(keyFactory) }
     if (requireActivity() !is MvRxViewModelStoreOwner) throw IllegalArgumentException("Your Activity must be a MvRxViewModelStoreOwner!")
     MvRxViewModelProvider.get(viewModelClass, requireActivity(), keyFactory(), stateFactory)
         .apply { subscribe(requireActivity(), shouldUpdate = shouldUpdate, subscriber = { if (readyToInvalidate()) invalidate() }) }
@@ -84,7 +84,7 @@ inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activityViewM
  * in a new process.
  */
 @Suppress("FunctionName")
-inline fun <reified S : MvRxState, T : Fragment> T.activityViewModelInitialStateProvider(keyFactory: () -> String): S {
+inline fun <reified S : MvRxState, T : Fragment> T._activityViewModelInitialStateProvider(keyFactory: () -> String): S {
     val args: Any? = arguments?.get(MvRx.KEY_ARG)
     val activity = requireActivity()
     if (activity is MvRxViewModelStoreOwner) {
@@ -166,7 +166,7 @@ fun <S : MvRxState> _initialStateProvider(stateClass: KClass<S>, args: Any?): S 
 inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.viewModel(
     viewModelClass: KClass<VM>,
     crossinline keyFactory: () -> String = { viewModelClass.java.name },
-    noinline stateFactory: () -> S = ::_activityViewModelInitialStateProvider
+    noinline stateFactory: () -> S = ::this@viewModel._activityViewModelInitialStateProvider
 ) where T : FragmentActivity,
         T : MvRxViewModelStoreOwner = lazy { MvRxViewModelProvider.get(viewModelClass, this, keyFactory(), stateFactory) }
 
