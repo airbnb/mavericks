@@ -12,7 +12,7 @@ echo y | android update sdk -a --no-ui --filter android-24
 echo y | android update sdk -a --no-ui --filter sys-img-armeabi-v7a-android-24
 echo no | android create avd --force -n travis -t android-24 --abi armeabi-v7a
 echo "-----Starting emulator"
-emulator -avd travis -no-audio -no-window &
+QEMU_AUDIO_DRV=none emulator -avd travis -no-window &
 echo "-----Waiting for boot"
 android-wait-for-emulator
 adb shell input keyevent 82 &
