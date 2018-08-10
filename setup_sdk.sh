@@ -5,6 +5,11 @@ if [ -e "$ANDROID_SDK" ]; then
     exit 0
 fi
 
+# Exit if any command fails
+set -e
+set -o pipefail
+
+
 mkdir -p $HOME/.cache
 curl https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip --output $HOME/.cache/sdk.zip
 unzip -q $HOME/.cache/sdk.zip -d $ANDROID_HOME
@@ -12,5 +17,5 @@ unzip -q $HOME/.cache/sdk.zip -d $ANDROID_HOME
 touch $HOME/.android/repositories.cfg
 sdkmanager --update
 # The progress bar fills up the travis log
-yes | sdkmanager "platform-tools" "platforms;android-27" "emulator" "system-images;android-28;default;x86_64" > /dev/null 2>&1
+yes | sdkmanager "platform-tools" "platforms;android-27" "emulator" "system-images;android-24;default;armeabi-v7a" > /dev/null 2>&1
 sdkmanager --list
