@@ -3,6 +3,11 @@ package com.airbnb.mvrx
 import android.os.Bundle
 import android.support.v4.app.Fragment
 
+/**
+ * Make your base Fragment class extend this to get MvRx functionality.
+ *
+ * This is necessary for the view model delegates and persistence to work correctly.
+ */
 abstract class MvRxFragment : Fragment(), MvRxView {
 
     override val mvrxViewModelStore by lazy { MvRxViewModelStore(viewModelStore) }
@@ -21,7 +26,7 @@ abstract class MvRxFragment : Fragment(), MvRxView {
     }
 
     /**
-     * TODO: Remove this
+     * TODO: Remove this API (#8)
      */
     override fun readyToInvalidate() = isAdded && view != null
 }
