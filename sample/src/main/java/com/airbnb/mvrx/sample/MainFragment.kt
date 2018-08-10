@@ -1,11 +1,14 @@
 package com.airbnb.mvrx.sample
 
+import android.os.Parcelable
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.views.basicRow
 import com.airbnb.mvrx.sample.views.marquee
 
 class MainFragment : BaseFragment() {
+
+    private val args: Parcelable by arg()
 
     override fun EpoxyController.buildModels() {
         marquee {

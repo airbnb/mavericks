@@ -185,10 +185,10 @@ fun <V : Any> arg() = object : ReadOnlyProperty<Fragment, V> {
     override fun getValue(thisRef: Fragment, property: KProperty<*>): V {
         if (value == null) {
             val args = thisRef.arguments ?: throw IllegalArgumentException("There are no fragment arguments!")
-            @Suppress("UNCHECKED_CAST")
-            value = args.get(MvRx.KEY_ARG) as V
+            if (!args.containsKey(MvRx.KEY_ARG)) ?: throw IllegalArgumentException("MvRx arguments not found at key MvRx.KEY_ARG!")
+            value = args.get(MvRx.KEY_ARG) as? V ?: throw IllegalArgumentException("")
         }
-        return value ?: throw IllegalArgumentException("MvRx argument cannot be read!")
+        return value ?: throw IllegalArgumentException("")
     }
 }
 
