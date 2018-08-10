@@ -44,10 +44,10 @@ abstract class MvRxBaseTest {
         }
     }
 
-    protected inline fun <reified T : Fragment, reified A : AppCompatActivity> createFragment(
+    protected inline fun <reified F : Fragment, reified A : AppCompatActivity> createFragment(
             savedInstanceState: Bundle? = null,
             args: Parcelable? = null
-    ): Pair<ActivityController<A>, T> {
+    ): Pair<ActivityController<A>, F> {
         val controller = Robolectric.buildActivity(A::class.java)
                 .create(savedInstanceState)
                 .start()
@@ -55,11 +55,15 @@ abstract class MvRxBaseTest {
                 .visible()
         val activity = controller.get()
 
-        val fragment = T::class.java.newInstance().apply {
-            arguments = Bundle().apply { putParcelable(MvRx.KEY_ARG, args) }
+        val fragment = if (savedInstanceState == null) {
+            F::class.java.newInstance().apply {
+                arguments = Bundle().apply { putParcelable(MvRx.KEY_ARG, args) }
+                activity.supportFragmentManager.beginTransaction().add(this, "TAG").commitNow()
+            }
+        } else {
+            activity.supportFragmentManager.findFragmentByTag("TAG") as F
         }
 
-        activity.supportFragmentManager.beginTransaction().add(fragment, "TAG").commitNow()
         return controller to fragment
     }
 }
