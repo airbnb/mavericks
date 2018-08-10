@@ -8,7 +8,9 @@ set -o pipefail
 # /usr/local/android-sdk/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
 
 android list target
-echo no | android create avd --force -n test -t android-22 --abi armeabi-v7a
+echo y | android update sdk -a --no-ui --filter android-24
+echo y | android update sdk -a --no-ui --filter sys-img-armeabi-v7a-android-24
+echo no | android create avd --force -n test -t android-24 --abi armeabi-v7a
 emulator -avd test -no-audio -no-window &
 android-wait-for-emulator
 adb shell input keyevent 82 &
