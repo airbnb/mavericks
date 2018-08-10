@@ -7,8 +7,7 @@ fi
 
 mkdir -p $HOME/.cache
 curl https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip --output $HOME/.cache/sdk.zip
-unzip $HOME/.cache/sdk.zip -d $ANDROID_HOME
-echo "Unzipped SDK"
-ls $ANDROID_HOME/tools/bin
+unzip $HOME/.cache/sdk.zip -d $ANDROID_HOME -s
 
+sdkmanager --update
 sdkmanager "platform-tools" "platforms;android-27" "system-images;android-27;default;x86_64"
