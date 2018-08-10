@@ -7,7 +7,6 @@ android:
   - build-tools-27.0.3
   - android-27
   - emulator
-  - system-images;android-24;default;armeabi-v7a
   # - extra-google-google_play_services
   # - extra-android-m2repository
   # - extra-android-support
