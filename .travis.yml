@@ -37,7 +37,6 @@ notifications:
 #       - ./test.sh
 
 script:
-- echo ANDROID_HOME $ANDROID_HOME
 - ./start_emulator.sh
 - ./test.sh
 
@@ -45,5 +44,10 @@ sudo: false
 
 cache:
   directories:
-  - $HOME/.m2
-  - $HOME/.gradle
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
+  - "$HOME/.android/build-cache"
+  - "$HOME/.m2"
+  - "$TRAVIS_BUILD_DIR/build"
+  - "$TRAVIS_BUILD_DIR/mvrx/build"
+  - "$TRAVIS_BUILD_DIR/sample/build"
