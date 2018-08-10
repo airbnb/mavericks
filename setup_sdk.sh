@@ -5,7 +5,7 @@ if [ -e "$ANDROID_SDK" ]; then
     exit 0
 fi
 
-mkdir $HOME/.cache
+mkdir -p $HOME/.cache
 curl https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip --output $HOME/.cache/sdk.zip
 unzip $HOME/.cache/sdk.zip $ANDROID_HOME
 
