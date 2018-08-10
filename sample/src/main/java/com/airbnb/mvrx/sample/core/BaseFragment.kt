@@ -12,8 +12,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.epoxy.EpoxyRecyclerView
-import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.BaseMvRxFragment
+import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.sample.R
 
 abstract class BaseFragment : BaseMvRxFragment() {
@@ -35,8 +35,6 @@ abstract class BaseFragment : BaseMvRxFragment() {
             toolbar.setupWithNavController(findNavController())
         }
     }
-
-    override fun readyToInvalidate() = isAdded && view != null
 
     override fun invalidate() {
         recyclerView.requestModelBuild()

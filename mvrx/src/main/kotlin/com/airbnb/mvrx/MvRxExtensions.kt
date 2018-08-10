@@ -35,7 +35,7 @@ inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragmentViewM
 ) where T : Fragment,
         T : MvRxView = lazy {
     MvRxViewModelProvider.get(viewModelClass, this, keyFactory(), stateFactory)
-        .apply { subscribe(requireActivity(), shouldUpdate = shouldUpdate, subscriber = { if (readyToInvalidate()) invalidate() }) }
+        .apply { subscribe(requireActivity(), shouldUpdate = shouldUpdate, subscriber = { invalidate() }) }
 }
 
 /**
@@ -50,7 +50,7 @@ fun <T, VM : BaseMvRxViewModel<S>, S : MvRxState> T.existingViewModel(
         T : MvRxView = lazy {
     val factory = MvRxFactory { throw IllegalStateException("ViewModel for ${requireActivity()}[${keyFactory()}] does not exist yet!") }
     ViewModelProviders.of(requireActivity(), factory).get(keyFactory(), viewModelClass.java)
-        .apply { subscribe(requireActivity(), shouldUpdate = shouldUpdate, subscriber = { if (readyToInvalidate()) invalidate() }) }
+        .apply { subscribe(requireActivity(), shouldUpdate = shouldUpdate, subscriber = { invalidate() }) }
 }
 
 /**
@@ -69,7 +69,7 @@ inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activityViewM
         T : MvRxView = lazy {
     if (requireActivity() !is MvRxViewModelStoreOwner) throw IllegalArgumentException("Your Activity must be a MvRxViewModelStoreOwner!")
     MvRxViewModelProvider.get(viewModelClass, requireActivity(), keyFactory(), stateFactory)
-        .apply { subscribe(requireActivity(), shouldUpdate = shouldUpdate, subscriber = { if (readyToInvalidate()) invalidate() }) }
+        .apply { subscribe(requireActivity(), shouldUpdate = shouldUpdate, subscriber = { invalidate() }) }
 }
 
 /**
