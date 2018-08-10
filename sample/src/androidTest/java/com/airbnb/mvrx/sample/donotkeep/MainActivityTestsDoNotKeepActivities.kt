@@ -14,8 +14,8 @@ class MainActivityTestsDoNotKeepActivities : BaseInstrumentationTest() {
 
     @Test
     fun testPersistState() {
-        onViewWithText("Flow").click()
-        onViewWithText("50").click()
+        scrollToAndClick("Flow")
+        scrollToAndClick("50")
         val originalActivity = activityRule.activity
         val intent = Intent(activityRule.activity, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK

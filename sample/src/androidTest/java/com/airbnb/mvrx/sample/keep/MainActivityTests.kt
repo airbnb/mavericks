@@ -32,28 +32,28 @@ class MainActivityTests : BaseInstrumentationTest() {
 
     @Test
     fun testHelloWorld() {
-        onViewWithText("Hello World").click()
+        scrollToAndClick("Hello World")
         onViewWithText("Hello World!").displayed()
     }
 
     @Test
     fun testDadJokes() {
-        onViewWithText("Dad Jokes").click()
+        scrollToAndClick("Dad Jokes")
         onView(instanceOf(RecyclerView::class.java)).perform(RecyclerViewActions.actionOnItemAtPosition<RecyclerView.ViewHolder>(1, click()))
         onViewWithText("ID: ").displayed()
     }
 
     @Test
     fun testFlow() {
-        onViewWithText("Flow").click()
-        onViewWithText("50").click()
+        scrollToAndClick("Flow")
+        scrollToAndClick("50")
         onViewWithText("Count: 50").displayed()
     }
 
     @Test
     fun testPersistState() {
-        onViewWithText("Flow").click()
-        onViewWithText("50").click()
+        scrollToAndClick("Flow")
+        scrollToAndClick("50")
         onViewWithText("Count: 50").displayed()
         onViewWithText("Not persisted counter: 50").displayed()
         val intent = Intent(activityRule.activity, MainActivity::class.java)

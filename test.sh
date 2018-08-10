@@ -19,6 +19,7 @@ adb shell pm install -t -r "/data/local/tmp/com.airbnb.mvrx.sample.test"
 
 echo "-----Granting WRITE_SECURE_SETTINGS"
 adb root
+adb shell settings put global development_settings_enabled 1
 adb shell pm grant com.airbnb.mvrx.sample android.permission.WRITE_SECURE_SETTINGS
 
 adb shell settings put global always_finish_activities 0
