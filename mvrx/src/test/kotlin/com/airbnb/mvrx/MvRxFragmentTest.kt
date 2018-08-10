@@ -8,6 +8,10 @@ import org.junit.Test
 @Parcelize
 data class MvrxArgsTestArgs(val count: Int = 0) : Parcelable
 
+
+@Parcelize
+data class MvrxArgsTestArgs2(val count: Int = 0) : Parcelable
+
 class MvRxArgsFragment : BaseMvRxFragment() {
     val args: MvrxArgsTestArgs by args()
 
@@ -25,5 +29,17 @@ class MvRxFragmentTest : MvRxBaseTest() {
     fun testSetArgs() {
         val (_, fragment) = createFragment<MvRxArgsFragment, TestMvRxActivity>(args = MvrxArgsTestArgs(2))
         Assert.assertEquals(2, fragment.args.count)
+    }
+
+    @Test(expected = ClassCastException::class)
+    fun testSetWrongArgs() {
+        val (_, fragment) = createFragment<MvRxArgsFragment, TestMvRxActivity>(args = MvrxArgsTestArgs2(2))
+        fragment.args
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun testNoArgs() {
+        val (_, fragment) = createFragment<MvRxArgsFragment, TestMvRxActivity>()
+        fragment.args
     }
 }

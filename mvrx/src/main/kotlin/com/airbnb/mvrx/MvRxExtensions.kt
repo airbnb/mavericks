@@ -187,10 +187,10 @@ fun <V : Any> args() = object : ReadOnlyProperty<Fragment, V> {
     override fun getValue(thisRef: Fragment, property: KProperty<*>): V {
         if (value == null) {
             val args = thisRef.arguments ?: throw IllegalArgumentException("There are no fragment arguments!")
-            if (!args.containsKey(MvRx.KEY_ARG)) throw IllegalArgumentException("MvRx arguments not found at key MvRx.KEY_ARG!")
             val argUntyped = args.get(MvRx.KEY_ARG)
+            argUntyped ?: throw IllegalArgumentException("MvRx arguments not found at key MvRx.KEY_ARG!")
             @Suppress("UNCHECKED_CAST")
-            value = argUntyped as? V ?: throw IllegalArgumentException("MvRx arguments are the wrong type! It is ${argUntyped::class.simpleName}.")
+            value = argUntyped as V
         }
         return value ?: throw IllegalArgumentException("")
     }
