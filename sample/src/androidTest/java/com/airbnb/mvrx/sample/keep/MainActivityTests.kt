@@ -1,4 +1,4 @@
-package com.airbnb.mvrx.sample.keepactivities
+package com.airbnb.mvrx.sample.keep
 
 import android.content.Intent
 import android.support.test.espresso.Espresso.onView

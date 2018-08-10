@@ -1,4 +1,4 @@
-package com.airbnb.mvrx.sample.donotkeepactivities
+package com.airbnb.mvrx.sample.donotkeep
 
 import android.content.Intent
 import com.airbnb.mvrx.sample.BaseInstrumentationTest
@@ -6,7 +6,7 @@ import com.airbnb.mvrx.sample.MainActivity
 import org.junit.Rule
 import org.junit.Test
 
-class MainActivityTestsDoNotKeep : BaseInstrumentationTest() {
+class MainActivityTestsDoNotKeepActivities : BaseInstrumentationTest() {
 
     @JvmField
     @Rule
