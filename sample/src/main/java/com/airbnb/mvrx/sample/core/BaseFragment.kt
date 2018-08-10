@@ -13,10 +13,10 @@ import androidx.navigation.ui.setupWithNavController
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.epoxy.EpoxyRecyclerView
 import com.airbnb.mvrx.MvRx
-import com.airbnb.mvrx.MvRxFragment
+import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.sample.R
 
-abstract class BaseFragment : MvRxFragment() {
+abstract class BaseFragment : BaseMvRxFragment() {
 
     @Suppress("MemberVisibilityCanBePrivate")
     protected lateinit var recyclerView: EpoxyRecyclerView

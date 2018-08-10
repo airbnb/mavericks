@@ -17,7 +17,7 @@ import android.support.v7.app.AppCompatActivity
  * 2) Replace your BaseActivity super class with this one.
  * 3) Manually integrate this into your base Activity (not recommended).
  */
-open class MvRxActivity : AppCompatActivity(), MvRxViewModelStoreOwner {
+abstract class BaseMvRxActivity : AppCompatActivity(), MvRxViewModelStoreOwner {
 
     /**
      * MvRx has its own wrapped ViewModelStore that enables improved state restoration if Android

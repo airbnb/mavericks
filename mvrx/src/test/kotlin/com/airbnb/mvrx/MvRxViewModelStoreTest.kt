@@ -37,14 +37,14 @@ class NoSaveActivity : AppCompatActivity(), MvRxViewModelStoreOwner {
     }
 }
 
-class TestActivity : MvRxActivity() {
+class TestActivity : BaseMvRxActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.Theme_AppCompat_NoActionBar)
     }
 }
 
-class ViewModelStoreTestFragment : MvRxFragment() {
+class ViewModelStoreTestFragment : BaseMvRxFragment() {
     val viewModelFragment by fragmentViewModel(ViewModelStoreTestViewModel::class)
     val viewModelActivity by activityViewModel(ViewModelStoreTestViewModel::class)
 

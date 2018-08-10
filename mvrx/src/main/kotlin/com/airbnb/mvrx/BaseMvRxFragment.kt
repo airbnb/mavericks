@@ -8,7 +8,7 @@ import android.support.v4.app.Fragment
  *
  * This is necessary for the view model delegates and persistence to work correctly.
  */
-abstract class MvRxFragment : Fragment(), MvRxView {
+abstract class BaseMvRxFragment : Fragment(), MvRxView {
 
     override val mvrxViewModelStore by lazy { MvRxViewModelStore(viewModelStore) }
 
