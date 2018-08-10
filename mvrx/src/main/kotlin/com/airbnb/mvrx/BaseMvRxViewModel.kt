@@ -130,10 +130,15 @@ abstract class BaseMvRxViewModel<S : MvRxState> : ViewModel() {
      * Execute an observable and wrap its progression with AsyncData reduced to the global state.
      *
      * @param mapper A map converting the observable type to the desired AsyncData type.
-     * @param successMetaData A map that provides metadata to set on the Success result
+     * @param successMetaData A map that provides metadata to set on the Success result.
+     *                        It allows data about the original Observable to be kept and accessed later. For example,
+     *                        your mapper could map a network request to just the data your UI needs, but your base layers could
+     *                        keep metadata about the request, like timing, for logging.
      * @param stateReducer A reducer that is applied to the current state and should return the
      *                     new state. Because the state is the receiver and it likely a data
      *                     class, an implementation may look like: `{ copy(response = it) }`.
+     *
+     *  @see Success.metadata
      */
     fun <T, V> Observable<T>.execute(
         mapper: (T) -> V,
