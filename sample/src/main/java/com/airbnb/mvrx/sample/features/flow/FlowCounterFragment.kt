@@ -2,7 +2,9 @@ package com.airbnb.mvrx.sample.features.flow
 
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.existingViewModel
+import com.airbnb.mvrx.sample.MainActivity
 import com.airbnb.mvrx.sample.core.BaseFragment
+import com.airbnb.mvrx.sample.views.basicRow
 import com.airbnb.mvrx.sample.views.marquee
 import com.airbnb.mvrx.withState
 
@@ -19,7 +21,14 @@ class FlowCounterFragment : BaseFragment() {
     override fun EpoxyController.buildModels() = withState(viewModel) { state ->
         marquee {
             id("marquee")
-            title("Counter: ${state.count}")
+            title("Count: ${state.count}")
+            subtitle("Not persisted counter: ${state.notPersistedCount}")
+        }
+
+        basicRow {
+            id("restart")
+            title("Restart")
+            clickListener { _ -> (activity as? MainActivity)?.simulateProcessRestart() }
         }
     }
 }

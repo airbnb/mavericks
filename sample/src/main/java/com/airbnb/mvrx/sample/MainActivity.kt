@@ -1,9 +1,14 @@
 package com.airbnb.mvrx.sample
 
+import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.support.v7.app.AppCompatActivity
 import com.airbnb.mvrx.MvRxViewModelStore
 import com.airbnb.mvrx.MvRxViewModelStoreOwner
+
+private const val EXTRA_INSTANCE_STATE = "mvrx:persistence_helper"
 
 /**
  * Extend this class to get MvRx support out of the box.
@@ -27,7 +32,8 @@ class MainActivity : AppCompatActivity(), MvRxViewModelStoreOwner {
      */
     override val mvrxViewModelStore by lazy { MvRxViewModelStore(viewModelStore) }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(originalState: Bundle?) {
+        val savedInstanceState = savedInstanceState(originalState)
         /**
          * This MUST be called before super!
          * In a new process, super.onCreate will trigger Fragment.onCreate, which could access a ViewModel.
@@ -41,8 +47,22 @@ class MainActivity : AppCompatActivity(), MvRxViewModelStoreOwner {
         setContentView(R.layout.activity_main)
     }
 
+
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         mvrxViewModelStore.saveViewModels(outState)
+    }
+
+    private fun savedInstanceState(originalState: Bundle?) = intent.extras?.getParcelable(EXTRA_INSTANCE_STATE) ?: originalState
+
+    fun simulateProcessRestart() {
+        Handler(Looper.getMainLooper()).post {
+            val intent = Intent(this, MainActivity::class.java)
+            val savedInstanceState = Bundle()
+            onSaveInstanceState(savedInstanceState)
+            intent.putExtra(EXTRA_INSTANCE_STATE, savedInstanceState)
+            startActivity(intent)
+        }
     }
 }

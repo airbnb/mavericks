@@ -1,4 +1,4 @@
-package com.airbnb.sample
+package com.airbnb.mvrx.sample
 
 import org.junit.Test
 

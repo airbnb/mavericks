@@ -4,9 +4,12 @@ android:
   components:
   - tools
   - platform-tools
+  - tools
   - build-tools-27.0.3
   - android-27
-  - extra-google-google_play_services
+  - emulator
+  - sys-img-armeabi-v7a-android-22
+  # - extra-google-google_play_services
   - extra-android-m2repository
   - extra-android-support
   - extra-google-m2repository
@@ -18,14 +21,41 @@ branches:
   except:
   - gh-pages
 
+  before_install:
+  - yes | sdkmanager --licenses
+# - export ANDROID_HOME=$HOME/sdk
+# - export PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/tools
+# - ./setup_sdk.sh
+
+
 notifications:
   email: false
-
-script: "./gradlew check"
+jobs:
+  include:
+    - stage: test
+      name: 'Instrumentation Tests'
+      script:
+      - ./start_emulator.sh
+      - ./gradlew :sample:connectedCheck
+#     - name: 'MvRx Unit Tests'
+#       script: ./gradlew :mvrx:test
+#     - name: 'MvRx Lint'
+#       script: ./gradlew :mvrx:lint
+#     - name: 'Sample App Unit Tests'
+#       script: ./gradlew :sample:test
+#     - name: 'Sample App Lint'
+#       script: ./gradlew :sample:lint
 
 sudo: false
 
 cache:
   directories:
-  - $HOME/.m2
-  - $HOME/.gradle
+  - "$HOME/.gradle/caches/"
+  - "$HOME/.gradle/wrapper/"
+  - "$HOME/.android/build-cache"
+  - "$HOME/.m2"
+  - "$HOME/.cache"
+  - "$TRAVIS_BUILD_DIR/build"
+  - "$TRAVIS_BUILD_DIR/mvrx/build"
+  - "$TRAVIS_BUILD_DIR/sample/build"
+  - "$ANDROID_HOME"
