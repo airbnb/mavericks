@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.support.annotation.IdRes
 import android.support.design.widget.CoordinatorLayout
-import android.support.v4.app.Fragment
 import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
@@ -14,26 +13,15 @@ import androidx.navigation.ui.setupWithNavController
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.epoxy.EpoxyRecyclerView
 import com.airbnb.mvrx.MvRx
-import com.airbnb.mvrx.MvRxView
-import com.airbnb.mvrx.MvRxViewModelStore
+import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.sample.R
 
-abstract class BaseFragment : Fragment(), MvRxView {
-
-    override val mvrxViewModelStore by lazy { MvRxViewModelStore(viewModelStore) }
+abstract class BaseFragment : BaseMvRxFragment() {
 
     @Suppress("MemberVisibilityCanBePrivate")
     protected lateinit var recyclerView: EpoxyRecyclerView
     protected lateinit var toolbar: Toolbar
     protected lateinit var coordinatorLayout: CoordinatorLayout
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        /**
-         * This MUST be done to restore ViewModel state.
-         */
-        mvrxViewModelStore.restoreViewModels(this, savedInstanceState)
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_base_mvrx, container, false).apply {
@@ -48,20 +36,13 @@ abstract class BaseFragment : Fragment(), MvRxView {
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        mvrxViewModelStore.saveViewModels(outState)
-    }
-
     override fun readyToInvalidate() = isAdded && view != null
 
     override fun invalidate() {
         recyclerView.requestModelBuild()
     }
 
-    open fun EpoxyController.buildModels() {
-
-    }
+    abstract fun EpoxyController.buildModels()
 
     protected fun navigateTo(@IdRes actionId: Int, arg: Parcelable? = null) {
         /**

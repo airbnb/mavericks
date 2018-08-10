@@ -167,6 +167,20 @@ class MvRxStateStoreTest : MvRxBaseTest() {
     }
 
     @Test
+    fun testSubscribeCalledWhenTransitionToStarted() {
+        lifecycleOwner.lifecycle.markState(Lifecycle.State.CREATED)
+
+        var callCount = 0
+        store.subscribe(lifecycleOwner) {
+            callCount++
+        }
+
+        assertEquals(0, callCount)
+        lifecycleOwner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_RESUME)
+        assertEquals(1, callCount)
+    }
+
+    @Test
     fun testSubscribeCalledWhenTransitionToResumed() {
         lifecycleOwner.lifecycle.markState(Lifecycle.State.STARTED)
 

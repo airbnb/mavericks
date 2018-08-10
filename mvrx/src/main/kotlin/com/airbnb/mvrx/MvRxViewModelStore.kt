@@ -37,6 +37,8 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
      */
     private val fragmentArgsForActivityViewModelState = HashMap<String, Any?>()
 
+    private var restoreViewModelsCalled = false
+
     /**
      * Iterates through all ViewModels, persists its current state with [PersistState] and stores it in outState.
      *
@@ -72,6 +74,7 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
      * [android.support.v4.app.FragmentActivity.onCreate].
      */
     fun restoreViewModels(activity: FragmentActivity, savedInstanceState: Bundle?) {
+        restoreViewModelsCalled = true
         savedInstanceState ?: return
         val args = activity.intent.extras?.get(MvRx.KEY_ARG)
         restoreViewModels(map, activity, savedInstanceState, args)
@@ -83,12 +86,12 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
         restoreViewModels(map, fragment.requireActivity(), savedInstanceState, args)
     }
 
-    fun restoreViewModels(map: MutableMap<String, ViewModel>, activity: FragmentActivity, savedInstanceState: Bundle?, ownerArgs: Any? = null) {
+    internal fun restoreViewModels(map: MutableMap<String, ViewModel>, activity: FragmentActivity, savedInstanceState: Bundle?, ownerArgs: Any? = null) {
         savedInstanceState ?: return
-        val viewModelsState = savedInstanceState.getBundle(KEY_MVRX_SAVED_INSTANCE_STATE)
+        val viewModelsState = savedInstanceState.getBundle(KEY_MVRX_SAVED_INSTANCE_STATE) ?: throw IllegalStateException("You are trying to call restoreViewModels but you never called saveViewModels!")
         if (map.isNotEmpty()) return
         restoreFragmentArgsFromSavedInstanceState(savedInstanceState)
-        viewModelsState?.keySet()?.forEach {
+        viewModelsState.keySet()?.forEach {
             // In the case that we are restoring an Activity ViewModel created by a Fragment, `ownerArgs` will be those of the Activity. So we
             // need to use the persisted Fragment args instead.
             val arguments = if (fragmentArgsForActivityViewModelState.containsKey(it)) {
@@ -138,6 +141,7 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
      */
     @Suppress("FunctionName")
     fun _saveActivityViewModelArgs(key: String, args: Any?) {
+        if (!restoreViewModelsCalled) throw IllegalStateException("You must call restoreInstanceState on your MvRxViewModelStore!")
         fragmentArgsForActivityViewModelState[key] = args
     }
 
