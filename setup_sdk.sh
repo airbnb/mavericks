@@ -10,7 +10,5 @@ curl https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip --outp
 unzip -q $HOME/.cache/sdk.zip -d $ANDROID_HOME
 
 touch $HOME/.android/repositories.cfg
-sdkmanager --list
 sdkmanager --update
-sdkmanager --list
-sdkmanager "platform-tools" "platforms;android-27" "system-images;android-27;default;x86_64"
+sdkmanager "platform-tools" "platforms;android-27" "system-images;android-28;default;x86_64 "
