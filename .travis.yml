@@ -19,8 +19,8 @@ branches:
   - gh-pages
 
 env:
-- ANDROID_HOME=$HOME/sdk
-- PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools/bin
+  - ANDROID_HOME=$HOME/sdk
+  - PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools/bin
 before_install:
 - ./setup_sdk.sh
 
