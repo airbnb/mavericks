@@ -1,3 +1,6 @@
+# This is disabled because we have limited free builds on Travis.
+# Reenable this when it goes public.
+
 language: android
 
 android:
