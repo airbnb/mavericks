@@ -10,7 +10,7 @@ android:
   - extra-android-m2repository
   - extra-android-support
   - extra-google-m2repository
-
+s
 jdk:
 - oraclejdk8
 
@@ -20,23 +20,25 @@ branches:
 
 notifications:
   email: false
-jobs:
-  include:
-    - stage: test
-    #   name: 'MvRx Unit Tests'
-    #   script: ./gradlew :mvrx:test
-    # - name: 'MvRx Lint'
-    #   script: ./gradlew :mvrx:lint
-    # - name: 'Sample App Unit Tests'
-    #   script: ./gradlew :sample:test
-    # - name: 'Sample App Lint'
-    #   script: ./gradlew :sample:lint
-    # - name: 'Instrumentation Tests'
-      script:
-      - ./start_emulator.sh
-      - ./test.sh
+# jobs:
+#   include:
+#     - stage: test
+#       name: 'MvRx Unit Tests'
+#       script: ./gradlew :mvrx:test
+#     - name: 'MvRx Lint'
+#       script: ./gradlew :mvrx:lint
+#     - name: 'Sample App Unit Tests'
+#       script: ./gradlew :sample:test
+#     - name: 'Sample App Lint'
+#       script: ./gradlew :sample:lint
+#     - name: 'Instrumentation Tests'
+#       script:
+#       - ./start_emulator.sh
+#       - ./test.sh
 
-script: "./gradlew check"
+script:
+- ./start_emulator.sh
+- ./test.sh
 
 sudo: false
 
