@@ -165,10 +165,12 @@ fun <S : MvRxState> _initialStateProvider(stateClass: KClass<S>, args: Any?): S 
  */
 inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.viewModel(
     viewModelClass: KClass<VM>,
-    crossinline keyFactory: () -> String = { viewModelClass.java.name },
-    noinline stateFactory: () -> S = ::this@viewModel._activityViewModelInitialStateProvider
+    crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : FragmentActivity,
-        T : MvRxViewModelStoreOwner = lazy { MvRxViewModelProvider.get(viewModelClass, this, keyFactory(), stateFactory) }
+        T : MvRxViewModelStoreOwner = lazy {
+    val stateFactory: () -> S = { _activityViewModelInitialStateProvider() }
+    MvRxViewModelProvider.get(viewModelClass, this, keyFactory(), stateFactory)
+}
 
 /**
  * Fragment argument delegate that makes it possible to set fragment args without
@@ -179,14 +181,16 @@ inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.viewModel(
  *
  * Each fragment can only have a single argument with the key [MvRx.KEY_ARG]
  */
-fun <V : Any> arg() = object : ReadOnlyProperty<Fragment, V> {
+fun <V : Any> args() = object : ReadOnlyProperty<Fragment, V> {
     var value: V? = null
 
     override fun getValue(thisRef: Fragment, property: KProperty<*>): V {
         if (value == null) {
             val args = thisRef.arguments ?: throw IllegalArgumentException("There are no fragment arguments!")
-            if (!args.containsKey(MvRx.KEY_ARG)) ?: throw IllegalArgumentException("MvRx arguments not found at key MvRx.KEY_ARG!")
-            value = args.get(MvRx.KEY_ARG) as? V ?: throw IllegalArgumentException("")
+            if (!args.containsKey(MvRx.KEY_ARG)) throw IllegalArgumentException("MvRx arguments not found at key MvRx.KEY_ARG!")
+            val argUntyped = args.get(MvRx.KEY_ARG)
+            @Suppress("UNCHECKED_CAST")
+            value = argUntyped as? V ?: throw IllegalArgumentException("MvRx arguments are the wrong type! It is ${argUntyped::class.simpleName}.")
         }
         return value ?: throw IllegalArgumentException("")
     }

@@ -2,13 +2,28 @@ package com.airbnb.mvrx
 
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
+import org.junit.Assert
+import org.junit.Test
 
 @Parcelize
 data class MvrxArgsTestArgs(val count: Int = 0) : Parcelable
 
 class MvRxArgsFragment : BaseMvRxFragment() {
-
-
+    val args: MvrxArgsTestArgs by args()
 
     override fun invalidate() {}
+}
+
+class MvRxFragmentTest : MvRxBaseTest() {
+    @Test
+    fun testArgs() {
+        val (_, fragment) = createFragment<MvRxArgsFragment, TestMvRxActivity>(args = MvrxArgsTestArgs())
+        Assert.assertEquals(0, fragment.args.count)
+    }
+
+    @Test
+    fun testSetArgs() {
+        val (_, fragment) = createFragment<MvRxArgsFragment, TestMvRxActivity>(args = MvrxArgsTestArgs(2))
+        Assert.assertEquals(2, fragment.args.count)
+    }
 }
