@@ -37,6 +37,7 @@ notifications:
 #       - ./test.sh
 
 script:
+- echo ANDROID_HOME $ANDROID_HOME
 - ./start_emulator.sh
 - ./test.sh
 
