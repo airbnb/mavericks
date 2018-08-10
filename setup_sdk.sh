@@ -17,5 +17,8 @@ unzip -q $HOME/.cache/sdk.zip -d $ANDROID_HOME
 touch $HOME/.android/repositories.cfg
 sdkmanager --update
 # The progress bar fills up the travis log
-yes | sdkmanager "platform-tools" "platforms;android-27" "emulator" "system-images;android-24;default;armeabi-v7a" > /dev/null 2>&1
+sdkmanager "platform-tools"
+yes | sdkmanager "platforms;android-27"
+sdkmanager "emulator"
+sdkmanager "system-images;android-24;default;armeabi-v7a"
 sdkmanager --list
