@@ -21,8 +21,8 @@ branches:
   except:
   - gh-pages
 
- before_install:
- - yes | sdkmanager --licenses
+  before_install:
+  - yes | sdkmanager --licenses
 # - export ANDROID_HOME=$HOME/sdk
 # - export PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/tools
 # - ./setup_sdk.sh
