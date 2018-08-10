@@ -30,10 +30,10 @@ import kotlin.reflect.full.isSupertypeOf
 inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragmentViewModel(
     viewModelClass: KClass<VM>,
     noinline shouldUpdate: ((S, S) -> Boolean)? = null,
-    crossinline keyFactory: () -> String = { viewModelClass.java.name },
-    noinline stateFactory: () -> S = ::_fragmentViewModelInitialStateProvider
+    crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : Fragment,
         T : MvRxView = lazy {
+    val stateFactory: () -> S = ::_fragmentViewModelInitialStateProvider
     MvRxViewModelProvider.get(viewModelClass, this, keyFactory(), stateFactory)
         .apply { subscribe(requireActivity(), shouldUpdate = shouldUpdate, subscriber = { invalidate() }) }
 }
@@ -63,10 +63,10 @@ fun <T, VM : BaseMvRxViewModel<S>, S : MvRxState> T.existingViewModel(
 inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activityViewModel(
     viewModelClass: KClass<VM>,
     noinline shouldUpdate: ((S, S) -> Boolean)? = null,
-    noinline keyFactory: () -> String = { viewModelClass.java.name },
-    noinline stateFactory: () -> S = { activityViewModelInitialStateProvider(keyFactory) }
+    noinline keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : Fragment,
         T : MvRxView = lazy {
+    val stateFactory: () -> S = { _activityViewModelInitialStateProvider(keyFactory) }
     if (requireActivity() !is MvRxViewModelStoreOwner) throw IllegalArgumentException("Your Activity must be a MvRxViewModelStoreOwner!")
     MvRxViewModelProvider.get(viewModelClass, requireActivity(), keyFactory(), stateFactory)
         .apply { subscribe(requireActivity(), shouldUpdate = shouldUpdate, subscriber = { invalidate() }) }
@@ -84,7 +84,7 @@ inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activityViewM
  * in a new process.
  */
 @Suppress("FunctionName")
-inline fun <reified S : MvRxState, T : Fragment> T.activityViewModelInitialStateProvider(keyFactory: () -> String): S {
+inline fun <reified S : MvRxState, T : Fragment> T._activityViewModelInitialStateProvider(keyFactory: () -> String): S {
     val args: Any? = arguments?.get(MvRx.KEY_ARG)
     val activity = requireActivity()
     if (activity is MvRxViewModelStoreOwner) {
@@ -165,10 +165,12 @@ fun <S : MvRxState> _initialStateProvider(stateClass: KClass<S>, args: Any?): S 
  */
 inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.viewModel(
     viewModelClass: KClass<VM>,
-    crossinline keyFactory: () -> String = { viewModelClass.java.name },
-    noinline stateFactory: () -> S = ::_activityViewModelInitialStateProvider
+    crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : FragmentActivity,
-        T : MvRxViewModelStoreOwner = lazy { MvRxViewModelProvider.get(viewModelClass, this, keyFactory(), stateFactory) }
+        T : MvRxViewModelStoreOwner = lazy {
+    val stateFactory: () -> S = { _activityViewModelInitialStateProvider() }
+    MvRxViewModelProvider.get(viewModelClass, this, keyFactory(), stateFactory)
+}
 
 /**
  * Fragment argument delegate that makes it possible to set fragment args without
@@ -179,16 +181,18 @@ inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.viewModel(
  *
  * Each fragment can only have a single argument with the key [MvRx.KEY_ARG]
  */
-fun <V : Any> arg() = object : ReadOnlyProperty<Fragment, V> {
+fun <V : Any> args() = object : ReadOnlyProperty<Fragment, V> {
     var value: V? = null
 
     override fun getValue(thisRef: Fragment, property: KProperty<*>): V {
         if (value == null) {
             val args = thisRef.arguments ?: throw IllegalArgumentException("There are no fragment arguments!")
+            val argUntyped = args.get(MvRx.KEY_ARG)
+            argUntyped ?: throw IllegalArgumentException("MvRx arguments not found at key MvRx.KEY_ARG!")
             @Suppress("UNCHECKED_CAST")
-            value = args.get(MvRx.KEY_ARG) as V
+            value = argUntyped as V
         }
-        return value ?: throw IllegalArgumentException("MvRx argument cannot be read!")
+        return value ?: throw IllegalArgumentException("")
     }
 }
 
