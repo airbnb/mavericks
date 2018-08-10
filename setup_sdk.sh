@@ -11,4 +11,4 @@ unzip -q $HOME/.cache/sdk.zip -d $ANDROID_HOME
 
 touch $HOME/.android/repositories.cfg
 sdkmanager --update
-sdkmanager "platform-tools" "platforms;android-27" "system-images;android-28;default;x86_64"
+yes | sdkmanager "platform-tools" "platforms;android-27" "system-images;android-28;default;x86_64"
