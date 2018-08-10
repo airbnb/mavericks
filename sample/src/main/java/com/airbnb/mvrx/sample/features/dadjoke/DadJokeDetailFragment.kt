@@ -62,6 +62,7 @@ class DadJokeDetailFragment : BaseFragment() {
         marquee {
             id("marquee")
             title("Dad Joke")
+            subtitle("ID: ${state.id}")
         }
 
         /**

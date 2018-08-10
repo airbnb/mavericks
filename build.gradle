@@ -8,6 +8,8 @@ buildscript {
     ext.koinVersion = '0.9.3'
     ext.retrofitVersion = '2.4.0'
     ext.navVersion = '1.0.0-alpha04'
+    ext.espressoVersion = '3.0.2'
+    ext.androidTestVersion = '1.0.2'
 
     repositories {
         jcenter()

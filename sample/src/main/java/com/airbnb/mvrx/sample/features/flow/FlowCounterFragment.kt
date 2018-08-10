@@ -19,7 +19,8 @@ class FlowCounterFragment : BaseFragment() {
     override fun EpoxyController.buildModels() = withState(viewModel) { state ->
         marquee {
             id("marquee")
-            title("Counter: ${state.count}")
+            title("Count: ${state.count}")
+            subtitle("Not persisted counter: ${state.notPersistedCount}")
         }
     }
 }

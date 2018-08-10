@@ -8,7 +8,7 @@ import com.airbnb.mvrx.sample.core.MvRxViewModel
 import com.airbnb.mvrx.sample.views.marquee
 import com.airbnb.mvrx.withState
 
-data class HelloWorldState(val title: String = "Hello World") : MvRxState
+data class HelloWorldState(val title: String = "Hello World!") : MvRxState
 
 class HelloWorldViewModel(override val initialState: HelloWorldState) : MvRxViewModel<HelloWorldState>()
 
