@@ -12,11 +12,6 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      * Override this to handle any state changes from MvRxViewModels created through MvRx Fragment delegates.
      */
     fun invalidate()
-    /**
-     * Override this to prevent any invalidate calls before certain conditions.
-     */
-    fun readyToInvalidate(): Boolean
-
 
     /**
      * Subscribes to all state updates for the given viewModel.
@@ -27,7 +22,7 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
             shouldUpdate: ((S, S) -> Boolean)? = null,
             observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
             subscriber: ((S) -> Unit)? = null
-    ) = subscribe(this@MvRxView, shouldUpdate, observerScheduler, subscriber ?: { if (readyToInvalidate()) invalidate() })
+    ) = subscribe(this@MvRxView, shouldUpdate, observerScheduler, subscriber ?: { invalidate() })
 
     /**
      * Subscribes to all state updates for the given viewModel. The subscriber will receive the previous state and the new state.
