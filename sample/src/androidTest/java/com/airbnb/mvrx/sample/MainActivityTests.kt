@@ -1,14 +1,11 @@
-package com.airbnb.mvrx.sample.keep
+package com.airbnb.mvrx.sample
 
-import android.content.Intent
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.IdlingRegistry
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.contrib.RecyclerViewActions
 import android.support.test.filters.LargeTest
 import android.support.v7.widget.RecyclerView
-import com.airbnb.mvrx.sample.BaseInstrumentationTest
-import com.airbnb.mvrx.sample.MainActivity
 import com.airbnb.mvrx.sample.core.OkHttp3IdlingResource
 import org.hamcrest.Matchers.instanceOf
 import org.junit.Before
@@ -51,17 +48,11 @@ class MainActivityTests : BaseInstrumentationTest() {
     }
 
     @Test
-    fun testPersistState() {
+    fun testPersistStateDoNotKeep() {
         scrollToAndClick("Flow")
         scrollToAndClick("50")
+        activityRule.activity.simulateProcessRestart()
         onViewWithText("Count: 50").displayed()
-        onViewWithText("Not persisted counter: 50").displayed()
-        val intent = Intent(activityRule.activity, MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        activityRule.activity.startActivity(intent)
-        onViewWithText("Flow").displayed()
-        pressBack()
-        onViewWithText("Count: 50").displayed()
-        onViewWithText("Not persisted counter: 50").displayed()
+        onViewWithText("Not persisted counter: 0").displayed()
     }
 }

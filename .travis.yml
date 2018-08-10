@@ -21,7 +21,7 @@ branches:
   except:
   - gh-pages
 
-before_install:
+# before_install:
 # - export ANDROID_HOME=$HOME/sdk
 # - export PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools/bin:$ANDROID_HOME/tools
 # - ./setup_sdk.sh
@@ -29,9 +29,9 @@ before_install:
 
 notifications:
   email: false
-# jobs:
-#   include:
-#     - stage: test
+jobs:
+  include:
+    - stage: test
 #       name: 'MvRx Unit Tests'
 #       script: ./gradlew :mvrx:test
 #     - name: 'MvRx Lint'
@@ -40,14 +40,8 @@ notifications:
 #       script: ./gradlew :sample:test
 #     - name: 'Sample App Lint'
 #       script: ./gradlew :sample:lint
-#     - name: 'Instrumentation Tests'
-#       script:
-#       - ./start_emulator.sh
-#       - ./test.sh
-
-script:
-- ./start_emulator.sh
-- ./test.sh
+    - name: 'Instrumentation Tests'
+      script: ./gradlew :sample:connectedCheck
 
 sudo: false
 
