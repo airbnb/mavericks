@@ -10,7 +10,7 @@ android:
   - extra-android-m2repository
   - extra-android-support
   - extra-google-m2repository
-s
+
 jdk:
 - oraclejdk8
 
