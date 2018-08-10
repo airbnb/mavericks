@@ -18,8 +18,9 @@ branches:
   except:
   - gh-pages
 
+env:
+- ANDROID_HOME=$HOME/sdk
 before_install:
-- export ANDROID_HOME=$HOME/sdk
 - export PATH=$PATH:$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools/bin
 - ./setup_sdk.sh
 
