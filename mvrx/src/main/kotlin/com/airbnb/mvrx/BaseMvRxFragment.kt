@@ -24,9 +24,4 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
         super.onSaveInstanceState(outState)
         mvrxViewModelStore.saveViewModels(outState)
     }
-
-    /**
-     * TODO: Remove this API (#8)
-     */
-    override fun readyToInvalidate() = isAdded && view != null
 }
