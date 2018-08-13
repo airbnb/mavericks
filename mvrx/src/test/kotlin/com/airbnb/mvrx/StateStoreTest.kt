@@ -7,7 +7,7 @@ import org.junit.Test
 
 data class MvRxStateStoreTestState(val count: Int = 1, val list: List<Int> = emptyList())
 
-class MvRxStateStoreTest : MvRxBaseTest() {
+class StateStoreTest : BaseTest() {
 
     private lateinit var store: MvRxStateStore<MvRxStateStoreTestState>
     private lateinit var lifecycleOwner: TestLifecycleOwner

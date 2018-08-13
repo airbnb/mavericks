@@ -10,7 +10,7 @@ import org.junit.Test
 import java.io.Serializable
 
 /** Test auto creating state from fragment arguments. */
-class FragmentStateProviderTest : MvRxBaseTest() {
+class FragmentStateProviderTest : BaseTest() {
 
     @Test
     fun testParcelableArgs() {

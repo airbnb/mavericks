@@ -154,9 +154,8 @@ fun <S : MvRxState> _initialStateProvider(stateClass: KClass<S>, args: Any?): S 
             null
         }
         ?: throw IllegalStateException(
-            "Attempt to auto create the mvrx state class ${stateClass.simpleName} has failed. It must have an empty constructor, or a " +
-                "secondary constructor for ${args?.javaClass?.simpleName ?: "a fragment argument"}. " +
-                "Otherwise the state must be explicitly created."
+            "Attempt to auto create the mvrx state class ${stateClass.simpleName} has failed. It must have default values for every property or a " +
+                "secondary constructor for ${args?.javaClass?.simpleName ?: "a fragment argument"}. "
         )
 }
 

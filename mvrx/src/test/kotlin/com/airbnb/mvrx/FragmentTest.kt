@@ -18,7 +18,7 @@ class MvRxArgsFragment : BaseMvRxFragment() {
     override fun invalidate() {}
 }
 
-class MvRxFragmentTest : MvRxBaseTest() {
+class FragmentTest : BaseTest() {
     @Test
     fun testArgs() {
         val (_, fragment) = createFragment<MvRxArgsFragment, TestMvRxActivity>(args = MvrxArgsTestArgs())

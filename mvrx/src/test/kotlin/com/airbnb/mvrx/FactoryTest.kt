@@ -13,7 +13,7 @@ class TestFactoryViewModel(override val initialState: FactoryState, val otherPro
     }
 }
 
-class MvRxFactoryTest : MvRxBaseTest() {
+class FactoryTest : BaseTest() {
 
     private lateinit var activity: FragmentActivity
 

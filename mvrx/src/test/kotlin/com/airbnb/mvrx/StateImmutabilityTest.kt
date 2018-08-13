@@ -8,7 +8,7 @@ import android.util.SparseArray
 import com.airbnb.android.lib.mvrx.base.assertImmutability
 import org.junit.Test
 
-class MvRxStateImmutabilityTest : MvRxBaseTest() {
+class StateImmutabilityTest : BaseTest() {
 
     @Test()
     fun valProp() {

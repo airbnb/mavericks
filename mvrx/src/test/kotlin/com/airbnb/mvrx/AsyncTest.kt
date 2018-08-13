@@ -6,7 +6,7 @@ import com.airbnb.mvrx.Async.Companion.getMetadata
 import com.airbnb.mvrx.Async.Companion.setMetadata
 import org.junit.Test
 
-class AsyncTest : MvRxBaseTest() {
+class AsyncTest : BaseTest() {
 
     @Test
     fun incompleteValueIsNull() {

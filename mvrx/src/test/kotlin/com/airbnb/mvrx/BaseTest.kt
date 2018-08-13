@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricTestRunner::class)
 @Ignore
-abstract class MvRxBaseTest {
+abstract class BaseTest {
     companion object {
         @JvmStatic
         @BeforeClass
