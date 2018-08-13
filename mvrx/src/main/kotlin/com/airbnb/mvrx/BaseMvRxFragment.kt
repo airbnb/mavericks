@@ -12,11 +12,8 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
 
     override val mvrxViewModelStore by lazy { MvRxViewModelStore(viewModelStore) }
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        /**
-         * This MUST be done to restore ViewModel state.
-         */
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         mvrxViewModelStore.restoreViewModels(this, savedInstanceState)
     }
 
