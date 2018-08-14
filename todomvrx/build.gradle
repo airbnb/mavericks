@@ -1,0 +1,51 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion 27
+    defaultConfig {
+        applicationId "com.airbnb.mvrx.todoapp"
+        minSdkVersion 16
+        targetSdkVersion 27
+        versionCode 1
+        versionName "0.0.1"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+    buildToolsVersion '27.0.3'
+}
+
+androidExtensions {
+    experimental = true
+}
+
+dependencies {
+    implementation project(':mvrx')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    implementation("com.android.support:appcompat-v7:$supportLibVersion")
+    implementation("com.android.support:recyclerview-v7:$supportLibVersion")
+    implementation "android.arch.lifecycle:extensions:$lifecycleVersion"
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation("com.airbnb.android:epoxy:$epoxyVersion") { exclude group: 'com.android.support' }
+    kapt "com.airbnb.android:epoxy-processor:$epoxyVersion"
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    implementation "io.reactivex.rxjava2:rxjava:2.2.0"
+    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
+    implementation "com.squareup.moshi:moshi:$moshiVersion"
+    implementation "com.squareup.moshi:moshi-kotlin:$moshiVersion"
+    kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
+    implementation "org.koin:koin-android-architecture:$koinVersion"
+    implementation "android.arch.navigation:navigation-fragment-ktx:$navVersion"
+    implementation "android.arch.navigation:navigation-ui-ktx:$navVersion"
+    implementation "android.arch.persistence.room:runtime:$roomVersion"
+    kapt "android.arch.persistence.room:compiler:$roomVersion"
+    implementation 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
+}

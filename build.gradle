@@ -1,4 +1,6 @@
-buildscript {
+buildscript { 
+    ext.kotlin_version = '1.2.60'
+
     ext.kotlinVersion = '1.2.41'
     ext.supportLibVersion = '27.1.1'
     ext.lifecycleVersion = '1.1.1'
@@ -8,6 +10,7 @@ buildscript {
     ext.koinVersion = '0.9.3'
     ext.retrofitVersion = '2.4.0'
     ext.navVersion = '1.0.0-alpha04'
+    ext.roomVersion = "1.1.1"
 
     repositories {
         jcenter()
@@ -18,7 +21,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlinVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-    }
+    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version" }
 }
 
 allprojects {
