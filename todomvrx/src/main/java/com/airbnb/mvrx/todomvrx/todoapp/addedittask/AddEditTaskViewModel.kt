@@ -27,7 +27,7 @@ import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksRepository
  *
  * This ViewModel only exposes [ObservableField]s, so it doesn't need to extend
  * [android.databinding.BaseObservable] and updates are notified automatically. See
- * [com.example.android.architecture.blueprints.todoapp.statistics.StatisticsViewModel] for
+ * [StatisticsViewModel] for
  * how to deal with more complex scenarios.
  */
 class AddEditTaskViewModel(
