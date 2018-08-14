@@ -16,13 +16,30 @@
 
 package com.airbnb.mvrx.todomvrx.todoapp.tasks
 
-import android.support.v4.app.Fragment
+import android.os.Bundle
+import android.view.View
+import com.airbnb.epoxy.EpoxyController
+import com.airbnb.mvrx.todomvrx.todoapp.R
+import com.airbnb.mvrx.todomvrx.todoapp.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.todoapp.data.Task
+import com.airbnb.mvrx.todomvrx.todoapp.views.header
 
 /**
  * Display a grid of [Task]s. User can choose to view all, active or completed tasks.
  */
-class TasksFragment : Fragment() {
+class TasksFragment : BaseFragment() {
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        fab.setImageResource(R.drawable.ic_add)
+    }
+
+    override fun EpoxyController.buildModels() {
+        header {
+            id("header")
+            title("Tasks Fragment")
+        }
+    }
 
 //    private lateinit var viewDataBinding: TasksFragBinding
 //    private lateinit var listAdapter: TasksAdapter

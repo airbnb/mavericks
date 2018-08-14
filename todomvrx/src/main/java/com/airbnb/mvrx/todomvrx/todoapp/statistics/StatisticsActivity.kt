@@ -15,7 +15,6 @@
  */
 package com.airbnb.mvrx.todomvrx.todoapp.statistics
 
-import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
@@ -23,7 +22,6 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import com.airbnb.mvrx.todomvrx.todoapp.R
-import com.airbnb.mvrx.todomvrx.todoapp.tasks.TasksActivity
 import com.airbnb.mvrx.todomvrx.todoapp.util.replaceFragmentInActivity
 import com.airbnb.mvrx.todomvrx.todoapp.util.setupActionBar
 
@@ -73,21 +71,21 @@ class StatisticsActivity : AppCompatActivity() {
     }
 
     private fun setupDrawerContent(navigationView: NavigationView) {
-        navigationView.setNavigationItemSelectedListener { menuItem ->
-            when (menuItem.itemId) {
-                R.id.list_navigation_menu_item -> {
-                    val intent = Intent(this@StatisticsActivity, TasksActivity::class.java)
-                    startActivity(intent)
-                }
-                R.id.statistics_navigation_menu_item -> {
-                    // Do nothing, we're already on that screen
-                }
-            }
-            // Close the navigation drawer when an item is selected.
-            menuItem.isChecked = true
-            drawerLayout.closeDrawers()
-            true
-        }
+//        navigationView.setNavigationItemSelectedListener { menuItem ->
+//            when (menuItem.itemId) {
+//                R.id.list_navigation_menu_item -> {
+//                    val intent = Intent(this@StatisticsActivity, TasksActivity::class.java)
+//                    startActivity(intent)
+//                }
+//                R.id.statistics_navigation_menu_item -> {
+//                    // Do nothing, we're already on that screen
+//                }
+//            }
+//            // Close the navigation drawer when an item is selected.
+//            menuItem.isChecked = true
+//            drawerLayout.closeDrawers()
+//            true
+//        }
     }
 
 //    fun obtainViewModel(): StatisticsViewModel = obtainViewModel(StatisticsViewModel::class.java)

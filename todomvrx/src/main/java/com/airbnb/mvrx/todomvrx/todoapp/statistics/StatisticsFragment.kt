@@ -15,12 +15,20 @@
  */
 package com.airbnb.mvrx.todomvrx.todoapp.statistics
 
-import android.support.v4.app.Fragment
+import com.airbnb.epoxy.EpoxyController
+import com.airbnb.mvrx.todomvrx.todoapp.core.BaseFragment
+import com.airbnb.mvrx.todomvrx.todoapp.views.header
 
 /**
  * Main UI for the statistics screen.
  */
-class StatisticsFragment : Fragment() {
+class StatisticsFragment : BaseFragment() {
+    override fun EpoxyController.buildModels() {
+        header {
+            id("header")
+            title("Statistics")
+        }
+    }
 
 //    private lateinit var viewDataBinding: StatisticsFragBinding
 //

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/tasksFragment">
+
+    <fragment
+        android:id="@+id/tasksFragment"
+        android:name="com.airbnb.mvrx.todomvrx.todoapp.tasks.TasksFragment"
+        android:label="TasksFragment"/>
+    <fragment
+        android:id="@+id/statisticsFragment"
+        android:name="com.airbnb.mvrx.todomvrx.todoapp.statistics.StatisticsFragment"
+        android:label="StatisticsFragment"/>
+</navigation>
