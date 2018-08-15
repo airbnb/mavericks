@@ -17,8 +17,6 @@ package com.airbnb.mvrx.todomvrx.todoapp.addedittask
 
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
-import com.airbnb.mvrx.todomvrx.todoapp.data.Task
-import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksDataSource
 import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksRepository
 
 /**
@@ -33,7 +31,7 @@ import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksRepository
 class AddEditTaskViewModel(
         context: Application,
         private val tasksRepository: TasksRepository
-) : AndroidViewModel(context), TasksDataSource.GetTaskCallback {
+) : AndroidViewModel(context) {
 
 //    val title = ObservableField<String>()
 //    val description = ObservableField<String>()
@@ -62,7 +60,7 @@ class AddEditTaskViewModel(
 //        }
 //    }
 //
-    override fun onTaskLoaded(task: Task) {
+//    override fun onTaskLoaded(task: Task) {
 //        title.set(task.title)
 //        description.set(task.description)
 //        taskCompleted = task.isCompleted
@@ -71,11 +69,11 @@ class AddEditTaskViewModel(
 //
 //        // Note that there's no need to notify that the values changed because we're using
 //        // ObservableFields.
-    }
+//    }
 //
-    override fun onDataNotAvailable() {
+//    override fun onDataNotAvailable() {
 //        dataLoading.set(false)
-    }
+//    }
 //
 //    // Called when clicking on fab.
 //    fun saveTask() {

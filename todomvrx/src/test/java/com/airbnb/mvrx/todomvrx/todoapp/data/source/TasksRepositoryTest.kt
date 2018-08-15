@@ -34,6 +34,7 @@ import org.mockito.Mockito.never
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
+import kotlin.text.Typography.times
 
 /**
  * Unit tests for the implementation of the in-memory repository with cache.
@@ -98,7 +99,7 @@ class TasksRepositoryTest {
         // Then the service API and persistent repository are called and the cache is updated
         verify<TasksDataSource>(tasksRemoteDataSource).saveTask(newTask)
         verify<TasksDataSource>(tasksLocalDataSource).saveTask(newTask)
-        assertThat(tasksRepository.cachedTasks.size, `is`(1))
+        assertThat(tasksRepository.cache.size, `is`(1))
     }
 
     @Test fun completeTask_completesTaskToServiceAPIUpdatesCache() {
@@ -114,8 +115,8 @@ class TasksRepositoryTest {
             // Then the service API and persistent repository are called and the cache is updated
             verify<TasksDataSource>(tasksRemoteDataSource).completeTask(newTask)
             verify<TasksDataSource>(tasksLocalDataSource).completeTask(newTask)
-            assertThat(cachedTasks.size, `is`(1))
-            val cachedNewTask = cachedTasks[newTask.id]
+            assertThat(cache.size, `is`(1))
+            val cachedNewTask = cache[newTask.id]
             assertNotNull(cachedNewTask as Task)
             assertThat(cachedNewTask.isActive, `is`(false))
         }
@@ -132,9 +133,9 @@ class TasksRepositoryTest {
                 // Then the service API and persistent repository are called and the cache is updated
                 verify<TasksDataSource>(tasksRemoteDataSource).completeTask(it)
                 verify<TasksDataSource>(tasksLocalDataSource).completeTask(it)
-                assertThat(tasksRepository.cachedTasks.size, `is`(1))
+                assertThat(tasksRepository.cache.size, `is`(1))
 
-                val cachedNewTask = cachedTasks[it.id]
+                val cachedNewTask = cache[it.id]
                 assertNotNull(cachedNewTask as Task)
                 assertThat(cachedNewTask.isActive, `is`(false))
             }
@@ -151,8 +152,8 @@ class TasksRepositoryTest {
             // Then the service API and persistent repository are called and the cache is updated
             verify(tasksRemoteDataSource).activateTask(newTask)
             verify(tasksLocalDataSource).activateTask(newTask)
-            assertThat(cachedTasks.size, `is`(1))
-            val cachedNewTask = cachedTasks[newTask.id]
+            assertThat(cache.size, `is`(1))
+            val cachedNewTask = cache[newTask.id]
             assertNotNull(cachedNewTask as Task)
             assertThat(cachedNewTask.isActive, `is`(true))
         }
@@ -170,8 +171,8 @@ class TasksRepositoryTest {
             // Then the service API and persistent repository are called and the cache is updated
             verify(tasksRemoteDataSource).activateTask(newTask)
             verify(tasksLocalDataSource).activateTask(newTask)
-            assertThat(cachedTasks.size, `is`(1))
-            val cachedNewTask = cachedTasks[newTask.id]
+            assertThat(cache.size, `is`(1))
+            val cachedNewTask = cache[newTask.id]
             assertNotNull(cachedNewTask as Task)
             assertThat(cachedNewTask.isActive, `is`(true))
         }
@@ -203,8 +204,8 @@ class TasksRepositoryTest {
             verify(tasksRemoteDataSource).clearCompletedTasks()
             verify(tasksLocalDataSource).clearCompletedTasks()
 
-            assertThat(cachedTasks.size, `is`(1))
-            val task = cachedTasks[newTask2.id]
+            assertThat(cache.size, `is`(1))
+            val task = cache[newTask2.id]
             assertNotNull(task as Task)
             assertTrue(task.isActive)
             assertThat(task.title, `is`(TASK_TITLE2))
@@ -228,7 +229,7 @@ class TasksRepositoryTest {
             verify(tasksRemoteDataSource).deleteAllTasks()
             verify(tasksLocalDataSource).deleteAllTasks()
 
-            assertThat(cachedTasks.size, `is`(0))
+            assertThat(cache.size, `is`(0))
         }
     }
 
@@ -237,7 +238,7 @@ class TasksRepositoryTest {
             // Given a task in the repository
             val newTask = Task(TASK_TITLE, TASK_DESCRIPTION).apply { isCompleted }
             saveTask(newTask)
-            assertThat(cachedTasks.containsKey(newTask.id), `is`(true))
+            assertThat(cache.containsKey(newTask.id), `is`(true))
 
             // When deleted
             deleteTask(newTask.id)
@@ -247,7 +248,7 @@ class TasksRepositoryTest {
             verify(tasksLocalDataSource).deleteTask(newTask.id)
 
             // Verify it's removed from repository
-            assertThat(cachedTasks.containsKey(newTask.id), `is`(false))
+            assertThat(cache.containsKey(newTask.id), `is`(false))
         }
     }
 

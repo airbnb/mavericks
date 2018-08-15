@@ -19,25 +19,54 @@ package com.airbnb.mvrx.todomvrx.todoapp.tasks
 import android.os.Bundle
 import android.view.View
 import com.airbnb.epoxy.EpoxyController
+import com.airbnb.mvrx.Loading
+import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.todomvrx.todoapp.R
+import com.airbnb.mvrx.todomvrx.todoapp.TasksViewModel
 import com.airbnb.mvrx.todomvrx.todoapp.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.todoapp.data.Task
+import com.airbnb.mvrx.todomvrx.todoapp.data.source.local.TasksLocalDataSource
+import com.airbnb.mvrx.todomvrx.todoapp.data.source.local.ToDoDatabase
+import com.airbnb.mvrx.todomvrx.todoapp.util.AppExecutors
 import com.airbnb.mvrx.todomvrx.todoapp.views.header
+import com.airbnb.mvrx.todomvrx.todoapp.views.horizontalLoader
+import com.airbnb.mvrx.todomvrx.todoapp.views.taskItemView
+import com.airbnb.mvrx.withState
 
 /**
  * Display a grid of [Task]s. User can choose to view all, active or completed tasks.
  */
 class TasksFragment : BaseFragment() {
 
+    private val viewModel by activityViewModel(TasksViewModel::class)
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         fab.setImageResource(R.drawable.ic_add)
+
+
+        val database = ToDoDatabase.getInstance(requireContext())
+        TasksLocalDataSource.getInstance(AppExecutors(), database.taskDao())
     }
 
-    override fun EpoxyController.buildModels() {
+    override fun EpoxyController.buildModels() = withState(viewModel) { state ->
+
+        horizontalLoader {
+            id("loader")
+            loading(state.tasksRequest is Loading)
+        }
+
         header {
             id("header")
             title("Tasks Fragment")
+        }
+
+        state.tasks.forEach {
+            taskItemView {
+                id(it.id)
+                title(it.title)
+                checked(it.isCompleted)
+            }
         }
     }
 

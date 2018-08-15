@@ -19,7 +19,7 @@ android {
     android {
         sourceSets {
             String sharedTestDir = 'src/sharedTest/java'
-            test {com.example.android.architecture.blueprints
+            test {
                 java.srcDir sharedTestDir
             }
             androidTest {
@@ -55,6 +55,7 @@ dependencies {
     implementation "android.arch.navigation:navigation-fragment-ktx:$navVersion"
     implementation "android.arch.navigation:navigation-ui-ktx:$navVersion"
     implementation "android.arch.persistence.room:runtime:$roomVersion"
+    implementation "android.arch.persistence.room:rxjava2:$roomVersion"
     kapt "android.arch.persistence.room:compiler:$roomVersion"
     implementation 'com.android.support.test.espresso:espresso-idling-resource:2.2.2'
     testImplementation 'junit:junit:4.12'

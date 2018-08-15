@@ -19,11 +19,11 @@ package com.airbnb.mvrx.todomvrx.todoapp.data.source;
 import android.support.annotation.NonNull;
 
 import com.airbnb.mvrx.todomvrx.todoapp.data.Task;
-import com.google.common.base.Optional;
+import com.airbnb.mvrx.todomvrx.todoapp.util.Optional;
 
 import java.util.List;
 
-import io.reactivex.Flowable;
+import io.reactivex.Single;
 
 
 /**
@@ -32,9 +32,9 @@ import io.reactivex.Flowable;
  */
 public interface TasksDataSource {
 
-    Flowable<List<Task>> getTasks();
+    Single<List<Task>> getTasks();
 
-    Flowable<Optional<Task>> getTask(@NonNull String taskId);
+    Single<Optional<Task>> getTask(@NonNull String taskId);
 
     void saveTask(@NonNull Task task);
 

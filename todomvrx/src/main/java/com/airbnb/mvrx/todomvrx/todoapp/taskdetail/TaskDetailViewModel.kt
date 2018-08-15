@@ -17,8 +17,6 @@ package com.airbnb.mvrx.todomvrx.todoapp.taskdetail
 
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
-import com.airbnb.mvrx.todomvrx.todoapp.data.Task
-import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksDataSource
 import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksRepository
 import com.airbnb.mvrx.todomvrx.todoapp.tasks.TasksFragment
 
@@ -30,7 +28,7 @@ import com.airbnb.mvrx.todomvrx.todoapp.tasks.TasksFragment
 class TaskDetailViewModel(
         context: Application,
         private val tasksRepository: TasksRepository
-) : AndroidViewModel(context), TasksDataSource.GetTaskCallback {
+) : AndroidViewModel(context) {
 //
 //    val task = ObservableField<Task>()
 //    val completed = ObservableBoolean()
@@ -81,15 +79,15 @@ class TaskDetailViewModel(
 //        completed.set(task.isCompleted)
 //    }
 //
-    override fun onTaskLoaded(task: Task) {
+//    override fun onTaskLoaded(task: Task) {
 //        setTask(task)
 //        isDataLoading = false
-    }
+//    }
 //
-    override fun onDataNotAvailable() {
+//    override fun onDataNotAvailable() {
 //        task.set(null)
 //        isDataLoading = false
-    }
+//    }
 //
 //    fun onRefresh() {
 //        if (task.get() != null) {
