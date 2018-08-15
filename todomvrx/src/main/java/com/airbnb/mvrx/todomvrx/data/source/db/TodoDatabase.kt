@@ -24,13 +24,12 @@ abstract class ToDoDatabase : RoomDatabase() {
         fun getInstance(context: Context): ToDoDatabase {
             synchronized(lock) {
                 if (INSTANCE == null) {
-                    INSTANCE = Room.databaseBuilder(context.applicationContext,
-                            ToDoDatabase::class.java, "Tasks.db")
+                    INSTANCE = Room
+                            .databaseBuilder(context.applicationContext, ToDoDatabase::class.java, "Tasks.db")
                             .build()
                 }
                 return INSTANCE!!
             }
         }
     }
-
 }

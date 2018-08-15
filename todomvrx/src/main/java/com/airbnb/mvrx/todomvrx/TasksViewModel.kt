@@ -32,7 +32,6 @@ class TasksViewModel(override val initialState: TasksState, private val sources:
         refreshTasks()
     }
 
-    @Suppress("UNCHECKED_CAST")
     fun refreshTasks() {
         Observable.merge(sources.map { it.getTasks().toObservable() })
                 .doOnSubscribe { setState { copy(isLoading = true) } }
@@ -68,11 +67,12 @@ class TasksViewModel(override val initialState: TasksState, private val sources:
     companion object : MvRxViewModelFactory<TasksState> {
         override fun create(activity: FragmentActivity, state: TasksState): BaseMvRxViewModel<TasksState> {
             val database = ToDoDatabase.getInstance(activity)
+            // Simulate data sources of different speeds.
+            // The slower one can be thought of as the network data source.
             val dataSource1 = DatabaseDataSource(database.taskDao(), 2000)
             val dataSource2 = DatabaseDataSource(database.taskDao(), 3500)
             return TasksViewModel(state, listOf(dataSource1, dataSource2))
         }
-
     }
 }
 

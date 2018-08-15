@@ -33,14 +33,18 @@ abstract class BaseFragment : BaseMvRxFragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
             inflater.inflate(R.layout.fragment_base, container, false).apply {
                 coordinatorLayout = findViewById(R.id.coordinator_layout)
+                fab = findViewById(R.id.fab)
                 recyclerView = findViewById(R.id.recycler_view)
                 recyclerView.buildModelsWith { it.buildModels() }
-                fab = findViewById(R.id.fab)
             }
 
     @CallSuper
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         viewModel.subscribeWithHistory(propertyWhitelist(TasksState::tasks)) { oldState, newState ->
+            if (oldState.tasks.any { it.complete } && !newState.tasks.any { it.complete }) {
+                coordinatorLayout.showLongSnackbar(R.string.completed_tasks_cleared)
+            }
+
             val oldTask = oldState.tasks.findTask(newState.lastEditedTask)
             val newTask = newState.tasks.findTask(newState.lastEditedTask)
             if (oldTask == newTask) return@subscribeWithHistory
@@ -61,12 +65,6 @@ abstract class BaseFragment : BaseMvRxFragment() {
         viewModel.subscribe(propertyWhitelist(TasksState::isLoading)) { state ->
             if (state.taskRequest is Error) {
                 coordinatorLayout.showLongSnackbar(R.string.loading_tasks_error)
-            }
-        }
-
-        viewModel.subscribeWithHistory(propertyWhitelist(TasksState::tasks)) { oldstate, newState ->
-            if (oldstate.tasks.any { it.complete } && !newState.tasks.any { it.complete }) {
-                coordinatorLayout.showLongSnackbar(R.string.completed_tasks_cleared)
             }
         }
     }
