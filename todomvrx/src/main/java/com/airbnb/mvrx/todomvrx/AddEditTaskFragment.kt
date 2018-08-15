@@ -18,13 +18,13 @@ package com.airbnb.mvrx.todomvrx
 import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
+import android.support.design.widget.Snackbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.navigation.fragment.findNavController
-import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.args
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.data.Task
@@ -42,7 +42,6 @@ data class AddEditTaskArgs(val id: String? = null) : Parcelable
  */
 class AddEditTaskFragment : BaseFragment() {
 
-    private val viewModel by activityViewModel(TasksViewModel::class)
     private val args: AddEditTaskArgs by args()
 
     private lateinit var titleView: EditText
@@ -50,14 +49,20 @@ class AddEditTaskFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.frag_add_edit, container, false).apply {
+            coordinatorLayout = findViewById(R.id.coordinator_layout)
             fab = findViewById(R.id.fab)
             titleView = findViewById(R.id.task_title)
             descriptionView = findViewById(R.id.task_description)
         }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         fab.setImageResource(R.drawable.ic_done)
         fab.setOnClickListener {
+            if (titleView.text.isEmpty()) {
+                Snackbar.make(coordinatorLayout, R.string.empty_task_message, Snackbar.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
             withState(viewModel) { state ->
                 val task = (state.tasks.findTask(args.id) ?: Task())
                         .copy(
@@ -68,7 +73,6 @@ class AddEditTaskFragment : BaseFragment() {
                 findNavController().navigateUp()
             }
         }
-        viewModel
     }
 
     override fun onDestroyView() {

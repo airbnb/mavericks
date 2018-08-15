@@ -26,7 +26,6 @@ import android.view.ViewGroup
 import android.widget.CheckBox
 import android.widget.TextView
 import androidx.navigation.fragment.findNavController
-import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.args
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.data.findTask
@@ -42,7 +41,6 @@ data class TaskDetailArgs(val id: String) : Parcelable
  */
 class TaskDetailFragment : BaseFragment() {
 
-    private val viewModel by activityViewModel(TasksViewModel::class)
     private val args: TaskDetailArgs by args()
 
     private lateinit var checkbox: CheckBox
@@ -52,6 +50,7 @@ class TaskDetailFragment : BaseFragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
             inflater.inflate(R.layout.frag_detail, container, false).apply {
+                coordinatorLayout = findViewById(R.id.coordinator_layout)
                 fab = findViewById(R.id.fab)
                 titleView = findViewById(R.id.task_title)
                 descriptionView = findViewById(R.id.task_description)
@@ -60,6 +59,7 @@ class TaskDetailFragment : BaseFragment() {
             }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         fab.setImageResource(R.drawable.ic_edit)
         fab.setOnClickListener {
@@ -69,12 +69,6 @@ class TaskDetailFragment : BaseFragment() {
             viewModel.setComplete(args.id, isChecked)
 
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        // https://github.com/airbnb/MvRx/issues/15
-        invalidate()
     }
 
     override fun invalidate() = withState(viewModel) { state ->

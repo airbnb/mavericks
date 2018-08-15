@@ -24,7 +24,6 @@ import android.view.MenuItem
 import android.view.View
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.core.MvRxViewModel
@@ -50,7 +49,6 @@ class TaskListViewModel(override val initialState: TaskListState) : MvRxViewMode
  */
 class TaskListFragment : BaseFragment() {
 
-    private val tasksViewModel by activityViewModel(TasksViewModel::class)
     private val taskListViewModel by fragmentViewModel(TaskListViewModel::class)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -71,13 +69,13 @@ class TaskListFragment : BaseFragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?) = when (item?.itemId ?: 0) {
-        R.id.menu_refresh -> tasksViewModel.refreshTasks().andTrue()
+        R.id.menu_refresh -> viewModel.refreshTasks().andTrue()
         R.id.menu_filter -> showFilteringPopUpMenu().andTrue()
-        R.id.menu_clear -> tasksViewModel.clearCompletedTasks().andTrue()
+        R.id.menu_clear -> viewModel.clearCompletedTasks().andTrue()
         else -> super.onOptionsItemSelected(item)
     }
 
-    override fun EpoxyController.buildModels() = withState(tasksViewModel, taskListViewModel) { state, taskListState ->
+    override fun EpoxyController.buildModels() = withState(viewModel, taskListViewModel) { state, taskListState ->
         // We always want to show this so the content won't snap up when the loader finishes.
         horizontalLoader {
             id("loader")
@@ -112,7 +110,7 @@ class TaskListFragment : BaseFragment() {
                             id(task.id)
                             title(task.title)
                             checked(task.complete)
-                            onCheckedChanged { completed -> tasksViewModel.setComplete(task.id, completed) }
+                            onCheckedChanged { completed -> viewModel.setComplete(task.id, completed) }
                             onClickListener { _ -> navigate(R.id.detailFragment, TaskDetailArgs(task.id)) }
                         }
                     }

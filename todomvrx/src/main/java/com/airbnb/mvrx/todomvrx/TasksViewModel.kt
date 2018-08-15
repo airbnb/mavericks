@@ -1,7 +1,6 @@
 package com.airbnb.mvrx.todomvrx
 
 import android.support.v4.app.FragmentActivity
-import android.util.Log
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.MvRxState
@@ -20,7 +19,8 @@ import io.reactivex.Single
 data class TasksState(
         val tasks: Tasks = emptyList(),
         val taskRequest: Async<Tasks> = Uninitialized,
-        val isLoading: Boolean = false
+        val isLoading: Boolean = false,
+        val lastEditedTask: String? = null
 ) : MvRxState
 
 class TasksViewModel(override val initialState: TasksState, private val sources: List<TasksDataSource>) : MvRxViewModel<TasksState>() {
@@ -35,29 +35,25 @@ class TasksViewModel(override val initialState: TasksState, private val sources:
                 .toObservable()
                 .doOnSubscribe { setState { copy(isLoading = true) } }
                 .doOnComplete { setState { copy(isLoading = false) } }
-                .execute { copy(taskRequest = it, tasks = it() ?: tasks) }
+                .execute { copy(taskRequest = it, tasks = it() ?: tasks, lastEditedTask = null) }
     }
 
     fun saveTask(task: Task) {
         setState {
             val index = tasks.indexOfFirst { it.id == task.id }
             if (index >= 0) {
-                copy(tasks = tasks.copy(index, task))
+                copy(tasks = tasks.copy(index, task), lastEditedTask = task.id)
             } else {
-                copy(tasks = tasks + task)
+                copy(tasks = tasks + task, lastEditedTask = task.id)
             }
         }
         sources.forEach { it.saveTask(task) }
     }
 
     fun setComplete(id: String, complete: Boolean) {
-        Log.d("Gabe", "setComplete $complete#\t")
-
         setState {
             tasks.findTask(id)?.let { task ->
-                copy(tasks = tasks.copy(tasks.indexOf(task), task.copy(complete = complete))).also {
-                    Log.d("Gabe", "setComplete $this -> $it")
-                }
+                copy(tasks = tasks.copy(tasks.indexOf(task), task.copy(complete = complete)), lastEditedTask = id)
             } ?: this
 
         }
@@ -66,17 +62,17 @@ class TasksViewModel(override val initialState: TasksState, private val sources:
 
     fun clearCompletedTasks() = setState {
         sources.forEach { it.clearCompletedTasks() }
-        copy(tasks = tasks.filter { !it.complete })
+        copy(tasks = tasks.filter { !it.complete }, lastEditedTask = null)
     }
 
     fun deleteAllTasks() {
-        setState { copy(tasks = emptyList()) }
+        setState { copy(tasks = emptyList(), lastEditedTask = null) }
         sources.forEach { it.deleteAllTasks() }
     }
 
-    fun deleteTask(taskId: String) {
-        setState { copy(tasks = tasks.delete { it.id == taskId }) }
-        sources.forEach { it.deleteTask(taskId) }
+    fun deleteTask(id: String) {
+        setState { copy(tasks = tasks.delete { it.id == id }, lastEditedTask = id) }
+        sources.forEach { it.deleteTask(id) }
     }
 
     private fun <T> List<T>.copy(i: Int, value: T): List<T> = toMutableList().apply { set(i, value) }

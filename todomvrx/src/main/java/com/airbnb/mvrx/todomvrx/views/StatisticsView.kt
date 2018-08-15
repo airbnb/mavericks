@@ -4,8 +4,8 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import android.widget.TextView
-import com.airbnb.epoxy.ModelProp
 import com.airbnb.epoxy.ModelView
+import com.airbnb.epoxy.TextProp
 import com.airbnb.mvrx.todomvrx.todoapp.R
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)
@@ -19,8 +19,8 @@ class StatisticsView @JvmOverloads constructor(
         inflate(context, R.layout.statistics_view, this)
     }
 
-    @ModelProp
-    fun setStatistic(statistic: String) {
+    @TextProp
+    fun setStatistic(statistic: CharSequence) {
         textView.text = statistic
     }
 }
