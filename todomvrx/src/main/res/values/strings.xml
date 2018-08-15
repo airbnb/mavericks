@@ -8,12 +8,12 @@
     <string name="menu_filter">Filter</string>
     <string name="menu_clear">Clear completed</string>
     <string name="menu_delete_task">Delete task</string>
-    <string name="navigation_view_header_title">TO-DOs</string>
+    <string name="navigation_view_header_title">ToDos</string>
     <string name="title_hint">Title</string>
-    <string name="description_hint">Enter your TO-DO here.</string>
+    <string name="description_hint">Enter your ToDo here.</string>
     <string name="empty_task_message">TO DOs cannot be empty</string>
-    <string name="successfully_saved_task_message">TO-DO saved</string>
-    <string name="list_title">TO-DO List</string>
+    <string name="successfully_saved_task_message">ToDo saved</string>
+    <string name="list_title">ToDo List</string>
     <string name="statistics_title">Statistics</string>
     <string name="statistics_no_tasks">You have no tasks.</string>
     <string name="statistics_active_tasks">Active tasks: %d</string>
@@ -23,15 +23,15 @@
     <string name="nav_all">All</string>
     <string name="nav_active">Active</string>
     <string name="nav_completed">Completed</string>
-    <string name="label_all">All TO-DOs</string>
-    <string name="label_active">Active TO-DOs</string>
-    <string name="label_completed">Completed TO-DOs</string>
-    <string name="no_tasks_all">You have no TO-DOs!</string>
-    <string name="no_tasks_active">You have no active TO-DOs!</string>
-    <string name="no_tasks_completed">You have no completed TO-DOs!</string>
+    <string name="label_all">All ToDos</string>
+    <string name="label_active">Active ToDos</string>
+    <string name="label_completed">Completed ToDos</string>
+    <string name="no_tasks_all">You have no ToDos!</string>
+    <string name="no_tasks_active">You have no active ToDos!</string>
+    <string name="no_tasks_completed">You have no completed ToDos!</string>
     <string name="refresh">Refresh</string>
     <string name="successfully_deleted_task_message">Task was deleted</string>
-    <string name="successfully_added_task_message">TO-DO added</string>
+    <string name="successfully_added_task_message">ToDo added</string>
     <string name="no_data_description"/>
 
 </resources>
