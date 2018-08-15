@@ -16,75 +16,84 @@
 package com.airbnb.mvrx.todomvrx.taskdetail
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import android.os.Parcelable
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.CheckBox
+import android.widget.TextView
+import androidx.navigation.fragment.findNavController
+import com.airbnb.mvrx.activityViewModel
+import com.airbnb.mvrx.args
+import com.airbnb.mvrx.todomvrx.TasksViewModel
+import com.airbnb.mvrx.todomvrx.addedittask.AddEditTaskArgs
+import com.airbnb.mvrx.todomvrx.core.BaseFragment
+import com.airbnb.mvrx.todomvrx.data.findTask
+import com.airbnb.mvrx.todomvrx.todoapp.R
+import com.airbnb.mvrx.withState
+import kotlinx.android.parcel.Parcelize
+
+@Parcelize
+data class TaskDetailArgs(val id: String) : Parcelable
 
 /**
  * Main UI for the task detail screen.
  */
-class TaskDetailFragment : Fragment() {
+class TaskDetailFragment : BaseFragment() {
 
-//    private lateinit var viewDataBinding: TaskdetailFragBinding
-//
-//    override fun onActivityCreated(savedInstanceState: Bundle?) {
-//        super.onActivityCreated(savedInstanceState)
-//        setupFab()
-//        viewDataBinding.viewmodel?.let {
-//            view?.setupSnackbar(this, it.snackbarMessage, Snackbar.LENGTH_LONG)
-//        }
-//    }
-//
-//    private fun setupFab() {
-//        activity.findViewById<View>(R.id.fab_edit_task).setOnClickListener {
-//            viewDataBinding.viewmodel?.editTask()
-//        }
-//    }
-//
-//    override fun onResume() {
-//        super.onResume()
-//        viewDataBinding.viewmodel?.start(arguments.getString(ARGUMENT_TASK_ID))
-//    }
-//
-//    override fun onCreateView(
-//            inflater: LayoutInflater,
-//            container: ViewGroup?,
-//            savedInstanceState: Bundle?
-//    ): View? {
-//        val view = inflater.inflate(R.layout.taskdetail_frag, container, false)
-//        viewDataBinding = TaskdetailFragBinding.bind(view).apply {
-//            viewmodel = (activity as TaskDetailActivity).obtainViewModel()
-//            listener = object : TaskDetailUserActionsListener {
-//                override fun onCompleteChanged(v: View) {
-//                    viewmodel?.setComplete((v as CheckBox).isChecked)
-//                }
-//            }
-//        }
-//        setHasOptionsMenu(true)
-//        return view
-//    }
-//
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        when (item.itemId) {
-//            R.id.menu_delete -> {
-//                viewDataBinding.viewmodel?.deleteTask()
-//                return true
-//            }
-//            else -> return false
-//        }
-//    }
-//
-//    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-//        inflater.inflate(R.menu.taskdetail_fragment_menu, menu)
-//    }
+    private val viewModel by activityViewModel(TasksViewModel::class)
+    private val args: TaskDetailArgs by args()
 
-    companion object {
+    private lateinit var checkbox: CheckBox
+    private lateinit var titleView: TextView
+    private lateinit var descriptionView: TextView
+    private lateinit var noDataView: View
 
-        const val ARGUMENT_TASK_ID = "TASK_ID"
-        const val REQUEST_EDIT_TASK = 1
-
-        fun newInstance(taskId: String) = TaskDetailFragment().apply {
-            arguments = Bundle().apply {
-                putString(ARGUMENT_TASK_ID, taskId)
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+            inflater.inflate(R.layout.frag_detail, container, false).apply {
+                fab = findViewById(R.id.fab)
+                titleView = findViewById(R.id.task_title)
+                descriptionView = findViewById(R.id.task_description)
+                checkbox = findViewById(R.id.complete)
+                noDataView = findViewById(R.id.no_data_view)
             }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        setHasOptionsMenu(true)
+        fab.setImageResource(R.drawable.ic_edit)
+        fab.setOnClickListener {
+            navigate(R.id.addEditFragment, AddEditTaskArgs(args.id))
         }
+        checkbox.setOnCheckedChangeListener { _, isChecked ->
+            viewModel.setComplete(args.id, isChecked)
+
+        }
+        // Must be called to trigger the lazy delegate
+        viewModel
+    }
+
+    override fun invalidate() = withState(viewModel) { state ->
+        val task = state.tasks.findTask(args.id)
+        checkbox.isChecked = task?.complete ?: false
+        checkbox.visibility = if (task == null) View.GONE else View.VISIBLE
+        titleView.text = task?.title
+        descriptionView.text = task?.description
+        noDataView.visibility = if (task == null) View.VISIBLE else View.GONE
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.menu_delete -> {
+            viewModel.deleteTask(args.id)
+            findNavController().navigateUp()
+            true
+        }
+        else -> false
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.taskdetail_fragment_menu, menu)
     }
 }

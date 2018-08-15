@@ -1,13 +1,17 @@
 package com.airbnb.mvrx.todomvrx.core
 
 import android.os.Bundle
+import android.os.Parcelable
+import android.support.annotation.IdRes
 import android.support.design.widget.FloatingActionButton
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.epoxy.EpoxyRecyclerView
 import com.airbnb.mvrx.BaseMvRxFragment
+import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.todomvrx.todoapp.R
 
 abstract class BaseFragment : BaseMvRxFragment() {
@@ -26,5 +30,9 @@ abstract class BaseFragment : BaseMvRxFragment() {
         recyclerView.requestModelBuild()
     }
 
-    abstract fun EpoxyController.buildModels()
+    open fun EpoxyController.buildModels() {}
+
+    protected fun navigate(@IdRes id: Int, args: Parcelable? = null) {
+        findNavController().navigate(id, Bundle().apply { putParcelable(MvRx.KEY_ARG, args) })
+    }
 }

@@ -16,65 +16,67 @@
 package com.airbnb.mvrx.todomvrx.addedittask
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import androidx.navigation.fragment.findNavController
+import com.airbnb.mvrx.activityViewModel
+import com.airbnb.mvrx.args
+import com.airbnb.mvrx.todomvrx.TasksViewModel
+import com.airbnb.mvrx.todomvrx.core.BaseFragment
+import com.airbnb.mvrx.todomvrx.data.Task
+import com.airbnb.mvrx.todomvrx.data.findTask
 import com.airbnb.mvrx.todomvrx.todoapp.R
+import com.airbnb.mvrx.withState
+import kotlinx.android.parcel.Parcelize
+
+
+@Parcelize
+data class AddEditTaskArgs(val id: String? = null) : Parcelable
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
  */
-class AddEditTaskFragment : Fragment() {
+class AddEditTaskFragment : BaseFragment() {
 
-//    private lateinit var viewDataBinding: AddtaskFragBinding
+    private val viewModel by activityViewModel(TasksViewModel::class)
+    private val args: AddEditTaskArgs by args()
 
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-        setupFab()
-//        viewDataBinding.viewmodel?.let {
-//            view?.setupSnackbar(this, it.snackbarMessage, Snackbar.LENGTH_LONG)
-//        }
-//        setupActionBar()
-//        loadData()
+    private lateinit var titleView: EditText
+    private lateinit var descriptionView: EditText
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
+        inflater.inflate(R.layout.frag_add_edit, container, false).apply {
+            fab = findViewById(R.id.fab)
+            titleView = findViewById(R.id.task_title)
+            descriptionView = findViewById(R.id.task_description)
+        }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        args.id?.let { id ->
+            withState(viewModel) { state ->
+                val task = state.tasks.findTask(id) ?: throw IllegalStateException("Unable to find task $id")
+                titleView.setText(task.title)
+                descriptionView.setText(task.description)
+            }
+        }
+        fab.setImageResource(if (args.id == null) R.drawable.ic_add else R.drawable.ic_edit)
+        fab.setOnClickListener {
+            withState(viewModel) { state ->
+                val task = state.tasks.findTask(args.id) ?: Task()
+                        .copy(
+                                title = titleView.text.toString(),
+                                description = descriptionView.text.toString()
+                        )
+                viewModel.saveTask(task)
+                findNavController().navigateUp()
+            }
+        }
     }
 
-    private fun loadData() {
-        // Add or edit an existing task?
-//        viewDataBinding.viewmodel?.start(arguments?.getString(ARGUMENT_EDIT_TASK_ID))
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?): View? {
-        val root = inflater.inflate(R.layout.addtask_frag, container, false)
-//        viewDataBinding = AddtaskFragBinding.bind(root).apply {
-//            viewmodel = (activity as AddEditTaskActivity).obtainViewModel()
-//        }
-//        setHasOptionsMenu(true)
-//        retainInstance = false
-//        return viewDataBinding.root
-        return root
-    }
-
-    private fun setupFab() {
-//        activity.findViewById<FloatingActionButton>(R.id.fab_edit_task_done).apply {
-//            setImageResource(R.drawable.ic_done)
-//            setOnClickListener { viewDataBinding.viewmodel?.saveTask() }
-//        }
-    }
-
-    private fun setupActionBar() {
-//        (activity as AppCompatActivity).supportActionBar?.setTitle(
-//                if (arguments != null && arguments.get(ARGUMENT_EDIT_TASK_ID) != null)
-//                    R.string.edit_task
-//                else
-//                    R.string.add_task
-//        )
-    }
-
-    companion object {
-        const val ARGUMENT_EDIT_TASK_ID = "EDIT_TASK_ID"
-
-        fun newInstance() = AddEditTaskFragment()
+    override fun invalidate() {
+        // Do nothing.
     }
 }

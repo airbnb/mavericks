@@ -15,7 +15,6 @@ import com.airbnb.mvrx.todomvrx.data.source.TasksDataSource
 import com.airbnb.mvrx.todomvrx.data.source.db.TasksLocalDataSource
 import com.airbnb.mvrx.todomvrx.data.source.db.ToDoDatabase
 import com.airbnb.mvrx.todomvrx.data.source.remote.TasksRemoteDataSource
-import com.airbnb.mvrx.todomvrx.todoapp.R.id.completed
 import com.airbnb.mvrx.todomvrx.util.AppExecutors
 import io.reactivex.Single
 
@@ -53,7 +52,7 @@ class TasksViewModel(override val initialState: TasksState, private val sources:
     }
 
     fun setComplete(id: String, complete: Boolean) {
-        Log.d("Gabe", "setComplete $completed#\t")
+        Log.d("Gabe", "setComplete $complete#\t")
 
         setState {
             tasks.findTask(id)?.let { task ->

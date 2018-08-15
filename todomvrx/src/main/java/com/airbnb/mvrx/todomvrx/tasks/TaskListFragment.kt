@@ -25,12 +25,14 @@ import android.view.View
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.fragmentViewModel
-import com.airbnb.mvrx.todomvrx.todoapp.R
 import com.airbnb.mvrx.todomvrx.TasksViewModel
+import com.airbnb.mvrx.todomvrx.addedittask.AddEditTaskArgs
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.data.Task
 import com.airbnb.mvrx.todomvrx.data.source.db.TasksLocalDataSource
 import com.airbnb.mvrx.todomvrx.data.source.db.ToDoDatabase
+import com.airbnb.mvrx.todomvrx.taskdetail.TaskDetailArgs
+import com.airbnb.mvrx.todomvrx.todoapp.R
 import com.airbnb.mvrx.todomvrx.util.AppExecutors
 import com.airbnb.mvrx.todomvrx.views.header
 import com.airbnb.mvrx.todomvrx.views.horizontalLoader
@@ -53,7 +55,9 @@ class TaskListFragment : BaseFragment() {
         val database = ToDoDatabase.getInstance(requireContext())
         TasksLocalDataSource.getInstance(AppExecutors(), database.taskDao())
 
-        fab.setOnClickListener { TODO() }
+        fab.setOnClickListener {
+            navigate(R.id.addEditFragment, AddEditTaskArgs())
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -88,9 +92,10 @@ class TaskListFragment : BaseFragment() {
                 .forEach { task ->
                     taskItemView {
                         id(task.id)
-                        title(task.displayTitle)
+                        title(task.title)
                         checked(task.complete)
                         onCheckedChanged { completed -> tasksViewModel.setComplete(task.id, completed) }
+                        onClickListener { _ -> navigate(R.id.detailFragment, TaskDetailArgs(task.id)) }
                     }
                 }
     }

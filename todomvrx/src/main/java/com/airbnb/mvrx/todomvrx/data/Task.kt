@@ -18,7 +18,6 @@ package com.airbnb.mvrx.todomvrx.data
 
 import android.arch.persistence.room.ColumnInfo
 import android.arch.persistence.room.Entity
-import android.arch.persistence.room.Ignore
 import android.arch.persistence.room.PrimaryKey
 import java.util.UUID
 
@@ -28,14 +27,4 @@ data class Task @JvmOverloads constructor(
         @ColumnInfo(name = "description") var description: String = "",
         @PrimaryKey @ColumnInfo(name = "id") var id: String = UUID.randomUUID().toString(),
         @ColumnInfo(name = "complete") var complete: Boolean = false
-) {
-
-    @Ignore
-    val displayTitle = if (title.isNotEmpty()) title else description
-
-    @Ignore
-    val isActive = !complete
-
-    @Ignore
-    val isEmpty = title.isEmpty() && description.isEmpty()
-}
+)

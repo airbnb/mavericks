@@ -12,4 +12,14 @@
         android:id="@+id/statisticsFragment"
         android:name="com.airbnb.mvrx.todomvrx.statistics.StatisticsFragment"
         android:label="TO-DO MvRx"/>
+
+    <fragment
+        android:id="@+id/addEditFragment"
+        android:name="com.airbnb.mvrx.todomvrx.addedittask.AddEditTaskFragment"
+        android:label="TO-DO MvRx"/>
+
+    <fragment
+        android:id="@+id/detailFragment"
+        android:name="com.airbnb.mvrx.todomvrx.taskdetail.TaskDetailFragment"
+        android:label="TO-DO MvRx"/>
 </navigation>

@@ -7,6 +7,7 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.widget.Toolbar
 import android.view.MenuItem
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
@@ -32,17 +33,23 @@ class MainActivity : BaseMvRxActivity() {
         navView.setupWithNavController(navController)
         setupActionBarWithNavController(navController)
 
-        navController.addOnNavigatedListener { _, _ ->
-            val isStartDestination = supportFragmentManager.backStackEntryCount == 0
-            toolbar.setNavigationIcon(if (isStartDestination) R.drawable.ic_menu else R.drawable.ic_back)
+        navController.addOnNavigatedListener { _, destination ->
+            val isDrawer = destination.isDrawerDestination()
+            toolbar.setNavigationIcon(if (isDrawer) R.drawable.ic_menu else R.drawable.ic_back)
         }
     }
 
     override fun onOptionsItemSelected(item: MenuItem?) = when(item?.itemId ?: 0) {
         android.R.id.home -> {
-            drawerLayout.openDrawer(GravityCompat.START)
+            if (navController.currentDestination.isDrawerDestination()) {
+                drawerLayout.openDrawer(GravityCompat.START)
+            } else {
+                navController.navigateUp()
+            }
             true
         }
         else -> super.onOptionsItemSelected(item)
     }
+
+    private fun NavDestination.isDrawerDestination() = id == R.id.tasksFragment || id == R.id.statisticsFragment
 }
