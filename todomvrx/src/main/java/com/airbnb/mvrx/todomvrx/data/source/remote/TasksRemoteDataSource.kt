@@ -19,6 +19,7 @@ package com.airbnb.mvrx.todomvrx.data.source.remote
 import com.airbnb.mvrx.todomvrx.data.Task
 import com.airbnb.mvrx.todomvrx.data.Tasks
 import com.airbnb.mvrx.todomvrx.data.source.TasksDataSource
+import io.reactivex.Completable
 import io.reactivex.Single
 import java.util.LinkedHashMap
 import java.util.concurrent.TimeUnit
@@ -47,17 +48,20 @@ object TasksRemoteDataSource : TasksDataSource {
                 .delay(SERVICE_LATENCY_IN_MILLIS.toLong(), TimeUnit.MILLISECONDS)
     }
 
-    override fun setComplete(id: String, complete: Boolean) {
+    override fun setComplete(id: String, complete: Boolean): Completable = Completable.fromCallable {
         TASKS_SERVICE_DATA[id]?.let { remoteTask ->
-            TASKS_SERVICE_DATA[remoteTask.id] = remoteTask.copy(complete = complete)
-        }
+            remoteTask.copy(complete = complete).also {
+                TASKS_SERVICE_DATA[remoteTask.id] = it
+            }
+        } ?: throw IllegalStateException("Task $id not found")
     }
 
-    override fun saveTask(task: Task) {
+    override fun saveTask(task: Task) = Completable.fromCallable {
         TASKS_SERVICE_DATA[task.id] = task
+        task
     }
 
-    override fun clearCompletedTasks() {
+    override fun clearCompletedTasks() = Completable.fromCallable {
         val it = TASKS_SERVICE_DATA.entries.iterator()
         while (it.hasNext()) {
             val entry = it.next()
@@ -67,16 +71,7 @@ object TasksRemoteDataSource : TasksDataSource {
         }
     }
 
-    override fun refreshTasks() {
-        // Not required because the {@link TasksRepository} handles the logic of refreshing the
-        // tasks from all the available data sources.
-    }
-
-    override fun deleteAllTasks() {
-        TASKS_SERVICE_DATA.clear()
-    }
-
-    override fun deleteTask(taskId: String) {
+    override fun deleteTask(taskId: String) = Completable.fromCallable {
         TASKS_SERVICE_DATA.remove(taskId)
     }
 }

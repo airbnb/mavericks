@@ -18,20 +18,17 @@ package com.airbnb.mvrx.todomvrx.data.source
 
 import com.airbnb.mvrx.todomvrx.data.Task
 import com.airbnb.mvrx.todomvrx.data.Tasks
+import io.reactivex.Completable
 import io.reactivex.Single
 
 interface TasksDataSource {
     fun getTasks(): Single<Tasks>
 
-    fun saveTask(task: Task)
+    fun saveTask(task: Task): Completable
 
-    fun setComplete(id: String, complete: Boolean)
+    fun setComplete(id: String, complete: Boolean): Completable
 
-    fun clearCompletedTasks()
+    fun clearCompletedTasks(): Completable
 
-    fun refreshTasks()
-
-    fun deleteAllTasks()
-
-    fun deleteTask(id: String)
+    fun deleteTask(id: String): Completable
 }

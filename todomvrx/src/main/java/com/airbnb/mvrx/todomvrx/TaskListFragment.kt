@@ -28,10 +28,7 @@ import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.core.MvRxViewModel
 import com.airbnb.mvrx.todomvrx.data.Task
-import com.airbnb.mvrx.todomvrx.data.source.db.TasksLocalDataSource
-import com.airbnb.mvrx.todomvrx.data.source.db.ToDoDatabase
 import com.airbnb.mvrx.todomvrx.todoapp.R
-import com.airbnb.mvrx.todomvrx.util.AppExecutors
 import com.airbnb.mvrx.todomvrx.views.fullScreenMessageView
 import com.airbnb.mvrx.todomvrx.views.header
 import com.airbnb.mvrx.todomvrx.views.horizontalLoader
@@ -55,9 +52,6 @@ class TaskListFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         fab.setImageResource(R.drawable.ic_add)
-
-        val database = ToDoDatabase.getInstance(requireContext())
-        TasksLocalDataSource.getInstance(AppExecutors(), database.taskDao())
 
         fab.setOnClickListener {
             navigate(R.id.addEditFragment, AddEditTaskArgs())
