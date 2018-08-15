@@ -14,7 +14,6 @@ import com.airbnb.mvrx.todomvrx.data.findTask
 import com.airbnb.mvrx.todomvrx.data.source.TasksDataSource
 import com.airbnb.mvrx.todomvrx.data.source.db.TasksLocalDataSource
 import com.airbnb.mvrx.todomvrx.data.source.db.ToDoDatabase
-import com.airbnb.mvrx.todomvrx.data.source.remote.TasksRemoteDataSource
 import com.airbnb.mvrx.todomvrx.util.AppExecutors
 import io.reactivex.Single
 
@@ -88,7 +87,7 @@ class TasksViewModel(override val initialState: TasksState, private val sources:
         override fun create(activity: FragmentActivity, state: TasksState): BaseMvRxViewModel<TasksState> {
             val database = ToDoDatabase.getInstance(activity)
             val localDataSource = TasksLocalDataSource.getInstance(AppExecutors(), database.taskDao())
-            return TasksViewModel(state, listOf(localDataSource, TasksRemoteDataSource))
+            return TasksViewModel(state, listOf(localDataSource/*, TasksRemoteDataSource*/))
         }
 
     }

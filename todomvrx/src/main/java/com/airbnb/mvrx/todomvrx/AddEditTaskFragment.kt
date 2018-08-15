@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.airbnb.mvrx.todomvrx.addedittask
+package com.airbnb.mvrx.todomvrx
 
 import android.os.Bundle
 import android.os.Parcelable
@@ -24,7 +24,6 @@ import android.widget.EditText
 import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.args
-import com.airbnb.mvrx.todomvrx.TasksViewModel
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.data.Task
 import com.airbnb.mvrx.todomvrx.data.findTask
@@ -55,14 +54,7 @@ class AddEditTaskFragment : BaseFragment() {
         }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        args.id?.let { id ->
-            withState(viewModel) { state ->
-                val task = state.tasks.findTask(id) ?: throw IllegalStateException("Unable to find task $id")
-                titleView.setText(task.title)
-                descriptionView.setText(task.description)
-            }
-        }
-        fab.setImageResource(if (args.id == null) R.drawable.ic_add else R.drawable.ic_edit)
+        fab.setImageResource(if (args.id == null) R.drawable.ic_add else R.drawable.ic_done)
         fab.setOnClickListener {
             withState(viewModel) { state ->
                 val task = state.tasks.findTask(args.id) ?: Task()
@@ -74,9 +66,12 @@ class AddEditTaskFragment : BaseFragment() {
                 findNavController().navigateUp()
             }
         }
+        viewModel
     }
 
-    override fun invalidate() {
-        // Do nothing.
+    override fun invalidate() = withState(viewModel) { state ->
+        val task = state.tasks.findTask(args.id)
+        titleView.setText(task?.title)
+        descriptionView.setText(task?.description)
     }
 }

@@ -13,20 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.airbnb.mvrx.todomvrx.statistics
+package com.airbnb.mvrx.todomvrx
 
 import com.airbnb.epoxy.EpoxyController
+import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
-import com.airbnb.mvrx.todomvrx.views.header
+import com.airbnb.mvrx.todomvrx.views.statisticsView
+import com.airbnb.mvrx.withState
 
 /**
  * Main UI for the statistics screen.
  */
 class StatisticsFragment : BaseFragment() {
-    override fun EpoxyController.buildModels() {
-        header {
-            id("header")
-            title("Statistics")
+
+    private val viewModel by activityViewModel(TasksViewModel::class)
+
+    override fun EpoxyController.buildModels() = withState(viewModel) { state ->
+        val (completeTasks, activeTasks) = state.tasks.partition { it.complete }
+        statisticsView {
+            id("active")
+            statistic("Active tasks: ${activeTasks.size}")
+        }
+        statisticsView {
+            id("complete")
+            statistic("Complete tasks: ${completeTasks.size}")
         }
     }
 

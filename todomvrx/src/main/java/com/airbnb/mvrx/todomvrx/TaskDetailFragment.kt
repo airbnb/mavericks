@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.airbnb.mvrx.todomvrx.taskdetail
+package com.airbnb.mvrx.todomvrx
 
 import android.os.Bundle
 import android.os.Parcelable
@@ -28,8 +28,6 @@ import android.widget.TextView
 import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.args
-import com.airbnb.mvrx.todomvrx.TasksViewModel
-import com.airbnb.mvrx.todomvrx.addedittask.AddEditTaskArgs
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.data.findTask
 import com.airbnb.mvrx.todomvrx.todoapp.R
@@ -72,7 +70,6 @@ class TaskDetailFragment : BaseFragment() {
 
         }
         // Must be called to trigger the lazy delegate
-        viewModel
     }
 
     override fun invalidate() = withState(viewModel) { state ->

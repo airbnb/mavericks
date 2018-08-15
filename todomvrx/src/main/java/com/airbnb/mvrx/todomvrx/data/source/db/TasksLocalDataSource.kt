@@ -21,17 +21,18 @@ import com.airbnb.mvrx.todomvrx.data.Tasks
 import com.airbnb.mvrx.todomvrx.data.source.TasksDataSource
 import com.airbnb.mvrx.todomvrx.util.AppExecutors
 import io.reactivex.Single
+import java.util.concurrent.TimeUnit
 
 
 /**
  * Concrete implementation of a data source as a db.
  */
 class TasksLocalDataSource private constructor(
-        val appExecutors: AppExecutors,
-        val tasksDao: TasksDao
+        private val appExecutors: AppExecutors,
+        private val tasksDao: TasksDao
 ) : TasksDataSource {
 
-    override fun getTasks(): Single<Tasks> = tasksDao.getTasks()
+    override fun getTasks(): Single<Tasks> = tasksDao.getTasks().delay(2000, TimeUnit.MILLISECONDS)
 
 
     override fun saveTask(task: Task) {
