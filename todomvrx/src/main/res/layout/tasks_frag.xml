@@ -13,7 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<com.airbnb.mvrx.todomvrx.todoapp.ScrollChildSwipeRefreshLayout
+<com.airbnb.mvrx.todomvrx.ScrollChildSwipeRefreshLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/refresh_layout"
     android:layout_width="match_parent"
@@ -81,5 +81,5 @@
 
         </LinearLayout>
     </RelativeLayout>
-</com.airbnb.mvrx.todomvrx.todoapp.ScrollChildSwipeRefreshLayout>
+</com.airbnb.mvrx.todomvrx.ScrollChildSwipeRefreshLayout>
 

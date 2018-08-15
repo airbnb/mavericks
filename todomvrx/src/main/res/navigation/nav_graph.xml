@@ -6,10 +6,10 @@
 
     <fragment
         android:id="@+id/tasksFragment"
-        android:name="com.airbnb.mvrx.todomvrx.todoapp.tasks.TaskListFragment"
+        android:name="com.airbnb.mvrx.todomvrx.tasks.TaskListFragment"
         android:label="TO-DO MvRx"/>
     <fragment
         android:id="@+id/statisticsFragment"
-        android:name="com.airbnb.mvrx.todomvrx.todoapp.statistics.StatisticsFragment"
+        android:name="com.airbnb.mvrx.todomvrx.statistics.StatisticsFragment"
         android:label="TO-DO MvRx"/>
 </navigation>
