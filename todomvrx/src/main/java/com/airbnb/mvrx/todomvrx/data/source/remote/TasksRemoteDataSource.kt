@@ -61,7 +61,7 @@ class TasksRemoteDataSource(
         } ?: throw IllegalStateException("Task $id not found")
     }
 
-    override fun saveTask(task: Task): Disposable = fromAction {
+    override fun upsertTask(task: Task): Disposable = fromAction {
         TASKS_SERVICE_DATA[task.id] = task
     }
 

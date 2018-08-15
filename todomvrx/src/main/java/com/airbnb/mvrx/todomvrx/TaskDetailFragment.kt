@@ -17,19 +17,17 @@ package com.airbnb.mvrx.todomvrx
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import android.view.ViewGroup
-import android.widget.CheckBox
-import android.widget.TextView
 import androidx.navigation.fragment.findNavController
+import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.args
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.data.findTask
 import com.airbnb.mvrx.todomvrx.todoapp.R
+import com.airbnb.mvrx.todomvrx.views.taskDetailView
 import com.airbnb.mvrx.withState
 import kotlinx.android.parcel.Parcelize
 
@@ -43,21 +41,6 @@ class TaskDetailFragment : BaseFragment() {
 
     private val args: TaskDetailArgs by args()
 
-    private lateinit var checkbox: CheckBox
-    private lateinit var titleView: TextView
-    private lateinit var descriptionView: TextView
-    private lateinit var noDataView: View
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-            inflater.inflate(R.layout.frag_detail, container, false).apply {
-                coordinatorLayout = findViewById(R.id.coordinator_layout)
-                fab = findViewById(R.id.fab)
-                titleView = findViewById(R.id.task_title)
-                descriptionView = findViewById(R.id.task_description)
-                checkbox = findViewById(R.id.complete)
-                noDataView = findViewById(R.id.no_data_view)
-            }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
@@ -65,19 +48,14 @@ class TaskDetailFragment : BaseFragment() {
         fab.setOnClickListener {
             navigate(R.id.addEditFragment, AddEditTaskArgs(args.id))
         }
-        checkbox.setOnCheckedChangeListener { _, isChecked ->
-            viewModel.setComplete(args.id, isChecked)
-
-        }
     }
 
-    override fun invalidate() = withState(viewModel) { state ->
-        val task = state.tasks.findTask(args.id)
-        checkbox.isChecked = task?.complete ?: false
-        checkbox.visibility = if (task == null) View.GONE else View.VISIBLE
-        titleView.text = task?.title
-        descriptionView.text = task?.description
-        noDataView.visibility = if (task == null) View.VISIBLE else View.GONE
+    override fun EpoxyController.buildModels() = withState(viewModel) { state ->
+        taskDetailView {
+            id("detail")
+            task(state.tasks.findTask(args.id))
+            onCompleteChanged { viewModel.setComplete(args.id, it) }
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {

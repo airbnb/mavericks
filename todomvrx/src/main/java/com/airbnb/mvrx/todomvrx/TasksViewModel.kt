@@ -40,9 +40,9 @@ class TasksViewModel(override val initialState: TasksState, private val sources:
                 .execute { copy(taskRequest = it, tasks = it() ?: tasks, lastEditedTask = null) }
     }
 
-    fun saveTask(task: Task) {
+    fun upsertTask(task: Task) {
         setState { copy(tasks = tasks.upsert(task) { it.id == task.id }, lastEditedTask =  task.id) }
-        sources.forEach { it.saveTask(task) }
+        sources.forEach { it.upsertTask(task) }
     }
 
     fun setComplete(id: String, complete: Boolean) {

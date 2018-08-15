@@ -18,7 +18,7 @@ class DatabaseDataSource(
 ) : TasksDataSource {
     override fun getTasks(): Single<Tasks> = dao.getTasks().delay(delayMs, TimeUnit.MILLISECONDS)
 
-    override fun saveTask(task: Task): Disposable = fromAction { dao.saveTask(task) }
+    override fun upsertTask(task: Task): Disposable = fromAction { dao.saveTask(task) }
 
     override fun setComplete(id: String, complete: Boolean): Disposable = fromAction { dao.setComplete(id, complete) }
 

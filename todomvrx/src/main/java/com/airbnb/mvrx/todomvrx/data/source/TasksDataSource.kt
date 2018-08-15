@@ -24,7 +24,7 @@ import io.reactivex.disposables.Disposable
 interface TasksDataSource {
     fun getTasks(): Single<Tasks>
 
-    fun saveTask(task: Task): Disposable
+    fun upsertTask(task: Task): Disposable
 
     fun setComplete(id: String, complete: Boolean): Disposable
 
