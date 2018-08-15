@@ -17,10 +17,15 @@
 package com.airbnb.mvrx.todomvrx.todoapp.tasks
 
 import android.os.Bundle
+import android.support.v7.widget.PopupMenu
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.Loading
 import com.airbnb.mvrx.activityViewModel
+import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.todomvrx.todoapp.R
 import com.airbnb.mvrx.todomvrx.todoapp.TasksViewModel
 import com.airbnb.mvrx.todomvrx.todoapp.core.BaseFragment
@@ -36,20 +41,33 @@ import com.airbnb.mvrx.withState
 /**
  * Display a grid of [Task]s. User can choose to view all, active or completed tasks.
  */
-class TasksFragment : BaseFragment() {
+class TaskListFragment : BaseFragment() {
 
-    private val viewModel by activityViewModel(TasksViewModel::class)
+    private val tasksViewModel by activityViewModel(TasksViewModel::class)
+    private val taskListViewModel by fragmentViewModel(TaskListViewModel::class)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true)
         fab.setImageResource(R.drawable.ic_add)
-
 
         val database = ToDoDatabase.getInstance(requireContext())
         TasksLocalDataSource.getInstance(AppExecutors(), database.taskDao())
+
+        fab.setOnClickListener { TODO() }
     }
 
-    override fun EpoxyController.buildModels() = withState(viewModel) { state ->
+    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
+        inflater?.inflate(R.menu.tasks_fragment_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?) = when (item?.itemId ?: 0) {
+        R.id.menu_refresh -> tasksViewModel.fetchTasks().andTrue()
+        R.id.menu_filter -> showFilteringPopUpMenu().andTrue()
+        else -> super.onOptionsItemSelected(item)
+    }
+
+    override fun EpoxyController.buildModels() = withState(tasksViewModel, taskListViewModel) { state, taskListState ->
 
         horizontalLoader {
             id("loader")
@@ -58,30 +76,24 @@ class TasksFragment : BaseFragment() {
 
         header {
             id("header")
-            title("Tasks Fragment")
+            title(when(taskListState.filter) {
+                TaskListFilter.All -> R.string.label_all
+                TaskListFilter.Active -> R.string.label_active
+                TaskListFilter.Completed -> R.string.label_completed
+            })
         }
 
-        state.tasks.forEach {
-            taskItemView {
-                id(it.id)
-                title(it.title)
-                checked(it.isCompleted)
-            }
-        }
+        state.tasks
+                .filter(taskListState.filter::matches)
+                .forEach {
+                    taskItemView {
+                        id(it.id)
+                        title(it.title)
+                        checked(it.isCompleted)
+                    }
+                }
     }
 
-//    private lateinit var viewDataBinding: TasksFragBinding
-//    private lateinit var listAdapter: TasksAdapter
-//
-//    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-//            savedInstanceState: Bundle?): View? {
-//        viewDataBinding = TasksFragBinding.inflate(inflater, container, false).apply {
-//            viewmodel = (activity as TasksActivity).obtainViewModel()
-//        }
-//        setHasOptionsMenu(true)
-//        return viewDataBinding.root
-//    }
-//
 //    override fun onResume() {
 //        super.onResume()
 //        viewDataBinding.viewmodel?.start()
@@ -118,60 +130,28 @@ class TasksFragment : BaseFragment() {
 //        setupRefreshLayout()
 //    }
 //
-//    private fun showFilteringPopUpMenu() {
-//        PopupMenu(context, activity.findViewById<View>(R.id.menu_filter)).run {
-//            menuInflater.inflate(R.menu.filter_tasks, menu)
-//
-//            setOnMenuItemClickListener {
-//                viewDataBinding.viewmodel?.run {
-//                    currentFiltering =
-//                            when (it.itemId) {
-//                                R.id.active -> TasksFilterType.ACTIVE_TASKS
-//                                R.id.completed -> TasksFilterType.COMPLETED_TASKS
-//                                else -> TasksFilterType.ALL_TASKS
-//                            }
-//                    loadTasks(false)
-//                }
-//                true
-//            }
-//            show()
-//        }
-//    }
-//
-//    private fun setupFab() {
-//        activity.findViewById<FloatingActionButton>(R.id.fab_add_task).run {
-//            setImageResource(R.drawable.ic_add)
-//            setOnClickListener {
-//                viewDataBinding.viewmodel?.addNewTask()
-//            }
-//        }
-//    }
-//
-//    private fun setupListAdapter() {
-//        val viewModel = viewDataBinding.viewmodel
-//        if (viewModel != null) {
-//            listAdapter = TasksAdapter(ArrayList(0), viewModel)
-//            viewDataBinding.tasksList.adapter = listAdapter
-//        } else {
-//            Log.w(TAG, "ViewModel not initialized when attempting to set up adapter.")
-//        }
-//    }
-//
-//    private fun setupRefreshLayout() {
-//        viewDataBinding.refreshLayout.run {
-//            setColorSchemeColors(
-//                    ContextCompat.getColor(activity, R.color.colorPrimary),
-//                    ContextCompat.getColor(activity, R.color.colorAccent),
-//                    ContextCompat.getColor(activity, R.color.colorPrimaryDark)
-//            )
-//            // Set the scrolling view in the custom SwipeRefreshLayout.
-//            scrollUpChild = viewDataBinding.tasksList
-//        }
-//    }
+    private fun showFilteringPopUpMenu() {
+        PopupMenu(requireContext(), requireActivity().findViewById<View>(R.id.menu_filter)).run {
+            menuInflater.inflate(R.menu.filter_tasks, menu)
+
+            setOnMenuItemClickListener {
+                val filter = when (it.itemId) {
+                    R.id.active -> TaskListFilter.Active
+                    R.id.completed -> TaskListFilter.Completed
+                    R.id.all -> TaskListFilter.All
+                    else -> TaskListFilter.All
+                }
+                taskListViewModel.setFilter(filter)
+                true
+            }
+            show()
+        }
+    }
+
+    @Suppress("unused")
+    private fun Unit.andTrue() = true
 
     companion object {
-        fun newInstance() = TasksFragment()
-        private const val TAG = "TasksFragment"
-
+        fun newInstance() = TaskListFragment()
     }
 }

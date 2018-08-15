@@ -34,8 +34,7 @@ class TasksViewModel(override val initialState: TasksState, private val reposito
             // TODO: make this more optimal
             val database = ToDoDatabase.getInstance(activity)
             val localDataSource = TasksLocalDataSource.getInstance(AppExecutors(), database.taskDao())
-            val remoteDataSource = TasksRemoteDataSource()
-            val repository = TasksRepository.getInstance(localDataSource, remoteDataSource)
+            val repository = TasksRepository.getInstance(localDataSource, TasksRemoteDataSource)
             return TasksViewModel(state, repository)
         }
 

@@ -12,7 +12,7 @@ import com.airbnb.epoxy.ModelView
 import com.airbnb.epoxy.TextProp
 import com.airbnb.mvrx.todomvrx.todoapp.R
 
-@ModelView(autoLayout = ModelView.Size.WRAP_WIDTH_MATCH_HEIGHT)
+@ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)
 class TaskItemView @JvmOverloads constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {

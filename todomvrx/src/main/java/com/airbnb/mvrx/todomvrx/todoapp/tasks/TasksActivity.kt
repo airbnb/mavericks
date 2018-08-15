@@ -63,7 +63,7 @@ class TasksActivity : AppCompatActivity(), TaskItemNavigator, TasksNavigator {
 
     private fun setupViewFragment() {
         supportFragmentManager.findFragmentById(R.id.contentFrame) ?:
-                TasksFragment.newInstance().let {
+                TaskListFragment.newInstance().let {
                     replaceFragmentInActivity(it, R.id.contentFrame)
                 }
     }

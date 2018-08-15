@@ -18,11 +18,11 @@ package com.airbnb.mvrx.todomvrx.todoapp.taskdetail
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksRepository
-import com.airbnb.mvrx.todomvrx.todoapp.tasks.TasksFragment
+import com.airbnb.mvrx.todomvrx.todoapp.tasks.TaskListFragment
 
 
 /**
- * Listens to user actions from the list item in ([TasksFragment]) and redirects them to the
+ * Listens to user actions from the list item in ([TaskListFragment]) and redirects them to the
  * Fragment's actions listener.
  */
 class TaskDetailViewModel(

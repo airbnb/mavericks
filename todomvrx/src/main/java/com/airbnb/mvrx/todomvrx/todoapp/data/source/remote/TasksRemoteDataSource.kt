@@ -26,7 +26,19 @@ import java.util.concurrent.TimeUnit
 /**
  * Implementation of the data source that adds a latency simulating network.
  */
-class TasksRemoteDataSource() : TasksDataSource {
+private const val SERVICE_LATENCY_IN_MILLIS = 2000
+object TasksRemoteDataSource : TasksDataSource {
+
+    private val TASKS_SERVICE_DATA: MutableMap<String, Task> = LinkedHashMap(2)
+
+    init {
+        arrayOf(
+                Task("Build tower in Pisa", "Ground looks good, no foundation work required."),
+                Task("Finish bridge in Tacoma", "Found awesome girders at half the cost!")
+        ).forEach {
+            TASKS_SERVICE_DATA[it.id] = it
+        }
+    }
 
     override fun getTasks(): Single<List<Task>> {
         return Single
@@ -88,33 +100,5 @@ class TasksRemoteDataSource() : TasksDataSource {
 
     override fun deleteTask(taskId: String) {
         TASKS_SERVICE_DATA.remove(taskId)
-    }
-
-    companion object {
-
-        private var INSTANCE: TasksRemoteDataSource? = null
-
-        private val SERVICE_LATENCY_IN_MILLIS = 5000
-
-        private val TASKS_SERVICE_DATA: MutableMap<String, Task>
-
-        init {
-            TASKS_SERVICE_DATA = LinkedHashMap(2)
-            addTask("Build tower in Pisa", "Ground looks good, no foundation work required.")
-            addTask("Finish bridge in Tacoma", "Found awesome girders at half the cost!")
-        }
-
-        val instance: TasksRemoteDataSource
-            get() {
-                if (INSTANCE == null) {
-                    INSTANCE = TasksRemoteDataSource()
-                }
-                return INSTANCE!!
-            }
-
-        private fun addTask(title: String, description: String) {
-            val newTask = Task(title, description)
-            TASKS_SERVICE_DATA[newTask.id] = newTask
-        }
     }
 }
