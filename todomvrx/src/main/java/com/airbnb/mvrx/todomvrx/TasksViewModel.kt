@@ -13,7 +13,10 @@ import com.airbnb.mvrx.todomvrx.data.findTask
 import com.airbnb.mvrx.todomvrx.data.source.TasksDataSource
 import com.airbnb.mvrx.todomvrx.data.source.db.DatabaseDataSource
 import com.airbnb.mvrx.todomvrx.data.source.db.ToDoDatabase
-import io.reactivex.Single
+import com.airbnb.mvrx.todomvrx.util.copy
+import com.airbnb.mvrx.todomvrx.util.delete
+import com.airbnb.mvrx.todomvrx.util.upsert
+import io.reactivex.Observable
 
 data class TasksState(
         val tasks: Tasks = emptyList(),
@@ -29,23 +32,16 @@ class TasksViewModel(override val initialState: TasksState, private val sources:
         refreshTasks()
     }
 
+    @Suppress("UNCHECKED_CAST")
     fun refreshTasks() {
-        Single.concat(sources.map { it.getTasks() })
-                .toObservable()
+        Observable.merge(sources.map { it.getTasks().toObservable() })
                 .doOnSubscribe { setState { copy(isLoading = true) } }
                 .doOnComplete { setState { copy(isLoading = false) } }
                 .execute { copy(taskRequest = it, tasks = it() ?: tasks, lastEditedTask = null) }
     }
 
     fun saveTask(task: Task) {
-        setState {
-            val index = tasks.indexOfFirst { it.id == task.id }
-            if (index >= 0) {
-                copy(tasks = tasks.copy(index, task), lastEditedTask = task.id)
-            } else {
-                copy(tasks = tasks + task, lastEditedTask = task.id)
-            }
-        }
+        setState { copy(tasks = tasks.upsert(task) { it.id == task.id }, lastEditedTask =  task.id) }
         sources.forEach { it.saveTask(task) }
     }
 
@@ -69,15 +65,12 @@ class TasksViewModel(override val initialState: TasksState, private val sources:
         sources.forEach { it.deleteTask(id) }
     }
 
-    private fun <T> List<T>.copy(i: Int, value: T): List<T> = toMutableList().apply { set(i, value) }
-
-    private inline fun <T> List<T>.delete(filter: (T) -> Boolean): List<T> = toMutableList().apply { removeAt(indexOfFirst(filter)) }
-
     companion object : MvRxViewModelFactory<TasksState> {
         override fun create(activity: FragmentActivity, state: TasksState): BaseMvRxViewModel<TasksState> {
             val database = ToDoDatabase.getInstance(activity)
-            val dataSource = DatabaseDataSource(database.taskDao())
-            return TasksViewModel(state, listOf(dataSource/*, TasksRemoteDataSource*/))
+            val dataSource1 = DatabaseDataSource(database.taskDao(), 2000)
+            val dataSource2 = DatabaseDataSource(database.taskDao(), 3500)
+            return TasksViewModel(state, listOf(dataSource1, dataSource2))
         }
 
     }

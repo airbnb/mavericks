@@ -33,6 +33,7 @@ class TaskItemView @JvmOverloads constructor(
     @ModelProp
     fun setChecked(checked: Boolean) {
         checkbox.isChecked = checked
+        setBackgroundResource(if (checked) R.drawable.completed_task_background else 0)
     }
 
     @CallbackProp

@@ -19,7 +19,7 @@
     <color name="colorPrimaryDark">#263238</color>
     <color name="colorAccent">#D50000</color>
 
-    <drawable name="completedTaskBackground">#CCCCCC</drawable>
+    <drawable name="completed_task_background">#CCCCCC</drawable>
 
     <drawable name="touchFeedback">#CFD8DC</drawable>
 

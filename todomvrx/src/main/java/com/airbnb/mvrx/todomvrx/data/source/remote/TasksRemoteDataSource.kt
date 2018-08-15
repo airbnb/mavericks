@@ -20,15 +20,20 @@ import com.airbnb.mvrx.todomvrx.data.Task
 import com.airbnb.mvrx.todomvrx.data.Tasks
 import com.airbnb.mvrx.todomvrx.data.source.TasksDataSource
 import io.reactivex.Completable
+import io.reactivex.Scheduler
 import io.reactivex.Single
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.Disposable
 import java.util.LinkedHashMap
 import java.util.concurrent.TimeUnit
 
 /**
  * Implementation of the data source that adds a latency simulating network.
  */
-private const val SERVICE_LATENCY_IN_MILLIS = 2000
-object TasksRemoteDataSource : TasksDataSource {
+class TasksRemoteDataSource(
+        private val latencyMs: Long = 2000,
+        private val scheduler: Scheduler
+) : TasksDataSource {
 
     private val TASKS_SERVICE_DATA: MutableMap<String, Task> = LinkedHashMap(2)
 
@@ -45,10 +50,10 @@ object TasksRemoteDataSource : TasksDataSource {
     override fun getTasks(): Single<Tasks> {
         return Single
                 .just(TASKS_SERVICE_DATA.values.toList())
-                .delay(SERVICE_LATENCY_IN_MILLIS.toLong(), TimeUnit.MILLISECONDS)
+                .delay(latencyMs, TimeUnit.MILLISECONDS)
     }
 
-    override fun setComplete(id: String, complete: Boolean): Completable = Completable.fromCallable {
+    override fun setComplete(id: String, complete: Boolean): Disposable = fromAction {
         TASKS_SERVICE_DATA[id]?.let { remoteTask ->
             remoteTask.copy(complete = complete).also {
                 TASKS_SERVICE_DATA[remoteTask.id] = it
@@ -56,12 +61,11 @@ object TasksRemoteDataSource : TasksDataSource {
         } ?: throw IllegalStateException("Task $id not found")
     }
 
-    override fun saveTask(task: Task) = Completable.fromCallable {
+    override fun saveTask(task: Task): Disposable = fromAction {
         TASKS_SERVICE_DATA[task.id] = task
-        task
     }
 
-    override fun clearCompletedTasks() = Completable.fromCallable {
+    override fun clearCompletedTasks(): Disposable = fromAction {
         val it = TASKS_SERVICE_DATA.entries.iterator()
         while (it.hasNext()) {
             val entry = it.next()
@@ -71,7 +75,13 @@ object TasksRemoteDataSource : TasksDataSource {
         }
     }
 
-    override fun deleteTask(taskId: String) = Completable.fromCallable {
-        TASKS_SERVICE_DATA.remove(taskId)
+    override fun deleteTask(id: String): Disposable = fromAction {
+        TASKS_SERVICE_DATA.remove(id)
     }
+
+    private fun fromAction(action: () -> Unit): Disposable = Completable.fromAction(action)
+            .subscribeOn(scheduler)
+            .observeOn(AndroidSchedulers.mainThread())
+            .delay(latencyMs, TimeUnit.MILLISECONDS)
+            .subscribe()
 }

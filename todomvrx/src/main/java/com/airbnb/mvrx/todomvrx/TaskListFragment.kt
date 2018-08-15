@@ -87,7 +87,7 @@ class TaskListFragment : BaseFragment() {
                 iconRes(iconRes)
                 title(title)
             }
-        } else {
+        } else if (!(state.isLoading && state.tasks.isEmpty())) {
             header {
                 id("header")
                 title(when (taskListState.filter) {
