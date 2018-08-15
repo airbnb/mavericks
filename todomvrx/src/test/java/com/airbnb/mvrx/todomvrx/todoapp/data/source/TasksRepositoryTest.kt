@@ -16,15 +16,14 @@
 package com.airbnb.mvrx.todomvrx.todoapp.data.source
 
 import com.airbnb.mvrx.todomvrx.todoapp.data.Task
+import com.airbnb.mvrx.todomvrx.todoapp.data.Tasks
 import com.airbnb.mvrx.todomvrx.todoapp.util.any
 import com.airbnb.mvrx.todomvrx.todoapp.util.capture
 import com.airbnb.mvrx.todomvrx.todoapp.util.eq
 import com.google.common.collect.Lists
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.After
-import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertThat
-import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.mockito.ArgumentCaptor
@@ -109,7 +108,7 @@ class TasksRepositoryTest {
 
             saveTask(newTask)
 
-            // When a task is completed to the tasks repository
+            // When a task is complete to the tasks repository
             completeTask(newTask)
 
             // Then the service API and persistent repository are called and the cache is updated
@@ -128,7 +127,7 @@ class TasksRepositoryTest {
             Task(TASK_TITLE, TASK_DESCRIPTION).also {
                 saveTask(it)
 
-                // When a task is completed using its id to the tasks repository
+                // When a task is complete using its id to the tasks repository
                 completeTask(it.id)
                 // Then the service API and persistent repository are called and the cache is updated
                 verify<TasksDataSource>(tasksRemoteDataSource).completeTask(it)
@@ -143,11 +142,11 @@ class TasksRepositoryTest {
     }
 
     @Test fun activateTask_activatesTaskToServiceAPIUpdatesCache() {
-        // Given a stub completed task with title and description in the repository
-        val newTask = Task(TASK_TITLE, TASK_DESCRIPTION).apply { isCompleted = true }
+        // Given a stub complete task with title and description in the repository
+        val newTask = Task(TASK_TITLE, TASK_DESCRIPTION).apply { complete = true }
         with(tasksRepository) {
             tasksRepository.saveTask(newTask)
-            // When a completed task is activated to the tasks repository
+            // When a complete task is activated to the tasks repository
             tasksRepository.activateTask(newTask)
             // Then the service API and persistent repository are called and the cache is updated
             verify(tasksRemoteDataSource).activateTask(newTask)
@@ -160,12 +159,12 @@ class TasksRepositoryTest {
     }
 
     @Test fun activateTaskId_activatesTaskToServiceAPIUpdatesCache() {
-        // Given a stub completed task with title and description in the repository
-        val newTask = Task(TASK_TITLE, TASK_DESCRIPTION).apply { isCompleted = true }
+        // Given a stub complete task with title and description in the repository
+        val newTask = Task(TASK_TITLE, TASK_DESCRIPTION).apply { complete = true }
         with(tasksRepository) {
             saveTask(newTask)
 
-            // When a completed task is activated with its id to the tasks repository
+            // When a complete task is activated with its id to the tasks repository
             activateTask(newTask.id)
 
             // Then the service API and persistent repository are called and the cache is updated
@@ -188,15 +187,15 @@ class TasksRepositoryTest {
 
     @Test fun deleteCompletedTasks_deleteCompletedTasksToServiceAPIUpdatesCache() {
         with(tasksRepository) {
-            // Given 2 stub completed tasks and 1 stub active tasks in the repository
-            val newTask = Task(TASK_TITLE, TASK_DESCRIPTION).apply { isCompleted = true }
+            // Given 2 stub complete tasks and 1 stub active tasks in the repository
+            val newTask = Task(TASK_TITLE, TASK_DESCRIPTION).apply { completed = true }
             saveTask(newTask)
             val newTask2 = Task(TASK_TITLE2, TASK_DESCRIPTION)
             saveTask(newTask2)
-            val newTask3 = Task(TASK_TITLE3, TASK_DESCRIPTION).apply { isCompleted = true }
+            val newTask3 = Task(TASK_TITLE3, TASK_DESCRIPTION).apply { completed = true }
             saveTask(newTask3)
 
-            // When a completed tasks are cleared to the tasks repository
+            // When a complete tasks are cleared to the tasks repository
             clearCompletedTasks()
 
 
@@ -214,12 +213,12 @@ class TasksRepositoryTest {
 
     @Test fun deleteAllTasks_deleteTasksToServiceAPIUpdatesCache() {
         with(tasksRepository) {
-            // Given 2 stub completed tasks and 1 stub active tasks in the repository
-            val newTask = Task(TASK_TITLE, TASK_DESCRIPTION).apply { isCompleted = true }
+            // Given 2 stub complete tasks and 1 stub active tasks in the repository
+            val newTask = Task(TASK_TITLE, TASK_DESCRIPTION).apply { completed = true }
             saveTask(newTask)
             val newTask2 = Task(TASK_TITLE2, TASK_DESCRIPTION)
             saveTask(newTask2)
-            val newTask3 = Task(TASK_TITLE3, TASK_DESCRIPTION).apply { isCompleted = true }
+            val newTask3 = Task(TASK_TITLE3, TASK_DESCRIPTION).apply { completed = true }
             saveTask(newTask3)
 
             // When all tasks are deleted to the tasks repository
@@ -236,7 +235,7 @@ class TasksRepositoryTest {
     @Test fun deleteTask_deleteTaskToServiceAPIRemovedFromCache() {
         with(tasksRepository) {
             // Given a task in the repository
-            val newTask = Task(TASK_TITLE, TASK_DESCRIPTION).apply { isCompleted }
+            val newTask = Task(TASK_TITLE, TASK_DESCRIPTION).apply { completed }
             saveTask(newTask)
             assertThat(cache.containsKey(newTask.id), `is`(true))
 
@@ -356,7 +355,7 @@ class TasksRepositoryTest {
         tasksCallbackCaptor.value.onDataNotAvailable()
     }
 
-    private fun setTasksAvailable(dataSource: TasksDataSource, tasks: List<Task>) {
+    private fun setTasksAvailable(dataSource: TasksDataSource, tasks: Tasks) {
         verify(dataSource).getTasks(capture(tasksCallbackCaptor))
         tasksCallbackCaptor.value.onTasksLoaded(tasks)
     }

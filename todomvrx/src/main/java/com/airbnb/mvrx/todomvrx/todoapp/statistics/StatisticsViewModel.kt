@@ -17,7 +17,6 @@ package com.airbnb.mvrx.todomvrx.todoapp.statistics
 
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
-import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksRepository
 
 /**
  * Exposes the data to be used in the statistics screen.
@@ -29,8 +28,7 @@ import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksRepository
  * preferable to having logic in the XML layout.
  */
 class StatisticsViewModel(
-        private val context: Application,
-        private val tasksRepository: TasksRepository
+        private val context: Application
 ) : AndroidViewModel(context) {
 //
 //    val dataLoading = ObservableBoolean(false)
@@ -69,7 +67,7 @@ class StatisticsViewModel(
 //     * Called when new data is ready.
 //     */
 //    private fun computeStats(tasks: List<Task>) {
-//        numberOfCompletedTasks = tasks.count { it.isCompleted }
+//        numberOfCompletedTasks = tasks.count { it.complete }
 //        numberOfActiveTasks = tasks.size - numberOfCompletedTasks
 //        updateDataBindingObservables()
 //    }

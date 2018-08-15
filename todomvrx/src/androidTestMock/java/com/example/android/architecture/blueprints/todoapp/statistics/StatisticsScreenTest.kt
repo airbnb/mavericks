@@ -91,7 +91,7 @@ import org.junit.runner.RunWith
     }
 
     @Test fun Tasks_ShowsNonEmptyMessage() {
-        // Check that the active and completed tasks text is displayed
+        // Check that the active and complete tasks text is displayed
         val expectedActiveTaskText = InstrumentationRegistry.getTargetContext()
                 .getString(R.string.statistics_active_tasks, 1)
         onView(withText(containsString(expectedActiveTaskText))).check(matches(isDisplayed()))

@@ -171,7 +171,7 @@ import org.junit.runner.RunWith
     @Test fun markTaskAsActive() {
         viewAllTasks()
 
-        // Add completed task
+        // Add complete task
         createTask(TITLE1, DESCRIPTION)
         clickCheckBoxForTask(TITLE1)
 
@@ -210,7 +210,7 @@ import org.junit.runner.RunWith
     }
 
     @Test fun showCompletedTasks() {
-        // Add 2 completed tasks
+        // Add 2 complete tasks
         createTask(TITLE1, DESCRIPTION)
         clickCheckBoxForTask(TITLE1)
         createTask(TITLE2, DESCRIPTION)
@@ -231,11 +231,11 @@ import org.junit.runner.RunWith
         createTask(TITLE2, DESCRIPTION)
         clickCheckBoxForTask(TITLE2)
 
-        // Click clear completed in menu
+        // Click clear complete in menu
         openActionBarOverflowOrOptionsMenu(getTargetContext())
         onView(withText(R.string.menu_clear)).perform(click())
 
-        //Verify that completed tasks are not shown
+        //Verify that complete tasks are not shown
         onView(withItemText(TITLE1)).check(matches(not(isDisplayed())))
         onView(withItemText(TITLE2)).check(matches(not(isDisplayed())))
     }
@@ -289,7 +289,7 @@ import org.junit.runner.RunWith
         // Click on the navigation up button to go back to the list
         onView(withContentDescription(toolbarNavigationContentDescription)).perform(click())
 
-        // Check that the task is marked as completed
+        // Check that the task is marked as complete
         onView(allOf(withId(R.id.complete),
                 hasSibling(withText(TITLE1)))).check(matches(isChecked()))
     }
@@ -297,7 +297,7 @@ import org.junit.runner.RunWith
     @Test fun markTaskAsActiveOnDetailScreen_taskIsActiveInList() {
         viewAllTasks()
 
-        // Add 1 completed task
+        // Add 1 complete task
         createTask(TITLE1, DESCRIPTION)
         clickCheckBoxForTask(TITLE1)
 
@@ -341,7 +341,7 @@ import org.junit.runner.RunWith
     @Test fun markTaskAsActiveAndCompleteOnDetailScreen_taskIsCompleteInList() {
         viewAllTasks()
 
-        // Add 1 completed task
+        // Add 1 complete task
         createTask(TITLE1, DESCRIPTION)
         clickCheckBoxForTask(TITLE1)
 
@@ -364,7 +364,7 @@ import org.junit.runner.RunWith
 
     @Test fun orientationChange_FilterActivePersists() {
 
-        // Add a completed task
+        // Add a complete task
         createTask(TITLE1, DESCRIPTION)
         clickCheckBoxForTask(TITLE1)
 
@@ -383,14 +383,14 @@ import org.junit.runner.RunWith
 
     @Test fun orientationChange_FilterCompletedPersists() {
 
-        // Add a completed task
+        // Add a complete task
         createTask(TITLE1, DESCRIPTION)
         clickCheckBoxForTask(TITLE1)
 
-        // when switching to completed tasks
+        // when switching to complete tasks
         viewCompletedTasks()
 
-        // the completed task should be displayed
+        // the complete task should be displayed
         onView(withText(TITLE1)).check(matches(isDisplayed()))
 
         // when rotating the screen
@@ -403,7 +403,7 @@ import org.junit.runner.RunWith
 
     // Blinking cursor after rotation breaks this in API 19
     @Test @SdkSuppress(minSdkVersion = 21) fun orientationChange_DuringEdit_ChangePersists() {
-        // Add a completed task
+        // Add a complete task
         createTask(TITLE1, DESCRIPTION)
 
         // Open the task in details view
@@ -425,7 +425,7 @@ import org.junit.runner.RunWith
 
     // Blinking cursor after rotation breaks this in API 19
     @Test @SdkSuppress(minSdkVersion = 21) fun orientationChange_DuringEdit_NoDuplicate() {
-        // Add a completed task
+        // Add a complete task
         createTask(TITLE1, DESCRIPTION)
 
         // Open the task in details view

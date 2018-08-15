@@ -26,7 +26,6 @@ import com.airbnb.mvrx.todomvrx.todoapp.TestUtils
 import com.airbnb.mvrx.todomvrx.todoapp.addedittask.AddEditTaskActivity
 import com.airbnb.mvrx.todomvrx.todoapp.data.Task
 import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksDataSource.LoadTasksCallback
-import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksRepository
 import com.airbnb.mvrx.todomvrx.todoapp.util.ADD_EDIT_RESULT_OK
 import com.airbnb.mvrx.todomvrx.todoapp.util.DELETE_RESULT_OK
 import com.airbnb.mvrx.todomvrx.todoapp.util.EDIT_RESULT_OK
@@ -71,13 +70,13 @@ class TasksViewModelTest {
         // Get a reference to the class under test
         tasksViewModel = TasksViewModel(context, tasksRepository)
 
-        // We initialise the tasks to 3, with one active and two completed
+        // We initialise the tasks to 3, with one active and two complete
         val task1 = Task("Title1", "Description1")
         val task2 = Task("Title2", "Description2").apply {
-            isCompleted = true
+            complete = true
         }
         val task3 = Task("Title3", "Description3").apply {
-            isCompleted = true
+            complete = true
         }
         tasks = Lists.newArrayList(task1, task2, task3)
 
@@ -177,7 +176,7 @@ class TasksViewModelTest {
     }
 
     @Test fun clearCompletedTasks_ClearsTasks() {
-        // When completed tasks are cleared
+        // When complete tasks are cleared
         tasksViewModel.clearCompletedTasks()
 
         // Then repository is called and the view is notified

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017, The Android Open Source Project
+ * Copyright 2016, The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,24 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.airbnb.mvrx.todomvrx.todoapp.tasks
 
-/**
- * Used with the filter spinner in the tasks list.
- */
-enum class TasksFilterType {
-    /**
-     * Do not filter tasks.
-     */
-    ALL_TASKS,
+package com.airbnb.mvrx.todomvrx.todoapp.data.source
 
-    /**
-     * Filters only the active (not complete yet) tasks.
-     */
-    ACTIVE_TASKS,
+import com.airbnb.mvrx.todomvrx.todoapp.data.Task
+import com.airbnb.mvrx.todomvrx.todoapp.data.Tasks
+import io.reactivex.Single
 
-    /**
-     * Filters only the complete tasks.
-     */
-    COMPLETED_TASKS
+interface TasksDataSource {
+    fun getTasks(): Single<Tasks>
+
+    fun saveTask(task: Task)
+
+    fun setComplete(id: String, complete: Boolean)
+
+    fun clearCompletedTasks()
+
+    fun refreshTasks()
+
+    fun deleteAllTasks()
+
+    fun deleteTask(id: String)
 }

@@ -20,7 +20,6 @@ import android.app.Application
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import com.airbnb.mvrx.todomvrx.todoapp.data.Task
 import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksDataSource
-import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksRepository
 import com.airbnb.mvrx.todomvrx.todoapp.util.any
 import com.airbnb.mvrx.todomvrx.todoapp.util.capture
 import com.airbnb.mvrx.todomvrx.todoapp.util.eq

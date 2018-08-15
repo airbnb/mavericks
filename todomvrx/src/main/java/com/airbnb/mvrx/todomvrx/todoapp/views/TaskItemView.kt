@@ -2,9 +2,9 @@ package com.airbnb.mvrx.todomvrx.todoapp.views
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.View
 import android.widget.CheckBox
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import android.widget.TextView
 import com.airbnb.epoxy.CallbackProp
 import com.airbnb.epoxy.ModelProp
@@ -17,7 +17,7 @@ class TaskItemView @JvmOverloads constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
-    private val container by lazy { findViewById<LinearLayout>(R.id.container) }
+    private val clickOverlay by lazy { findViewById<View>(R.id.click_overlay) }
     private val checkbox by lazy { findViewById<CheckBox>(R.id.checkbox) }
     private val titleView by lazy { findViewById<TextView>(R.id.title) }
 
@@ -38,7 +38,7 @@ class TaskItemView @JvmOverloads constructor(
     @CallbackProp
     fun onCheckedChanged(callback: ((Boolean) -> Unit)?) {
         callback?.let { _ ->
-            container.setOnClickListener { _ ->
+            clickOverlay.setOnClickListener { _ ->
                 callback.invoke(!checkbox.isChecked)
             }
         }

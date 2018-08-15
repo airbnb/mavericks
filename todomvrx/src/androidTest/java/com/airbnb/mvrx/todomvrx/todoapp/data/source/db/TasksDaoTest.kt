@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.airbnb.mvrx.todomvrx.todoapp.data.source.local
+package com.airbnb.mvrx.todomvrx.todoapp.data.source.db
 
 import android.arch.persistence.room.Room
 import android.support.test.InstrumentationRegistry
@@ -59,7 +59,7 @@ import org.junit.runner.RunWith
 
         // When a task with the same id is inserted
         val newTask = Task(NEW_TITLE, NEW_DESCRIPTION, DEFAULT_ID).apply {
-            isCompleted = NEW_IS_COMPLETED
+            complete = NEW_IS_COMPLETED
         }
         database.taskDao().insertTask(newTask)
 
@@ -89,7 +89,7 @@ import org.junit.runner.RunWith
 
         // When the task is updated
         val updatedTask = Task(NEW_TITLE, NEW_DESCRIPTION, DEFAULT_ID).apply {
-            isCompleted = NEW_IS_COMPLETED
+            complete = NEW_IS_COMPLETED
         }
         database.taskDao().updateTask(updatedTask)
 
@@ -143,10 +143,10 @@ import org.junit.runner.RunWith
     }
 
     @Test fun deleteCompletedTasksAndGettingTasks() {
-        // Given a completed task inserted
+        // Given a complete task inserted
         database.taskDao().insertTask(DEFAULT_TASK)
 
-        // When deleting completed tasks
+        // When deleting complete tasks
         database.taskDao().deleteCompletedTasks()
 
         // When getting the tasks
@@ -167,7 +167,7 @@ import org.junit.runner.RunWith
         assertThat(task.id, `is`(id))
         assertThat(task.title, `is`(title))
         assertThat(task.description, `is`(description))
-        assertThat(task.isCompleted, `is`(completed))
+        assertThat(task.complete, `is`(completed))
     }
 
     companion object {
@@ -177,7 +177,7 @@ import org.junit.runner.RunWith
         private val DEFAULT_ID = "id"
         private val DEFAULT_IS_COMPLETED = true
         private val DEFAULT_TASK = Task(DEFAULT_TITLE, DEFAULT_DESCRIPTION, DEFAULT_ID).apply {
-            isCompleted = DEFAULT_IS_COMPLETED
+            complete = DEFAULT_IS_COMPLETED
         }
 
         private val NEW_TITLE = "title2"

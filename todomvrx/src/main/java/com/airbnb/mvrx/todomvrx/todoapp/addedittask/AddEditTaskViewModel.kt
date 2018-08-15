@@ -17,7 +17,6 @@ package com.airbnb.mvrx.todomvrx.todoapp.addedittask
 
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
-import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksRepository
 
 /**
  * ViewModel for the Add/Edit screen.
@@ -29,8 +28,7 @@ import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksRepository
  * how to deal with more complex scenarios.
  */
 class AddEditTaskViewModel(
-        context: Application,
-        private val tasksRepository: TasksRepository
+        context: Application
 ) : AndroidViewModel(context) {
 
 //    val title = ObservableField<String>()
@@ -63,7 +61,7 @@ class AddEditTaskViewModel(
 //    override fun onTaskLoaded(task: Task) {
 //        title.set(task.title)
 //        description.set(task.description)
-//        taskCompleted = task.isCompleted
+//        taskCompleted = task.complete
 //        dataLoading.set(false)
 //        isDataLoaded = true
 //
@@ -87,7 +85,7 @@ class AddEditTaskViewModel(
 //        } else {
 //            taskId?.let {
 //                updateTask(Task(title.get(), description.get(), it)
-//                        .apply { isCompleted = taskCompleted })
+//                        .apply { complete = taskCompleted })
 //            }
 //        }
 //    }

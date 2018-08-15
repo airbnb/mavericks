@@ -17,7 +17,6 @@ package com.airbnb.mvrx.todomvrx.todoapp.taskdetail
 
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
-import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksRepository
 import com.airbnb.mvrx.todomvrx.todoapp.tasks.TaskListFragment
 
 
@@ -26,12 +25,11 @@ import com.airbnb.mvrx.todomvrx.todoapp.tasks.TaskListFragment
  * Fragment's actions listener.
  */
 class TaskDetailViewModel(
-        context: Application,
-        private val tasksRepository: TasksRepository
+        context: Application
 ) : AndroidViewModel(context) {
 //
 //    val task = ObservableField<Task>()
-//    val completed = ObservableBoolean()
+//    val complete = ObservableBoolean()
 //    val editTaskCommand = SingleLiveEvent<Void>()
 //    val deleteTaskCommand = SingleLiveEvent<Void>()
 //    val snackbarMessage = SingleLiveEvent<Int>()
@@ -51,14 +49,14 @@ class TaskDetailViewModel(
 //        editTaskCommand.call()
 //    }
 //
-//    fun setCompleted(completed: Boolean) {
+//    fun setComplete(complete: Boolean) {
 //        if (isDataLoading) {
 //            return
 //        }
 //        val task = this.task.get().apply {
-//            isCompleted = completed
+//            complete = complete
 //        }
-//        if (completed) {
+//        if (complete) {
 //            tasksRepository.completeTask(task)
 //            showSnackbarMessage(R.string.task_marked_complete)
 //        } else {
@@ -76,7 +74,7 @@ class TaskDetailViewModel(
 //
 //    fun setTask(task: Task) {
 //        this.task.set(task)
-//        completed.set(task.isCompleted)
+//        complete.set(task.complete)
 //    }
 //
 //    override fun onTaskLoaded(task: Task) {

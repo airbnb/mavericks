@@ -17,7 +17,6 @@ package com.airbnb.mvrx.todomvrx.todoapp.tasks
 
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
-import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksRepository
 
 
 /**
@@ -29,8 +28,7 @@ import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksRepository
  * getter method.
  */
 class TasksViewModel(
-        context: Application,
-        private val tasksRepository: TasksRepository
+        context: Application
 ) : AndroidViewModel(context) {
 //
 //    private val isDataLoadingError = ObservableBoolean(false)
@@ -105,12 +103,12 @@ class TasksViewModel(
 //        loadTasks(false, false)
 //    }
 //
-//    fun completeTask(task: Task, completed: Boolean) {
+//    fun completeTask(task: Task, complete: Boolean) {
 //        // Update the entity
-//        task.isCompleted = completed
+//        task.complete = complete
 //
 //        // Notify repository
-//        if (completed) {
+//        if (complete) {
 //            tasksRepository.completeTask(task)
 //            showSnackbarMessage(R.string.task_marked_complete)
 //        } else {
@@ -169,7 +167,7 @@ class TasksViewModel(
 //                    TasksFilterType.ACTIVE_TASKS ->
 //                        tasksToShow = tasks.filter { it.isActive }
 //                    TasksFilterType.COMPLETED_TASKS ->
-//                        tasksToShow = tasks.filter { it.isCompleted }
+//                        tasksToShow = tasks.filter { it.complete }
 //                }
 //
 //                if (showLoadingUI) {

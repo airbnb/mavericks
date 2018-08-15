@@ -17,8 +17,8 @@
 package com.airbnb.mvrx.todomvrx.todoapp.data.source.remote
 
 import com.airbnb.mvrx.todomvrx.todoapp.data.Task
+import com.airbnb.mvrx.todomvrx.todoapp.data.Tasks
 import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksDataSource
-import com.airbnb.mvrx.todomvrx.todoapp.util.Optional
 import io.reactivex.Single
 import java.util.LinkedHashMap
 import java.util.concurrent.TimeUnit
@@ -33,25 +33,23 @@ object TasksRemoteDataSource : TasksDataSource {
 
     init {
         arrayOf(
-                Task("Build tower in Pisa", "Ground looks good, no foundation work required."),
-                Task("Finish bridge in Tacoma", "Found awesome girders at half the cost!")
+//                Task("Build tower in Pisa", "Ground looks good, no foundation work required."),
+//                Task("Finish bridge in Tacoma", "Found awesome girders at half the cost!")
+            Task("A", "a")
         ).forEach {
             TASKS_SERVICE_DATA[it.id] = it
         }
     }
 
-    override fun getTasks(): Single<List<Task>> {
+    override fun getTasks(): Single<Tasks> {
         return Single
                 .just(TASKS_SERVICE_DATA.values.toList())
                 .delay(SERVICE_LATENCY_IN_MILLIS.toLong(), TimeUnit.MILLISECONDS)
     }
 
-    override fun getTask(taskId: String): Single<Optional<Task>> {
-        val task = TASKS_SERVICE_DATA[taskId]
-        return if (task != null) {
-            Single.just(Optional(task)).delay(SERVICE_LATENCY_IN_MILLIS.toLong(), TimeUnit.MILLISECONDS)
-        } else {
-            Single.just(Optional<Task>(null))
+    override fun setComplete(id: String, complete: Boolean) {
+        TASKS_SERVICE_DATA[id]?.let { remoteTask ->
+            TASKS_SERVICE_DATA[remoteTask.id] = remoteTask.copy(complete = complete)
         }
     }
 
@@ -59,31 +57,11 @@ object TasksRemoteDataSource : TasksDataSource {
         TASKS_SERVICE_DATA[task.id] = task
     }
 
-    override fun completeTask(task: Task) {
-        val completedTask = Task(task.title, task.description, task.id, true)
-        TASKS_SERVICE_DATA[task.id] = completedTask
-    }
-
-    override fun completeTask(taskId: String) {
-        // Not required for the remote data source because the {@link TasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
-    }
-
-    override fun activateTask(task: Task) {
-        val activeTask = Task(task.title, task.description, task.id)
-        TASKS_SERVICE_DATA[task.id] = activeTask
-    }
-
-    override fun activateTask(taskId: String) {
-        // Not required for the remote data source because the {@link TasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
-    }
-
     override fun clearCompletedTasks() {
         val it = TASKS_SERVICE_DATA.entries.iterator()
         while (it.hasNext()) {
             val entry = it.next()
-            if (entry.value.isCompleted) {
+            if (entry.value.complete) {
                 it.remove()
             }
         }

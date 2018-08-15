@@ -20,7 +20,6 @@ import android.app.Application
 import android.arch.core.executor.testing.InstantTaskExecutorRule
 import com.airbnb.mvrx.todomvrx.todoapp.data.Task
 import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksDataSource
-import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksRepository
 import com.airbnb.mvrx.todomvrx.todoapp.util.capture
 import com.google.common.collect.Lists
 import org.hamcrest.MatcherAssert.assertThat
@@ -57,13 +56,13 @@ class StatisticsViewModelTest {
         // Get a reference to the class under test
         statisticsViewModel = StatisticsViewModel(mock(Application::class.java), tasksRepository)
 
-        // We initialise the tasks to 3, with one active and two completed
+        // We initialise the tasks to 3, with one active and two complete
         val task1 = Task("Title1", "Description1")
         val task2 = Task("Title2", "Description2").apply {
-            isCompleted = true
+            complete = true
         }
         val task3 = Task("Title3", "Description3").apply {
-            isCompleted = true
+            complete = true
         }
         tasks = Lists.newArrayList(task1, task2, task3)
     }

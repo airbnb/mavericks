@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.airbnb.mvrx.todomvrx.todoapp.data.source.local
+package com.airbnb.mvrx.todomvrx.todoapp.data.source.db
 
 import android.arch.persistence.room.Dao
 import android.arch.persistence.room.Insert
@@ -22,6 +22,7 @@ import android.arch.persistence.room.OnConflictStrategy
 import android.arch.persistence.room.Query
 import android.arch.persistence.room.Update
 import com.airbnb.mvrx.todomvrx.todoapp.data.Task
+import com.airbnb.mvrx.todomvrx.todoapp.data.Tasks
 import io.reactivex.Single
 
 /**
@@ -34,7 +35,7 @@ import io.reactivex.Single
      *
      * @return all tasks.
      */
-    @Query("SELECT * FROM Tasks") fun getTasks(): Single<List<Task>>
+    @Query("SELECT * FROM Tasks") fun getTasks(): Single<Tasks>
 
     /**
      * Select a task by id.
@@ -42,7 +43,7 @@ import io.reactivex.Single
      * @param taskId the task id.
      * @return the task with taskId.
      */
-    @Query("SELECT * FROM Tasks WHERE entryid = :taskId") fun getTaskById(taskId: String): Single<Task>
+    @Query("SELECT * FROM Tasks WHERE id = :taskId") fun getTaskById(taskId: String): Single<Task>
 
     /**
      * Insert a task in the database. If the task already exists, replace it.
@@ -63,17 +64,17 @@ import io.reactivex.Single
      * Update the complete status of a task
      *
      * @param taskId    id of the task
-     * @param completed status to be updated
+     * @param complete status to be updated
      */
-    @Query("UPDATE tasks SET completed = :completed WHERE entryid = :taskId")
-    fun updateCompleted(taskId: String, completed: Boolean)
+    @Query("UPDATE tasks SET complete = :complete WHERE id = :taskId")
+    fun updateCompleted(taskId: String, complete: Boolean)
 
     /**
      * Delete a task by id.
      *
      * @return the number of tasks deleted. This should always be 1.
      */
-    @Query("DELETE FROM Tasks WHERE entryid = :taskId") fun deleteTaskById(taskId: String): Int
+    @Query("DELETE FROM Tasks WHERE id = :taskId") fun deleteTaskById(taskId: String): Int
 
     /**
      * Delete all tasks.
@@ -81,9 +82,9 @@ import io.reactivex.Single
     @Query("DELETE FROM Tasks") fun deleteTasks()
 
     /**
-     * Delete all completed tasks from the table.
+     * Delete all complete tasks from the table.
      *
      * @return the number of tasks deleted.
      */
-    @Query("DELETE FROM Tasks WHERE completed = 1") fun deleteCompletedTasks(): Int
+    @Query("DELETE FROM Tasks WHERE complete = 1") fun deleteCompletedTasks(): Int
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.airbnb.mvrx.todomvrx.todoapp.data.source.local
+package com.airbnb.mvrx.todomvrx.todoapp.data.source.db
 
 import android.arch.persistence.room.Database
 import android.arch.persistence.room.Room
@@ -26,7 +26,7 @@ import com.airbnb.mvrx.todomvrx.todoapp.data.Task
 /**
  * The Room Database that contains the Task table.
  */
-@Database(entities = arrayOf(Task::class), version = 1)
+@Database(entities = [Task::class], version = 2)
 abstract class ToDoDatabase : RoomDatabase() {
 
     abstract fun taskDao(): TasksDao

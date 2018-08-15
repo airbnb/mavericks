@@ -7,5 +7,5 @@ enum class TaskListFilter {
     Active,
     Completed;
 
-    fun matches(task: Task): Boolean = if (task.isCompleted) this != Completed else this != Completed
+    fun matches(task: Task): Boolean = if (task.complete) this != Completed else this != Completed
 }

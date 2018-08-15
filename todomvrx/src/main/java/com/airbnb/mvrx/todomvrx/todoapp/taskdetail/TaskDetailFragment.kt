@@ -54,7 +54,7 @@ class TaskDetailFragment : Fragment() {
 //            viewmodel = (activity as TaskDetailActivity).obtainViewModel()
 //            listener = object : TaskDetailUserActionsListener {
 //                override fun onCompleteChanged(v: View) {
-//                    viewmodel?.setCompleted((v as CheckBox).isChecked)
+//                    viewmodel?.setComplete((v as CheckBox).isChecked)
 //                }
 //            }
 //        }

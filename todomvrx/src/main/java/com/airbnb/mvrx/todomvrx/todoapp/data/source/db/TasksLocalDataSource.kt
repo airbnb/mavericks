@@ -13,13 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.airbnb.mvrx.todomvrx.todoapp.data.source.local
+package com.airbnb.mvrx.todomvrx.todoapp.data.source.db
 
 import android.support.annotation.VisibleForTesting
 import com.airbnb.mvrx.todomvrx.todoapp.data.Task
+import com.airbnb.mvrx.todomvrx.todoapp.data.Tasks
 import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksDataSource
 import com.airbnb.mvrx.todomvrx.todoapp.util.AppExecutors
-import com.airbnb.mvrx.todomvrx.todoapp.util.Optional
+import io.reactivex.Single
 
 
 /**
@@ -30,32 +31,15 @@ class TasksLocalDataSource private constructor(
         val tasksDao: TasksDao
 ) : TasksDataSource {
 
-    override fun getTasks() = tasksDao.getTasks()
+    override fun getTasks(): Single<Tasks> = tasksDao.getTasks()
 
-    override fun getTask(taskId: String) = tasksDao.getTaskById(taskId)
-            .map { Optional(it) }
-            .onErrorReturn { Optional(null) }
 
     override fun saveTask(task: Task) {
         appExecutors.diskIO.execute { tasksDao.insertTask(task) }
     }
 
-    override fun completeTask(task: Task) {
-        appExecutors.diskIO.execute { tasksDao.updateCompleted(task.id, true) }
-    }
-
-    override fun completeTask(taskId: String) {
-        // Not required for the local data source because the {@link TasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
-    }
-
-    override fun activateTask(task: Task) {
-        appExecutors.diskIO.execute { tasksDao.updateCompleted(task.id, false) }
-    }
-
-    override fun activateTask(taskId: String) {
-        // Not required for the local data source because the {@link TasksRepository} handles
-        // converting from a {@code taskId} to a {@link task} using its cached data.
+    override fun setComplete(id: String, complete: Boolean) {
+        appExecutors.diskIO.execute { tasksDao.updateCompleted(id, complete) }
     }
 
     override fun clearCompletedTasks() {
@@ -71,8 +55,8 @@ class TasksLocalDataSource private constructor(
         appExecutors.diskIO.execute { tasksDao.deleteTasks() }
     }
 
-    override fun deleteTask(taskId: String) {
-        appExecutors.diskIO.execute { tasksDao.deleteTaskById(taskId) }
+    override fun deleteTask(id: String) {
+        appExecutors.diskIO.execute { tasksDao.deleteTaskById(id) }
     }
 
     companion object {

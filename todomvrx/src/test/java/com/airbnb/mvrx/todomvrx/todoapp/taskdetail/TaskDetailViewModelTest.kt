@@ -23,7 +23,6 @@ import android.content.res.Resources
 import com.airbnb.mvrx.todomvrx.todoapp.R
 import com.airbnb.mvrx.todomvrx.todoapp.data.Task
 import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksDataSource
-import com.airbnb.mvrx.todomvrx.todoapp.data.source.TasksRepository
 import com.airbnb.mvrx.todomvrx.todoapp.util.capture
 import com.airbnb.mvrx.todomvrx.todoapp.util.eq
 import org.hamcrest.CoreMatchers.nullValue

@@ -23,15 +23,14 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import com.airbnb.epoxy.EpoxyController
-import com.airbnb.mvrx.Loading
 import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.todomvrx.todoapp.R
 import com.airbnb.mvrx.todomvrx.todoapp.TasksViewModel
 import com.airbnb.mvrx.todomvrx.todoapp.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.todoapp.data.Task
-import com.airbnb.mvrx.todomvrx.todoapp.data.source.local.TasksLocalDataSource
-import com.airbnb.mvrx.todomvrx.todoapp.data.source.local.ToDoDatabase
+import com.airbnb.mvrx.todomvrx.todoapp.data.source.db.TasksLocalDataSource
+import com.airbnb.mvrx.todomvrx.todoapp.data.source.db.ToDoDatabase
 import com.airbnb.mvrx.todomvrx.todoapp.util.AppExecutors
 import com.airbnb.mvrx.todomvrx.todoapp.views.header
 import com.airbnb.mvrx.todomvrx.todoapp.views.horizontalLoader
@@ -39,7 +38,7 @@ import com.airbnb.mvrx.todomvrx.todoapp.views.taskItemView
 import com.airbnb.mvrx.withState
 
 /**
- * Display a grid of [Task]s. User can choose to view all, active or completed tasks.
+ * Display a grid of [Task]s. User can choose to view all, active or complete tasks.
  */
 class TaskListFragment : BaseFragment() {
 
@@ -62,8 +61,9 @@ class TaskListFragment : BaseFragment() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?) = when (item?.itemId ?: 0) {
-        R.id.menu_refresh -> tasksViewModel.fetchTasks().andTrue()
+        R.id.menu_refresh -> tasksViewModel.refreshTasks().andTrue()
         R.id.menu_filter -> showFilteringPopUpMenu().andTrue()
+        R.id.menu_clear -> tasksViewModel.clearCompletedTasks().andTrue()
         else -> super.onOptionsItemSelected(item)
     }
 
@@ -71,7 +71,7 @@ class TaskListFragment : BaseFragment() {
 
         horizontalLoader {
             id("loader")
-            loading(state.tasksRequest is Loading)
+            loading(state.isLoading)
         }
 
         header {
@@ -85,51 +85,16 @@ class TaskListFragment : BaseFragment() {
 
         state.tasks
                 .filter(taskListState.filter::matches)
-                .forEach {
+                .forEach { task ->
                     taskItemView {
-                        id(it.id)
-                        title(it.title)
-                        checked(it.isCompleted)
+                        id(task.id)
+                        title(task.displayTitle)
+                        checked(task.complete)
+                        onCheckedChanged { completed -> tasksViewModel.setComplete(task.id, completed) }
                     }
                 }
     }
 
-//    override fun onResume() {
-//        super.onResume()
-//        viewDataBinding.viewmodel?.start()
-//    }
-//
-//    override fun onOptionsItemSelected(item: MenuItem) =
-//            when (item.itemId) {
-//                R.id.menu_clear -> {
-//                    viewDataBinding.viewmodel?.clearCompletedTasks()
-//                    true
-//                }
-//                R.id.menu_filter -> {
-//                    showFilteringPopUpMenu()
-//                    true
-//                }
-//                R.id.menu_refresh -> {
-//                    viewDataBinding.viewmodel?.loadTasks(true)
-//                    true
-//                }
-//                else -> false
-//            }
-//
-//    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-//        inflater.inflate(R.menu.tasks_fragment_menu, menu)
-//    }
-//
-//    override fun onActivityCreated(savedInstanceState: Bundle?) {
-//        super.onActivityCreated(savedInstanceState)
-//        viewDataBinding.viewmodel?.let {
-//            view?.setupSnackbar(this, it.snackbarMessage, Snackbar.LENGTH_LONG)
-//        }
-//        setupFab()
-//        setupListAdapter()
-//        setupRefreshLayout()
-//    }
-//
     private fun showFilteringPopUpMenu() {
         PopupMenu(requireContext(), requireActivity().findViewById<View>(R.id.menu_filter)).run {
             menuInflater.inflate(R.menu.filter_tasks, menu)

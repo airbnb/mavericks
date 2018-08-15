@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.airbnb.mvrx.todomvrx.todoapp.data.source.local
+package com.airbnb.mvrx.todomvrx.todoapp.data.source.db
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.filters.LargeTest
@@ -35,6 +35,7 @@ import org.mockito.Mockito.mock
 import org.mockito.Mockito.never
 import org.mockito.Mockito.verify
 import android.arch.persistence.room.Room
+import com.airbnb.mvrx.todomvrx.todoapp.data.Tasks
 import com.airbnb.mvrx.todomvrx.todoapp.utils.SingleExecutors
 
 
@@ -98,14 +99,14 @@ import com.airbnb.mvrx.todomvrx.todoapp.utils.SingleExecutors
         with(localDataSource) {
             saveTask(newTask)
 
-            // When completed in the persistent repository
+            // When complete in the persistent repository
             completeTask(newTask)
 
             // Then the task can be retrieved from the persistent repository and is complete
             getTask(newTask.id, object : TasksDataSource.GetTaskCallback {
                 override fun onTaskLoaded(task: Task) {
                     assertThat(task, `is`(newTask))
-                    assertThat(task.isCompleted, `is`(true))
+                    assertThat(task.complete, `is`(true))
                 }
 
                 override fun onDataNotAvailable() {
@@ -119,7 +120,7 @@ import com.airbnb.mvrx.todomvrx.todoapp.utils.SingleExecutors
         // Initialize mock for the callback.
         val callback = mock<TasksDataSource.GetTaskCallback>()
 
-        // Given a new completed task in the persistent repository
+        // Given a new complete task in the persistent repository
         val newTask = Task(TITLE)
         with(localDataSource) {
             saveTask(newTask)
@@ -134,7 +135,7 @@ import com.airbnb.mvrx.todomvrx.todoapp.utils.SingleExecutors
         verify(callback, never()).onDataNotAvailable()
         verify(callback).onTaskLoaded(newTask)
 
-        assertThat(newTask.isCompleted, `is`(false))
+        assertThat(newTask.complete, `is`(false))
     }
 
     @Test fun clearCompletedTask_taskNotRetrievable() {
@@ -143,7 +144,7 @@ import com.airbnb.mvrx.todomvrx.todoapp.utils.SingleExecutors
         val callback2 = mock(TasksDataSource.GetTaskCallback::class.java)
         val callback3 = mock(TasksDataSource.GetTaskCallback::class.java)
 
-        // Given 2 new completed tasks and 1 active task in the persistent repository
+        // Given 2 new complete tasks and 1 active task in the persistent repository
         val newTask1 = Task(TITLE)
         val newTask2 = Task(TITLE2)
         val newTask3 = Task(TITLE3)
@@ -153,10 +154,10 @@ import com.airbnb.mvrx.todomvrx.todoapp.utils.SingleExecutors
             saveTask(newTask2)
             completeTask(newTask2)
             saveTask(newTask3)
-            // When completed tasks are cleared in the repository
+            // When complete tasks are cleared in the repository
             clearCompletedTasks()
 
-            // Then the completed tasks cannot be retrieved and the active one can
+            // Then the complete tasks cannot be retrieved and the active one can
             getTask(newTask1.id, callback1)
 
             verify(callback1).onDataNotAvailable()
@@ -191,7 +192,7 @@ import com.airbnb.mvrx.todomvrx.todoapp.utils.SingleExecutors
         }
         verify<TasksDataSource.LoadTasksCallback>(callback).onDataNotAvailable()
         verify<TasksDataSource.LoadTasksCallback>(callback, never())
-                .onTasksLoaded(any<List<Task>>())
+                .onTasksLoaded(any<Tasks>())
     }
 
     @Test fun getTasks_retrieveSavedTasks() {

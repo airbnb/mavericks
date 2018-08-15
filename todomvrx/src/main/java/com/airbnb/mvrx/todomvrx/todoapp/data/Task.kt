@@ -26,15 +26,15 @@ import java.util.UUID
 data class Task @JvmOverloads constructor(
         @ColumnInfo(name = "title") var title: String = "",
         @ColumnInfo(name = "description") var description: String = "",
-        @PrimaryKey @ColumnInfo(name = "entryid") var id: String = UUID.randomUUID().toString(),
-        @ColumnInfo(name = "completed") var isCompleted: Boolean = false
+        @PrimaryKey @ColumnInfo(name = "id") var id: String = UUID.randomUUID().toString(),
+        @ColumnInfo(name = "complete") var complete: Boolean = false
 ) {
 
     @Ignore
-    val titleForList = if (title.isNotEmpty()) title else description
+    val displayTitle = if (title.isNotEmpty()) title else description
 
     @Ignore
-    val isActive = !isCompleted
+    val isActive = !complete
 
     @Ignore
     val isEmpty = title.isEmpty() && description.isEmpty()
