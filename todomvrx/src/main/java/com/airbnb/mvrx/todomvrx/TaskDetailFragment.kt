@@ -69,7 +69,12 @@ class TaskDetailFragment : BaseFragment() {
             viewModel.setComplete(args.id, isChecked)
 
         }
-        // Must be called to trigger the lazy delegate
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // https://github.com/airbnb/MvRx/issues/15
+        invalidate()
     }
 
     override fun invalidate() = withState(viewModel) { state ->

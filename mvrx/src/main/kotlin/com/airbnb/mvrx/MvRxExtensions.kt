@@ -69,7 +69,7 @@ inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activityViewM
     val stateFactory: () -> S = { _activityViewModelInitialStateProvider(keyFactory) }
     if (requireActivity() !is MvRxViewModelStoreOwner) throw IllegalArgumentException("Your Activity must be a MvRxViewModelStoreOwner!")
     MvRxViewModelProvider.get(viewModelClass, requireActivity(), keyFactory(), stateFactory)
-        .apply { subscribe(requireActivity(), shouldUpdate = shouldUpdate, subscriber = { invalidate() }) }
+        .apply { subscribe(this@activityViewModel, shouldUpdate = shouldUpdate, subscriber = { invalidate() }) }
 }
 
 /**

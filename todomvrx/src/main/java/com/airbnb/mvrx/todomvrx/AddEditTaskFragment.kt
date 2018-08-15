@@ -15,11 +15,13 @@
  */
 package com.airbnb.mvrx.todomvrx
 
+import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.activityViewModel
@@ -54,10 +56,10 @@ class AddEditTaskFragment : BaseFragment() {
         }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        fab.setImageResource(if (args.id == null) R.drawable.ic_add else R.drawable.ic_done)
+        fab.setImageResource(R.drawable.ic_done)
         fab.setOnClickListener {
             withState(viewModel) { state ->
-                val task = state.tasks.findTask(args.id) ?: Task()
+                val task = (state.tasks.findTask(args.id) ?: Task())
                         .copy(
                                 title = titleView.text.toString(),
                                 description = descriptionView.text.toString()
@@ -67,6 +69,12 @@ class AddEditTaskFragment : BaseFragment() {
             }
         }
         viewModel
+    }
+
+    override fun onDestroyView() {
+        val imm = requireContext().getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(titleView.windowToken, 0)
+        super.onDestroyView()
     }
 
     override fun invalidate() = withState(viewModel) { state ->

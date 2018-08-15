@@ -20,7 +20,6 @@ import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.LifecycleRegistry
 import android.arch.lifecycle.Observer
-import com.airbnb.mvrx.todomvrx.SingleLiveEvent
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test

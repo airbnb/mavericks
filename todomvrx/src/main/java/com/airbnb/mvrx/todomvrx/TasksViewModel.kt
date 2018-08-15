@@ -35,7 +35,7 @@ class TasksViewModel(override val initialState: TasksState, private val sources:
                 .toObservable()
                 .doOnSubscribe { setState { copy(isLoading = true) } }
                 .doOnComplete { setState { copy(isLoading = false) } }
-                .execute { copy(taskRequest = it, tasks = it() ?: emptyList()) }
+                .execute { copy(taskRequest = it, tasks = it() ?: tasks) }
     }
 
     fun saveTask(task: Task) {

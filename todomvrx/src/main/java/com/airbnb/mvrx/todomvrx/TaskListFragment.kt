@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.airbnb.mvrx.todomvrx.tasks
+package com.airbnb.mvrx.todomvrx
 
 import android.os.Bundle
 import android.support.v7.widget.PopupMenu
@@ -26,10 +26,6 @@ import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.fragmentViewModel
-import com.airbnb.mvrx.todomvrx.AddEditTaskArgs
-import com.airbnb.mvrx.todomvrx.TaskDetailArgs
-import com.airbnb.mvrx.todomvrx.TaskListFilter
-import com.airbnb.mvrx.todomvrx.TasksViewModel
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.core.MvRxViewModel
 import com.airbnb.mvrx.todomvrx.data.Task
@@ -82,13 +78,13 @@ class TaskListFragment : BaseFragment() {
     }
 
     override fun EpoxyController.buildModels() = withState(tasksViewModel, taskListViewModel) { state, taskListState ->
-
+        // We always want to show this so the content won't snap up when the loader finishes.
         horizontalLoader {
             id("loader")
             loading(state.isLoading)
         }
 
-        if (state.tasks.isEmpty()) {
+        if (state.tasks.isEmpty() && !state.isLoading) {
             val (title, iconRes) = when (taskListState.filter) {
                 TaskListFilter.All -> R.string.no_tasks_all to R.drawable.ic_assignment_turned_in_24dp
                 TaskListFilter.Active -> R.string.no_tasks_active to R.drawable.ic_check_circle_24dp

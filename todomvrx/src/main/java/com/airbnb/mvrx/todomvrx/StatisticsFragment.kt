@@ -15,18 +15,21 @@
  */
 package com.airbnb.mvrx.todomvrx
 
+import android.os.Bundle
+import android.view.View
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.views.statisticsView
 import com.airbnb.mvrx.withState
 
-/**
- * Main UI for the statistics screen.
- */
 class StatisticsFragment : BaseFragment() {
 
     private val viewModel by activityViewModel(TasksViewModel::class)
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        fab.visibility = View.GONE
+    }
 
     override fun EpoxyController.buildModels() = withState(viewModel) { state ->
         val (completeTasks, activeTasks) = state.tasks.partition { it.complete }
@@ -38,31 +41,5 @@ class StatisticsFragment : BaseFragment() {
             id("complete")
             statistic("Complete tasks: ${completeTasks.size}")
         }
-    }
-
-//    private lateinit var viewDataBinding: StatisticsFragBinding
-//
-//    private lateinit var statisticsViewModel: StatisticsViewModel
-//
-//    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-//            savedInstanceState: Bundle?): View? {
-//        viewDataBinding = DataBindingUtil.inflate(inflater, R.layout.statistics_frag, container,
-//                false)
-//        return viewDataBinding.root
-//    }
-//
-//    override fun onActivityCreated(savedInstanceState: Bundle?) {
-//        super.onActivityCreated(savedInstanceState)
-//        statisticsViewModel = (activity as StatisticsActivity).obtainViewModel()
-//        viewDataBinding.stats = statisticsViewModel
-//    }
-//
-//    override fun onResume() {
-//        super.onResume()
-//        statisticsViewModel.start()
-//    }
-
-    companion object {
-        fun newInstance() = StatisticsFragment()
     }
 }
