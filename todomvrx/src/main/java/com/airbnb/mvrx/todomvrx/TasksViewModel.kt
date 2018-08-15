@@ -47,9 +47,9 @@ class TasksViewModel(override val initialState: TasksState, private val sources:
 
     fun setComplete(id: String, complete: Boolean) {
         setState {
-            tasks.findTask(id)?.let { task ->
-                copy(tasks = tasks.copy(tasks.indexOf(task), task.copy(complete = complete)), lastEditedTask = id)
-            } ?: this
+            val task = tasks.findTask(id) ?: return@setState this
+            if (task.complete == complete) return@setState this
+            copy(tasks = tasks.copy(tasks.indexOf(task), task.copy(complete = complete)), lastEditedTask = id)
 
         }
         sources.forEach { it.setComplete(id, complete) }

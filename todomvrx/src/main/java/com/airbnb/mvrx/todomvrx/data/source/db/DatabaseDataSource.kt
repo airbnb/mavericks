@@ -3,6 +3,7 @@ package com.airbnb.mvrx.todomvrx.data.source.db
 import com.airbnb.mvrx.todomvrx.data.Task
 import com.airbnb.mvrx.todomvrx.data.Tasks
 import com.airbnb.mvrx.todomvrx.data.source.TasksDataSource
+import com.airbnb.mvrx.todomvrx.util.EspressoIdlingResource
 import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.Single
@@ -30,5 +31,7 @@ class DatabaseDataSource(
             .subscribeOn(scheduler)
             .observeOn(AndroidSchedulers.mainThread())
             .delay(delayMs, TimeUnit.MILLISECONDS)
+            .doOnSubscribe { EspressoIdlingResource.increment() }
+            .doOnComplete { EspressoIdlingResource.decrement() }
             .subscribe()
 }

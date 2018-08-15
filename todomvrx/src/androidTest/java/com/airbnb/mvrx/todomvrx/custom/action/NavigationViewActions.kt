@@ -17,14 +17,6 @@ package com.airbnb.mvrx.todomvrx.custom.action
 
 import android.content.res.Resources.NotFoundException
 import android.support.design.widget.NavigationView
-import android.support.test.espresso.PerformException
-import android.support.test.espresso.UiController
-import android.support.test.espresso.ViewAction
-import android.support.test.espresso.matcher.ViewMatchers
-import android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom
-import android.support.test.espresso.matcher.ViewMatchers.isDisplayingAtLeast
-import android.support.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
-import android.support.test.espresso.util.HumanReadables
 import android.support.v4.widget.DrawerLayout
 import android.view.Menu
 import android.view.View

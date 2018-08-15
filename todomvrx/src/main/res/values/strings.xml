@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">ToDo MvRx</string>
-    <string name="add_task">New TO-DO</string>
-    <string name="edit_task">Edit TO-DO</string>
     <string name="task_marked_complete">Task marked complete</string>
     <string name="task_marked_active">Task marked active</string>
     <string name="loading_tasks_error">Error while loading tasks</string>
@@ -20,7 +18,6 @@
     <string name="statistics_no_tasks">You have no tasks.</string>
     <string name="statistics_active_tasks">Active tasks: %d</string>
     <string name="statistics_completed_tasks">Completed tasks: %d</string>
-    <string name="statistics_error">Error loading statistics.</string>
     <string name="no_data">No data</string>
 
     <string name="nav_all">All</string>

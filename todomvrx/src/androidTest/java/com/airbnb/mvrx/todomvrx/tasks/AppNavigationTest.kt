@@ -15,18 +15,6 @@
  */
 package com.airbnb.mvrx.todomvrx.tasks
 
-import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.action.ViewActions.click
-import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.contrib.DrawerActions.open
-import android.support.test.espresso.contrib.DrawerMatchers.isClosed
-import android.support.test.espresso.contrib.DrawerMatchers.isOpen
-import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
-import android.support.test.espresso.matcher.ViewMatchers.withContentDescription
-import android.support.test.espresso.matcher.ViewMatchers.withId
-import android.support.test.filters.LargeTest
-import android.support.test.rule.ActivityTestRule
-import android.support.test.runner.AndroidJUnit4
 import android.support.v4.widget.DrawerLayout
 import android.view.Gravity
 import com.airbnb.mvrx.todomvrx.todoapp.R

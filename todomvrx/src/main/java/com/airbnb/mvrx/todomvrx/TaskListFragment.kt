@@ -52,7 +52,6 @@ class TaskListFragment : BaseFragment() {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
         fab.setImageResource(R.drawable.ic_add)
-
         fab.setOnClickListener {
             navigate(R.id.addEditFragment, AddEditTaskArgs())
         }
@@ -131,8 +130,4 @@ class TaskListFragment : BaseFragment() {
 
     @Suppress("unused")
     private fun Unit.andTrue() = true
-
-    companion object {
-        fun newInstance() = TaskListFragment()
-    }
 }

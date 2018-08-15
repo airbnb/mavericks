@@ -17,14 +17,11 @@ package com.airbnb.mvrx.todomvrx.taskdetail
 
 
 import android.app.Application
-import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.content.Context
 import android.content.res.Resources
 import com.airbnb.mvrx.todomvrx.todoapp.R
 import com.airbnb.mvrx.todomvrx.data.Task
 import com.airbnb.mvrx.todomvrx.data.source.TasksDataSource
-import com.airbnb.mvrx.todomvrx.todoapp.util.capture
-import com.airbnb.mvrx.todomvrx.todoapp.util.eq
 import org.hamcrest.CoreMatchers.nullValue
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is.`is`
@@ -33,13 +30,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
-import org.mockito.MockitoAnnotations
 
 /**
  * Unit tests for the implementation of [TaskDetailViewModel]

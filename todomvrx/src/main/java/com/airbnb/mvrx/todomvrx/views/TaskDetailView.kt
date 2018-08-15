@@ -19,7 +19,7 @@ class TaskDetailView @JvmOverloads constructor(
 
     private val titleView by lazy { findViewById<TextView>(R.id.task_title) }
     private val descriptionView by lazy { findViewById<TextView>(R.id.task_description) }
-    private val completeCheckBox by lazy { findViewById<CheckBox>(R.id.complete) }
+    private val checkbox by lazy { findViewById<CheckBox>(R.id.complete) }
     private val noDataView by lazy { findViewById<View>(R.id.no_data_view) }
 
     init {
@@ -30,17 +30,17 @@ class TaskDetailView @JvmOverloads constructor(
     fun setTask(task: Task?) {
         titleView.text = task?.title
         descriptionView.text = task?.description
-        completeCheckBox.isChecked = task?.complete ?: false
-        completeCheckBox.visibility = if (task == null) View.GONE else View.VISIBLE
+        checkbox.isChecked = task?.complete ?: false
+        checkbox.visibility = if (task == null) View.GONE else View.VISIBLE
         noDataView.visibility = if (task == null) View.VISIBLE else View.GONE
     }
 
     @CallbackProp
-    fun onCompleteChanged(listener: ((Boolean) -> Unit)?) {
+    fun onCheckedChanged(listener: ((Boolean) -> Unit)?) {
         if (listener == null) {
-            completeCheckBox.setOnCheckedChangeListener(null)
+            checkbox.setOnCheckedChangeListener(null)
         } else {
-            completeCheckBox.setOnCheckedChangeListener { _, isChecked -> listener(isChecked) }
+            checkbox.setOnCheckedChangeListener { _, isChecked -> listener(isChecked) }
         }
     }
 }

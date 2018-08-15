@@ -23,10 +23,6 @@ import android.app.Activity
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.support.annotation.IdRes
-import android.support.test.InstrumentationRegistry
-import android.support.test.runner.lifecycle.ActivityLifecycleMonitor
-import android.support.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
-import android.support.test.runner.lifecycle.Stage
 import android.support.v7.widget.Toolbar
 
 private fun Activity.rotateToLandscape() {

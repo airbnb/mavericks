@@ -19,9 +19,6 @@ package com.airbnb.mvrx.todomvrx
  * Helper functions that are workarounds to Runtime Exceptions when using kotlin.
  */
 
-import org.mockito.ArgumentCaptor
-import org.mockito.Mockito
-
 /**
  * Returns Mockito.eq() as nullable type to avoid java.lang.IllegalStateException when
  * null is returned.

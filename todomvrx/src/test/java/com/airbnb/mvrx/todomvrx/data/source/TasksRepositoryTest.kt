@@ -17,22 +17,11 @@ package com.airbnb.mvrx.todomvrx.data.source
 
 import com.airbnb.mvrx.todomvrx.data.Task
 import com.airbnb.mvrx.todomvrx.data.Tasks
-import com.airbnb.mvrx.todomvrx.todoapp.util.any
-import com.airbnb.mvrx.todomvrx.todoapp.util.capture
-import com.airbnb.mvrx.todomvrx.todoapp.util.eq
-import com.google.common.collect.Lists
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.After
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
-import org.mockito.Mock
-import org.mockito.Mockito.never
-import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
-import org.mockito.MockitoAnnotations
 
 /**
  * Unit tests for the implementation of the in-memory repository with cache.

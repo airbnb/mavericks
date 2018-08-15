@@ -25,7 +25,7 @@ fun ViewGroup.asSequence(): Sequence<View> = object : Sequence<View> {
         private var done = false
         private var position: Int = 0
 
-        override public fun hasNext(): Boolean {
+        override fun hasNext(): Boolean {
             if (nextValue == null && !done) {
                 nextValue = getChildAt(position)
                 position++
@@ -35,9 +35,7 @@ fun ViewGroup.asSequence(): Sequence<View> = object : Sequence<View> {
         }
 
         override fun next(): View {
-            if (!hasNext()) {
-                throw NoSuchElementException()
-            }
+            if (!hasNext()) throw NoSuchElementException()
             val answer = nextValue
             nextValue = null
             return answer!!

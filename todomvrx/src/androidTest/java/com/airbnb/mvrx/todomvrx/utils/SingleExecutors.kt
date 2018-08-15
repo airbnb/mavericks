@@ -15,7 +15,6 @@
  */
 package com.airbnb.mvrx.todomvrx.utils
 
-import com.airbnb.mvrx.todomvrx.util.AppExecutors
 import java.util.concurrent.Executor
 
 /**

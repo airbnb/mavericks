@@ -17,23 +17,13 @@ package com.airbnb.mvrx.todomvrx.addedittask
 
 
 import android.app.Application
-import android.arch.core.executor.testing.InstantTaskExecutorRule
 import com.airbnb.mvrx.todomvrx.data.Task
 import com.airbnb.mvrx.todomvrx.data.source.TasksDataSource
-import com.airbnb.mvrx.todomvrx.todoapp.util.any
-import com.airbnb.mvrx.todomvrx.todoapp.util.capture
-import com.airbnb.mvrx.todomvrx.todoapp.util.eq
-import com.airbnb.mvrx.todomvrx.todoapp.util.mock
 import org.hamcrest.Matchers.`is`
 import org.junit.Assert.assertThat
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
-import org.mockito.Mock
-import org.mockito.Mockito.verify
-import org.mockito.MockitoAnnotations
 
 /**
  * Unit tests for the implementation of [AddEditTaskViewModel].

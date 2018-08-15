@@ -17,23 +17,14 @@ package com.airbnb.mvrx.todomvrx.statistics
 
 
 import android.app.Application
-import android.arch.core.executor.testing.InstantTaskExecutorRule
 import com.airbnb.mvrx.todomvrx.data.Task
 import com.airbnb.mvrx.todomvrx.data.source.TasksDataSource
-import com.airbnb.mvrx.todomvrx.todoapp.util.capture
-import com.google.common.collect.Lists
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.core.Is.`is`
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
-import org.mockito.Mock
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
-import org.mockito.MockitoAnnotations
 
 /**
  * Unit tests for the implementation of [StatisticsViewModel]

@@ -16,7 +16,6 @@
 package com.airbnb.mvrx.todomvrx.tasks
 
 import android.app.Application
-import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Observer
 import android.content.Context
 import android.content.res.Resources
@@ -24,14 +23,6 @@ import com.airbnb.mvrx.todomvrx.todoapp.R
 import com.airbnb.mvrx.todomvrx.todoapp.R.string.successfully_deleted_task_message
 import com.airbnb.mvrx.todomvrx.TestUtils
 import com.airbnb.mvrx.todomvrx.data.Task
-import com.airbnb.mvrx.todomvrx.data.source.TasksDataSource.LoadTasksCallback
-import com.airbnb.mvrx.todomvrx.util.ADD_EDIT_RESULT_OK
-import com.airbnb.mvrx.todomvrx.util.DELETE_RESULT_OK
-import com.airbnb.mvrx.todomvrx.util.EDIT_RESULT_OK
-import com.airbnb.mvrx.todomvrx.todoapp.util.any
-import com.airbnb.mvrx.todomvrx.todoapp.util.capture
-import com.airbnb.mvrx.todomvrx.todoapp.util.mock
-import com.google.common.collect.Lists
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
 import org.junit.Assert.assertFalse
@@ -39,13 +30,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.verify
-import org.mockito.MockitoAnnotations
 
 /**
  * Unit tests for the implementation of [TasksViewModel]

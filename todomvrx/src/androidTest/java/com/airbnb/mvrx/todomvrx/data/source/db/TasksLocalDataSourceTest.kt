@@ -15,13 +15,8 @@
  */
 package com.airbnb.mvrx.todomvrx.data.source.db
 
-import android.support.test.InstrumentationRegistry
-import android.support.test.filters.LargeTest
-import android.support.test.runner.AndroidJUnit4
 import com.airbnb.mvrx.todomvrx.data.Task
 import com.airbnb.mvrx.todomvrx.data.source.TasksDataSource
-import com.airbnb.mvrx.todomvrx.todoapp.util.any
-import com.airbnb.mvrx.todomvrx.todoapp.util.mock
 import org.hamcrest.core.Is.`is`
 import org.junit.After
 import org.junit.Assert.assertNotNull
@@ -31,9 +26,6 @@ import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
-import org.mockito.Mockito.never
-import org.mockito.Mockito.verify
 import android.arch.persistence.room.Room
 import com.airbnb.mvrx.todomvrx.data.Tasks
 import com.airbnb.mvrx.todomvrx.utils.SingleExecutors

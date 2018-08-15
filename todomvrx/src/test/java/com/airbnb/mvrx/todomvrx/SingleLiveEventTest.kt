@@ -15,7 +15,6 @@
  */
 package com.airbnb.mvrx.todomvrx
 
-import android.arch.core.executor.testing.InstantTaskExecutorRule
 import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.LifecycleRegistry
@@ -23,13 +22,6 @@ import android.arch.lifecycle.Observer
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.Mock
-import org.mockito.Mockito.`when`
-import org.mockito.Mockito.never
-import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
-import org.mockito.MockitoAnnotations
 
 
 class SingleLiveEventTest {

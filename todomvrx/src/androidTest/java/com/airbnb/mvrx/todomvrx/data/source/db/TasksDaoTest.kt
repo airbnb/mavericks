@@ -17,8 +17,6 @@
 package com.airbnb.mvrx.todomvrx.data.source.db
 
 import android.arch.persistence.room.Room
-import android.support.test.InstrumentationRegistry
-import android.support.test.runner.AndroidJUnit4
 import com.airbnb.mvrx.todomvrx.data.Task
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.notNullValue

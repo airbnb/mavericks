@@ -37,11 +37,11 @@ class TaskItemView @JvmOverloads constructor(
     }
 
     @CallbackProp
-    fun onCheckedChanged(callback: ((Boolean) -> Unit)?) {
-        callback?.let { _ ->
-            checkbox.setOnCheckedChangeListener { _, isChecked ->
-                callback.invoke(isChecked)
-            }
+    fun onCheckedChanged(listener: ((Boolean) -> Unit)?) {
+        if (listener == null) {
+            checkbox.setOnCheckedChangeListener(null)
+        } else {
+            checkbox.setOnCheckedChangeListener { _, isChecked -> listener(isChecked) }
         }
     }
 

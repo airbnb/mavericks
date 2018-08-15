@@ -15,35 +15,11 @@
  */
 package com.airbnb.mvrx.todomvrx.tasks
 
-import android.support.test.InstrumentationRegistry
-import android.support.test.InstrumentationRegistry.getTargetContext
-import android.support.test.espresso.Espresso.onView
-import android.support.test.espresso.Espresso.openActionBarOverflowOrOptionsMenu
-import android.support.test.espresso.action.ViewActions.click
-import android.support.test.espresso.action.ViewActions.closeSoftKeyboard
-import android.support.test.espresso.action.ViewActions.replaceText
-import android.support.test.espresso.action.ViewActions.typeText
-import android.support.test.espresso.assertion.ViewAssertions.doesNotExist
-import android.support.test.espresso.assertion.ViewAssertions.matches
-import android.support.test.espresso.matcher.ViewMatchers.hasSibling
-import android.support.test.espresso.matcher.ViewMatchers.isAssignableFrom
-import android.support.test.espresso.matcher.ViewMatchers.isChecked
-import android.support.test.espresso.matcher.ViewMatchers.isDescendantOfA
-import android.support.test.espresso.matcher.ViewMatchers.isDisplayed
-import android.support.test.espresso.matcher.ViewMatchers.withContentDescription
-import android.support.test.espresso.matcher.ViewMatchers.withId
-import android.support.test.espresso.matcher.ViewMatchers.withText
-import android.support.test.filters.LargeTest
-import android.support.test.filters.SdkSuppress
-import android.support.test.rule.ActivityTestRule
-import android.support.test.runner.AndroidJUnit4
 import android.view.View
 import android.widget.ListView
-import com.airbnb.mvrx.todomvrx.todoapp.Injection
 import com.airbnb.mvrx.todomvrx.todoapp.R
 import com.airbnb.mvrx.todomvrx.currentActivity
 import com.airbnb.mvrx.todomvrx.rotateOrientation
-import com.google.common.base.Preconditions.checkArgument
 import org.hamcrest.Description
 import org.hamcrest.Matcher
 import org.hamcrest.Matchers.allOf
