@@ -20,6 +20,7 @@ import com.airbnb.mvrx.todomvrx.TasksState
 import com.airbnb.mvrx.todomvrx.TasksViewModel
 import com.airbnb.mvrx.todomvrx.data.findTask
 import com.airbnb.mvrx.todomvrx.todoapp.R
+import com.airbnb.mvrx.todomvrx.util.ToDoEpoxyController
 import com.airbnb.mvrx.todomvrx.util.showLongSnackbar
 
 abstract class BaseFragment : BaseMvRxFragment() {
@@ -35,7 +36,7 @@ abstract class BaseFragment : BaseMvRxFragment() {
                 coordinatorLayout = findViewById(R.id.coordinator_layout)
                 fab = findViewById(R.id.fab)
                 recyclerView = findViewById(R.id.recycler_view)
-                recyclerView.buildModelsWith { it.buildModels() }
+                recyclerView.setController(ToDoEpoxyController { buildModels() })
             }
 
     @CallSuper
