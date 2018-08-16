@@ -1,16 +1,18 @@
 package com.airbnb.mvrx
 
+import android.content.Intent
 import android.os.Bundle
 import android.os.Parcelable
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.parcel.Parcelize
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.robolectric.Robolectric
 
 @Parcelize
 data class ViewModelStoreTestArgs(val count: Int = 2) : Parcelable
 
-data class ViewModelStoreTestState(val notPersistedCount: Int = 1, @PersistState val persistedCount: Int = 1) : MvRxState {
+data class ViewModelStoreTestState(val notPersistedCount: Int, @PersistState val persistedCount: Int) : MvRxState {
     constructor(args: ViewModelStoreTestArgs) : this(args.count, args.count)
 }
 
@@ -38,6 +40,9 @@ class NoSaveActivity : AppCompatActivity(), MvRxViewModelStoreOwner {
 }
 
 class TestActivity : BaseMvRxActivity() {
+
+    val viewModel by viewModel(ViewModelStoreTestViewModel::class)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setTheme(R.style.Theme_AppCompat_NoActionBar)
@@ -51,7 +56,7 @@ class ViewModelStoreTestFragment : BaseMvRxFragment() {
     override fun invalidate() { }
 }
 
-class MvRxViewModelStoreTest : MvRxBaseTest() {
+class ViewModelStoreTest : BaseTest() {
 
     @Test
     fun testCanCreateFragment() {
@@ -161,5 +166,65 @@ class MvRxViewModelStoreTest : MvRxBaseTest() {
         val bundle = Bundle()
         controller.saveInstanceState(bundle)
         createFragment<ViewModelStoreTestFragment, NoSaveActivity>(savedInstanceState = bundle)
+    }
+
+    @Test
+    fun testViewModelInActivityWithoutArgs() {
+        val controller = Robolectric.buildActivity(TestActivity::class.java)
+                .create(null)
+                .start()
+                .resume()
+                .visible()
+        withState(controller.get().viewModel) { state ->
+            assertEquals(1, state.notPersistedCount)
+            assertEquals(1, state.persistedCount)
+        }
+    }
+
+    @Test
+    fun testViewModelInActivityWithArgs() {
+        val args = ViewModelStoreTestArgs(3)
+        val intent = Intent()
+        intent.putExtra(MvRx.KEY_ARG, args)
+
+        val controller = Robolectric.buildActivity(TestActivity::class.java, intent)
+                .create(null)
+                .start()
+                .resume()
+                .visible()
+        withState(controller.get().viewModel) { state ->
+            assertEquals(3, state.notPersistedCount)
+            assertEquals(3, state.persistedCount)
+        }
+    }
+
+    @Test
+    fun testViewModelInActivityWithSavedInstanceState() {
+        val args = ViewModelStoreTestArgs(3)
+        val intent = Intent()
+        intent.putExtra(MvRx.KEY_ARG, args)
+
+        val controller = Robolectric.buildActivity(TestActivity::class.java, intent)
+                .create(null)
+                .start()
+                .resume()
+                .visible()
+
+        controller.get().viewModel.setCount(4)
+
+        val savedInstanceState = Bundle()
+        controller.saveInstanceState(savedInstanceState)
+
+
+        val controller2 = Robolectric.buildActivity(TestActivity::class.java, intent)
+                .create(savedInstanceState)
+                .start()
+                .resume()
+                .visible()
+
+        withState(controller2.get().viewModel) { state ->
+            assertEquals(3, state.notPersistedCount)
+            assertEquals(4, state.persistedCount)
+        }
     }
 }

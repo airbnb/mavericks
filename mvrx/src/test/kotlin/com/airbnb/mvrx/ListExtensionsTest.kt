@@ -3,7 +3,7 @@ package com.airbnb.mvrx
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class MvRxListExtensionsTest : MvRxBaseTest() {
+class ListExtensionsTest : BaseTest() {
 
     @Test
     fun testAppendNull() {

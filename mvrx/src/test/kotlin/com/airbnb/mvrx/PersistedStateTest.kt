@@ -9,7 +9,7 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.Mockito
 
-class MvRxPersistedStateTest : MvRxBaseTest() {
+class PersistedStateTest : BaseTest() {
 
     enum class MyEnum { A,
         B,

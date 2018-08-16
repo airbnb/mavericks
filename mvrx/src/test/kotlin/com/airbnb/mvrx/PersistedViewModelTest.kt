@@ -12,7 +12,7 @@ import org.mockito.Mockito.mock
 
 enum class TestEnum { A, B, C }
 
-class MvRxPersistedViewModelTest : MvRxBaseTest() {
+class PersistedViewModelTest : BaseTest() {
 
     private lateinit var store: MvRxViewModelStore
     private lateinit var activity: FragmentActivity

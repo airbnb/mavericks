@@ -4,7 +4,7 @@ import org.junit.Test
 import java.util.concurrent.Semaphore
 
 data class IdempotentReducerState(val count: Int = 0) : MvRxState
-class MvRxIdempotentReducerTest : MvRxBaseTest() {
+class IdempotentReducerTest : BaseTest() {
 
     @Test(expected = IllegalArgumentException::class)
     fun impureReducerShouldFail() {

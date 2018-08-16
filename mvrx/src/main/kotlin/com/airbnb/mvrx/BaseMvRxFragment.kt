@@ -14,9 +14,6 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        /**
-         * This MUST be done to restore ViewModel state.
-         */
         mvrxViewModelStore.restoreViewModels(this, savedInstanceState)
     }
 

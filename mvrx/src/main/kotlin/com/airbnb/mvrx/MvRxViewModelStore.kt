@@ -18,9 +18,6 @@ import kotlin.reflect.full.companionObjectInstance
  * Then, to support persistence across processes, you must:
  * Save: Call [saveViewModels] from the same method in your StoreOwner.
  *
- * Restore: Call [restoreViewModels] from onCreate in an Activity or onActivityCreated in a Fragment. It must be in onActivityCreated
- * beacuse it must be attached to an activity.
- *
  * @see MvRxViewModelFactory
  */
 class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
@@ -70,7 +67,7 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
     /**
      * Iterates through all persisted ViewModels saved with [saveViewModels] and stores them in the store map.
      *
-     * This should be called from [android.support.v4.app.Fragment.onActivityCreated] or
+     * This should be called from [android.support.v4.app.Fragment.onCreate] or
      * [android.support.v4.app.FragmentActivity.onCreate].
      */
     fun restoreViewModels(activity: FragmentActivity, savedInstanceState: Bundle?) {
