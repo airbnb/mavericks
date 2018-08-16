@@ -32,7 +32,7 @@ class ViewModelTestViewModel(override val initialState: ViewModelTestState) : Te
     }
 }
 
-class ViewModelTest : MvRxBaseTest() {
+class ViewModelTest : BaseTest() {
 
     private lateinit var viewModel: ViewModelTestViewModel
 
@@ -53,7 +53,7 @@ class ViewModelTest : MvRxBaseTest() {
 
     @Test
     fun testSelectSubscribe() {
-        assertEquals(1, viewModel.selectSubscribeCalled)
+        assertEquals(0, viewModel.selectSubscribeCalled)
     }
 
     @Test
