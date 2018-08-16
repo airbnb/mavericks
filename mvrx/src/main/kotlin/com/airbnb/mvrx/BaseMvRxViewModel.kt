@@ -16,6 +16,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
+import kotlin.reflect.KProperty1
 import kotlin.reflect.KVisibility
 
 abstract class BaseMvRxViewModel<S : MvRxState> : ViewModel() {
@@ -196,33 +197,123 @@ abstract class BaseMvRxViewModel<S : MvRxState> : ViewModel() {
      * For ViewModels that want to subscribe to themself.
      */
     protected fun subscribe(
-        shouldUpdate: (((S, S) -> Boolean))? = null,
-        observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
-        subscriber: (S) -> Unit
+            shouldUpdate: (((S, S) -> Boolean))? = null,
+            observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
+            subscriber: (S) -> Unit
     ) {
         stateStore
-            .subscribe(null, observerScheduler, shouldUpdate, subscriber)
-            .disposeOnClear()
+                .subscribe(null, observerScheduler, shouldUpdate, subscriber)
+                .disposeOnClear()
+    }
+
+    /**
+     * Subscribe to state changes for only a single property.
+     */
+    fun <A> selectSubscribe(
+            owner: LifecycleOwner,
+            prop1: KProperty1<S, A>,
+            observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
+            subscriber: (A) -> Unit
+    ) {
+        subscribe(owner, propertyWhitelist(prop1), observerScheduler) {
+            subscriber(prop1.get(it))
+        }
+    }
+
+    /**
+     * Subscribe to state changes for only a single property.
+     */
+    protected fun <A> selectSubscribe(
+            prop1: KProperty1<S, A>,
+            observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
+            subscriber: (A) -> Unit
+    ) {
+        subscribe(propertyWhitelist(prop1), observerScheduler) {
+            subscriber(prop1.get(it))
+        }
+    }
+
+    /**
+     * Subscribe to state changes for two properties.
+     */
+    fun <A, B> selectSubscribe(
+            owner: LifecycleOwner,
+            prop1: KProperty1<S, A>,
+            prop2: KProperty1<S, B>,
+            observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
+            subscriber: (A, B) -> Unit
+    ) {
+        subscribe(owner, propertyWhitelist(prop1, prop2), observerScheduler) {
+            subscriber(prop1.get(it), prop2.get(it))
+        }
+    }
+
+    /**
+     * Subscribe to state changes for two properties.
+     */
+    protected fun <A, B> selectSubscribe(
+            prop1: KProperty1<S, A>,
+            prop2: KProperty1<S, B>,
+            observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
+            subscriber: (A, B) -> Unit
+    ) {
+        subscribe(propertyWhitelist(prop1, prop2), observerScheduler) {
+            subscriber(prop1.get(it), prop2.get(it))
+        }
+    }
+
+    /**
+     * Subscribe to state changes for three properties.
+     */
+    fun <A, B, C> selectSubscribe(
+            owner: LifecycleOwner,
+            prop1: KProperty1<S, A>,
+            prop2: KProperty1<S, B>,
+            prop3: KProperty1<S, C>,
+            observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
+            subscriber: (A, B, C) -> Unit
+    ) {
+        subscribe(owner, propertyWhitelist(prop1, prop2), observerScheduler) {
+            subscriber(prop1.get(it), prop2.get(it), prop3.get(it))
+        }
+    }
+
+    /**
+     * Subscribe to state changes for three properties.
+     */
+    protected fun <A, B, C> selectSubscribe(
+            prop1: KProperty1<S, A>,
+            prop2: KProperty1<S, B>,
+            prop3: KProperty1<S, C>,
+            observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
+            subscriber: (A, B, C) -> Unit
+    ) {
+        subscribe(propertyWhitelist(prop1, prop2), observerScheduler) {
+            subscriber(prop1.get(it), prop2.get(it), prop3.get(it))
+        }
     }
 
     /**
      * Subscribe to state updates. Includes the previous state.
-     *
-     * @see subscribe
      */
     fun subscribeWithHistory(
-        owner: LifecycleOwner? = null,
+        owner: LifecycleOwner,
         shouldUpdate: ((S, S) -> Boolean)? = null,
         observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
         subscriber: (S, S) -> Unit
     ) = stateStore
-        .subscribeWithHistory(
-            owner,
-            observerScheduler = observerScheduler,
-            shouldUpdate = shouldUpdate,
-            subscriber = subscriber
-        )
+        .subscribeWithHistory(owner, observerScheduler, shouldUpdate, subscriber)
         .disposeOnClear()
+
+    /**
+     * Subscribe to state updates. Includes the previous state.
+     */
+    protected fun subscribeWithHistory(
+            shouldUpdate: ((S, S) -> Boolean)? = null,
+            observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
+            subscriber: (S, S) -> Unit
+    ) = stateStore.subscribeWithHistory(null, observerScheduler, shouldUpdate, subscriber)
+            .disposeOnClear()
 
     protected fun Disposable.disposeOnClear(): Disposable {
         disposables.add(this)
