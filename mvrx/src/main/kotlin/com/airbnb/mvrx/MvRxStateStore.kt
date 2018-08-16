@@ -30,7 +30,7 @@ open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
     /**
      * The observable observes the subject but only emits events when the state actually changed.
      */
-    private val observable: Observable<S> = subject/*.distinctUntilChanged()*/
+    private val observable: Observable<S> = subject.distinctUntilChanged()
     private val defaultObserveOnScheduler = AndroidSchedulers.mainThread()
     private val disposables = CompositeDisposable()
 
