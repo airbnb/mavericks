@@ -70,12 +70,6 @@ abstract class BaseFragment : BaseMvRxFragment() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        // https://github.com/airbnb/MvRx/issues/15
-        invalidate()
-    }
-
     override fun invalidate() {
         recyclerView.requestModelBuild()
     }
