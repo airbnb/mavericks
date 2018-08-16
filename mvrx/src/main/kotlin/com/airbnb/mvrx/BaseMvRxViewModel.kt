@@ -73,10 +73,11 @@ abstract class BaseMvRxViewModel<S : MvRxState> : ViewModel() {
                 val firstState = this.reducer()
                 val secondState = this.reducer()
                 if (firstState != secondState) throw IllegalArgumentException("Your reducer must be pure!")
-                this
+                firstState
             }
+        } else {
+            stateStore.set(reducer)
         }
-        stateStore.set(reducer)
     }
 
     /**
