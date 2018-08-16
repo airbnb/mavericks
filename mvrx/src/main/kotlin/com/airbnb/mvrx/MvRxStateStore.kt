@@ -22,11 +22,11 @@ import java.util.LinkedList
  * until the subscriber callback completes. This will prevent the state from updating in the middle
  * of the subscription callback.
  */
-open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
+open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
     /**
      * The subject is where state changes should be pushed to.
      */
-    private val subject: Subject<S> = BehaviorSubject.create<S>().toSerialized()
+    private val subject: BehaviorSubject<S> = BehaviorSubject.createDefault(initialState)
     /**
      * The observable observes the subject but only emits events when the state actually changed.
      */
@@ -47,11 +47,11 @@ open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
      * This is automatically updated from a subscription on the subject for easy access to the
      * current state.
      */
-    @Volatile var state = initialState
-        private set
+    val state: S
+        // value must be present here, since the subject is created with initialState
+        get() = subject.value!!
 
     init {
-        subject.onNext(initialState)
 
         flushQueueSubject.observeOn(Schedulers.newThread())
             // We don't want race conditions with setting the state on multiple background threads
@@ -166,7 +166,6 @@ open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
         }
             .fold(state) { state, reducer -> state.reducer() }
             .run {
-                state = this
                 subject.onNext(this)
             }
     }
