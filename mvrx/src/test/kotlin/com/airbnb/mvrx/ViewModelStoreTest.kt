@@ -39,7 +39,7 @@ class NoSaveActivity : AppCompatActivity(), MvRxViewModelStoreOwner {
     }
 }
 
-class TestActivity : BaseMvRxActivity() {
+class ViewModelStoreActivity : TestActivity() {
 
     val viewModel by viewModel(ViewModelStoreTestViewModel::class)
 
@@ -170,7 +170,7 @@ class ViewModelStoreTest : BaseTest() {
 
     @Test
     fun testViewModelInActivityWithoutArgs() {
-        val controller = Robolectric.buildActivity(TestActivity::class.java)
+        val controller = Robolectric.buildActivity(ViewModelStoreActivity::class.java)
                 .create(null)
                 .start()
                 .resume()
@@ -187,7 +187,7 @@ class ViewModelStoreTest : BaseTest() {
         val intent = Intent()
         intent.putExtra(MvRx.KEY_ARG, args)
 
-        val controller = Robolectric.buildActivity(TestActivity::class.java, intent)
+        val controller = Robolectric.buildActivity(ViewModelStoreActivity::class.java, intent)
                 .create(null)
                 .start()
                 .resume()
@@ -204,7 +204,7 @@ class ViewModelStoreTest : BaseTest() {
         val intent = Intent()
         intent.putExtra(MvRx.KEY_ARG, args)
 
-        val controller = Robolectric.buildActivity(TestActivity::class.java, intent)
+        val controller = Robolectric.buildActivity(ViewModelStoreActivity::class.java, intent)
                 .create(null)
                 .start()
                 .resume()
@@ -216,7 +216,7 @@ class ViewModelStoreTest : BaseTest() {
         controller.saveInstanceState(savedInstanceState)
 
 
-        val controller2 = Robolectric.buildActivity(TestActivity::class.java, intent)
+        val controller2 = Robolectric.buildActivity(ViewModelStoreActivity::class.java, intent)
                 .create(savedInstanceState)
                 .start()
                 .resume()

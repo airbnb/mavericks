@@ -8,6 +8,7 @@ import org.junit.Test
 @Parcelize
 data class MvrxArgsTestArgs(val count: Int = 0) : Parcelable
 
+
 @Parcelize
 data class MvrxArgsTestArgs2(val count: Int = 0) : Parcelable
 
@@ -17,7 +18,7 @@ class MvRxArgsFragment : BaseMvRxFragment() {
     override fun invalidate() {}
 }
 
-class FragmentTest : BaseTest() {
+class MvRxFragmentTest : MvRxBaseTest() {
     @Test
     fun testArgs() {
         val (_, fragment) = createFragment<MvRxArgsFragment, TestMvRxActivity>(args = MvrxArgsTestArgs())
