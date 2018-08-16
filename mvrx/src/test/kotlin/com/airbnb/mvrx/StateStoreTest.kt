@@ -199,6 +199,40 @@ class StateStoreTest : BaseTest() {
     }
 
     @Test
+    fun testSubscribeCalledOnRestart() {
+        lifecycleOwner.lifecycle.markState(Lifecycle.State.RESUMED)
+
+        var callCount = 0
+        store.subscribe(lifecycleOwner) {
+            callCount++
+        }
+        assertEquals(1, callCount)
+        lifecycleOwner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+        assertEquals(1, callCount)
+        lifecycleOwner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        assertEquals(1, callCount)
+        lifecycleOwner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+        assertEquals(2, callCount)
+    }
+
+    @Test
+    fun testSubscribeWithHistoryCalledOnRestart() {
+        lifecycleOwner.lifecycle.markState(Lifecycle.State.RESUMED)
+
+        var callCount = 0
+        store.subscribeWithHistory(lifecycleOwner) { _, _ ->
+            callCount++
+        }
+        assertEquals(1, callCount)
+        lifecycleOwner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+        assertEquals(1, callCount)
+        lifecycleOwner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        assertEquals(1, callCount)
+        lifecycleOwner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+        assertEquals(2, callCount)
+    }
+
+    @Test
     fun testAddToList() {
         var callCount = 0
         store.subscribe {
