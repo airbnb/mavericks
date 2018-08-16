@@ -47,7 +47,7 @@ open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
      * This is automatically updated from a subscription on the subject for easy access to the
      * current state.
      */
-    @Volatile var state = initialState
+    var state = initialState
         private set
 
     init {
