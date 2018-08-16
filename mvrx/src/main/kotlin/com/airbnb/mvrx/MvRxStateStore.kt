@@ -107,6 +107,7 @@ open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
         if (lifecycleOwner == null) return observable.subscribe(subscriber)
 
         val lifecycleAwareObserver = MvRxLifecycleAwareObserver.Builder<S>(lifecycleOwner)
+            .alwaysDeliverValueWhenUnlocked()
             .onNext(subscriber)
             .build()
         return observable.subscribeWith(lifecycleAwareObserver)
@@ -129,6 +130,7 @@ open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
         if (lifecycleOwner == null) return observable.subscribe { pair -> subscriber(pair.first, pair.second) }
 
         val lifecycleAwareObserver = MvRxLifecycleAwareObserver.Builder<Pair<S, S>>(lifecycleOwner)
+            .alwaysDeliverValueWhenUnlocked()
             .onNext { pair -> subscriber(pair.first, pair.second) }
             .build()
         return observable.subscribeWith(lifecycleAwareObserver)
