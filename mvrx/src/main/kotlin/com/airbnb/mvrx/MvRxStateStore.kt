@@ -22,7 +22,7 @@ import java.util.LinkedList
  * until the subscriber callback completes. This will prevent the state from updating in the middle
  * of the subscription callback.
  */
-open class MvRxStateStore<S : Any>(val initialState: S) : Disposable {
+open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
     /**
      * The subject is where state changes should be pushed to.
      */
@@ -48,7 +48,8 @@ open class MvRxStateStore<S : Any>(val initialState: S) : Disposable {
      * current state.
      */
     val state: S
-        get() = subject.value ?: initialState
+        // value must be present here, since the subject is created with initialState
+        get() = subject.value!!
 
     init {
 
