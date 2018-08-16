@@ -12,7 +12,7 @@ import org.robolectric.Robolectric
 @Parcelize
 data class ViewModelStoreTestArgs(val count: Int = 2) : Parcelable
 
-data class ViewModelStoreTestState(val notPersistedCount: Int, @PersistState val persistedCount: Int) : MvRxState {
+data class ViewModelStoreTestState(val notPersistedCount: Int = 1, @PersistState val persistedCount: Int = 1) : MvRxState {
     constructor(args: ViewModelStoreTestArgs) : this(args.count, args.count)
 }
 
