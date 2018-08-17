@@ -10,6 +10,7 @@ import io.reactivex.Scheduler
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.annotations.NonNull
 import io.reactivex.disposables.Disposable
+import io.reactivex.exceptions.CompositeException
 import io.reactivex.internal.schedulers.ExecutorScheduler
 import io.reactivex.plugins.RxJavaPlugins
 import org.junit.BeforeClass
@@ -42,7 +43,10 @@ abstract class BaseTest {
             RxJavaPlugins.setInitIoSchedulerHandler { immediate }
             // This is necessary to prevent rxjava from swallowing errors
             // https://github.com/ReactiveX/RxJava/issues/5234
-            Thread.setDefaultUncaughtExceptionHandler { _, e -> throw e }
+            Thread.setDefaultUncaughtExceptionHandler { _, e ->
+                if (e is CompositeException && e.exceptions.size == 1) throw e.exceptions[0]
+                throw e
+            }
             RxAndroidPlugins.setInitMainThreadSchedulerHandler { immediate }
         }
     }
