@@ -40,6 +40,9 @@ abstract class BaseTest {
             }
             RxJavaPlugins.setNewThreadSchedulerHandler { immediate }
             RxJavaPlugins.setInitIoSchedulerHandler { immediate }
+            // This is necessary to prevent rxjava from swallowing errors
+            // https://github.com/ReactiveX/RxJava/issues/5234
+            Thread.setDefaultUncaughtExceptionHandler { _, e -> throw e }
             RxAndroidPlugins.setInitMainThreadSchedulerHandler { immediate }
         }
     }
