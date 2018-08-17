@@ -6,7 +6,6 @@ import android.arch.lifecycle.ViewModel
 import android.os.Looper
 import android.support.annotation.CallSuper
 import android.util.Log
-import com.airbnb.android.lib.mvrx.base.assertImmutability
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.Single

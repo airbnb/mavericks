@@ -25,20 +25,18 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
         test.java.srcDirs += 'src/test/kotlin'
     }
-    testOptions {
-        unitTests {
-            includeAndroidResources = true
-        }
-    }
     buildTypes {
         debug {
             testCoverageEnabled true
         }
     }
     testOptions {
-        unitTests.all {
-            jacoco {
-                includeNoLocationClasses = true
+        unitTests {
+            includeAndroidResources = true
+            all {
+                jacoco {
+                    includeNoLocationClasses = true
+                }
             }
         }
     }
@@ -49,7 +47,8 @@ androidExtensions {
 }
 
 jacoco {
-    toolVersion = "0.8.1"
+    // 0.8.2 has better Kotlin support
+    toolVersion = "0.8.2-SNAPSHOT"
 }
 
 dependencies {
@@ -105,18 +104,17 @@ task coverage(type: JacocoReport, dependsOn: "testDebugUnitTest") {
 
     // what to exclude from coverage report
     // UI, "noise", generated classes, platform classes, etc.
-//    def excludes = [
-//            '**/R.class',
-//            '**/R$*.class',
+    def excludes = [
+            '**/R.class',
+            '**/R$*.class',
 //            '**/*$ViewInjector*.*',
-//            '**/BuildConfig.*',
-//            '**/Manifest*.*',
+            '**/BuildConfig.*',
+            '**/Manifest*.*',
 //            '**/*Test*.*',
 //            'android/**/*.*',
 //            '**/*Fragment.*',
 //            '**/*Activity.*'
-//    ]
-    def excludes = []
+    ]
     // generated classes
     def debugTree = fileTree(dir: "${buildDir}/intermediates/classes/debug", excludes: excludes)
     def kotlinDebugTree = fileTree(dir: "${buildDir}/tmp/kotlin-classes/debug", excludes: excludes)
