@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 import android.widget.CheckBox
+import android.widget.CompoundButton
 import android.widget.RelativeLayout
 import android.widget.TextView
 import com.airbnb.epoxy.CallbackProp
@@ -36,11 +37,7 @@ class TaskDetailView @JvmOverloads constructor(
     }
 
     @CallbackProp
-    fun onCheckedChanged(listener: ((Boolean) -> Unit)?) {
-        if (listener == null) {
-            checkbox.setOnCheckedChangeListener(null)
-        } else {
-            checkbox.setOnCheckedChangeListener { _, isChecked -> listener(isChecked) }
-        }
+    fun onCheckedChanged(listener: CompoundButton.OnCheckedChangeListener?) {
+            checkbox.setOnCheckedChangeListener(listener)
     }
 }

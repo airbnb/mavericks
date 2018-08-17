@@ -7,7 +7,6 @@ import com.airbnb.mvrx.todomvrx.util.EspressoIdlingResource
 import io.reactivex.Completable
 import io.reactivex.Scheduler
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
@@ -29,7 +28,6 @@ class DatabaseDataSource(
 
     private fun fromAction(action: () -> Unit): Disposable = Completable.fromAction(action)
             .subscribeOn(scheduler)
-            .observeOn(AndroidSchedulers.mainThread())
             .delay(delayMs, TimeUnit.MILLISECONDS)
             .doOnSubscribe { EspressoIdlingResource.increment() }
             .doOnComplete { EspressoIdlingResource.decrement() }

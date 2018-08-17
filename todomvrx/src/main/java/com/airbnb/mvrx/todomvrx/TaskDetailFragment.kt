@@ -54,7 +54,7 @@ class TaskDetailFragment : BaseFragment() {
         taskDetailView {
             id("detail")
             task(state.tasks.findTask(args.id))
-            onCheckedChanged { viewModel.setComplete(args.id, it) }
+            onCheckedChanged { _, checked -> viewModel.setComplete(args.id, checked) }
         }
     }
 
