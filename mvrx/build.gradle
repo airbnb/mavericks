@@ -102,20 +102,16 @@ task coverage(type: JacocoReport, dependsOn: "testDebugUnitTest") {
         html.enabled = true
     }
 
-    // what to exclude from coverage report
-    // UI, "noise", generated classes, platform classes, etc.
     def excludes = [
             '**/R.class',
             '**/R$*.class',
             '**/BuildConfig.*',
             '**/Manifest*.*',
     ]
-    // generated classes
     def debugTree = fileTree(dir: "${buildDir}/intermediates/classes/debug", excludes: excludes)
     def kotlinDebugTree = fileTree(dir: "${buildDir}/tmp/kotlin-classes/debug", excludes: excludes)
     classDirectories = files([debugTree], [kotlinDebugTree])
 
-    // sources
     sourceDirectories = files([
             android.sourceSets.main.java.srcDirs,
             "${project.projectDir}/src/main/kotlin"
