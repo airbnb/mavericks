@@ -6,7 +6,7 @@ import java.util.concurrent.Semaphore
 data class IdempotentReducerState(val count: Int = 0) : MvRxState
 class IdempotentReducerTest : BaseTest() {
 
-    @Test(expected = IllegalArgumentException::class)
+    @Test
     fun impureReducerShouldFail() {
         val semaphore = Semaphore(0)
         class ImpureViewModel(override val initialState: IdempotentReducerState) : TestMvRxViewModel<IdempotentReducerState>() {
@@ -14,29 +14,33 @@ class IdempotentReducerTest : BaseTest() {
             fun impureReducer() {
                 setState {
                     val state = copy(count = ++this@ImpureViewModel.count)
-                    semaphore.release()
                     state
                 }
             }
         }
-        ImpureViewModel(IdempotentReducerState()).impureReducer()
+        val impureViewModel = ImpureViewModel(IdempotentReducerState())
+        impureViewModel.stateStore.semaphoreForTesting = semaphore
+        impureViewModel.impureReducer()
         semaphore.acquire()
+        assert(impureViewModel.stateStore.throwableForTesting is IllegalArgumentException)
     }
 
     @Test
     fun pureReducerShouldNotFail() {
         val semaphore = Semaphore(0)
-        class ImpureViewModel(override val initialState: IdempotentReducerState) : TestMvRxViewModel<IdempotentReducerState>() {
-
+        class PureViewModel(override val initialState: IdempotentReducerState) : TestMvRxViewModel<IdempotentReducerState>() {
             fun pureReducer() {
                 setState {
                     val state = copy(count = count + 1)
-                    semaphore.release()
                     state
                 }
             }
         }
-        ImpureViewModel(IdempotentReducerState()).pureReducer()
+
+        val pureViewModel = PureViewModel(IdempotentReducerState())
+        pureViewModel.stateStore.semaphoreForTesting = semaphore
+        pureViewModel.pureReducer()
         semaphore.acquire()
+        assert(pureViewModel.stateStore.throwableForTesting == null)
     }
 }

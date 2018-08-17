@@ -5,6 +5,7 @@ import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.ViewModel
 import android.os.Looper
 import android.support.annotation.CallSuper
+import android.support.annotation.VisibleForTesting
 import android.util.Log
 import io.reactivex.Observable
 import io.reactivex.Scheduler
@@ -26,7 +27,8 @@ abstract class BaseMvRxViewModel<S : MvRxState> : ViewModel() {
     /**
      * This has to be lazy so that initialState can be initialized in the child.
      */
-    private val stateStore: MvRxStateStore<S> by lazy { MvRxStateStore(initialState) }
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    val stateStore: MvRxStateStore<S> by lazy { MvRxStateStore(initialState) }
 
     /**
      * Enable debug features which check for certain properties like idempotent reducers and immutable state.
