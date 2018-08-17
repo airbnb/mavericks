@@ -1,4 +1,4 @@
-package com.airbnb.android.lib.mvrx.base
+package com.airbnb.mvrx
 
 import android.support.annotation.VisibleForTesting
 import android.support.v4.util.ArrayMap

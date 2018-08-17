@@ -2,6 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply from: 'gradle-maven-push.gradle'
+apply plugin: "jacoco"
 
 android {
     compileSdkVersion 27
@@ -24,15 +25,30 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
         test.java.srcDirs += 'src/test/kotlin'
     }
+    buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
+    }
     testOptions {
         unitTests {
             includeAndroidResources = true
+            all {
+                jacoco {
+                    includeNoLocationClasses = true
+                }
+            }
         }
     }
 }
 
 androidExtensions {
     experimental = true
+}
+
+jacoco {
+    // 0.8.2 has better Kotlin support
+    toolVersion = "0.8.2-SNAPSHOT"
 }
 
 dependencies {
@@ -75,4 +91,30 @@ artifacts {
 
 tasks.withType(Javadoc).all {
     enabled = false
+}
+
+task coverage(type: JacocoReport, dependsOn: "testDebugUnitTest") {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports for Debug build"
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+
+    def excludes = [
+            '**/R.class',
+            '**/R$*.class',
+            '**/BuildConfig.*',
+            '**/Manifest*.*',
+    ]
+    def debugTree = fileTree(dir: "${buildDir}/intermediates/classes/debug", excludes: excludes)
+    def kotlinDebugTree = fileTree(dir: "${buildDir}/tmp/kotlin-classes/debug", excludes: excludes)
+    classDirectories = files([debugTree], [kotlinDebugTree])
+
+    sourceDirectories = files([
+            android.sourceSets.main.java.srcDirs,
+            "${project.projectDir}/src/main/kotlin"
+    ])
+    executionData = files("$buildDir/jacoco/testDebugUnitTest.exec")
 }

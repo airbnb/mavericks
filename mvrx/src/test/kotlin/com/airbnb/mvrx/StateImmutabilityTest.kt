@@ -5,7 +5,6 @@ package com.airbnb.mvrx
 import android.support.v4.util.ArrayMap
 import android.support.v4.util.SparseArrayCompat
 import android.util.SparseArray
-import com.airbnb.android.lib.mvrx.base.assertImmutability
 import org.junit.Test
 
 class StateImmutabilityTest : BaseTest() {
