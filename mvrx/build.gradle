@@ -107,13 +107,8 @@ task coverage(type: JacocoReport, dependsOn: "testDebugUnitTest") {
     def excludes = [
             '**/R.class',
             '**/R$*.class',
-//            '**/*$ViewInjector*.*',
             '**/BuildConfig.*',
             '**/Manifest*.*',
-//            '**/*Test*.*',
-//            'android/**/*.*',
-//            '**/*Fragment.*',
-//            '**/*Activity.*'
     ]
     // generated classes
     def debugTree = fileTree(dir: "${buildDir}/intermediates/classes/debug", excludes: excludes)
