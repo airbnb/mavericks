@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ToDo MvRx</string>
+    <string name="task_marked_complete">Task marked complete</string>
+    <string name="task_marked_active">Task marked active</string>
+    <string name="loading_tasks_error">Error while loading tasks</string>
+    <string name="completed_tasks_cleared">Completed tasks cleared</string>
+    <string name="menu_filter">Filter</string>
+    <string name="menu_clear">Clear completed</string>
+    <string name="menu_delete_task">Delete task</string>
+    <string name="navigation_view_header_title">ToDos</string>
+    <string name="title_hint">Title</string>
+    <string name="description_hint">Enter your ToDo here.</string>
+    <string name="empty_task_message">TO DOs cannot be empty</string>
+    <string name="successfully_saved_task_message">ToDo saved</string>
+    <string name="list_title">ToDo List</string>
+    <string name="statistics_title">Statistics</string>
+    <string name="statistics_no_tasks">You have no tasks.</string>
+    <string name="statistics_active_tasks">Active tasks: %d</string>
+    <string name="statistics_completed_tasks">Completed tasks: %d</string>
+    <string name="no_data">No data</string>
+
+    <string name="nav_all">All</string>
+    <string name="nav_active">Active</string>
+    <string name="nav_completed">Completed</string>
+    <string name="label_all">All ToDos</string>
+    <string name="label_active">Active ToDos</string>
+    <string name="label_completed">Completed ToDos</string>
+    <string name="no_tasks_all">You have no ToDos!</string>
+    <string name="no_tasks_active">You have no active ToDos!</string>
+    <string name="no_tasks_completed">You have no completed ToDos!</string>
+    <string name="refresh">Refresh</string>
+    <string name="successfully_deleted_task_message">Task was deleted</string>
+    <string name="successfully_added_task_message">ToDo added</string>
+    <string name="no_data_description"/>
+
+</resources>
