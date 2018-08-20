@@ -165,13 +165,16 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      *
      * @param owner The LifecycleOwner such as a Fragment or Activity that wants to subscribe to
      *                     state updates.
-     * @param shouldUpdate A lambda that takes the previous and new state and retuns whether the
-     *                     subscriber should be notified.
-     * @param subscriber A lambda that will get called every time the state changes.
+     * @param shouldUpdate is an optional observer that you can implement to filter whether or not
+     *                     your subscriber gets called. It will be given the old state and new state
+     *                     and should return whether or not to call the subscriber. It will initially
+     *                     be called with null as the old state to determine whether or not to
+     *                     deliver the initial state.
+     *                     MvRx comes with some shouldUpdate helpers such as onSuccess, onFail, and propertyWhitelist.
      */
     fun subscribe(
         owner: LifecycleOwner,
-        shouldUpdate: ((S, S) -> Boolean)? = null,
+        shouldUpdate: ((S?, S) -> Boolean)? = null,
         observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
         subscriber: (S) -> Unit
     ) {
@@ -181,10 +184,16 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     }
 
     /**
-     * For ViewModels that want to subscribe to themself.
+     * For ViewModels that want to subscribe to them self.
+     * @param shouldUpdate is an optional observer that you can implement to filter whether or not
+     *                     your subscriber gets called. It will be given the old state and new state
+     *                     and should return whether or not to call the subscriber. It will initially
+     *                     be called with null as the old state to determine whether or not to
+     *                     deliver the initial state.
+     *                     MvRx comes with some shouldUpdate helpers such as onSuccess, onFail, and propertyWhitelist.
      */
     protected fun subscribe(
-            shouldUpdate: (((S, S) -> Boolean))? = null,
+            shouldUpdate: ((S?, S) -> Boolean)? = null,
             observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
             subscriber: (S) -> Unit
     ) {
@@ -281,24 +290,40 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     }
 
     /**
-     * Subscribe to state updates. Includes the previous state.
+     * Subscribe to state updates. Includes the previous state. The previous state will be null
+     * for the initial call.
+     *
+     * @param shouldUpdate is an optional observer that you can implement to filter whether or not
+     *                     your subscriber gets called. It will be given the old state and new state
+     *                     and should return whether or not to call the subscriber. It will initially
+     *                     be called with null as the old state to determine whether or not to
+     *                     deliver the initial state.
+     *                     MvRx comes with some shouldUpdate helpers such as onSuccess, onFail, and propertyWhitelist.
      */
     fun subscribeWithHistory(
         owner: LifecycleOwner,
-        shouldUpdate: ((S, S) -> Boolean)? = null,
+        shouldUpdate: ((S?, S) -> Boolean)? = null,
         observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
-        subscriber: (S, S) -> Unit
+        subscriber: (S?, S) -> Unit
     ) = stateStore
         .subscribeWithHistory(owner, observerScheduler, shouldUpdate, subscriber)
         .disposeOnClear()
 
     /**
-     * Subscribe to state updates. Includes the previous state.
+     * Subscribe to state updates. Includes the previous state. The previous state will be null
+     * for the initial call.
+     *
+     * @param shouldUpdate is an optional observer that you can implement to filter whether or not
+     *                     your subscriber gets called. It will be given the old state and new state
+     *                     and should return whether or not to call the subscriber. It will initially
+     *                     be called with null as the old state to determine whether or not to
+     *                     deliver the initial state.
+     *                     MvRx comes with some shouldUpdate helpers such as onSuccess, onFail, and propertyWhitelist.
      */
     protected fun subscribeWithHistory(
-            shouldUpdate: ((S, S) -> Boolean)? = null,
+            shouldUpdate: ((S?, S) -> Boolean)? = null,
             observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
-            subscriber: (S, S) -> Unit
+            subscriber: (S?, S) -> Unit
     ) = stateStore.subscribeWithHistory(null, observerScheduler, shouldUpdate, subscriber)
             .disposeOnClear()
 

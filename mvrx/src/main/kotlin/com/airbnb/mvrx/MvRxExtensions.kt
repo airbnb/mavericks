@@ -23,13 +23,18 @@ import kotlin.reflect.full.isSupertypeOf
  *
  * MvRx will also handle persistence across process restarts. Refer to [com.airbnb.mvrx.PersistState] for more info.
  *
- * Use shouldUpdate if you only want to subscribe to a subset of all updates. There are some standard ones in ShouldUpdateHelpers.
- *
- * Use keyFactory if you have multiple ViewModels of the same class in the same scope.
+ * @param shouldUpdate is an optional observer that you can implement to filter whether or not
+ *                     your subscriber gets called. It will be given the old state and new state
+ *                     and should return whether or not to call the subscriber. It will initially
+ *                     be called with null as the old state to determine whether or not to
+ *                     deliver the initial state.
+ * @param keyFactory is an optional lambda that can be used to provide a custom key for your view model
+ *                   in the store. This isn't necessary unless you expect to have multiple activityViewModels
+ *                   of the same class.
  */
 inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragmentViewModel(
     viewModelClass: KClass<VM>,
-    noinline shouldUpdate: ((S, S) -> Boolean)? = null,
+    noinline shouldUpdate: ((S?, S) -> Boolean)? = null,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : Fragment,
         T : MvRxView = lazy {
@@ -41,10 +46,19 @@ inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragmentViewM
 /**
  * [activityViewModel] except it will throw [IllegalStateException] if the ViewModel doesn't already exist.
  * Use this for screens in the middle of a flow that cannot reasonably be an entrypoint to the flow.
+ *
+ * @param shouldUpdate is an optional observer that you can implement to filter whether or not
+ *                     your subscriber gets called. It will be given the old state and new state
+ *                     and should return whether or not to call the subscriber. It will initially
+ *                     be called with null as the old state to determine whether or not to
+ *                     deliver the initial state.
+ * @param keyFactory is an optional lambda that can be used to provide a custom key for your view model
+ *                   in the store. This isn't necessary unless you expect to have multiple activityViewModels
+ *                   of the same class.
  */
 fun <T, VM : BaseMvRxViewModel<S>, S : MvRxState> T.existingViewModel(
     viewModelClass: KClass<VM>,
-    shouldUpdate: ((S, S) -> Boolean)? = null,
+    shouldUpdate: ((S?, S) -> Boolean)? = null,
     keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : Fragment,
         T : MvRxView = lazy {
@@ -56,13 +70,18 @@ fun <T, VM : BaseMvRxViewModel<S>, S : MvRxState> T.existingViewModel(
 /**
  * [fragmentViewModel] except scoped to the current Activity. Use this to share state between different Fragments.
  *
- * @param stateFactory A lambda that provides an instance of your State class; this will be used to initialize the ViewModel. If no lambda is provided,
- * the default will attempt to instantiate your state class with the arguments provided to the fragment.
- * If the fragment has no arguments set then state will be initialized with a zero argument constructor. If neither exist an exception will be thrown.
+ * @param shouldUpdate is an optional observer that you can implement to filter whether or not
+ *                     your subscriber gets called. It will be given the old state and new state
+ *                     and should return whether or not to call the subscriber. It will initially
+ *                     be called with null as the old state to determine whether or not to
+ *                     deliver the initial state.
+ * @param keyFactory is an optional lambda that can be used to provide a custom key for your view model
+ *                   in the store. This isn't necessary unless you expect to have multiple activityViewModels
+ *                   of the same class.
  */
 inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activityViewModel(
     viewModelClass: KClass<VM>,
-    noinline shouldUpdate: ((S, S) -> Boolean)? = null,
+    noinline shouldUpdate: ((S?, S) -> Boolean)? = null,
     noinline keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : Fragment,
         T : MvRxView = lazy {

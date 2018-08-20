@@ -98,7 +98,7 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
     fun subscribe(
         lifecycleOwner: LifecycleOwner? = null,
         observerScheduler: Scheduler = defaultObserveOnScheduler,
-        shouldUpdate: ((S, S) -> Boolean)? = null,
+        shouldUpdate: ((S?, S) -> Boolean)? = null,
         subscriber: (S) -> Unit
     ): Disposable {
         val observable = observableFor(observerScheduler, shouldUpdate).map { it.second }
@@ -121,14 +121,14 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
     fun subscribeWithHistory(
         lifecycleOwner: LifecycleOwner? = null,
         observerScheduler: Scheduler = defaultObserveOnScheduler,
-        shouldUpdate: ((S, S) -> Boolean)? = null,
-        subscriber: (S, S) -> Unit
+        shouldUpdate: ((S?, S) -> Boolean)? = null,
+        subscriber: (S?, S) -> Unit
     ): Disposable {
         val observable = observableFor(observerScheduler, shouldUpdate)
 
-        if (lifecycleOwner == null) return observable.subscribe { pair -> subscriber(pair.first, pair.second) }
+        if (lifecycleOwner == null) return observable.subscribe { pair -> subscriber(pair?.first, pair.second) }
 
-        val lifecycleAwareObserver = MvRxLifecycleAwareObserver.Builder<Pair<S, S>>(lifecycleOwner)
+        val lifecycleAwareObserver = MvRxLifecycleAwareObserver.Builder<Pair<S?, S>>(lifecycleOwner)
             .alwaysDeliverValueWhenUnlocked()
             .onNext { pair -> subscriber(pair.first, pair.second) }
             .build()
@@ -177,13 +177,14 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
         e?.let { throw it }
     }
 
-    private fun observableFor(observerScheduler: Scheduler, shouldUpdate: ((S, S) -> Boolean)? = null): Observable<Pair<S, S>> {
+    private fun observableFor(observerScheduler: Scheduler, shouldUpdate: ((S?, S) -> Boolean)? = null): Observable<Pair<S?, S>> {
         val shouldUpdateWithDefault = shouldUpdate ?: { _, _ -> true }
-        return this.observable
+        return observable
             // Map the current state to a pair so that it has the same type as the scan accumulator which is a pair of (old state, new state)
-            .map { it to it }
+            .map { Pair<S?, S>(it, it) }
             // Accumulator is a pair of (old state, new state)
-            .scan { accumulator, currentState -> accumulator.second to currentState.first }
+            .scan(Pair<S?, S>(null, state)) { accumulator, currentState -> accumulator.second to currentState.second }
+            .filter { it.first !== it.second }
             .filter { shouldUpdateWithDefault(it.first, it.second) }
             .observeOn(observerScheduler)
     }

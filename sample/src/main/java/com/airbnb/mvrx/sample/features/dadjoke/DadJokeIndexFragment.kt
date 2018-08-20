@@ -97,7 +97,7 @@ class DadJokeIndexFragment : BaseFragment() {
          * Returning early from this block is similar to using a shouldUpdate parameter.
          */
         viewModel.subscribeWithHistory { oldState, newState ->
-            Log.d(TAG, "There were ${oldState.jokes.size} jokes and now there are ${newState.jokes.size} jokes.")
+            Log.d(TAG, "There were ${oldState?.jokes?.size} jokes and now there are ${newState.jokes.size} jokes.")
         }
     }
 
