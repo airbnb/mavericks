@@ -185,6 +185,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 
     /**
      * For ViewModels that want to subscribe to them self.
+     *
      * @param shouldUpdate is an optional observer that you can implement to filter whether or not
      *                     your subscriber gets called. It will be given the old state and new state
      *                     and should return whether or not to call the subscriber. It will initially

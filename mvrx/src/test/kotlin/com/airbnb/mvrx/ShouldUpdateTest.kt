@@ -5,7 +5,11 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
-data class ShouldUpdateState(val prop: Async<String> = Uninitialized, val prop2: String = "foo")
+data class ShouldUpdateState(
+        val prop1: Async<String> = Uninitialized,
+        val prop2: String = "foo",
+        val prop3: String = "foo"
+)
 
 class ShouldUpdateTest : BaseTest() {
 
@@ -32,10 +36,10 @@ class ShouldUpdateTest : BaseTest() {
     @Test
     fun testOnSuccess() {
         var callCount = 0
-        store.set { copy(prop = Success("foo")) }
-        store.subscribe(shouldUpdate = onSuccess(ShouldUpdateState::prop)) { state ->
+        store.set { copy(prop1 = Success("foo")) }
+        store.subscribe(shouldUpdate = onSuccess(ShouldUpdateState::prop1)) { state ->
             callCount++
-            assertEquals(Success("foo"), state.prop)
+            assertEquals(Success("foo"), state.prop1)
         }
         assertEquals(1, callCount)
     }
@@ -43,8 +47,8 @@ class ShouldUpdateTest : BaseTest() {
     @Test
     fun testOnSuccessNoInitial() {
         var callCount = 0
-        store.set { copy(prop = Success("foo")) }
-        store.subscribe(shouldUpdate = onSuccessNoInitial(ShouldUpdateState::prop)) {
+        store.set { copy(prop1 = Success("foo")) }
+        store.subscribe(shouldUpdate = onSuccess(ShouldUpdateState::prop1, false)) {
             callCount++
         }
         assertEquals(0, callCount)
@@ -54,10 +58,10 @@ class ShouldUpdateTest : BaseTest() {
     fun testOnFail() {
         var callCount = 0
         val fail = Fail<String>(IllegalStateException("foo"))
-        store.set { copy(prop = fail) }
-        store.subscribe(shouldUpdate = onFail(ShouldUpdateState::prop)) { state ->
+        store.set { copy(prop1 = fail) }
+        store.subscribe(shouldUpdate = onFail(ShouldUpdateState::prop1)) { state ->
             callCount++
-            assertEquals(fail, state.prop)
+            assertEquals(fail, state.prop1)
         }
         assertEquals(1, callCount)
     }
@@ -65,8 +69,8 @@ class ShouldUpdateTest : BaseTest() {
     @Test
     fun testOnFailNoInitial() {
         var callCount = 0
-        store.set { copy(prop = Fail(IllegalStateException("foo"))) }
-        store.subscribe(shouldUpdate = onFailNoInitial(ShouldUpdateState::prop)) {
+        store.set { copy(prop1 = Fail(IllegalStateException("foo"))) }
+        store.subscribe(shouldUpdate = onFail(ShouldUpdateState::prop1, false)) {
             callCount++
         }
         assertEquals(0, callCount)
@@ -75,9 +79,9 @@ class ShouldUpdateTest : BaseTest() {
     @Test
     fun propertyWhitelistInitialValue() {
         var callCount = 0
-        store.subscribe(shouldUpdate = propertyWhitelist(ShouldUpdateState::prop)) { state ->
+        store.subscribe(shouldUpdate = propertyWhitelist(ShouldUpdateState::prop1)) { state ->
             callCount++
-            assertEquals(Uninitialized, state.prop)
+            assertEquals(Uninitialized, state.prop1)
         }
         assertEquals(1, callCount)
     }
@@ -85,7 +89,7 @@ class ShouldUpdateTest : BaseTest() {
     @Test
     fun propertyWhitelistNoInitialValue() {
         var callCount = 0
-        store.subscribe(shouldUpdate = propertyWhitelistNoInitial(ShouldUpdateState::prop)) {
+        store.subscribe(shouldUpdate = propertyWhitelist(ShouldUpdateState::prop1, false)) {
             callCount++
         }
         assertEquals(0, callCount)
@@ -107,14 +111,40 @@ class ShouldUpdateTest : BaseTest() {
         store.subscribe(shouldUpdate = propertyWhitelist(ShouldUpdateState::prop2)) {
             callCount++
         }
+        store.set { copy(prop1 = Loading()) }
         store.set { copy(prop2 = "foo2") }
+        store.set { copy(prop3 = "foo2") }
         assertEquals(2, callCount)
+    }
+
+    @Test
+    fun propertyWhitelis2tWithChange() {
+        var callCount = 0
+        store.subscribe(shouldUpdate = propertyWhitelist(ShouldUpdateState::prop1, ShouldUpdateState::prop2)) {
+            callCount++
+        }
+        store.set { copy(prop1 = Loading()) }
+        store.set { copy(prop2 = "foo2") }
+        store.set { copy(prop3 = "foo2") }
+        assertEquals(3, callCount)
+    }
+
+    @Test
+    fun propertyWhitelis3tWithChange() {
+        var callCount = 0
+        store.subscribe(shouldUpdate = propertyWhitelist(ShouldUpdateState::prop1, ShouldUpdateState::prop2, ShouldUpdateState::prop3)) {
+            callCount++
+        }
+        store.set { copy(prop1 = Loading()) }
+        store.set { copy(prop2 = "foo2") }
+        store.set { copy(prop3 = "foo2") }
+        assertEquals(4, callCount)
     }
 
     @Test
     fun propertyWhitelistSubscribeToDifferentProp() {
         var callCount = 0
-        store.subscribe(shouldUpdate = propertyWhitelist(ShouldUpdateState::prop)) {
+        store.subscribe(shouldUpdate = propertyWhitelist(ShouldUpdateState::prop1)) {
             callCount++
         }
         store.set { copy(prop2 = "foo2") }

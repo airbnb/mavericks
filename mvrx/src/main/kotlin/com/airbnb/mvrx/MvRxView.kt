@@ -52,6 +52,7 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      */
     fun <S : MvRxState, A> BaseMvRxViewModel<S>.selectSubscribe(
             prop1: KProperty1<S, A>,
+            initialValue: Boolean = true,
             observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
             subscriber: (A) -> Unit
     ) = subscribe(this@MvRxView, propertyWhitelist(prop1), observerScheduler) {

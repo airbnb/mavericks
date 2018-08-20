@@ -41,7 +41,8 @@ abstract class BaseFragment : BaseMvRxFragment() {
 
     @CallSuper
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.subscribeWithHistory(propertyWhitelist(TasksState::tasks)) { oldState, newState ->
+        viewModel.subscribeWithHistory(propertyWhitelist(TasksState::tasks, false)) { oldState, newState ->
+            oldState ?: return@subscribeWithHistory
             if (oldState.tasks.any { it.complete } && !newState.tasks.any { it.complete }) {
                 coordinatorLayout.showLongSnackbar(R.string.completed_tasks_cleared)
             }
