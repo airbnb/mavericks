@@ -29,7 +29,7 @@ abstract class BaseMvRxViewModel<S : MvRxState> : ViewModel() {
     private val stateStore: MvRxStateStore<S> by lazy { MvRxStateStore(initialState) }
 
     /**
-     * Enable debug features which check for certain properties like idempotent reducers and immutable state.
+     * Enable debug features which check for certain properties like pure reducers and immutable state.
      */
     protected abstract val debugMode: Boolean
 

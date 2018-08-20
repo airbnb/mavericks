@@ -1,14 +1,13 @@
 package com.airbnb.mvrx
 
 import org.junit.Test
-import java.util.concurrent.Semaphore
 
-data class IdempotentReducerState(val count: Int = 0) : MvRxState
-class IdempotentReducerTest : BaseTest() {
+data class PureReducerValidationState(val count: Int = 0) : MvRxState
+class PureReducerValidationTest : BaseTest() {
 
     @Test(expected = IllegalArgumentException::class)
     fun impureReducerShouldFail() {
-        class ImpureViewModel(override val initialState: IdempotentReducerState) : TestMvRxViewModel<IdempotentReducerState>() {
+        class ImpureViewModel(override val initialState: PureReducerValidationState) : TestMvRxViewModel<PureReducerValidationState>() {
             private var count = 0
             fun impureReducer() {
                 setState {
@@ -17,12 +16,12 @@ class IdempotentReducerTest : BaseTest() {
                 }
             }
         }
-        ImpureViewModel(IdempotentReducerState()).impureReducer()
+        ImpureViewModel(PureReducerValidationState()).impureReducer()
     }
 
     @Test
     fun pureReducerShouldNotFail() {
-        class PureViewModel(override val initialState: IdempotentReducerState) : TestMvRxViewModel<IdempotentReducerState>() {
+        class PureViewModel(override val initialState: PureReducerValidationState) : TestMvRxViewModel<PureReducerValidationState>() {
             fun pureReducer() {
                 setState {
                     val state = copy(count = count + 1)
@@ -30,6 +29,6 @@ class IdempotentReducerTest : BaseTest() {
                 }
             }
         }
-        PureViewModel(IdempotentReducerState()).pureReducer()
+        PureViewModel(PureReducerValidationState()).pureReducer()
     }
 }
