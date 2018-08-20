@@ -23,48 +23,44 @@ import kotlin.reflect.full.isSupertypeOf
  *
  * MvRx will also handle persistence across process restarts. Refer to [com.airbnb.mvrx.PersistState] for more info.
  *
- * @param shouldUpdate is an optional observer that you can implement to filter whether or not
- *                     your subscriber gets called. It will be given the old state and new state
- *                     and should return whether or not to call the subscriber. It will initially
- *                     be called with null as the old state to determine whether or not to
- *                     deliver the initial state.
+ * @param shouldUpdate filters whether or not your consumer should be called. oldState will be
+ *                     null for the first invocation.
+ *                     MvRx comes with some shouldUpdate helpers such as onSuccess, onFail, and propertyWhitelist.
  * @param keyFactory is an optional lambda that can be used to provide a custom key for your view model
  *                   in the store. This isn't necessary unless you expect to have multiple activityViewModels
  *                   of the same class.
  */
 inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragmentViewModel(
     viewModelClass: KClass<VM>,
-    noinline shouldUpdate: ((S?, S) -> Boolean)? = null,
+    noinline shouldUpdate: ((oldState: S?, newState: S) -> Boolean)? = null,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : Fragment,
         T : MvRxView = lazy {
     val stateFactory: () -> S = ::_fragmentViewModelInitialStateProvider
     MvRxViewModelProvider.get(viewModelClass, this, keyFactory(), stateFactory)
-        .apply { subscribe(requireActivity(), shouldUpdate = shouldUpdate, subscriber = { invalidate() }) }
+        .apply { subscribe(requireActivity(), shouldUpdate = shouldUpdate, consumer = { invalidate() }) }
 }
 
 /**
  * [activityViewModel] except it will throw [IllegalStateException] if the ViewModel doesn't already exist.
  * Use this for screens in the middle of a flow that cannot reasonably be an entrypoint to the flow.
  *
- * @param shouldUpdate is an optional observer that you can implement to filter whether or not
- *                     your subscriber gets called. It will be given the old state and new state
- *                     and should return whether or not to call the subscriber. It will initially
- *                     be called with null as the old state to determine whether or not to
- *                     deliver the initial state.
+ * @param shouldUpdate filters whether or not your consumer should be called. oldState will be
+ *                     null for the first invocation.
+ *                     MvRx comes with some shouldUpdate helpers such as onSuccess, onFail, and propertyWhitelist..
  * @param keyFactory is an optional lambda that can be used to provide a custom key for your view model
  *                   in the store. This isn't necessary unless you expect to have multiple activityViewModels
  *                   of the same class.
  */
 fun <T, VM : BaseMvRxViewModel<S>, S : MvRxState> T.existingViewModel(
     viewModelClass: KClass<VM>,
-    shouldUpdate: ((S?, S) -> Boolean)? = null,
+    shouldUpdate: ((oldState: S?, newState: S) -> Boolean)? = null,
     keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : Fragment,
         T : MvRxView = lazy {
     val factory = MvRxFactory { throw IllegalStateException("ViewModel for ${requireActivity()}[${keyFactory()}] does not exist yet!") }
     ViewModelProviders.of(requireActivity(), factory).get(keyFactory(), viewModelClass.java)
-        .apply { subscribe(requireActivity(), shouldUpdate = shouldUpdate, subscriber = { invalidate() }) }
+        .apply { subscribe(requireActivity(), shouldUpdate = shouldUpdate, consumer = { invalidate() }) }
 }
 
 /**
@@ -88,7 +84,7 @@ inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activityViewM
     val stateFactory: () -> S = { _activityViewModelInitialStateProvider(keyFactory) }
     if (requireActivity() !is MvRxViewModelStoreOwner) throw IllegalArgumentException("Your Activity must be a MvRxViewModelStoreOwner!")
     MvRxViewModelProvider.get(viewModelClass, requireActivity(), keyFactory(), stateFactory)
-        .apply { subscribe(this@activityViewModel, shouldUpdate = shouldUpdate, subscriber = { invalidate() }) }
+        .apply { subscribe(this@activityViewModel, shouldUpdate = shouldUpdate, consumer = { invalidate() }) }
 }
 
 /**

@@ -48,7 +48,7 @@ class ShouldUpdateTest : BaseTest() {
     fun testOnSuccessNoInitial() {
         var callCount = 0
         store.set { copy(prop1 = Success("foo")) }
-        store.subscribe(shouldUpdate = onSuccess(ShouldUpdateState::prop1, false)) {
+        store.subscribe(shouldUpdate = onSuccess(ShouldUpdateState::prop1, true)) {
             callCount++
         }
         assertEquals(0, callCount)
@@ -70,7 +70,7 @@ class ShouldUpdateTest : BaseTest() {
     fun testOnFailNoInitial() {
         var callCount = 0
         store.set { copy(prop1 = Fail(IllegalStateException("foo"))) }
-        store.subscribe(shouldUpdate = onFail(ShouldUpdateState::prop1, false)) {
+        store.subscribe(shouldUpdate = onFail(ShouldUpdateState::prop1, true)) {
             callCount++
         }
         assertEquals(0, callCount)
@@ -89,7 +89,7 @@ class ShouldUpdateTest : BaseTest() {
     @Test
     fun propertyWhitelistNoInitialValue() {
         var callCount = 0
-        store.subscribe(shouldUpdate = propertyWhitelist(ShouldUpdateState::prop1, false)) {
+        store.subscribe(shouldUpdate = propertyWhitelist(ShouldUpdateState::prop1, true)) {
             callCount++
         }
         assertEquals(0, callCount)
@@ -118,7 +118,7 @@ class ShouldUpdateTest : BaseTest() {
     }
 
     @Test
-    fun propertyWhitelis2tWithChange() {
+    fun propertyWhitelist2WithChange() {
         var callCount = 0
         store.subscribe(shouldUpdate = propertyWhitelist(ShouldUpdateState::prop1, ShouldUpdateState::prop2)) {
             callCount++
@@ -130,7 +130,7 @@ class ShouldUpdateTest : BaseTest() {
     }
 
     @Test
-    fun propertyWhitelis3tWithChange() {
+    fun propertyWhitelist3WithChange() {
         var callCount = 0
         store.subscribe(shouldUpdate = propertyWhitelist(ShouldUpdateState::prop1, ShouldUpdateState::prop2, ShouldUpdateState::prop3)) {
             callCount++

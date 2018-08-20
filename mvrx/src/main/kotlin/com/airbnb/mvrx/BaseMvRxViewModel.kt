@@ -164,42 +164,36 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * This is only open so it can be mocked for testing. Do not extend it.
      *
      * @param owner The LifecycleOwner such as a Fragment or Activity that wants to subscribe to
-     *                     state updates.
-     * @param shouldUpdate is an optional observer that you can implement to filter whether or not
-     *                     your subscriber gets called. It will be given the old state and new state
-     *                     and should return whether or not to call the subscriber. It will initially
-     *                     be called with null as the old state to determine whether or not to
-     *                     deliver the initial state.
+     *              state updates.
+     * @param shouldUpdate filters whether or not your consumer should be called. oldState will be
+     *                     null for the first invocation.
      *                     MvRx comes with some shouldUpdate helpers such as onSuccess, onFail, and propertyWhitelist.
      */
     fun subscribe(
-        owner: LifecycleOwner,
-        shouldUpdate: ((S?, S) -> Boolean)? = null,
-        observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
-        subscriber: (S) -> Unit
+            owner: LifecycleOwner,
+            shouldUpdate: ((oldState: S?, newState: S) -> Boolean)? = null,
+            observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
+            consumer: (state: S) -> Unit
     ) {
         stateStore
-            .subscribe(owner, observerScheduler, shouldUpdate, subscriber)
+            .subscribe(owner, observerScheduler, shouldUpdate, consumer)
             .disposeOnClear()
     }
 
     /**
      * For ViewModels that want to subscribe to them self.
      *
-     * @param shouldUpdate is an optional observer that you can implement to filter whether or not
-     *                     your subscriber gets called. It will be given the old state and new state
-     *                     and should return whether or not to call the subscriber. It will initially
-     *                     be called with null as the old state to determine whether or not to
-     *                     deliver the initial state.
+     * @param shouldUpdate filters whether or not your consumer should be called. oldState will be
+     *                     null for the first invocation.
      *                     MvRx comes with some shouldUpdate helpers such as onSuccess, onFail, and propertyWhitelist.
      */
     protected fun subscribe(
-            shouldUpdate: ((S?, S) -> Boolean)? = null,
+            shouldUpdate: ((oldState: S?, newState: S) -> Boolean)? = null,
             observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
-            subscriber: (S) -> Unit
+            consumer: (state: S) -> Unit
     ) {
         stateStore
-                .subscribe(null, observerScheduler, shouldUpdate, subscriber)
+                .subscribe(null, observerScheduler, shouldUpdate, consumer)
                 .disposeOnClear()
     }
 
@@ -209,11 +203,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     fun <A> selectSubscribe(
             owner: LifecycleOwner,
             prop1: KProperty1<S, A>,
+            skipFirst: Boolean = false,
             observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
-            subscriber: (A) -> Unit
+            consumer: (A) -> Unit
     ) {
-        subscribe(owner, propertyWhitelist(prop1), observerScheduler) {
-            subscriber(prop1.get(it))
+        subscribe(owner, propertyWhitelist(prop1, skipFirst), observerScheduler) {
+            consumer(prop1.get(it))
         }
     }
 
@@ -222,11 +217,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      */
     protected fun <A> selectSubscribe(
             prop1: KProperty1<S, A>,
+            skipFirst: Boolean = false,
             observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
-            subscriber: (A) -> Unit
+            consumer: (A) -> Unit
     ) {
-        subscribe(propertyWhitelist(prop1), observerScheduler) {
-            subscriber(prop1.get(it))
+        subscribe(propertyWhitelist(prop1, skipFirst), observerScheduler) {
+            consumer(prop1.get(it))
         }
     }
 
@@ -237,11 +233,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             owner: LifecycleOwner,
             prop1: KProperty1<S, A>,
             prop2: KProperty1<S, B>,
+            skipFirst: Boolean = false,
             observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
-            subscriber: (A, B) -> Unit
+            consumer: (A, B) -> Unit
     ) {
-        subscribe(owner, propertyWhitelist(prop1, prop2), observerScheduler) {
-            subscriber(prop1.get(it), prop2.get(it))
+        subscribe(owner, propertyWhitelist(prop1, prop2, skipFirst), observerScheduler) {
+            consumer(prop1.get(it), prop2.get(it))
         }
     }
 
@@ -251,11 +248,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     protected fun <A, B> selectSubscribe(
             prop1: KProperty1<S, A>,
             prop2: KProperty1<S, B>,
+            skipFirst: Boolean = false,
             observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
-            subscriber: (A, B) -> Unit
+            consumer: (A, B) -> Unit
     ) {
-        subscribe(propertyWhitelist(prop1, prop2), observerScheduler) {
-            subscriber(prop1.get(it), prop2.get(it))
+        subscribe(propertyWhitelist(prop1, prop2, skipFirst), observerScheduler) {
+            consumer(prop1.get(it), prop2.get(it))
         }
     }
 
@@ -267,11 +265,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             prop1: KProperty1<S, A>,
             prop2: KProperty1<S, B>,
             prop3: KProperty1<S, C>,
+            skipFirst: Boolean = false,
             observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
-            subscriber: (A, B, C) -> Unit
+            consumer: (A, B, C) -> Unit
     ) {
-        subscribe(owner, propertyWhitelist(prop1, prop2), observerScheduler) {
-            subscriber(prop1.get(it), prop2.get(it), prop3.get(it))
+        subscribe(owner, propertyWhitelist(prop1, prop2, prop3, skipFirst), observerScheduler) {
+            consumer(prop1.get(it), prop2.get(it), prop3.get(it))
         }
     }
 
@@ -282,11 +281,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             prop1: KProperty1<S, A>,
             prop2: KProperty1<S, B>,
             prop3: KProperty1<S, C>,
+            skipFirst: Boolean = false,
             observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
-            subscriber: (A, B, C) -> Unit
+            consumer: (A, B, C) -> Unit
     ) {
-        subscribe(propertyWhitelist(prop1, prop2), observerScheduler) {
-            subscriber(prop1.get(it), prop2.get(it), prop3.get(it))
+        subscribe(propertyWhitelist(prop1, prop2, prop3, skipFirst), observerScheduler) {
+            consumer(prop1.get(it), prop2.get(it), prop3.get(it))
         }
     }
 
@@ -294,38 +294,32 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * Subscribe to state updates. Includes the previous state. The previous state will be null
      * for the initial call.
      *
-     * @param shouldUpdate is an optional observer that you can implement to filter whether or not
-     *                     your subscriber gets called. It will be given the old state and new state
-     *                     and should return whether or not to call the subscriber. It will initially
-     *                     be called with null as the old state to determine whether or not to
-     *                     deliver the initial state.
+    @param shouldUpdate filters whether or not your consumer should be called. oldState will be
+     *                     null for the first invocation.
      *                     MvRx comes with some shouldUpdate helpers such as onSuccess, onFail, and propertyWhitelist.
      */
     fun subscribeWithHistory(
-        owner: LifecycleOwner,
-        shouldUpdate: ((S?, S) -> Boolean)? = null,
-        observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
-        subscriber: (S?, S) -> Unit
+            owner: LifecycleOwner,
+            shouldUpdate: ((oldState: S?, newState: S) -> Boolean)? = null,
+            observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
+            consumer: (oldState: S?, newState: S) -> Unit
     ) = stateStore
-        .subscribeWithHistory(owner, observerScheduler, shouldUpdate, subscriber)
+        .subscribeWithHistory(owner, observerScheduler, shouldUpdate, consumer)
         .disposeOnClear()
 
     /**
      * Subscribe to state updates. Includes the previous state. The previous state will be null
      * for the initial call.
      *
-     * @param shouldUpdate is an optional observer that you can implement to filter whether or not
-     *                     your subscriber gets called. It will be given the old state and new state
-     *                     and should return whether or not to call the subscriber. It will initially
-     *                     be called with null as the old state to determine whether or not to
-     *                     deliver the initial state.
+     * @param shouldUpdate filters whether or not your consumer should be called. oldState will be
+     *                     null for the first invocation.
      *                     MvRx comes with some shouldUpdate helpers such as onSuccess, onFail, and propertyWhitelist.
      */
     protected fun subscribeWithHistory(
-            shouldUpdate: ((S?, S) -> Boolean)? = null,
+            shouldUpdate: ((oldState: S?, newState: S) -> Boolean)? = null,
             observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
-            subscriber: (S?, S) -> Unit
-    ) = stateStore.subscribeWithHistory(null, observerScheduler, shouldUpdate, subscriber)
+            consumer: (oldState: S?, newState: S) -> Unit
+    ) = stateStore.subscribeWithHistory(null, observerScheduler, shouldUpdate, consumer)
             .disposeOnClear()
 
     protected fun Disposable.disposeOnClear(): Disposable {
