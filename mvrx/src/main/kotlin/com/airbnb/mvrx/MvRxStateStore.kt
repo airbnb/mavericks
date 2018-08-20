@@ -8,7 +8,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
-import io.reactivex.subjects.Subject
 import java.util.LinkedList
 
 /**

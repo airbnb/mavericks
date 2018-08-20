@@ -67,12 +67,17 @@ abstract class BaseMvRxViewModel<S : MvRxState> : ViewModel() {
      */
     protected fun setState(reducer: S.() -> S) {
         if (debugMode) {
-            val state = state
-            val firstState = state.reducer()
-            val secondState = state.reducer()
-            if (firstState != secondState) throw IllegalArgumentException("Your reducer must be pure!")
+            // Must use `set` to ensure the validated state is the same as the actual state used in reducer
+            // Do not use `get` since `getState` queue has lower priority and the validated state would be the state after reduced
+            stateStore.set {
+                val firstState = this.reducer()
+                val secondState = this.reducer()
+                if (firstState != secondState) throw IllegalArgumentException("Your reducer must be pure!")
+                firstState
+            }
+        } else {
+            stateStore.set(reducer)
         }
-        stateStore.set(reducer)
     }
 
     /**
