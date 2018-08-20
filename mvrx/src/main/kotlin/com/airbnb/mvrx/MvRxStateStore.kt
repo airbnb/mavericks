@@ -126,7 +126,7 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
     ): Disposable {
         val observable = observableFor(observerScheduler, shouldUpdate)
 
-        if (lifecycleOwner == null) return observable.subscribe { pair -> subscriber(pair?.first, pair.second) }
+        if (lifecycleOwner == null) return observable.subscribe { pair -> subscriber(pair.first, pair.second) }
 
         val lifecycleAwareObserver = MvRxLifecycleAwareObserver.Builder<Pair<S?, S>>(lifecycleOwner)
             .alwaysDeliverValueWhenUnlocked()

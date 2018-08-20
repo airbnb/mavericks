@@ -198,7 +198,8 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     }
 
     /**
-     * Subscribe to state changes for only a single property.
+     * Subscribe to state changes for only a single property. skipFirst indicates whether the current
+     * value should be emitted or only subsequent changes.
      */
     fun <A> selectSubscribe(
             owner: LifecycleOwner,
@@ -213,7 +214,8 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     }
 
     /**
-     * Subscribe to state changes for only a single property.
+     * Subscribe to state changes for only a single property. skipFirst indicates whether the current
+     * value should be emitted or only subsequent changes.
      */
     protected fun <A> selectSubscribe(
             prop1: KProperty1<S, A>,
@@ -227,7 +229,8 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     }
 
     /**
-     * Subscribe to state changes for two properties.
+     * Subscribe to state changes for two properties. skipFirst indicates whether the current
+     * value should be emitted or only subsequent changes.
      */
     fun <A, B> selectSubscribe(
             owner: LifecycleOwner,
@@ -243,7 +246,8 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     }
 
     /**
-     * Subscribe to state changes for two properties.
+     * Subscribe to state changes for two properties. skipFirst indicates whether the current
+     * value should be emitted or only subsequent changes.
      */
     protected fun <A, B> selectSubscribe(
             prop1: KProperty1<S, A>,
@@ -258,7 +262,8 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     }
 
     /**
-     * Subscribe to state changes for three properties.
+     * Subscribe to state changes for three properties. skipFirst indicates whether the current
+     * value should be emitted or only subsequent changes.
      */
     fun <A, B, C> selectSubscribe(
             owner: LifecycleOwner,
@@ -275,7 +280,8 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     }
 
     /**
-     * Subscribe to state changes for three properties.
+     * Subscribe to state changes for three properties. skipFirst indicates whether the current
+     * value should be emitted or only subsequent changes.
      */
     protected fun <A, B, C> selectSubscribe(
             prop1: KProperty1<S, A>,
