@@ -1,7 +1,6 @@
 package com.airbnb.mvrx
 
 import android.arch.lifecycle.LifecycleOwner
-import android.support.annotation.VisibleForTesting
 import io.reactivex.Observable
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -10,7 +9,6 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import java.util.LinkedList
-import java.util.concurrent.Semaphore
 
 /**
  * This is a container class around the actual state itself. It has a few optimizations to ensure
@@ -28,16 +26,6 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
      * The subject is where state changes should be pushed to.
      */
     private val subject: BehaviorSubject<S> = BehaviorSubject.createDefault(initialState)
-    /**
-     * This is only for testing purpose
-     */
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var throwableForTesting: Throwable? = null
-    /**
-     * This is only for testing purpose
-     */
-    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
-    var semaphoreForTesting: Semaphore? = null
     /**
      * The observable observes the subject but only emits events when the state actually changed.
      */
@@ -175,19 +163,7 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
             setStateQueue = LinkedList()
             queue
         }
-            .fold(state) { state, reducer ->
-                val semaphoreForTesting = semaphoreForTesting ?: return@fold state.reducer()
-                try {
-                    state.reducer()
-                }
-                catch(thrown: Throwable) {
-                    throwableForTesting = thrown
-                    // rethrow to keep existing behavior
-                    throw thrown
-                } finally {
-                    semaphoreForTesting.release()
-                }
-            }
+            .fold(state) { state, reducer -> state.reducer() }
             .run {
                 subject.onNext(this)
             }
