@@ -12,6 +12,11 @@ android {
         minSdkVersion 16
         targetSdkVersion 27
     }
+    buildTypes {
+        release {
+            consumerProguardFiles 'proguard-rules.pro'
+        }
+    }
     lintOptions {
         abortOnError true
         textReport true
