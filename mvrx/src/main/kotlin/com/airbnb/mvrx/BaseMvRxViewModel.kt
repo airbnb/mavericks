@@ -23,10 +23,6 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
     private val backgroundScheduler = Schedulers.single()
-
-    /**
-     * This has to be lazy so that initialState can be initialized in the child.
-     */
     private val stateStore: MvRxStateStore<S> = MvRxStateStore(initialState)
 
     init {
