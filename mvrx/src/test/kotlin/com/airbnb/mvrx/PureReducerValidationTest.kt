@@ -7,7 +7,7 @@ class PureReducerValidationTest : BaseTest() {
 
     @Test(expected = IllegalArgumentException::class)
     fun impureReducerShouldFail() {
-        class ImpureViewModel(override val initialState: PureReducerValidationState) : TestMvRxViewModel<PureReducerValidationState>() {
+        class ImpureViewModel(initialState: PureReducerValidationState) : TestMvRxViewModel<PureReducerValidationState>(initialState) {
             private var count = 0
             fun impureReducer() {
                 setState {
@@ -21,7 +21,7 @@ class PureReducerValidationTest : BaseTest() {
 
     @Test
     fun pureReducerShouldNotFail() {
-        class PureViewModel(override val initialState: PureReducerValidationState) : TestMvRxViewModel<PureReducerValidationState>() {
+        class PureViewModel(initialState: PureReducerValidationState) : TestMvRxViewModel<PureReducerValidationState>(initialState) {
             fun pureReducer() {
                 setState {
                     val state = copy(count = count + 1)

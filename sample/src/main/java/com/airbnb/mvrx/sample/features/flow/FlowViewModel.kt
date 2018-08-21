@@ -10,7 +10,7 @@ import com.airbnb.mvrx.sample.core.MvRxViewModel
  */
 data class FlowState(@PersistState val count: Int = 0) : MvRxState
 
-class FlowViewModel(override val initialState: FlowState) : MvRxViewModel<FlowState>() {
+class FlowViewModel(initialState: FlowState) : MvRxViewModel<FlowState>(initialState) {
 
     fun setCount(count: Int) = setState { copy(count = count) }
 }

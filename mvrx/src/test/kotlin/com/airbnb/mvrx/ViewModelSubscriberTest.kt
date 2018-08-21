@@ -2,14 +2,12 @@ package com.airbnb.mvrx
 
 import io.reactivex.Maybe
 import io.reactivex.disposables.Disposable
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
 data class ViewModelTestState(val foo: Int = 0) : MvRxState
-class ViewModelTestViewModel(override val initialState: ViewModelTestState) : TestMvRxViewModel<ViewModelTestState>() {
+class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewModel<ViewModelTestState>(initialState) {
 
     var subscribeCallCount = 0
     var subscribeWithHistoryCallCount = 0

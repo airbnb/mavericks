@@ -6,7 +6,7 @@ import org.junit.Test
 
 data class ViewSubscriberState(val foo: Int = 0) : MvRxState
 
-class ViewSubscriberViewModel(override val initialState: ViewSubscriberState) : TestMvRxViewModel<ViewSubscriberState>() {
+class ViewSubscriberViewModel(initialState: ViewSubscriberState) : TestMvRxViewModel<ViewSubscriberState>(initialState) {
     fun setFoo(foo: Int) = setState { copy(foo = foo) }
 }
 

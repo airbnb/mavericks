@@ -1,11 +1,7 @@
 package com.airbnb.mvrx.todomvrx
 
 import android.support.v4.app.FragmentActivity
-import com.airbnb.mvrx.Async
-import com.airbnb.mvrx.BaseMvRxViewModel
-import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.MvRxViewModelFactory
-import com.airbnb.mvrx.Uninitialized
+import com.airbnb.mvrx.*
 import com.airbnb.mvrx.todomvrx.core.MvRxViewModel
 import com.airbnb.mvrx.todomvrx.data.Task
 import com.airbnb.mvrx.todomvrx.data.Tasks
@@ -25,7 +21,7 @@ data class TasksState(
         val lastEditedTask: String? = null
 ) : MvRxState
 
-class TasksViewModel(override val initialState: TasksState, private val sources: List<TasksDataSource>) : MvRxViewModel<TasksState>() {
+class TasksViewModel(initialState: TasksState, private val sources: List<TasksDataSource>) : MvRxViewModel<TasksState>(initialState) {
 
     init {
         logStateChanges()

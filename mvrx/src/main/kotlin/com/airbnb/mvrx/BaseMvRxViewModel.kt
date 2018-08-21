@@ -13,12 +13,14 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty1
 import kotlin.reflect.KVisibility
 
-abstract class BaseMvRxViewModel<S : MvRxState> : ViewModel() {
+
+abstract class BaseMvRxViewModel<S : MvRxState>(
+        private val initialState: S,
+        @Suppress("MemberVisibilityCanBePrivate") protected val debugMode: Boolean = false
+) : ViewModel() {
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
     private val backgroundScheduler = Schedulers.single()
@@ -28,29 +30,18 @@ abstract class BaseMvRxViewModel<S : MvRxState> : ViewModel() {
      */
     private val stateStore: MvRxStateStore<S> by lazy { MvRxStateStore(initialState) }
 
-    /**
-     * Enable debug features which check for certain properties like pure reducers and immutable state.
-     */
-    protected abstract val debugMode: Boolean
-
-    internal val state: S by object : ReadOnlyProperty<BaseMvRxViewModel<S>, S> {
-        private var hasValidatedState = false
-
-        override fun getValue(thisRef: BaseMvRxViewModel<S>, property: KProperty<*>) = thisRef.stateStore.state.apply {
-            if (debugMode && !hasValidatedState) {
-                Observable.fromCallable { validateState() }
-                    .subscribeOn(Schedulers.computation())
-                    .subscribe()
-                hasValidatedState = true
-            }
+    init {
+        if (debugMode) {
+            Observable.fromCallable { validateState() }.subscribeOn(Schedulers.computation()).subscribe()
         }
     }
+
+    val state: S
+        get() = stateStore.state
 
     /**
      * Override this to provide the initial state.
      */
-    protected abstract val initialState: S
-
     @CallSuper override fun onCleared() {
         super.onCleared()
         disposables.dispose()

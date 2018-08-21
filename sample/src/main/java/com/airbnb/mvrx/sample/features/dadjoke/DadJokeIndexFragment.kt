@@ -6,15 +6,7 @@ import android.support.v4.app.FragmentActivity
 import android.util.Log
 import android.view.View
 import com.airbnb.epoxy.EpoxyController
-import com.airbnb.mvrx.Async
-import com.airbnb.mvrx.BaseMvRxViewModel
-import com.airbnb.mvrx.Fail
-import com.airbnb.mvrx.Loading
-import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.MvRxViewModelFactory
-import com.airbnb.mvrx.Uninitialized
-import com.airbnb.mvrx.fragmentViewModel
-import com.airbnb.mvrx.onFail
+import com.airbnb.mvrx.*
 import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.core.MvRxViewModel
@@ -24,7 +16,6 @@ import com.airbnb.mvrx.sample.network.DadJokeService
 import com.airbnb.mvrx.sample.views.basicRow
 import com.airbnb.mvrx.sample.views.loadingRow
 import com.airbnb.mvrx.sample.views.marquee
-import com.airbnb.mvrx.withState
 import org.koin.android.ext.android.inject
 
 data class DadJokeIndexState(
@@ -40,9 +31,9 @@ private const val JOKES_PER_PAGE = 5
  * initialState *must* be implemented as a constructor parameter.
  */
 class DadJokeIndexViewModel(
-        override val initialState: DadJokeIndexState,
+        initialState: DadJokeIndexState,
         private val dadJokeService: DadJokeService
-) : MvRxViewModel<DadJokeIndexState>() {
+) : MvRxViewModel<DadJokeIndexState>(initialState) {
 
     init {
         fetchNextPage()
