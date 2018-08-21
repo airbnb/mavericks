@@ -3,7 +3,6 @@ package com.airbnb.mvrx
 import android.annotation.SuppressLint
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.ViewModel
-import android.os.Looper
 import android.support.annotation.CallSuper
 import android.util.Log
 import io.reactivex.Observable
@@ -18,7 +17,7 @@ import kotlin.reflect.KVisibility
 
 
 abstract class BaseMvRxViewModel<S : MvRxState>(
-        private val initialState: S,
+        initialState: S,
         @Suppress("MemberVisibilityCanBePrivate") protected val debugMode: Boolean = false
 ) : ViewModel() {
     private val tag by lazy { javaClass.simpleName }
@@ -28,11 +27,11 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     /**
      * This has to be lazy so that initialState can be initialized in the child.
      */
-    private val stateStore: MvRxStateStore<S> by lazy { MvRxStateStore(initialState) }
+    private val stateStore: MvRxStateStore<S> = MvRxStateStore(initialState)
 
     init {
         if (debugMode) {
-            Observable.fromCallable { validateState() }.subscribeOn(Schedulers.computation()).subscribe()
+            Observable.fromCallable { validateState(initialState) }.subscribeOn(Schedulers.computation()).subscribe()
         }
     }
 
@@ -84,10 +83,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * a fair amount of reflection.
      */
     @SuppressLint("VisibleForTests")
-    fun validateState() {
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            throw IllegalStateException("validateState should not be called from the main thread.")
-        }
+    internal fun validateState(initialState: S) {
         if (state::class.visibility != KVisibility.PUBLIC) {
             throw IllegalStateException("Your state class ${state::class.qualifiedName} must be public.")
         }

@@ -5,6 +5,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.robolectric.Robolectric
+import java.lang.reflect.InvocationTargetException
 
 data class FactoryState(val count: Int = 0) : MvRxState
 class TestFactoryViewModel(initialState: FactoryState, val otherProp: Long) : TestMvRxViewModel<FactoryState>(initialState) {
@@ -50,11 +51,12 @@ class FactoryTest : BaseTest() {
     }
 
     private data class PrivateState(val count1: Int = 0) : MvRxState
-    @Test(expected = IllegalStateException::class)
+    @Test(expected = InvocationTargetException::class)
     fun failOnPrivateState() {
         class MyViewModel(initialState: PrivateState) : TestMvRxViewModel<PrivateState>(initialState)
+        // Create a view model to run state validation checks.
+        @Suppress("UNUSED_VARIABLE")
         val viewModel = MvRxViewModelProvider.get(MyViewModel::class, activity) { PrivateState() }
-        viewModel.validateState()
     }
 
     @Test(expected = IllegalArgumentException::class)
