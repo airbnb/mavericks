@@ -4,7 +4,12 @@ import android.annotation.SuppressLint
 import android.os.Parcelable
 import android.support.v4.app.FragmentActivity
 import com.airbnb.epoxy.EpoxyController
-import com.airbnb.mvrx.*
+import com.airbnb.mvrx.Async
+import com.airbnb.mvrx.BaseMvRxViewModel
+import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MvRxViewModelFactory
+import com.airbnb.mvrx.Uninitialized
+import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.core.MvRxViewModel
 import com.airbnb.mvrx.sample.models.Joke
@@ -12,6 +17,7 @@ import com.airbnb.mvrx.sample.network.DadJokeService
 import com.airbnb.mvrx.sample.views.basicRow
 import com.airbnb.mvrx.sample.views.loadingRow
 import com.airbnb.mvrx.sample.views.marquee
+import com.airbnb.mvrx.withState
 import kotlinx.android.parcel.Parcelize
 import org.koin.android.ext.android.inject
 
