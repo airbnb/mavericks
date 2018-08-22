@@ -40,9 +40,9 @@ private const val JOKES_PER_PAGE = 5
  * initialState *must* be implemented as a constructor parameter.
  */
 class DadJokeIndexViewModel(
-        override val initialState: DadJokeIndexState,
+        initialState: DadJokeIndexState,
         private val dadJokeService: DadJokeService
-) : MvRxViewModel<DadJokeIndexState>() {
+) : MvRxViewModel<DadJokeIndexState>(initialState) {
 
     init {
         fetchNextPage()

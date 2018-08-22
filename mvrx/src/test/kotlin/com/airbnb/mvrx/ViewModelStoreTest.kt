@@ -16,7 +16,7 @@ data class ViewModelStoreTestState(val notPersistedCount: Int = 1, @PersistState
     constructor(args: ViewModelStoreTestArgs) : this(args.count, args.count)
 }
 
-class ViewModelStoreTestViewModel(override val initialState: ViewModelStoreTestState) : TestMvRxViewModel<ViewModelStoreTestState>() {
+class ViewModelStoreTestViewModel(initialState: ViewModelStoreTestState) : TestMvRxViewModel<ViewModelStoreTestState>(initialState) {
     fun setCount(count: Int) = setState { copy(persistedCount = count, notPersistedCount = count) }
 }
 

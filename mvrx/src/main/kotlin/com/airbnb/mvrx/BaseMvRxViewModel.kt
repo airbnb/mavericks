@@ -3,7 +3,6 @@ package com.airbnb.mvrx
 import android.annotation.SuppressLint
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.ViewModel
-import android.os.Looper
 import android.support.annotation.CallSuper
 import android.util.Log
 import io.reactivex.Observable
@@ -13,44 +12,31 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlin.properties.ReadOnlyProperty
-import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty1
 import kotlin.reflect.KVisibility
 
-abstract class BaseMvRxViewModel<S : MvRxState> : ViewModel() {
+
+abstract class BaseMvRxViewModel<S : MvRxState>(
+        initialState: S,
+        @Suppress("MemberVisibilityCanBePrivate") protected val debugMode: Boolean = false
+) : ViewModel() {
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
     private val backgroundScheduler = Schedulers.single()
+    private val stateStore: MvRxStateStore<S> = MvRxStateStore(initialState)
 
-    /**
-     * This has to be lazy so that initialState can be initialized in the child.
-     */
-    private val stateStore: MvRxStateStore<S> by lazy { MvRxStateStore(initialState) }
-
-    /**
-     * Enable debug features which check for certain properties like pure reducers and immutable state.
-     */
-    protected abstract val debugMode: Boolean
-
-    internal val state: S by object : ReadOnlyProperty<BaseMvRxViewModel<S>, S> {
-        private var hasValidatedState = false
-
-        override fun getValue(thisRef: BaseMvRxViewModel<S>, property: KProperty<*>) = thisRef.stateStore.state.apply {
-            if (debugMode && !hasValidatedState) {
-                Observable.fromCallable { validateState() }
-                    .subscribeOn(Schedulers.computation())
-                    .subscribe()
-                hasValidatedState = true
-            }
+    init {
+        if (debugMode) {
+            Observable.fromCallable { validateState(initialState) }.subscribeOn(Schedulers.computation()).subscribe()
         }
     }
+
+    val state: S
+        get() = stateStore.state
 
     /**
      * Override this to provide the initial state.
      */
-    protected abstract val initialState: S
-
     @CallSuper override fun onCleared() {
         super.onCleared()
         disposables.dispose()
@@ -93,10 +79,7 @@ abstract class BaseMvRxViewModel<S : MvRxState> : ViewModel() {
      * a fair amount of reflection.
      */
     @SuppressLint("VisibleForTests")
-    fun validateState() {
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            throw IllegalStateException("validateState should not be called from the main thread.")
-        }
+    internal fun validateState(initialState: S) {
         if (state::class.visibility != KVisibility.PUBLIC) {
             throw IllegalStateException("Your state class ${state::class.qualifiedName} must be public.")
         }

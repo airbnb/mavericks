@@ -10,7 +10,7 @@ import com.airbnb.mvrx.withState
 
 data class HelloWorldState(val title: String = "Hello World") : MvRxState
 
-class HelloWorldViewModel(override val initialState: HelloWorldState) : MvRxViewModel<HelloWorldState>()
+class HelloWorldViewModel(initialState: HelloWorldState) : MvRxViewModel<HelloWorldState>(initialState)
 
 class HelloWorldFragment : BaseFragment() {
     private val viewModel by fragmentViewModel(HelloWorldViewModel::class)

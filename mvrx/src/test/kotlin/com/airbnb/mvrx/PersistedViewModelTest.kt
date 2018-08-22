@@ -27,7 +27,7 @@ class PersistedViewModelTest : BaseTest() {
     // and remove the no-arg java constructor.
     data class SetSaveIntState(@PersistState val count: Int = 0) : MvRxState
     @Test fun setSaveInt() {
-        class TestViewModel(override val initialState: SetSaveIntState) : TestMvRxViewModel<SetSaveIntState>()
+        class TestViewModel(initialState: SetSaveIntState) : TestMvRxViewModel<SetSaveIntState>(initialState)
         val originalState = SetSaveIntState(count = 7)
         val viewModel = TestViewModel(originalState)
         val newState = testViewModel(viewModel)
@@ -36,7 +36,7 @@ class PersistedViewModelTest : BaseTest() {
 
     data class SetSaveEnumState(@PersistState val enumVal: TestEnum = TestEnum.A) : MvRxState
     @Test fun setSaveEnum() {
-        class TestViewModel(override val initialState: SetSaveEnumState) : TestMvRxViewModel<SetSaveEnumState>()
+        class TestViewModel(initialState: SetSaveEnumState) : TestMvRxViewModel<SetSaveEnumState>(initialState)
         val originalState = SetSaveEnumState(enumVal = TestEnum.C)
         val viewModel = TestViewModel(originalState)
         val newState = testViewModel(viewModel)
@@ -45,7 +45,7 @@ class PersistedViewModelTest : BaseTest() {
 
     data class SetSaveOneIntState(@PersistState val count1: Int = 0, val count2: Int = 0) : MvRxState
     @Test fun setSaveOneInt() {
-        class TestViewModel(override val initialState: SetSaveOneIntState) : TestMvRxViewModel<SetSaveOneIntState>()
+        class TestViewModel(initialState: SetSaveOneIntState) : TestMvRxViewModel<SetSaveOneIntState>(initialState)
         val originalState = SetSaveOneIntState(count1 = 7, count2 = 9)
         val viewModel = TestViewModel(originalState)
         val newState = testViewModel(viewModel)
@@ -55,7 +55,7 @@ class PersistedViewModelTest : BaseTest() {
 
     data class InvalidViewModelState(@PersistState val count1: Int = 0, val count2: Int) : MvRxState
     @Test(expected = IllegalStateException::class) fun invalidViewModel() {
-        class TestViewModel(override val initialState: InvalidViewModelState) : TestMvRxViewModel<InvalidViewModelState>()
+        class TestViewModel(initialState: InvalidViewModelState) : TestMvRxViewModel<InvalidViewModelState>(initialState)
         val originalState = InvalidViewModelState(count1 = 7, count2 = 9)
         val viewModel = TestViewModel(originalState)
         testViewModel(viewModel)
@@ -66,7 +66,7 @@ class PersistedViewModelTest : BaseTest() {
         constructor(args: Args) : this(count2 = args.initialCount)
     }
     @Test fun paramRestoredViaArgs() {
-        class TestViewModel(override val initialState: ArgState) : TestMvRxViewModel<ArgState>()
+        class TestViewModel(initialState: ArgState) : TestMvRxViewModel<ArgState>(initialState)
         val originalState = ArgState(count1 = 7, count2 = 9)
         val viewModel = TestViewModel(originalState)
         val newState = testViewModel(viewModel, Args(1))
@@ -78,7 +78,7 @@ class PersistedViewModelTest : BaseTest() {
         constructor(args: Args) : this(count2 = args.initialCount)
     }
     @Test fun paramRestoredViaArgsOverwrittenWithState() {
-        class TestViewModel(override val initialState: ArgPersistState) : TestMvRxViewModel<ArgPersistState>()
+        class TestViewModel(initialState: ArgPersistState) : TestMvRxViewModel<ArgPersistState>(initialState)
         val originalState = ArgPersistState(count1 = 7, count2 = 9)
         val viewModel = TestViewModel(originalState)
         val newState = testViewModel(viewModel, Args(1))

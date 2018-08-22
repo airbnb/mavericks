@@ -65,8 +65,6 @@ object MvRxViewModelProvider {
                     "that takes state as a single arg."
         }
 
-        if (primaryConstructor.parameters.isEmpty()) throw IllegalArgumentException("Your ViewModel must override initialState as its first and only constructor parameter.")
-
         require(!primaryConstructor.parameters[0].isOptional) { "initialState may not be an optional constructor parameter." }
         return primaryConstructor.call(state)
     }

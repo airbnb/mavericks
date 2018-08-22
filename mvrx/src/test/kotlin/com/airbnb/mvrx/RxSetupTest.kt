@@ -8,7 +8,7 @@ class RxSetupTest : BaseTest() {
 
     @Test(expected = IllegalArgumentException::class)
     fun ensureExceptionsThrownInRxJavaAreCaught() {
-        class RxSetupViewModel(override val initialState: RxSetupState) : TestMvRxViewModel<RxSetupState>() {
+        class RxSetupViewModel(initialState: RxSetupState) : TestMvRxViewModel<RxSetupState>(initialState) {
             fun throwInWithState() {
                 withState {
                     throw IllegalArgumentException()

@@ -25,7 +25,7 @@ data class TasksState(
         val lastEditedTask: String? = null
 ) : MvRxState
 
-class TasksViewModel(override val initialState: TasksState, private val sources: List<TasksDataSource>) : MvRxViewModel<TasksState>() {
+class TasksViewModel(initialState: TasksState, private val sources: List<TasksDataSource>) : MvRxViewModel<TasksState>(initialState) {
 
     init {
         logStateChanges()

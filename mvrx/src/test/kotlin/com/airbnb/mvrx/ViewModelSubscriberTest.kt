@@ -9,7 +9,7 @@ import org.junit.Before
 import org.junit.Test
 
 data class ViewModelTestState(val foo: Int = 0) : MvRxState
-class ViewModelTestViewModel(override val initialState: ViewModelTestState) : TestMvRxViewModel<ViewModelTestState>() {
+class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewModel<ViewModelTestState>(initialState) {
 
     var subscribeCallCount = 0
     var subscribeWithHistoryCallCount = 0

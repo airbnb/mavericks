@@ -37,7 +37,7 @@ import com.airbnb.mvrx.withState
 
 data class TaskListState(val filter: TaskListFilter = TaskListFilter.All) : MvRxState
 
-class TaskListViewModel(override val initialState: TaskListState) : MvRxViewModel<TaskListState>() {
+class TaskListViewModel(initialState: TaskListState) : MvRxViewModel<TaskListState>(initialState) {
     fun setFilter(filter: TaskListFilter) = setState { copy(filter = filter) }
 }
 

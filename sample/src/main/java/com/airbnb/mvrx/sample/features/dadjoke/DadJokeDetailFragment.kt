@@ -33,10 +33,7 @@ data class DadJokeDetailState(val id: String, val joke: Async<Joke> = Uninitiali
     constructor(args: DadJokeDetailArgs) : this(id = args.id)
 }
 
-class DadJokeDetailViewModel(
-        override val initialState: DadJokeDetailState,
-        private val dadJokeService: DadJokeService
-) : MvRxViewModel<DadJokeDetailState>() {
+class DadJokeDetailViewModel(initialState: DadJokeDetailState, private val dadJokeService: DadJokeService) : MvRxViewModel<DadJokeDetailState>(initialState) {
 
     init {
         fetchJoke()
