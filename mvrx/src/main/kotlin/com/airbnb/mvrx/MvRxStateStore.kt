@@ -190,6 +190,8 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
                 .map { Pair<S?, S>(it, it) }
                 // Accumulator is a pair of (old state, new state)
                 .scan(Pair<S?, S>(null, initialState)) { accumulator, currentState -> accumulator.second to currentState.second }
+                // The second item is going to be (initialState, initialState). Filter that out.
+                // Also filter out any other time this happens to happen.
                 .filter { it.first !== it.second }
                 .filter { shouldUpdateWithDefault(it.first, it.second) }
                 .observeOn(observerScheduler)

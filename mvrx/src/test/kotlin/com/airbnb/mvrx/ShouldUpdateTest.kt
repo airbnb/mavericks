@@ -30,7 +30,7 @@ class ShouldUpdateTest : BaseTest() {
             true
         }
         store.subscribe(shouldUpdate = shouldUpdate) { _ -> Unit}
-        Assert.assertEquals(1, callCount)
+        assertEquals(1, callCount)
     }
 
     @Test
