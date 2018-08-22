@@ -300,7 +300,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * Subscribe to state updates. Includes the previous state. The previous state will be null
      * for the initial call.
      *
-    @param shouldUpdate filters whether or not your consumer should be called. oldState will be
+     * @param shouldUpdate filters whether or not your consumer should be called. oldState will be
      *                     null for the first invocation.
      *                     MvRx comes with some shouldUpdate helpers such as onSuccess, onFail, and propertyWhitelist.
      */
