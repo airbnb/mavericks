@@ -3,6 +3,7 @@ package com.airbnb.mvrx
 import android.arch.lifecycle.LifecycleOwner
 import io.reactivex.Observable
 import io.reactivex.Scheduler
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -96,10 +97,10 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
      * @return A [Disposable] to terminate the subscription early.
      */
     fun subscribe(
-        lifecycleOwner: LifecycleOwner? = null,
-        observerScheduler: Scheduler = defaultObserveOnScheduler,
-        shouldUpdate: ((S, S) -> Boolean)? = null,
-        subscriber: (S) -> Unit
+            lifecycleOwner: LifecycleOwner? = null,
+            observerScheduler: Scheduler = defaultObserveOnScheduler,
+            shouldUpdate: ((S?, S) -> Boolean)? = null,
+            subscriber: (S) -> Unit
     ): Disposable {
         val observable = observableFor(observerScheduler, shouldUpdate).map { it.second }
 
@@ -121,14 +122,14 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
     fun subscribeWithHistory(
         lifecycleOwner: LifecycleOwner? = null,
         observerScheduler: Scheduler = defaultObserveOnScheduler,
-        shouldUpdate: ((S, S) -> Boolean)? = null,
-        subscriber: (S, S) -> Unit
+        shouldUpdate: ((S?, S) -> Boolean)? = null,
+        subscriber: (S?, S) -> Unit
     ): Disposable {
         val observable = observableFor(observerScheduler, shouldUpdate)
 
         if (lifecycleOwner == null) return observable.subscribe { pair -> subscriber(pair.first, pair.second) }
 
-        val lifecycleAwareObserver = MvRxLifecycleAwareObserver.Builder<Pair<S, S>>(lifecycleOwner)
+        val lifecycleAwareObserver = MvRxLifecycleAwareObserver.Builder<Pair<S?, S>>(lifecycleOwner)
             .alwaysDeliverValueWhenUnlocked()
             .onNext { pair -> subscriber(pair.first, pair.second) }
             .build()
@@ -177,15 +178,24 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
         e?.let { throw it }
     }
 
-    private fun observableFor(observerScheduler: Scheduler, shouldUpdate: ((S, S) -> Boolean)? = null): Observable<Pair<S, S>> {
+    private fun observableFor(observerScheduler: Scheduler, shouldUpdate: ((S?, S) -> Boolean)? = null): Observable<Pair<S?, S>> {
         val shouldUpdateWithDefault = shouldUpdate ?: { _, _ -> true }
-        return this.observable
-            // Map the current state to a pair so that it has the same type as the scan accumulator which is a pair of (old state, new state)
-            .map { it to it }
-            // Accumulator is a pair of (old state, new state)
-            .scan { accumulator, currentState -> accumulator.second to currentState.first }
-            .filter { shouldUpdateWithDefault(it.first, it.second) }
-            .observeOn(observerScheduler)
+        // This will ensure that we start with the actual value of the current state including any reducers
+        // currently on the setState queue and use that as the initial state rather than the current value
+        // of the state property.
+        val initialValueSingle = Single.create<S> { source -> get { source.onSuccess(it) } }
+        return initialValueSingle.flatMapObservable { initialState ->
+            observable
+                // Map the current state to a pair so that it has the same type as the scan accumulator which is a pair of (old state, new state)
+                .map { Pair<S?, S>(it, it) }
+                // Accumulator is a pair of (old state, new state)
+                .scan(Pair<S?, S>(null, initialState)) { accumulator, currentState -> accumulator.second to currentState.second }
+                // The second item is going to be (initialState, initialState). Filter that out.
+                // Also filter out any other time this happens to happen.
+                .filter { it.first !== it.second }
+                .filter { shouldUpdateWithDefault(it.first, it.second) }
+                .observeOn(observerScheduler)
+        }
     }
 
     override fun isDisposed() = disposables.isDisposed
