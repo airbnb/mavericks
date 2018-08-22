@@ -26,6 +26,13 @@
             app:exitAnim="@anim/anim_exit"
             app:popEnterAnim="@anim/anim_pop_enter"
             app:popExitAnim="@anim/anim_pop_exit"/>
+        <action
+            android:id="@+id/action_main_to_randomDadJokeFragment"
+            app:destination="@id/randomDadJokeFragment"
+            app:enterAnim="@anim/anim_enter"
+            app:exitAnim="@anim/anim_exit"
+            app:popEnterAnim="@anim/anim_pop_enter"
+            app:popExitAnim="@anim/anim_pop_exit" />
     </fragment>
 
     <fragment
@@ -59,4 +66,7 @@
     <fragment
         android:id="@+id/dadJokeDetailFragment"
         android:name="com.airbnb.mvrx.sample.features.dadjoke.DadJokeDetailFragment"/>
+    <fragment
+        android:id="@+id/randomDadJokeFragment"
+        android:name="com.airbnb.mvrx.sample.features.dadjoke.RandomDadJokeFragment"/>
 </navigation>
