@@ -3,6 +3,7 @@ package com.airbnb.mvrx
 import android.arch.lifecycle.LifecycleOwner
 import io.reactivex.Observable
 import io.reactivex.Scheduler
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
@@ -96,10 +97,10 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
      * @return A [Disposable] to terminate the subscription early.
      */
     fun subscribe(
-        lifecycleOwner: LifecycleOwner? = null,
-        observerScheduler: Scheduler = defaultObserveOnScheduler,
-        shouldUpdate: ((S?, S) -> Boolean)? = null,
-        subscriber: (S) -> Unit
+            lifecycleOwner: LifecycleOwner? = null,
+            observerScheduler: Scheduler = defaultObserveOnScheduler,
+            shouldUpdate: ((S?, S) -> Boolean)? = null,
+            subscriber: (S) -> Unit
     ): Disposable {
         val observable = observableFor(observerScheduler, shouldUpdate).map { it.second }
 
@@ -179,14 +180,20 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
 
     private fun observableFor(observerScheduler: Scheduler, shouldUpdate: ((S?, S) -> Boolean)? = null): Observable<Pair<S?, S>> {
         val shouldUpdateWithDefault = shouldUpdate ?: { _, _ -> true }
-        return observable
-            // Map the current state to a pair so that it has the same type as the scan accumulator which is a pair of (old state, new state)
-            .map { Pair<S?, S>(it, it) }
-            // Accumulator is a pair of (old state, new state)
-            .scan(Pair<S?, S>(null, state)) { accumulator, currentState -> accumulator.second to currentState.second }
-            .filter { it.first !== it.second }
-            .filter { shouldUpdateWithDefault(it.first, it.second) }
-            .observeOn(observerScheduler)
+        // This will ensure that we start with the actual value of the current state including any reducers
+        // currently on the setState queue and use that as the initial state rather than the current value
+        // of the state property.
+        val initialValueSingle = Single.create<S> { source -> get { source.onSuccess(it) } }
+        return initialValueSingle.flatMapObservable { initialState ->
+            observable
+                // Map the current state to a pair so that it has the same type as the scan accumulator which is a pair of (old state, new state)
+                .map { Pair<S?, S>(it, it) }
+                // Accumulator is a pair of (old state, new state)
+                .scan(Pair<S?, S>(null, initialState)) { accumulator, currentState -> accumulator.second to currentState.second }
+                .filter { it.first !== it.second }
+                .filter { shouldUpdateWithDefault(it.first, it.second) }
+                .observeOn(observerScheduler)
+        }
     }
 
     override fun isDisposed() = disposables.isDisposed
