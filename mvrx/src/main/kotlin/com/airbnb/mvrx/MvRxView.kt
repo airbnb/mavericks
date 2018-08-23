@@ -57,7 +57,7 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
             prop2: KProperty1<S, B>,
             observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
             subscriber: (A, B) -> Unit
-    ) = subscribe(this@MvRxView, propertyWhitelist(prop1), observerScheduler) {
+    ) = subscribe(this@MvRxView, propertyWhitelist(prop1, prop2), observerScheduler) {
         subscriber(prop1.get(it), prop2.get(it))
     }
 
@@ -71,7 +71,7 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
             prop3: KProperty1<S, C>,
             observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
             subscriber: (A, B, C) -> Unit
-    ) = subscribe(this@MvRxView, propertyWhitelist(prop1), observerScheduler) {
+    ) = subscribe(this@MvRxView, propertyWhitelist(prop1, prop2, prop3), observerScheduler) {
         subscriber(prop1.get(it), prop2.get(it), prop3.get(it))
     }
 }

@@ -260,7 +260,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
             subscriber: (A, B, C) -> Unit
     ) {
-        subscribe(owner, propertyWhitelist(prop1, prop2), observerScheduler) {
+        subscribe(owner, propertyWhitelist(prop1, prop2, prop3), observerScheduler) {
             subscriber(prop1.get(it), prop2.get(it), prop3.get(it))
         }
     }
@@ -275,7 +275,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
             subscriber: (A, B, C) -> Unit
     ) {
-        subscribe(propertyWhitelist(prop1, prop2), observerScheduler) {
+        subscribe(propertyWhitelist(prop1, prop2, prop3), observerScheduler) {
             subscriber(prop1.get(it), prop2.get(it), prop3.get(it))
         }
     }
