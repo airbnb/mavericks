@@ -76,33 +76,22 @@ class ViewModelSubscriberTest : BaseTest() {
 
     @Test
     fun testSelectSubscribe() {
-        assertEquals(0, viewModel.selectSubscribe1Called)
+        assertEquals(1, viewModel.selectSubscribe1Called)
     }
 
     @Test
     fun testSelectSubscribe1External() {
         var callCount = 0
         viewModel.selectSubscribe(owner, ViewModelTestState::foo) { callCount++ }
-        assertEquals(0, callCount)
-        viewModel.setFoo(1)
         assertEquals(1, callCount)
+        viewModel.setFoo(1)
+        assertEquals(2, callCount)
     }
 
     @Test
     fun testNotChangingFoo() {
         viewModel.setFoo(0)
         assertEquals(1, viewModel.subscribeCallCount)
-        assertEquals(0, viewModel.selectSubscribe1Called)
-        assertEquals(0, viewModel.selectSubscribe2Called)
-        assertEquals(0, viewModel.selectSubscribe3Called)
-        assertEquals(0, viewModel.onSuccessCalled)
-        assertEquals(0, viewModel.onFailCalled)
-    }
-
-    @Test
-    fun testChangingFoo() {
-        viewModel.setFoo(1)
-        assertEquals(2, viewModel.subscribeCallCount)
         assertEquals(1, viewModel.selectSubscribe1Called)
         assertEquals(1, viewModel.selectSubscribe2Called)
         assertEquals(1, viewModel.selectSubscribe3Called)
@@ -111,12 +100,23 @@ class ViewModelSubscriberTest : BaseTest() {
     }
 
     @Test
+    fun testChangingFoo() {
+        viewModel.setFoo(1)
+        assertEquals(2, viewModel.subscribeCallCount)
+        assertEquals(2, viewModel.selectSubscribe1Called)
+        assertEquals(2, viewModel.selectSubscribe2Called)
+        assertEquals(2, viewModel.selectSubscribe3Called)
+        assertEquals(0, viewModel.onSuccessCalled)
+        assertEquals(0, viewModel.onFailCalled)
+    }
+
+    @Test
     fun testChangingBar() {
         viewModel.setBar(1)
         assertEquals(2, viewModel.subscribeCallCount)
-        assertEquals(0, viewModel.selectSubscribe1Called)
-        assertEquals(1, viewModel.selectSubscribe2Called)
-        assertEquals(1, viewModel.selectSubscribe3Called)
+        assertEquals(1, viewModel.selectSubscribe1Called)
+        assertEquals(2, viewModel.selectSubscribe2Called)
+        assertEquals(2, viewModel.selectSubscribe3Called)
         assertEquals(0, viewModel.onSuccessCalled)
         assertEquals(0, viewModel.onFailCalled)
     }
@@ -125,9 +125,9 @@ class ViewModelSubscriberTest : BaseTest() {
     fun testChangingBam() {
         viewModel.setBam(1)
         assertEquals(2, viewModel.subscribeCallCount)
-        assertEquals(0, viewModel.selectSubscribe1Called)
-        assertEquals(0, viewModel.selectSubscribe2Called)
-        assertEquals(1, viewModel.selectSubscribe3Called)
+        assertEquals(1, viewModel.selectSubscribe1Called)
+        assertEquals(1, viewModel.selectSubscribe2Called)
+        assertEquals(2, viewModel.selectSubscribe3Called)
         assertEquals(0, viewModel.onSuccessCalled)
         assertEquals(0, viewModel.onFailCalled)
     }
@@ -136,9 +136,9 @@ class ViewModelSubscriberTest : BaseTest() {
     fun testSuccess() {
         viewModel.setAsync(Success("Hello World"))
         assertEquals(2, viewModel.subscribeCallCount)
-        assertEquals(0, viewModel.selectSubscribe1Called)
-        assertEquals(0, viewModel.selectSubscribe2Called)
-        assertEquals(0, viewModel.selectSubscribe3Called)
+        assertEquals(1, viewModel.selectSubscribe1Called)
+        assertEquals(1, viewModel.selectSubscribe2Called)
+        assertEquals(1, viewModel.selectSubscribe3Called)
         assertEquals(1, viewModel.onSuccessCalled)
         assertEquals(0, viewModel.onFailCalled)
     }
@@ -147,9 +147,9 @@ class ViewModelSubscriberTest : BaseTest() {
     fun testFail() {
         viewModel.setAsync(Fail(IllegalStateException("foo")))
         assertEquals(2, viewModel.subscribeCallCount)
-        assertEquals(0, viewModel.selectSubscribe1Called)
-        assertEquals(0, viewModel.selectSubscribe2Called)
-        assertEquals(0, viewModel.selectSubscribe3Called)
+        assertEquals(1, viewModel.selectSubscribe1Called)
+        assertEquals(1, viewModel.selectSubscribe2Called)
+        assertEquals(1, viewModel.selectSubscribe3Called)
         assertEquals(0, viewModel.onSuccessCalled)
         assertEquals(1, viewModel.onFailCalled)
     }

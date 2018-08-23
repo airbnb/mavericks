@@ -29,13 +29,12 @@ import kotlin.reflect.full.isSupertypeOf
  */
 inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragmentViewModel(
     viewModelClass: KClass<VM>,
-    noinline shouldUpdate: ((S, S) -> Boolean)? = null,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : Fragment,
         T : MvRxView = lazy {
     val stateFactory: () -> S = ::_fragmentViewModelInitialStateProvider
     MvRxViewModelProvider.get(viewModelClass, this, keyFactory(), stateFactory)
-        .apply { subscribe(requireActivity(), shouldUpdate = shouldUpdate, subscriber = { invalidate() }) }
+        .apply { subscribe(requireActivity(), subscriber = { invalidate() }) }
 }
 
 /**
@@ -44,13 +43,12 @@ inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragmentViewM
  */
 fun <T, VM : BaseMvRxViewModel<S>, S : MvRxState> T.existingViewModel(
     viewModelClass: KClass<VM>,
-    shouldUpdate: ((S, S) -> Boolean)? = null,
     keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : Fragment,
         T : MvRxView = lazy {
     val factory = MvRxFactory { throw IllegalStateException("ViewModel for ${requireActivity()}[${keyFactory()}] does not exist yet!") }
     ViewModelProviders.of(requireActivity(), factory).get(keyFactory(), viewModelClass.java)
-        .apply { subscribe(requireActivity(), shouldUpdate = shouldUpdate, subscriber = { invalidate() }) }
+        .apply { subscribe(requireActivity(), subscriber = { invalidate() }) }
 }
 
 /**
@@ -62,14 +60,13 @@ fun <T, VM : BaseMvRxViewModel<S>, S : MvRxState> T.existingViewModel(
  */
 inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activityViewModel(
     viewModelClass: KClass<VM>,
-    noinline shouldUpdate: ((S, S) -> Boolean)? = null,
     noinline keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : Fragment,
         T : MvRxView = lazy {
     val stateFactory: () -> S = { _activityViewModelInitialStateProvider(keyFactory) }
     if (requireActivity() !is MvRxViewModelStoreOwner) throw IllegalArgumentException("Your Activity must be a MvRxViewModelStoreOwner!")
     MvRxViewModelProvider.get(viewModelClass, requireActivity(), keyFactory(), stateFactory)
-        .apply { subscribe(this@activityViewModel, shouldUpdate = shouldUpdate, subscriber = { invalidate() }) }
+        .apply { subscribe(this@activityViewModel, subscriber = { invalidate() }) }
 }
 
 /**

@@ -31,10 +31,10 @@ class DadJokeIndexFragment : BaseFragment() {
          * function that is given the old state and new state and returns whether or not to
          * call the subscriber. onSuccess, onFail, and propertyWhitelist ship with MvRx.
          */
-        viewModel.subscribe(onFail(DadJokeIndexState::request)) {
+        viewModel.asyncSubscribe(DadJokeIndexState::request, onFail = { error ->
             Snackbar.make(coordinatorLayout, "Jokes request failed.", Snackbar.LENGTH_INDEFINITE).show()
-            Log.w(TAG, "Jokes request failed", (it.request as Fail<*>).error)
-        }
+            Log.w(TAG, "Jokes request failed", error)
+        })
     }
 
     override fun EpoxyController.buildModels() = withState(viewModel) { state ->
