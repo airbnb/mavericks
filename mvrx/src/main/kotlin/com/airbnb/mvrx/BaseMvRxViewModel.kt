@@ -162,7 +162,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      *
      * This is only open so it can be mocked for testing. Do not extend it.
      *
-     * @param owner The LifecycleOwner such as a Fragment or Activity that wants to _subscribe to
+     * @param owner The LifecycleOwner such as a Fragment or Activity that wants to subscribeLifecycle to
      *                     state updates.
      * @param shouldUpdate A lambda that takes the previous and new state and retuns whether the
      *                     subscriber should be notified.
@@ -172,15 +172,15 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         owner: LifecycleOwner,
         shouldUpdate: ((S, S) -> Boolean)? = null,
         subscriber: (S) -> Unit
-    ) = _subscribe(owner, shouldUpdate, subscriber)
+    ) = subscribeLifecycle(owner, shouldUpdate, subscriber)
 
     /**
-     * For ViewModels that want to _subscribe to themself.
+     * For ViewModels that want to subscribeLifecycle to themself.
      */
     protected fun subscribe(
         shouldUpdate: (((S, S) -> Boolean))? = null,
         subscriber: (S) -> Unit
-    ) = _subscribe(null, shouldUpdate, subscriber)
+    ) = subscribeLifecycle(null, shouldUpdate, subscriber)
 
     /**
      * Subscribe to state changes for only a single property.
@@ -197,7 +197,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     protected fun <A> selectSubscribe(
         prop1: KProperty1<S, A>,
         subscriber: (A) -> Unit
-    ) = _subscribe(null, propertyWhitelist(prop1)) { subscriber(prop1.get(it)) }
+    ) = subscribeLifecycle(null, propertyWhitelist(prop1)) { subscriber(prop1.get(it)) }
 
     /**
      * Subscribe to state changes for two properties.
@@ -216,7 +216,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         subscriber: (A, B) -> Unit
-    ) = _subscribe(null, propertyWhitelist(prop1, prop2)) { subscriber(prop1.get(it), prop2.get(it)) }
+    ) = subscribeLifecycle(null, propertyWhitelist(prop1, prop2)) { subscriber(prop1.get(it), prop2.get(it)) }
 
     /**
      * Subscribe to state changes for three properties.
@@ -237,10 +237,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
         subscriber: (A, B, C) -> Unit
-    ) = _subscribe(null, propertyWhitelist(prop1, prop2, prop3)) { subscriber(prop1.get(it), prop2.get(it), prop3.get(it)) }
+    ) = subscribeLifecycle(null, propertyWhitelist(prop1, prop2, prop3)) { subscriber(prop1.get(it), prop2.get(it), prop3.get(it)) }
 
     @Suppress("FunctionName")
-    private fun _subscribe(
+    private fun subscribeLifecycle(
         lifecycleOwner: LifecycleOwner? = null,
         shouldUpdate: ((S, S) -> Boolean)? = null,
         subscriber: (S) -> Unit
