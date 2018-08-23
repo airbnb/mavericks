@@ -166,7 +166,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      *                     state updates.
      * @param shouldUpdate A lambda that takes the previous and new state and retuns whether the
      *                     subscriber should be notified.
-     * @param subscribero A lambda that will get called every time the state changes.
+     * @param subscriber A lambda that will get called every time the state changes.
      */
     fun subscribe(
         owner: LifecycleOwner,
