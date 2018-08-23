@@ -6,6 +6,7 @@ import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import java.util.LinkedList
@@ -105,10 +106,11 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
 
         if (lifecycleOwner == null) return observable.subscribe(subscriber)
 
-        val lifecycleAwareObserver = MvRxLifecycleAwareObserver.Builder<S>(lifecycleOwner)
-            .alwaysDeliverValueWhenUnlocked()
-            .onNext(subscriber)
-            .build()
+        val lifecycleAwareObserver = MvRxLifecycleAwareObserver(
+                lifecycleOwner,
+                alwaysDeliverLastValueWhenUnlocked = true,
+                onNext = Consumer<S> { subscriber.invoke(it) }
+        )
         return observable.subscribeWith(lifecycleAwareObserver)
     }
 
@@ -128,10 +130,11 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
 
         if (lifecycleOwner == null) return observable.subscribe { pair -> subscriber(pair.first, pair.second) }
 
-        val lifecycleAwareObserver = MvRxLifecycleAwareObserver.Builder<Pair<S, S>>(lifecycleOwner)
-            .alwaysDeliverValueWhenUnlocked()
-            .onNext { pair -> subscriber(pair.first, pair.second) }
-            .build()
+        val lifecycleAwareObserver = MvRxLifecycleAwareObserver<Pair<S, S>>(
+                lifecycleOwner,
+                alwaysDeliverLastValueWhenUnlocked = true,
+                onNext = Consumer { pair -> subscriber(pair.first, pair.second) }
+        )
         return observable.subscribeWith(lifecycleAwareObserver)
     }
 
