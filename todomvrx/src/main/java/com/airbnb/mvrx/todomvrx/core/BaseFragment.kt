@@ -1,5 +1,6 @@
 package com.airbnb.mvrx.todomvrx.core
 
+import android.app.TaskStackBuilder
 import android.os.Bundle
 import android.os.Parcelable
 import android.support.annotation.CallSuper
@@ -18,6 +19,7 @@ import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.propertyWhitelist
 import com.airbnb.mvrx.todomvrx.TasksState
 import com.airbnb.mvrx.todomvrx.TasksViewModel
+import com.airbnb.mvrx.todomvrx.data.Tasks
 import com.airbnb.mvrx.todomvrx.data.findTask
 import com.airbnb.mvrx.todomvrx.todoapp.R
 import com.airbnb.mvrx.todomvrx.util.ToDoEpoxyController
@@ -30,6 +32,8 @@ abstract class BaseFragment : BaseMvRxFragment() {
     protected lateinit var coordinatorLayout: CoordinatorLayout
     protected lateinit var recyclerView: EpoxyRecyclerView
     protected lateinit var fab: FloatingActionButton
+    // Used to keep track of task changes to determine if we should show a snackbar.
+    private var oldTasks: Tasks? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
             inflater.inflate(R.layout.fragment_base, container, false).apply {
@@ -41,14 +45,19 @@ abstract class BaseFragment : BaseMvRxFragment() {
 
     @CallSuper
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        viewModel.subscribeWithHistory(propertyWhitelist(TasksState::tasks)) { oldState, newState ->
-            if (oldState.tasks.any { it.complete } && !newState.tasks.any { it.complete }) {
+        viewModel.selectSubscribe(TasksState::tasks, TasksState::lastEditedTask) { tasks, lastEditedTask ->
+            if (oldTasks == null) {
+                oldTasks = tasks
+                return@selectSubscribe
+            }
+
+            if (oldTasks?.any { it.complete } == true && !tasks.any { it.complete }) {
                 coordinatorLayout.showLongSnackbar(R.string.completed_tasks_cleared)
             }
 
-            val oldTask = oldState.tasks.findTask(newState.lastEditedTask)
-            val newTask = newState.tasks.findTask(newState.lastEditedTask)
-            if (oldTask == newTask) return@subscribeWithHistory
+            val oldTask = oldTasks?.findTask(lastEditedTask)
+            val newTask = tasks.findTask(lastEditedTask)
+            if (oldTask == newTask) return@selectSubscribe
             val message = when {
                 oldTask == null -> R.string.successfully_added_task_message
                 newTask == null -> R.string.successfully_deleted_task_message
@@ -61,6 +70,7 @@ abstract class BaseFragment : BaseMvRxFragment() {
             if (message != 0) {
                 coordinatorLayout.showLongSnackbar(message)
             }
+            oldTasks = tasks
         }
 
         viewModel.subscribe(propertyWhitelist(TasksState::isLoading)) { state ->
