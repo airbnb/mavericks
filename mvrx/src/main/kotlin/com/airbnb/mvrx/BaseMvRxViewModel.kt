@@ -212,9 +212,9 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     fun <T> asyncSubscribe(
         owner: LifecycleOwner,
         asyncProp: KProperty1<S, Async<T>>,
-        onSuccess: ((T) -> Unit)? = null,
-        onFail: ((Throwable) -> Unit)? = null
-    ) = asyncSubscribeInternal(owner, asyncProp, onSuccess, onFail)
+        onFail: ((Throwable) -> Unit)? = null,
+        onSuccess: ((T) -> Unit)? = null
+    ) = asyncSubscribeInternal(owner, asyncProp, onFail, onSuccess)
 
     /**
      * Subscribe to changes in an async property. There are optional parameters for onSuccess
@@ -222,15 +222,15 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      */
     protected fun <T> asyncSubscribe(
         asyncProp: KProperty1<S, Async<T>>,
-        onSuccess: ((T) -> Unit)? = null,
-        onFail: ((Throwable) -> Unit)? = null
-    ) = asyncSubscribeInternal(null, asyncProp, onSuccess, onFail)
+        onFail: ((Throwable) -> Unit)? = null,
+        onSuccess: ((T) -> Unit)? = null
+    ) = asyncSubscribeInternal(null, asyncProp, onFail, onSuccess)
 
     private fun <T> asyncSubscribeInternal(
         owner: LifecycleOwner?,
         asyncProp: KProperty1<S, Async<T>>,
-        onSuccess: ((T) -> Unit)? = null,
-        onFail: ((Throwable) -> Unit)? = null
+        onFail: ((Throwable) -> Unit)? = null,
+        onSuccess: ((T) -> Unit)? = null
     ) = selectSubscribeInternal(owner, asyncProp) {
         if (onSuccess != null && it is Success) {
             onSuccess(it())

@@ -41,9 +41,9 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      */
     fun <S : MvRxState, T> BaseMvRxViewModel<S>.asyncSubscribe(
         asyncProp: KProperty1<S, Async<T>>,
-        onSuccess: ((T) -> Unit)? = null,
-        onFail: ((Throwable) -> Unit)? = null
-    ) = asyncSubscribe(this@MvRxView, asyncProp, onSuccess, onFail)
+        onFail: ((Throwable) -> Unit)? = null,
+        onSuccess: ((T) -> Unit)? = null
+    ) = asyncSubscribe(this@MvRxView, asyncProp, onFail, onSuccess)
 
     /**
      * Subscribes to state changes for two specific properties and calls the subscribe with

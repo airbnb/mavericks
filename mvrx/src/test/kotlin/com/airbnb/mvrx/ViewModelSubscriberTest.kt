@@ -24,7 +24,7 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewMod
         selectSubscribe(ViewModelTestState::foo) { selectSubscribe1Called++ }
         selectSubscribe(ViewModelTestState::foo, ViewModelTestState::bar) { _, _ -> selectSubscribe2Called++ }
         selectSubscribe(ViewModelTestState::foo, ViewModelTestState::bar, ViewModelTestState::bam) { _, _, _ -> selectSubscribe3Called++ }
-        asyncSubscribe(ViewModelTestState::async, onSuccess = { onSuccessCalled++ }, onFail = { onFailCalled++ })
+        asyncSubscribe(ViewModelTestState::async, { onFailCalled++ }) { onSuccessCalled++ }
     }
 
     fun setFoo(foo: Int) = setState { copy(foo = foo) }
