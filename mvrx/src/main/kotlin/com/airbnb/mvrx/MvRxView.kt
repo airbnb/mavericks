@@ -36,6 +36,16 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
     }
 
     /**
+     * Subscribe to changes in an async property. There are optional parameters for onSuccess
+     * and onFail which automatically unwrap the value or error.
+     */
+    fun <S : MvRxState, T> BaseMvRxViewModel<S>.asyncSubscribe(
+        asyncProp: KProperty1<S, Async<T>>,
+        onSuccess: ((T) -> Unit)? = null,
+        onFail: ((Throwable) -> Unit)? = null
+    ) = asyncSubscribe(this@MvRxView, asyncProp, onSuccess, onFail)
+
+    /**
      * Subscribes to state changes for two specific properties and calls the subscribe with
      * both properties.
      */

@@ -5,24 +5,26 @@ import io.reactivex.Maybe
 import io.reactivex.disposables.Disposable
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-data class ViewModelTestState(val foo: Int = 0, val bar: Int = 0, val bam: Int = 0, val list: List<Int> = emptyList()) : MvRxState
+data class ViewModelTestState(val foo: Int = 0, val bar: Int = 0, val bam: Int = 0, val list: List<Int> = emptyList(), val async: Async<String> = Uninitialized) : MvRxState
 class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewModel<ViewModelTestState>(initialState) {
 
     var subscribeCallCount = 0
     var selectSubscribe1Called = 0
     var selectSubscribe2Called = 0
     var selectSubscribe3Called = 0
+    var onSuccessCalled = 0
+    var onFailCalled = 0
 
     init {
         subscribe { _ -> subscribeCallCount++ }
         selectSubscribe(ViewModelTestState::foo) { selectSubscribe1Called++ }
         selectSubscribe(ViewModelTestState::foo, ViewModelTestState::bar) { _, _ -> selectSubscribe2Called++ }
         selectSubscribe(ViewModelTestState::foo, ViewModelTestState::bar, ViewModelTestState::bam) { _, _, _ -> selectSubscribe3Called++ }
+        asyncSubscribe(ViewModelTestState::async, onSuccess = { onSuccessCalled++ }, onFail = { onFailCalled++ })
     }
 
     fun setFoo(foo: Int) = setState { copy(foo = foo) }
@@ -33,6 +35,10 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewMod
 
     fun set(reducer: ViewModelTestState.() -> ViewModelTestState) {
         setState(reducer)
+    }
+
+    fun setAsync(async: Async<String>) {
+        setState { copy(async = async) }
     }
 
     fun disposeOnClear(disposable: Disposable) {
@@ -89,6 +95,8 @@ class ViewModelSubscriberTest : BaseTest() {
         assertEquals(0, viewModel.selectSubscribe1Called)
         assertEquals(0, viewModel.selectSubscribe2Called)
         assertEquals(0, viewModel.selectSubscribe3Called)
+        assertEquals(0, viewModel.onSuccessCalled)
+        assertEquals(0, viewModel.onFailCalled)
     }
 
     @Test
@@ -98,6 +106,8 @@ class ViewModelSubscriberTest : BaseTest() {
         assertEquals(1, viewModel.selectSubscribe1Called)
         assertEquals(1, viewModel.selectSubscribe2Called)
         assertEquals(1, viewModel.selectSubscribe3Called)
+        assertEquals(0, viewModel.onSuccessCalled)
+        assertEquals(0, viewModel.onFailCalled)
     }
 
     @Test
@@ -107,6 +117,8 @@ class ViewModelSubscriberTest : BaseTest() {
         assertEquals(0, viewModel.selectSubscribe1Called)
         assertEquals(1, viewModel.selectSubscribe2Called)
         assertEquals(1, viewModel.selectSubscribe3Called)
+        assertEquals(0, viewModel.onSuccessCalled)
+        assertEquals(0, viewModel.onFailCalled)
     }
 
     @Test
@@ -116,6 +128,30 @@ class ViewModelSubscriberTest : BaseTest() {
         assertEquals(0, viewModel.selectSubscribe1Called)
         assertEquals(0, viewModel.selectSubscribe2Called)
         assertEquals(1, viewModel.selectSubscribe3Called)
+        assertEquals(0, viewModel.onSuccessCalled)
+        assertEquals(0, viewModel.onFailCalled)
+    }
+
+    @Test
+    fun testSuccess() {
+        viewModel.setAsync(Success("Hello World"))
+        assertEquals(2, viewModel.subscribeCallCount)
+        assertEquals(0, viewModel.selectSubscribe1Called)
+        assertEquals(0, viewModel.selectSubscribe2Called)
+        assertEquals(0, viewModel.selectSubscribe3Called)
+        assertEquals(1, viewModel.onSuccessCalled)
+        assertEquals(0, viewModel.onFailCalled)
+    }
+
+    @Test
+    fun testFail() {
+        viewModel.setAsync(Fail(IllegalStateException("foo")))
+        assertEquals(2, viewModel.subscribeCallCount)
+        assertEquals(0, viewModel.selectSubscribe1Called)
+        assertEquals(0, viewModel.selectSubscribe2Called)
+        assertEquals(0, viewModel.selectSubscribe3Called)
+        assertEquals(0, viewModel.onSuccessCalled)
+        assertEquals(1, viewModel.onFailCalled)
     }
 
     @Test

@@ -189,7 +189,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         owner: LifecycleOwner,
         prop1: KProperty1<S, A>,
         subscriber: (A) -> Unit
-    ) = subscribe(owner, propertyWhitelist(prop1)) { subscriber(prop1.get(it)) }
+    ) = selectSubscribeInternal(owner, prop1, subscriber)
 
     /**
      * Subscribe to state changes for only a single property.
@@ -197,7 +197,47 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     protected fun <A> selectSubscribe(
         prop1: KProperty1<S, A>,
         subscriber: (A) -> Unit
-    ) = subscribeLifecycle(null, propertyWhitelist(prop1)) { subscriber(prop1.get(it)) }
+    ) = selectSubscribeInternal(null, prop1, subscriber)
+
+    private fun <A> selectSubscribeInternal(
+        owner: LifecycleOwner?,
+        prop1: KProperty1<S, A>,
+        subscriber: (A) -> Unit
+    ) = subscribeLifecycle(owner, propertyWhitelist(prop1)) { subscriber(prop1.get(it)) }
+
+    /**
+     * Subscribe to changes in an async property. There are optional parameters for onSuccess
+     * and onFail which automatically unwrap the value or error.
+     */
+    fun <T> asyncSubscribe(
+        owner: LifecycleOwner,
+        asyncProp: KProperty1<S, Async<T>>,
+        onSuccess: ((T) -> Unit)? = null,
+        onFail: ((Throwable) -> Unit)? = null
+    ) = asyncSubscribeInternal(owner, asyncProp, onSuccess, onFail)
+
+    /**
+     * Subscribe to changes in an async property. There are optional parameters for onSuccess
+     * and onFail which automatically unwrap the value or error.
+     */
+    protected fun <T> asyncSubscribe(
+        asyncProp: KProperty1<S, Async<T>>,
+        onSuccess: ((T) -> Unit)? = null,
+        onFail: ((Throwable) -> Unit)? = null
+    ) = asyncSubscribeInternal(null, asyncProp, onSuccess, onFail)
+
+    private fun <T> asyncSubscribeInternal(
+        owner: LifecycleOwner?,
+        asyncProp: KProperty1<S, Async<T>>,
+        onSuccess: ((T) -> Unit)? = null,
+        onFail: ((Throwable) -> Unit)? = null
+    ) = selectSubscribeInternal(owner, asyncProp) {
+        if (onSuccess != null && it is Success) {
+            onSuccess(it())
+        } else if (onFail != null && it is Fail) {
+            onFail(it.error)
+        }
+    }
 
     /**
      * Subscribe to state changes for two properties.
@@ -207,7 +247,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         subscriber: (A, B) -> Unit
-    ) = subscribeLifecycle(owner, propertyWhitelist(prop1, prop2)) { subscriber(prop1.get(it), prop2.get(it)) }
+    ) = selectSubscribeInternal(owner, prop1, prop2, subscriber)
 
     /**
      * Subscribe to state changes for two properties.
@@ -216,7 +256,14 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         subscriber: (A, B) -> Unit
-    ) = subscribeLifecycle(null, propertyWhitelist(prop1, prop2)) { subscriber(prop1.get(it), prop2.get(it)) }
+    ) = selectSubscribeInternal(null, prop1, prop2, subscriber)
+
+    private fun <A, B> selectSubscribeInternal(
+        owner: LifecycleOwner?,
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        subscriber: (A, B) -> Unit
+    ) = subscribeLifecycle(owner, propertyWhitelist(prop1, prop2)) { subscriber(prop1.get(it), prop2.get(it)) }
 
     /**
      * Subscribe to state changes for three properties.
@@ -227,7 +274,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
         subscriber: (A, B, C) -> Unit
-    ) = subscribeLifecycle(owner, propertyWhitelist(prop1, prop2, prop3)) { subscriber(prop1.get(it), prop2.get(it), prop3.get(it)) }
+    ) = selectSubscribeInternal(owner, prop1, prop2, prop3, subscriber)
 
     /**
      * Subscribe to state changes for three properties.
@@ -237,7 +284,15 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
         subscriber: (A, B, C) -> Unit
-    ) = subscribeLifecycle(null, propertyWhitelist(prop1, prop2, prop3)) { subscriber(prop1.get(it), prop2.get(it), prop3.get(it)) }
+    ) = selectSubscribeInternal(null, prop1, prop2, prop3, subscriber)
+
+    private fun <A, B, C> selectSubscribeInternal(
+        owner: LifecycleOwner?,
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        prop3: KProperty1<S, C>,
+        subscriber: (A, B, C) -> Unit
+    ) = subscribeLifecycle(owner, propertyWhitelist(prop1, prop2, prop3)) { subscriber(prop1.get(it), prop2.get(it), prop3.get(it)) }
 
     @Suppress("FunctionName")
     private fun subscribeLifecycle(
