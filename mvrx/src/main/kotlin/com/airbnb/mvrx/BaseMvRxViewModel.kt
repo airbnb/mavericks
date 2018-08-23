@@ -168,7 +168,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      *                     subscriber should be notified.
      * @param subscriber A lambda that will get called every time the state changes.
      */
-    fun subscribe(
+    internal fun subscribe(
         owner: LifecycleOwner,
         shouldUpdate: ((S, S) -> Boolean)? = null,
         subscriber: (S) -> Unit
@@ -185,7 +185,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     /**
      * Subscribe to state changes for only a single property.
      */
-    fun <A> selectSubscribe(
+    internal fun <A> selectSubscribe(
         owner: LifecycleOwner,
         prop1: KProperty1<S, A>,
         subscriber: (A) -> Unit
@@ -209,7 +209,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * Subscribe to changes in an async property. There are optional parameters for onSuccess
      * and onFail which automatically unwrap the value or error.
      */
-    fun <T> asyncSubscribe(
+    internal fun <T> asyncSubscribe(
         owner: LifecycleOwner,
         asyncProp: KProperty1<S, Async<T>>,
         onFail: ((Throwable) -> Unit)? = null,
@@ -242,7 +242,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     /**
      * Subscribe to state changes for two properties.
      */
-    fun <A, B> selectSubscribe(
+    internal fun <A, B> selectSubscribe(
         owner: LifecycleOwner,
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
@@ -268,7 +268,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     /**
      * Subscribe to state changes for three properties.
      */
-    fun <A, B, C> selectSubscribe(
+    internal fun <A, B, C> selectSubscribe(
         owner: LifecycleOwner,
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
