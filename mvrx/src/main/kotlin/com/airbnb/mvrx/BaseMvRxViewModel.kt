@@ -18,7 +18,7 @@ import kotlin.reflect.KVisibility
 
 abstract class BaseMvRxViewModel<S : MvRxState>(
     initialState: S,
-    @Suppress("MemberVisibilityCanBePrivate") protected val debugMode: Boolean = false
+    private val debugMode: Boolean = false
 ) : ViewModel() {
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
@@ -175,7 +175,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ) = subscribeLifecycle(owner, shouldUpdate, subscriber)
 
     /**
-     * For ViewModels that want to subscribeLifecycle to themself.
+     * For ViewModels that want to subscribe to itself.
      */
     protected fun subscribe(
         shouldUpdate: (((S, S) -> Boolean))? = null,
