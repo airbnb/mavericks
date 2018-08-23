@@ -207,7 +207,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         subscriber: (A, B) -> Unit
-    ) = subscribe(owner, propertyWhitelist(prop1, prop2)) { subscriber(prop1.get(it), prop2.get(it)) }
+    ) = subscribeLifecycle(owner, propertyWhitelist(prop1, prop2)) { subscriber(prop1.get(it), prop2.get(it)) }
 
     /**
      * Subscribe to state changes for two properties.
@@ -227,7 +227,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
         subscriber: (A, B, C) -> Unit
-    ) = subscribe(owner, propertyWhitelist(prop1, prop2, prop3)) { subscriber(prop1.get(it), prop2.get(it), prop3.get(it)) }
+    ) = subscribeLifecycle(owner, propertyWhitelist(prop1, prop2, prop3)) { subscriber(prop1.get(it), prop2.get(it), prop3.get(it)) }
 
     /**
      * Subscribe to state changes for three properties.
