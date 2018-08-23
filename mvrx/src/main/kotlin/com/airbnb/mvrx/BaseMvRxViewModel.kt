@@ -162,9 +162,9 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      *
      * This is only open so it can be mocked for testing. Do not extend it.
      *
-     * @param owner The LifecycleOwner such as a Fragment or Activity that wants to subscribeLifecycle to
+     * @param owner The LifecycleOwner such as a Fragment or Activity that wants to subscribe to
      *                     state updates.
-     * @param shouldUpdate A lambda that takes the previous and new state and retuns whether the
+     * @param shouldUpdate A lambda that takes the previous and new state and returns whether the
      *                     subscriber should be notified.
      * @param subscriber A lambda that will get called every time the state changes.
      */
