@@ -164,23 +164,17 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      *
      * @param owner The LifecycleOwner such as a Fragment or Activity that wants to _subscribe to
      *                     state updates.
-     * @param shouldUpdate A lambda that takes the previous and new state and retuns whether the
-     *                     subscriber should be notified.
      * @param subscriber A lambda that will get called every time the state changes.
      */
     fun subscribe(
         owner: LifecycleOwner,
-        shouldUpdate: ((S, S) -> Boolean)? = null,
         subscriber: (S) -> Unit
-    ) = _subscribe(owner, shouldUpdate, subscriber)
+    ) = stateStore.observable._subscribe(owner, subscriber)
 
     /**
      * For ViewModels that want to _subscribe to themself.
      */
-    protected fun subscribe(
-        shouldUpdate: (((S, S) -> Boolean))? = null,
-        subscriber: (S) -> Unit
-    ) = _subscribe(null, shouldUpdate, subscriber)
+    protected fun subscribe(subscriber: (S) -> Unit) = stateStore.observable._subscribe(null, subscriber)
 
     /**
      * Subscribe to state changes for only a single property.
@@ -189,7 +183,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         owner: LifecycleOwner,
         prop1: KProperty1<S, A>,
         subscriber: (A) -> Unit
-    ) = subscribe(owner, propertyWhitelist(prop1)) { subscriber(prop1.get(it)) }
+    ) = stateStore.observable
+        .map { MvRxTuple1(prop1.get(it)) }
+        .distinctUntilChanged()
+        ._subscribe(owner) { (a) -> subscriber(a) }
 
     /**
      * Subscribe to state changes for only a single property.
@@ -197,7 +194,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     protected fun <A> selectSubscribe(
         prop1: KProperty1<S, A>,
         subscriber: (A) -> Unit
-    ) = _subscribe(null, propertyWhitelist(prop1)) { subscriber(prop1.get(it)) }
+    ) = stateStore.observable
+        .map { MvRxTuple1(prop1.get(it)) }
+        .distinctUntilChanged()
+        ._subscribe(null) { (a) -> subscriber(a) }
 
     /**
      * Subscribe to state changes for two properties.
@@ -207,7 +207,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         subscriber: (A, B) -> Unit
-    ) = subscribe(owner, propertyWhitelist(prop1, prop2)) { subscriber(prop1.get(it), prop2.get(it)) }
+    ) = stateStore.observable
+        .map { MvRxTuple2(prop1.get(it), prop2.get(it)) }
+        .distinctUntilChanged()
+        ._subscribe(owner) { (a, b) -> subscriber(a, b) }
 
     /**
      * Subscribe to state changes for two properties.
@@ -216,7 +219,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         subscriber: (A, B) -> Unit
-    ) = _subscribe(null, propertyWhitelist(prop1, prop2)) { subscriber(prop1.get(it), prop2.get(it)) }
+    ) = stateStore.observable
+        .map { MvRxTuple2(prop1.get(it), prop2.get(it)) }
+        .distinctUntilChanged()
+        ._subscribe(null) { (a, b) -> subscriber(a, b) }
 
     /**
      * Subscribe to state changes for three properties.
@@ -227,7 +233,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
         subscriber: (A, B, C) -> Unit
-    ) = subscribe(owner, propertyWhitelist(prop1, prop2, prop3)) { subscriber(prop1.get(it), prop2.get(it), prop3.get(it)) }
+    ) = stateStore.observable
+        .map { MvRxTuple3(prop1.get(it), prop2.get(it), prop3.get(it)) }
+        .distinctUntilChanged()
+        ._subscribe(owner) { (a, b, c) -> subscriber(a, b, c) }
 
     /**
      * Subscribe to state changes for three properties.
@@ -237,36 +246,22 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
         subscriber: (A, B, C) -> Unit
-    ) = _subscribe(null, propertyWhitelist(prop1, prop2, prop3)) { subscriber(prop1.get(it), prop2.get(it), prop3.get(it)) }
+    ) = stateStore.observable
+        .map { MvRxTuple3(prop1.get(it), prop2.get(it), prop3.get(it)) }
+        .distinctUntilChanged()
+        ._subscribe(null) { (a, b, c) -> subscriber(a, b, c) }
 
-    @Suppress("FunctionName")
-    private fun _subscribe(
-        lifecycleOwner: LifecycleOwner? = null,
-        shouldUpdate: ((S, S) -> Boolean)? = null,
-        subscriber: (S) -> Unit
-    ): Disposable {
-        val observable = observableFor(shouldUpdate).map { it.second }
-
-        if (lifecycleOwner == null) return observable.subscribe(subscriber).disposeOnClear()
-
+    private fun <T> Observable<T>._subscribe(lifecycleOwner: LifecycleOwner? = null, subscriber: (T) -> Unit): Disposable {
+        if (lifecycleOwner == null) {
+            return observeOn(AndroidSchedulers.mainThread()).subscribe(subscriber).disposeOnClear()
+        }
 
         val lifecycleAwareObserver = MvRxLifecycleAwareObserver(
             lifecycleOwner,
             alwaysDeliverLastValueWhenUnlocked = true,
-            onNext = Consumer<S> { subscriber(it) }
+            onNext = Consumer<T> { subscriber(it) }
         )
-        return observable.subscribeWith(lifecycleAwareObserver).disposeOnClear()
-    }
-
-    private fun observableFor(shouldUpdate: ((S, S) -> Boolean)? = null): Observable<Pair<S, S>> {
-        val shouldUpdateWithDefault = shouldUpdate ?: { _, _ -> true }
-        return stateStore.observable
-            // Map the current state to a pair so that it has the same type as the scan accumulator which is a pair of (old state, new state)
-            .map { it to it }
-            // Accumulator is a pair of (old state, new state)
-            .scan { accumulator, currentState -> accumulator.second to currentState.first }
-            .filter { shouldUpdateWithDefault(it.first, it.second) }
-            .observeOn(AndroidSchedulers.mainThread())
+        return observeOn(AndroidSchedulers.mainThread()).subscribeWith(lifecycleAwareObserver).disposeOnClear()
     }
 
     protected fun Disposable.disposeOnClear(): Disposable {

@@ -31,9 +31,10 @@ class DadJokeIndexFragment : BaseFragment() {
          * function that is given the old state and new state and returns whether or not to
          * call the subscriber. onSuccess, onFail, and propertyWhitelist ship with MvRx.
          */
-        viewModel.subscribe(onFail(DadJokeIndexState::request)) {
-            Snackbar.make(coordinatorLayout, "Jokes request failed.", Snackbar.LENGTH_INDEFINITE).show()
-            Log.w(TAG, "Jokes request failed", (it.request as Fail<*>).error)
+        viewModel.selectSubscribe(DadJokeIndexState::request) {
+            if (it is Fail) {
+                Snackbar.make(coordinatorLayout, "Jokes request failed.", Snackbar.LENGTH_INDEFINITE).show()
+            }
         }
     }
 
