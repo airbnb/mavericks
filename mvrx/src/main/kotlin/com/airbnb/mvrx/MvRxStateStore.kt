@@ -39,8 +39,7 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
      */
     private val flushQueueSubject = BehaviorSubject.create<Unit>()
 
-    private var setStateQueue = LinkedList<S.() -> S>()
-    private val getStateQueue = LinkedList<(state: S) -> Unit>()
+    private val jobs = Jobs<S>()
 
     val observable: Observable<S> = subject.distinctUntilChanged()
     /**
@@ -66,9 +65,7 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
      * are guaranteed to run before the get block is run.
      */
     fun get(block: (S) -> Unit) {
-        synchronized(this) {
-            getStateQueue.push(block)
-        }
+        jobs.enqueueGetStateBlock(block)
         flushQueueSubject.onNext(Unit)
     }
 
@@ -83,10 +80,41 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
      * all of the code required.
      */
     fun set(stateReducer: S.() -> S) {
-        synchronized(this) {
-            setStateQueue.push(stateReducer)
-        }
+        jobs.enqueueSetStateBlock(stateReducer)
         flushQueueSubject.onNext(Unit)
+    }
+
+    private class Jobs<S> {
+
+        private val getStateQueue = LinkedList<(state: S) -> Unit>()
+        private var setStateQueue = LinkedList<S.() -> S>()
+
+        @Synchronized
+        fun enqueueGetStateBlock(block: (state: S) -> Unit) {
+            getStateQueue.push(block)
+        }
+
+        @Synchronized
+        fun enqueueSetStateBlock(block: S.() -> S) {
+            setStateQueue.push(block)
+        }
+
+        @Synchronized
+        fun dequeueGetStateBlock(): ((state: S) -> Unit)? {
+            if (getStateQueue.isEmpty()) return null
+
+            return getStateQueue.removeFirst()
+        }
+
+        @Synchronized
+        fun dequeueAllSetStateBlocks(): List<(S.() -> S)>? {
+            // do not allocate empty queue for no-op flushes
+            if (setStateQueue.isEmpty()) return null
+
+            val queue = setStateQueue
+            setStateQueue = LinkedList()
+            return queue
+        }
     }
 
     /**
@@ -99,10 +127,7 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
      */
     private fun flushQueues() {
         flushSetStateQueue()
-        val block = synchronized(this) {
-            if (getStateQueue.isEmpty()) return
-            getStateQueue.removeFirst()
-        }
+        val block = jobs.dequeueGetStateBlock() ?: return
         block(state)
         flushQueues()
     }
@@ -111,16 +136,11 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
      * Coalesce all updates on the setState queue and clear the queue.
      */
     private fun flushSetStateQueue() {
-        synchronized(this) {
-            if (setStateQueue.isEmpty()) return
-            val queue = setStateQueue
-            setStateQueue = LinkedList()
-            queue
-        }
-            .fold(state) { state, reducer -> state.reducer() }
-            .run {
-                subject.onNext(this)
-            }
+        val blocks = jobs.dequeueAllSetStateBlocks() ?: return
+
+        blocks
+                .fold(state) { state, reducer -> state.reducer() }
+                .run { subject.onNext(this) }
     }
 
     private fun handleError(throwable: Throwable) {
