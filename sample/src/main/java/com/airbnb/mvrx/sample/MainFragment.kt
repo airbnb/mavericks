@@ -22,6 +22,13 @@ class MainFragment : BaseFragment() {
         }
 
         basicRow {
+            id("random_dad_joke")
+            title("Random Dad Joke")
+            subtitle(demonstrates("fragmentViewModel", "Network requests", "Dependency Injection"))
+            clickListener { _ -> navigateTo(R.id.action_main_to_randomDadJokeFragment) }
+        }
+
+        basicRow {
             id("dad_jokes")
             title("Dad Jokes")
             subtitle(demonstrates("fragmentViewModel", "Fragment arguments", "Network requests", "Pagination", "Dependency Injection"))

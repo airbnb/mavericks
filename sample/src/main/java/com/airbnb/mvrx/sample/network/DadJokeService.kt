@@ -20,4 +20,8 @@ interface DadJokeService {
     @Headers("Accept: application/json")
     @GET("j/{id}")
     fun fetch(@Path("id") id: String): Observable<Joke>
+
+    @Headers("Accept: application/json")
+    @GET("/")
+    fun random(): Observable<Joke>
 }
