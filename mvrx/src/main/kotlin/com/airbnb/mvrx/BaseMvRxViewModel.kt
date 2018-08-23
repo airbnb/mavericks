@@ -162,19 +162,19 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      *
      * This is only open so it can be mocked for testing. Do not extend it.
      *
-     * @param owner The LifecycleOwner such as a Fragment or Activity that wants to _subscribe to
+     * @param owner The LifecycleOwner such as a Fragment or Activity that wants to subscribeLifecycle to
      *                     state updates.
      * @param subscriber A lambda that will get called every time the state changes.
      */
     fun subscribe(
         owner: LifecycleOwner,
         subscriber: (S) -> Unit
-    ) = stateStore.observable._subscribe(owner, subscriber)
+    ) = stateStore.observable.subscribeLifecycle(owner, subscriber)
 
     /**
-     * For ViewModels that want to _subscribe to themself.
+     * For ViewModels that want to subscribeLifecycle to themself.
      */
-    protected fun subscribe(subscriber: (S) -> Unit) = stateStore.observable._subscribe(null, subscriber)
+    protected fun subscribe(subscriber: (S) -> Unit) = stateStore.observable.subscribeLifecycle(null, subscriber)
 
     /**
      * Subscribe to state changes for only a single property.
@@ -186,7 +186,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ) = stateStore.observable
         .map { MvRxTuple1(prop1.get(it)) }
         .distinctUntilChanged()
-        ._subscribe(owner) { (a) -> subscriber(a) }
+        .subscribeLifecycle(owner) { (a) -> subscriber(a) }
 
     /**
      * Subscribe to state changes for only a single property.
@@ -197,7 +197,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ) = stateStore.observable
         .map { MvRxTuple1(prop1.get(it)) }
         .distinctUntilChanged()
-        ._subscribe(null) { (a) -> subscriber(a) }
+        .subscribeLifecycle(null) { (a) -> subscriber(a) }
 
     /**
      * Subscribe to state changes for two properties.
@@ -210,7 +210,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ) = stateStore.observable
         .map { MvRxTuple2(prop1.get(it), prop2.get(it)) }
         .distinctUntilChanged()
-        ._subscribe(owner) { (a, b) -> subscriber(a, b) }
+        .subscribeLifecycle(owner) { (a, b) -> subscriber(a, b) }
 
     /**
      * Subscribe to state changes for two properties.
@@ -222,7 +222,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ) = stateStore.observable
         .map { MvRxTuple2(prop1.get(it), prop2.get(it)) }
         .distinctUntilChanged()
-        ._subscribe(null) { (a, b) -> subscriber(a, b) }
+        .subscribeLifecycle(null) { (a, b) -> subscriber(a, b) }
 
     /**
      * Subscribe to state changes for three properties.
@@ -236,7 +236,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ) = stateStore.observable
         .map { MvRxTuple3(prop1.get(it), prop2.get(it), prop3.get(it)) }
         .distinctUntilChanged()
-        ._subscribe(owner) { (a, b, c) -> subscriber(a, b, c) }
+        .subscribeLifecycle(owner) { (a, b, c) -> subscriber(a, b, c) }
 
     /**
      * Subscribe to state changes for three properties.
@@ -249,9 +249,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ) = stateStore.observable
         .map { MvRxTuple3(prop1.get(it), prop2.get(it), prop3.get(it)) }
         .distinctUntilChanged()
-        ._subscribe(null) { (a, b, c) -> subscriber(a, b, c) }
+        .subscribeLifecycle(null) { (a, b, c) -> subscriber(a, b, c) }
 
-    private fun <T> Observable<T>._subscribe(lifecycleOwner: LifecycleOwner? = null, subscriber: (T) -> Unit): Disposable {
+    private fun <T> Observable<T>.subscribeLifecycle(
+        lifecycleOwner: LifecycleOwner? = null,
+        subscriber: (T) -> Unit
+    ): Disposable {
         if (lifecycleOwner == null) {
             return observeOn(AndroidSchedulers.mainThread()).subscribe(subscriber).disposeOnClear()
         }
