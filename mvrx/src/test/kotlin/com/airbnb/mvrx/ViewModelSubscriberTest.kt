@@ -62,9 +62,8 @@ class ViewModelSubscriberTest : BaseTest() {
     @Test
     fun testSubscribeWithHistoryExternal() {
         var callCount = 0
-        viewModel.subscribeWithHistory(owner) { oldState, _ ->
+        viewModel.subscribeWithHistory(owner) { _, _ ->
             callCount++
-            assertNull(oldState)
         }
         assertEquals(1, callCount)
     }
@@ -83,25 +82,25 @@ class ViewModelSubscriberTest : BaseTest() {
 
     @Test
     fun testSelectSubscribe() {
-        assertEquals(1, viewModel.selectSubscribe1Called)
+        assertEquals(0, viewModel.selectSubscribe1Called)
     }
 
     @Test
     fun testSelectSubscribe1External() {
         var callCount = 0
         viewModel.selectSubscribe(owner, ViewModelTestState::foo) { callCount++ }
-        assertEquals(1, callCount)
+        assertEquals(0, callCount)
         viewModel.setFoo(1)
-        assertEquals(2, callCount)
+        assertEquals(1, callCount)
     }
 
     @Test
     fun testNotChangingFoo() {
         viewModel.setFoo(0)
         assertEquals(1, viewModel.subscribeCallCount)
-        assertEquals(1, viewModel.selectSubscribe1Called)
-        assertEquals(1, viewModel.selectSubscribe2Called)
-        assertEquals(1, viewModel.selectSubscribe3Called)
+        assertEquals(0, viewModel.selectSubscribe1Called)
+        assertEquals(0, viewModel.selectSubscribe2Called)
+        assertEquals(0, viewModel.selectSubscribe3Called)
         assertEquals(1, viewModel.subscribeWithHistoryCallCount)
     }
 
@@ -109,9 +108,9 @@ class ViewModelSubscriberTest : BaseTest() {
     fun testChangingFoo() {
         viewModel.setFoo(1)
         assertEquals(2, viewModel.subscribeCallCount)
-        assertEquals(2, viewModel.selectSubscribe1Called)
-        assertEquals(2, viewModel.selectSubscribe2Called)
-        assertEquals(2, viewModel.selectSubscribe3Called)
+        assertEquals(1, viewModel.selectSubscribe1Called)
+        assertEquals(1, viewModel.selectSubscribe2Called)
+        assertEquals(1, viewModel.selectSubscribe3Called)
         assertEquals(2, viewModel.subscribeWithHistoryCallCount)
     }
 
@@ -119,9 +118,9 @@ class ViewModelSubscriberTest : BaseTest() {
     fun testChangingBar() {
         viewModel.setBar(1)
         assertEquals(2, viewModel.subscribeCallCount)
-        assertEquals(1, viewModel.selectSubscribe1Called)
-        assertEquals(2, viewModel.selectSubscribe2Called)
-        assertEquals(2, viewModel.selectSubscribe3Called)
+        assertEquals(0, viewModel.selectSubscribe1Called)
+        assertEquals(1, viewModel.selectSubscribe2Called)
+        assertEquals(1, viewModel.selectSubscribe3Called)
         assertEquals(2, viewModel.subscribeWithHistoryCallCount)
     }
 
@@ -129,9 +128,9 @@ class ViewModelSubscriberTest : BaseTest() {
     fun testChangingBam() {
         viewModel.setBam(1)
         assertEquals(2, viewModel.subscribeCallCount)
-        assertEquals(1, viewModel.selectSubscribe1Called)
-        assertEquals(1, viewModel.selectSubscribe2Called)
-        assertEquals(2, viewModel.selectSubscribe3Called)
+        assertEquals(0, viewModel.selectSubscribe1Called)
+        assertEquals(0, viewModel.selectSubscribe2Called)
+        assertEquals(1, viewModel.selectSubscribe3Called)
         assertEquals(2, viewModel.subscribeWithHistoryCallCount)
     }
 
