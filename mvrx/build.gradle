@@ -47,8 +47,7 @@ androidExtensions {
 }
 
 jacoco {
-    // 0.8.2 has better Kotlin support
-    toolVersion = "0.8.2-SNAPSHOT"
+    toolVersion = "0.8.2"
 }
 
 dependencies {
