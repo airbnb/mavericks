@@ -31,17 +31,10 @@ class DadJokeIndexFragment : BaseFragment() {
          * function that is given the old state and new state and returns whether or not to
          * call the subscriber. onSuccess, onFail, and propertyWhitelist ship with MvRx.
          */
-        viewModel.subscribe(onFail(DadJokeIndexState::request)) {
-            Snackbar.make(coordinatorLayout, "Jokes request failed.", Snackbar.LENGTH_INDEFINITE).show()
-            Log.w(TAG, "Jokes request failed", (it.request as Fail<*>).error)
-        }
-
-        /**
-         * This is similar to subscribe above but is given the old and new state.
-         * Returning early from this block is similar to using a shouldUpdate parameter.
-         */
-        viewModel.subscribeWithHistory { oldState, newState ->
-            Log.d(TAG, "There were ${oldState.jokes.size} jokes and now there are ${newState.jokes.size} jokes.")
+        viewModel.selectSubscribe(DadJokeIndexState::request) {
+            if (it is Fail) {
+                Snackbar.make(coordinatorLayout, "Jokes request failed.", Snackbar.LENGTH_INDEFINITE).show()
+            }
         }
     }
 

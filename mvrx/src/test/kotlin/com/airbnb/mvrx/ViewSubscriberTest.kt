@@ -15,14 +15,11 @@ class ViewSubscriberFragment : BaseMvRxFragment() {
     private val viewModel by fragmentViewModel(ViewSubscriberViewModel::class)
 
     var subscribeCallCount = 0
-    var subscribeWithHistoryCallCount = 0
     var selectSubscribeCalled = 0
-    var selectSubscribeCalledWith: Int? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.subscribe { _ -> subscribeCallCount++ }
-        viewModel.subscribeWithHistory { _, _ ->  subscribeWithHistoryCallCount++ }
         viewModel.selectSubscribe(ViewSubscriberState::foo) {
             selectSubscribeCalled++
             selectSubscribeCalled = it
@@ -43,16 +40,6 @@ class ViewSubscriberTest : BaseTest() {
         assertEquals(1, fragment.subscribeCallCount)
         fragment.setFoo(1)
         assertEquals(2, fragment.subscribeCallCount)
-    }
-
-    @Test
-    fun testSubscribeWithHistory() {
-        val (_, fragment) = createFragment<ViewSubscriberFragment, TestActivity>()
-        assertEquals(1, fragment.subscribeWithHistoryCallCount)
-        fragment.setFoo(0)
-        assertEquals(1, fragment.subscribeWithHistoryCallCount)
-        fragment.setFoo(1)
-        assertEquals(2, fragment.subscribeWithHistoryCallCount)
     }
 
     @Test

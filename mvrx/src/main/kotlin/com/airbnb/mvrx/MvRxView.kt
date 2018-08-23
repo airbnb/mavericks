@@ -19,22 +19,8 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      *
      * Use shouldUpdate if you only want to subscribe to a subset of all updates. There are some standard ones in ShouldUpdateHelpers.
      */
-    fun <S : MvRxState> BaseMvRxViewModel<S>.subscribe(
-            shouldUpdate: ((S, S) -> Boolean)? = null,
-            observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
-            subscriber: ((S) -> Unit)? = null
-    ) = subscribe(this@MvRxView, shouldUpdate, observerScheduler, subscriber ?: { invalidate() })
-
-    /**
-     * Subscribes to all state updates for the given viewModel. The subscriber will receive the previous state and the new state.
-     *
-     * Use shouldUpdate if you only want to subscribe to a subset of all updates. There are some standard ones in ShouldUpdateHelpers.
-     */
-    fun <S : MvRxState> BaseMvRxViewModel<S>.subscribeWithHistory(
-            shouldUpdate: ((S, S) -> Boolean)? = null,
-            observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
-            subscriber: (S, S) -> Unit
-    ) = subscribeWithHistory(this@MvRxView, shouldUpdate, observerScheduler, subscriber)
+    fun <S : MvRxState> BaseMvRxViewModel<S>.subscribe(subscriber: (S) -> Unit) =
+        subscribe(this@MvRxView, subscriber)
 
     /**
      * Subscribes to state changes for only a specific property and calls the subscribe with
@@ -42,11 +28,8 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      */
     fun <S : MvRxState, A> BaseMvRxViewModel<S>.selectSubscribe(
             prop1: KProperty1<S, A>,
-            observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
             subscriber: (A) -> Unit
-    ) = subscribe(this@MvRxView, propertyWhitelist(prop1), observerScheduler) {
-        subscriber(prop1.get(it))
-    }
+    ) = selectSubscribe(this@MvRxView, prop1, subscriber)
 
     /**
      * Subscribes to state changes for two specific properties and calls the subscribe with
@@ -55,11 +38,8 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
     fun <S : MvRxState, A, B> BaseMvRxViewModel<S>.selectSubscribe(
             prop1: KProperty1<S, A>,
             prop2: KProperty1<S, B>,
-            observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
             subscriber: (A, B) -> Unit
-    ) = subscribe(this@MvRxView, propertyWhitelist(prop1, prop2), observerScheduler) {
-        subscriber(prop1.get(it), prop2.get(it))
-    }
+    ) = selectSubscribe(this@MvRxView, prop1, prop2, subscriber)
 
     /**
      * Subscribes to state changes for two specific properties and calls the subscribe with
@@ -69,9 +49,6 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
             prop1: KProperty1<S, A>,
             prop2: KProperty1<S, B>,
             prop3: KProperty1<S, C>,
-            observerScheduler: Scheduler = AndroidSchedulers.mainThread(),
             subscriber: (A, B, C) -> Unit
-    ) = subscribe(this@MvRxView, propertyWhitelist(prop1, prop2, prop3), observerScheduler) {
-        subscriber(prop1.get(it), prop2.get(it), prop3.get(it))
-    }
+    ) = selectSubscribe(this@MvRxView, prop1, prop2, prop3, subscriber)
 }
