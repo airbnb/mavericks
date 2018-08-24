@@ -33,7 +33,7 @@ class RandomDadJokeViewModel(
     }
 
     companion object : MvRxViewModelFactory<RandomDadJokeState> {
-        override fun create(activity: FragmentActivity, state: RandomDadJokeState): BaseMvRxViewModel<RandomDadJokeState> {
+        @JvmStatic override fun create(activity: FragmentActivity, state: RandomDadJokeState): BaseMvRxViewModel<RandomDadJokeState> {
             val service: DadJokeService by activity.inject()
             return RandomDadJokeViewModel(state, service)
         }

@@ -5,9 +5,8 @@ import android.arch.lifecycle.ViewModelStore
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
-import com.airbnb.mvrx.MvRxViewModelProvider.createDefaultViewModel
+import com.airbnb.mvrx.MvRxViewModelProvider.createViewModel
 import kotlin.collections.set
-import kotlin.reflect.full.companionObjectInstance
 
 /**
  * Custom ViewModelStore that supports persisting and restoring ViewModels.
@@ -108,23 +107,13 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
     private fun restoreViewModel(activity: FragmentActivity, holder: MvRxPersistedViewModelHolder, arguments: Any?): ViewModel {
         val (viewModelClassName, stateClassName, viewModelState) = holder
         @Suppress("UNCHECKED_CAST")
-        val viewModelClass = (Class.forName(viewModelClassName) as Class<BaseMvRxViewModel<MvRxState>>).kotlin
+        val viewModelClass = (Class.forName(viewModelClassName) as Class<BaseMvRxViewModel<MvRxState>>)
         @Suppress("UNCHECKED_CAST")
         val stateClass = Class.forName(stateClassName) as Class<MvRxState>
         // If there is a key in the fragmentArgsForActivityViewModelState map, then this is an activity ViewModel. The map value will contain
         // the Fragment args that the ViewModel was created with.
-        val state =
-            try {
-                _initialStateProvider(stateClass.kotlin, arguments).let(viewModelState::restorePersistedState)
-            } catch (exception: IllegalStateException) {
-                // Todo @ben.schwab the update to state creation broke some existing MvRx flows that did not have a 0 arg default constructor.
-                // We should fix all screens ASAP, but for now in the case of an exception, fall back to the legacy manner of state creation.
-                viewModelState.createInitialStateFromPersistedState(stateClass)
-            }
-
-        @Suppress("UNCHECKED_CAST")
-        val factory = viewModelClass.companionObjectInstance as? MvRxViewModelFactory<MvRxState>
-        return factory?.let { factory.create(activity, state) } ?: createDefaultViewModel(viewModelClass, state)
+        val state = _initialStateProvider(stateClass, arguments).let(viewModelState::restorePersistedState)
+        return createViewModel(viewModelClass, activity, state)
     }
 
     /**

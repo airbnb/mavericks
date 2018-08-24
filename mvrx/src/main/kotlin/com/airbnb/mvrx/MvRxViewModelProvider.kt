@@ -5,7 +5,6 @@ import android.arch.lifecycle.ViewModelStoreOwner
 import android.support.annotation.RestrictTo
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
-import kotlin.reflect.KClass
 import kotlin.reflect.full.companionObjectInstance
 import kotlin.reflect.full.primaryConstructor
 
@@ -33,9 +32,9 @@ object MvRxViewModelProvider {
      * property syntax: `YourState::yourProperty`
      */
     fun <VM : BaseMvRxViewModel<S>, S : MvRxState> get(
-        viewModelClass: KClass<VM>,
+        viewModelClass: Class<VM>,
         storeOwner: ViewModelStoreOwner,
-        key: String = viewModelClass.java.name,
+        key: String = viewModelClass.name,
         stateFactory: () -> S
     ): VM {
         // This wraps the fact that ViewModelProvider.of has individual methods for Fragment and FragmentActivity.
@@ -46,28 +45,90 @@ object MvRxViewModelProvider {
                 ?: throw IllegalArgumentException("$storeOwner must either be an Activity or a Fragment that is attached to an Activity")
 
         val factory = MvRxFactory {
-            createFactoryViewModel(viewModelClass, fragmentActivity, stateFactory()) ?: createDefaultViewModel(viewModelClass, stateFactory())
+            createViewModel(viewModelClass, fragmentActivity, stateFactory())
         }
         return when {
             activityOwner != null -> ViewModelProviders.of(activityOwner, factory)
             else -> ViewModelProviders.of(fragmentOwner!!, factory)
-        }.get(key, viewModelClass.java)
+        }.get(key, viewModelClass)
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun <VM : BaseMvRxViewModel<*>> createFactoryViewModel(
-        viewModelClass: KClass<VM>,
+    fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModel(
+        viewModelClass: Class<VM>,
         fragmentActivity: FragmentActivity,
-        state: MvRxState
-    ) = (viewModelClass.companionObjectInstance as? MvRxViewModelFactory<MvRxState>)?.create(fragmentActivity, state)
+        state: S
+    ): VM {
+        val viewModel = createFactoryViewModel(viewModelClass, fragmentActivity, state)
+            ?: createDefaultViewModel(viewModelClass, state)
+        return requireNotNull(viewModel) {
 
-    fun <VM : BaseMvRxViewModel<*>> createDefaultViewModel(viewModelClass: KClass<VM>, state: Any): VM {
-        val primaryConstructor = requireNotNull(viewModelClass.primaryConstructor) {
-            "$viewModelClass must implement a companion object BaseMvRxViewModelFactory or have a primary constructor " +
-                    "that takes state as a single arg."
+            // We are about to crash, so accessing Kotlin reflect is okay for a better error message.
+            when {
+                viewModelClass.kotlin.companionObjectInstance is MvRxViewModelFactory<*> -> {
+                    "${viewModelClass.simpleName} companion " +
+                        "${MvRxViewModelFactory::class.java.simpleName} is missing ${JvmStatic::class.java.name} " +
+                        "annotation on its create method."
+                }
+                viewModelClass.kotlin.companionObjectInstance != null -> {
+                    "${viewModelClass.simpleName} must have primary constructor with a single " +
+                        "parameter for initial state of ${state::class.java} or a companion object " +
+                        "implementing ${MvRxViewModelFactory::class.java} and a ${JvmStatic::class.java.simpleName} " +
+                        "annotated create method. Found a companion object which does not " +
+                        "implement ${MvRxViewModelFactory::class.java.simpleName}."
+                }
+                viewModelClass.kotlin.primaryConstructor?.parameters?.size?.let { it > 1 } == true -> {
+                    "${viewModelClass.simpleName} takes dependencies other than initialState. " +
+                        "It must have companion object implementing ${MvRxViewModelFactory::class.java.simpleName} " +
+                        "and a ${JvmStatic::class.java.simpleName} annotated create method."
+                }
+                viewModelClass.kotlin.primaryConstructor?.parameters?.size?.let { it == 0 } == true -> {
+                    "${MvRxViewModelFactory::class.java.simpleName} must have primary constructor with a " +
+                        "single parameter that takes initial state of ${state::class.java.simpleName}."
+                }
+                viewModelClass.kotlin.primaryConstructor?.parameters?.get(0)?.type != state::class -> {
+                    "${MvRxViewModelFactory::class.java.simpleName} must have primary constructor with a " +
+                        "single parameter that takes initial state of ${state::class.java.simpleName}. Found type " +
+                        "${viewModelClass.kotlin.primaryConstructor?.parameters?.get(0)?.type?.javaClass?.simpleName}"
+                }
+                viewModelClass.kotlin.primaryConstructor?.parameters?.get(0)?.isOptional == true -> {
+                    "initialState may not be an optional constructor parameter."
+                }
+                else -> {
+                    "${viewModelClass.simpleName} must have a companion object implementing " +
+                        "${MvRxViewModelFactory::class.java.simpleName} and a ${JvmStatic::class.java.simpleName} " +
+                        "annotated create method *or* have primary constructor with a single parameter for " +
+                        "initial state of ${state::class.java.simpleName}."
+                }
+            }
+
         }
+    }
 
-        require(!primaryConstructor.parameters[0].isOptional) { "initialState may not be an optional constructor parameter." }
-        return primaryConstructor.call(state)
+    @Suppress("UNCHECKED_CAST")
+    private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createFactoryViewModel(
+        viewModelClass: Class<VM>,
+        fragmentActivity: FragmentActivity,
+        state: S
+    ) : VM? {
+        val method = try {
+            viewModelClass.getMethod("create", FragmentActivity::class.java, state::class.java)
+        } catch (exception: NoSuchMethodException) {
+            null
+        }
+        return method?.invoke(null, fragmentActivity, state) as? VM
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createDefaultViewModel(viewModelClass: Class<VM>, state: S): VM? {
+        // If we are checking for a default ViewModel, we expect only a single default constructor. Any other case
+        // is a misconfiguration and we will throw an appropriate error under further inspection.
+        if (viewModelClass.constructors.size == 1) {
+            val primaryConstructor = viewModelClass.constructors[0]
+            if ( primaryConstructor.parameterTypes.size == 1 && primaryConstructor.parameterTypes[0].isAssignableFrom(state::class.java)) {
+                return primaryConstructor?.newInstance(state) as? VM
+            }
+        }
+        return null
     }
 }

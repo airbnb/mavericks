@@ -50,7 +50,7 @@ class DadJokeIndexViewModel(
      * @see MvRxViewModelFactory
      */
     companion object : MvRxViewModelFactory<DadJokeIndexState> {
-        override fun create(activity: FragmentActivity, state: DadJokeIndexState): BaseMvRxViewModel<DadJokeIndexState> {
+        @JvmStatic override fun create(activity: FragmentActivity, state: DadJokeIndexState): BaseMvRxViewModel<DadJokeIndexState> {
             val service: DadJokeService by activity.inject()
             return DadJokeIndexViewModel(state, service)
         }
