@@ -35,8 +35,6 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
 
     /**
      * Subscribes to all state updates for the given viewModel.
-     *
-     * Use shouldUpdate if you only want to subscribe to a subset of all updates. There are some standard ones in ShouldUpdateHelpers.
      */
     fun <S : MvRxState> BaseMvRxViewModel<S>.subscribe(subscriber: (S) -> Unit) = subscribe(this@MvRxView, subscriber)
 
