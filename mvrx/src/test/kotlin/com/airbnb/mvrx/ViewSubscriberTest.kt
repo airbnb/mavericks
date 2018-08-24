@@ -12,7 +12,7 @@ class ViewSubscriberViewModel(initialState: ViewSubscriberState) : TestMvRxViewM
 
 
 class ViewSubscriberFragment : BaseMvRxFragment() {
-    private val viewModel by fragmentViewModel(ViewSubscriberViewModel::class)
+    private val viewModel: ViewSubscriberViewModel by fragmentViewModel()
 
     var subscribeCallCount = 0
     var selectSubscribeCalled = 0

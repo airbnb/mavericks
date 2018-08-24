@@ -7,7 +7,7 @@ import com.airbnb.mvrx.sample.views.marquee
 import com.airbnb.mvrx.withState
 
 class HelloWorldEpoxyFragment : BaseFragment() {
-    private val viewModel by fragmentViewModel(HelloWorldViewModel::class)
+    private val viewModel: HelloWorldViewModel by fragmentViewModel()
 
     override fun EpoxyController.buildModels() = withState(viewModel) { state ->
         marquee {

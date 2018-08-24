@@ -16,7 +16,7 @@ class HelloWorldViewModel(initialState: HelloWorldState) : MvRxViewModel<HelloWo
 }
 
 class HelloWorldFragment : BaseFragment() {
-    private val viewModel by fragmentViewModel(HelloWorldViewModel::class)
+    private val viewModel: HelloWorldViewModel by fragmentViewModel()
 
     override fun EpoxyController.buildModels() = withState(viewModel) { state ->
         header {

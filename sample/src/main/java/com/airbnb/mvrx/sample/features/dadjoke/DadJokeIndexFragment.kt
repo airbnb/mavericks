@@ -21,7 +21,7 @@ class DadJokeIndexFragment : BaseFragment() {
      * subscribe to all state changes and call [invalidate] which we have wired up to
      * call [buildModels] in [BaseFragment].
      */
-    private val viewModel by fragmentViewModel(DadJokeIndexViewModel::class)
+    private val viewModel: DadJokeIndexViewModel by fragmentViewModel()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         /**

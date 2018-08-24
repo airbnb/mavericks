@@ -50,8 +50,8 @@ class ViewModelStoreActivity : TestActivity() {
 }
 
 class ViewModelStoreTestFragment : BaseMvRxFragment() {
-    val viewModelFragment by fragmentViewModel(ViewModelStoreTestViewModel::class)
-    val viewModelActivity by activityViewModel(ViewModelStoreTestViewModel::class)
+    val viewModelFragment: ViewModelStoreTestViewModel by fragmentViewModel()
+    val viewModelActivity: ViewModelStoreTestViewModel by activityViewModel()
 
     override fun invalidate() { }
 }

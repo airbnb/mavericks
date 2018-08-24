@@ -14,7 +14,7 @@ import com.airbnb.mvrx.sample.views.Marquee
 import com.airbnb.mvrx.withState
 
 class HelloWorldFragment : BaseMvRxFragment() {
-    private val viewModel by fragmentViewModel(HelloWorldViewModel::class)
+    private val viewModel: HelloWorldViewModel by fragmentViewModel()
 
     private lateinit var marquee: Marquee
 

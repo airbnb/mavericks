@@ -46,7 +46,7 @@ class TaskListViewModel(initialState: TaskListState) : MvRxViewModel<TaskListSta
  */
 class TaskListFragment : BaseFragment() {
 
-    private val taskListViewModel by fragmentViewModel(TaskListViewModel::class)
+    private val taskListViewModel: TaskListViewModel by fragmentViewModel()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
