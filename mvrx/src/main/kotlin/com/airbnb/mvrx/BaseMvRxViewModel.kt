@@ -332,4 +332,5 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         return this
     }
 
+    override fun toString(): String = "${this::class.simpleName} $stateStore"
 }

@@ -38,10 +38,12 @@ internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
 
     val observable: Observable<S> = subject.distinctUntilChanged()
     /**
-     * Do *NOT* expose `state` which can cause race condition.
+     * Do NOT expose `state` which can cause race condition
      * `state` should only be accessed from the merge thread
      * For all external usage, please use `get(block)`
      * For all internal usage, `state` must be invoked from merge thread
+     * An exception is `print` for debugging purpose
+     * e.g. print the current state and crash the app without executing remaining reducers
      */
     private val state: S
         // value must be present here, since the subject is created with initialState
@@ -158,4 +160,9 @@ internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
         disposables.add(this)
         return this
     }
+
+    /**
+     * This is mainly for debugging purpose and can be invoked from any thread
+     */
+    override fun toString(): String = "$state"
 }
