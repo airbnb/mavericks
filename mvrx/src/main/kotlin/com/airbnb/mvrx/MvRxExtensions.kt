@@ -137,7 +137,7 @@ fun <S : MvRxState> _initialStateProvider(stateClass: Class<S>, args: Any?): S {
             null
         }
         ?: throw IllegalStateException(
-            "Attempt to auto create the MvRX state class ${stateClass.simpleName} has failed. It must have default values for every property or a " +
+            "Attempt to auto create the MvRx state class ${stateClass.simpleName} has failed. It must have default values for every property or a " +
                 "secondary constructor for ${args?.javaClass?.simpleName ?: "a fragment argument"}. "
         )
 }
