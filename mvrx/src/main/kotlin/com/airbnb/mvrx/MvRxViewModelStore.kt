@@ -55,6 +55,7 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
                     val holder = MvRxPersistedViewModelHolder(viewModel::class.java.name, state::class.java.name, persistedState)
                     bundle.apply { putParcelable(key, holder) }
                 }
+                bundle
             }
             .let {
                 outState.putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, it)

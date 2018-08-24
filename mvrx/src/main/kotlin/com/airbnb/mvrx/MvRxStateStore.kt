@@ -38,10 +38,12 @@ internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
 
     val observable: Observable<S> = subject.distinctUntilChanged()
     /**
-     * This is automatically updated from a subscription on the subject for easy access to the
-     * current state.
+     * Do *NOT* expose `state` which can cause race condition.
+     * `state` should only be accessed from the merge thread
+     * For all external usage, please use `get(block)`
+     * For all internal usage, `state` must be invoked from merge thread
      */
-    val state: S
+    private val state: S
         // value must be present here, since the subject is created with initialState
         get() = subject.value!!
 
