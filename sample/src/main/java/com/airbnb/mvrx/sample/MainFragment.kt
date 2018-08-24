@@ -22,6 +22,13 @@ class MainFragment : BaseFragment() {
         }
 
         basicRow {
+            id("hello_world_epoxy")
+            title("Hello World (Epoxy)")
+            subtitle(demonstrates("Simple MvRx usage", "Epoxy integration"))
+            clickListener { _ -> navigateTo(R.id.action_main_to_helloWorldEpoxyFragment) }
+        }
+
+        basicRow {
             id("random_dad_joke")
             title("Random Dad Joke")
             subtitle(demonstrates("fragmentViewModel", "Network requests", "Dependency Injection"))
