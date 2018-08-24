@@ -5,13 +5,13 @@ import android.arch.lifecycle.LifecycleOwner
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import io.reactivex.Scheduler
-import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlin.reflect.KProperty1
 
-
-private val handler = Handler(Looper.getMainLooper(), Handler.Callback { message ->
+// Set of MvRxView identity hash codes that have a pending invalidate.
+private val PENDING_INVALIDATES = HashSet<Int>()
+private val HANDLER = Handler(Looper.getMainLooper(), Handler.Callback { message ->
     val view = message.obj as MvRxView
+    PENDING_INVALIDATES.remove(System.identityHashCode(view))
     if (view.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) view.invalidate()
     true
 })
@@ -29,8 +29,10 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
     fun invalidate()
 
     fun postInvalidate() {
-        handler.removeMessages(System.identityHashCode(this@MvRxView))
-        handler.sendMessage(Message.obtain(handler, System.identityHashCode(this@MvRxView), this@MvRxView))
+        if (PENDING_INVALIDATES.contains(System.identityHashCode(this@MvRxView))) return
+
+        PENDING_INVALIDATES.add(System.identityHashCode(this@MvRxView))
+        HANDLER.sendMessage(Message.obtain(HANDLER, System.identityHashCode(this@MvRxView), this@MvRxView))
     }
 
     /**
