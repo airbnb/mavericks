@@ -33,6 +33,7 @@ import com.airbnb.mvrx.todomvrx.views.fullScreenMessageView
 import com.airbnb.mvrx.todomvrx.views.header
 import com.airbnb.mvrx.todomvrx.views.horizontalLoader
 import com.airbnb.mvrx.todomvrx.views.taskItemView
+import com.airbnb.mvrx.withRenderingState
 import com.airbnb.mvrx.withState
 
 data class TaskListState(val filter: TaskListFilter = TaskListFilter.All) : MvRxState
@@ -68,7 +69,7 @@ class TaskListFragment : BaseFragment() {
         else -> super.onOptionsItemSelected(item)
     }
 
-    override fun EpoxyController.buildModels() = withState(viewModel, taskListViewModel) { state, taskListState ->
+    override fun EpoxyController.buildModels() = withRenderingState(viewModel, taskListViewModel) { state, taskListState ->
         // We always want to show this so the content won't snap up when the loader finishes.
         horizontalLoader {
             id("loader")

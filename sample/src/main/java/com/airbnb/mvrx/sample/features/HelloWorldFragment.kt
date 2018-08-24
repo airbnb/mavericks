@@ -6,7 +6,7 @@ import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.core.MvRxViewModel
 import com.airbnb.mvrx.sample.views.marquee
-import com.airbnb.mvrx.withState
+import com.airbnb.mvrx.withRenderingState
 
 data class HelloWorldState(val title: String = "Hello World") : MvRxState
 
@@ -15,7 +15,7 @@ class HelloWorldViewModel(initialState: HelloWorldState) : MvRxViewModel<HelloWo
 class HelloWorldFragment : BaseFragment() {
     private val viewModel by fragmentViewModel(HelloWorldViewModel::class)
 
-    override fun EpoxyController.buildModels() = withState(viewModel) { state ->
+    override fun EpoxyController.buildModels() = withRenderingState(viewModel) { state ->
         marquee {
             id("marquee")
             title(state.title)

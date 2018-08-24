@@ -31,7 +31,7 @@ import com.airbnb.mvrx.todomvrx.todoapp.R
 import com.airbnb.mvrx.todomvrx.util.asSequence
 import com.airbnb.mvrx.todomvrx.views.AddEditView
 import com.airbnb.mvrx.todomvrx.views.addEditView
-import com.airbnb.mvrx.withState
+import com.airbnb.mvrx.withRenderingState
 import kotlinx.android.parcel.Parcelize
 
 
@@ -55,7 +55,7 @@ class AddEditTaskFragment : BaseFragment() {
                 Snackbar.make(coordinatorLayout, R.string.empty_task_message, Snackbar.LENGTH_LONG).show()
                 return@setOnClickListener
             }
-            withState(viewModel) { state ->
+            withRenderingState(viewModel) { state ->
                 val task = (state.tasks.findTask(args.id) ?: Task()).copy(title = title, description = description)
                 viewModel.upsertTask(task)
                 findNavController().navigateUp()
@@ -63,7 +63,7 @@ class AddEditTaskFragment : BaseFragment() {
         }
     }
 
-    override fun EpoxyController.buildModels() = withState(viewModel) { state ->
+    override fun EpoxyController.buildModels() = withRenderingState(viewModel) { state ->
         val task = state.tasks.findTask(args.id)
         addEditView {
             id("add_edit")

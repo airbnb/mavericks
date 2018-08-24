@@ -29,10 +29,18 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     private val backgroundScheduler = Schedulers.single()
     private val stateStore: MvRxStateStore<S> = MvRxStateStore(initialState)
 
+    /**
+     * `renderingState` is the current state in the main thread, used for ui rendering purpose
+     * For non-rendering purpose, please use withState(block) to access the state asynchronously from merge thread, to avoid race condition
+     */
+    var renderingState: S = initialState
+        private set
+
     init {
         if (debugMode) {
             Observable.fromCallable { validateState(initialState) }.subscribeOn(Schedulers.computation()).subscribe()
         }
+        subscribe { renderingState = it }.disposeOnClear()
     }
 
     /**

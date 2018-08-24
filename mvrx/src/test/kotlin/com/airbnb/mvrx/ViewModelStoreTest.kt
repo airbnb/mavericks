@@ -63,15 +63,15 @@ class ViewModelStoreTest : BaseTest() {
         val (_, fragment) = createFragment<ViewModelStoreTestFragment, TestActivity>()
 
         var callCount = 0
-        withState(fragment.viewModelFragment) { callCount++ }
-        withState(fragment.viewModelFragment) { callCount++ }
+        withAsyncState(fragment.viewModelFragment) { callCount++ }
+        withAsyncState(fragment.viewModelFragment) { callCount++ }
         assertEquals(2, callCount)
     }
 
     @Test
     fun testActivityViewModelCanUseDefaultConstructor() {
         val (_, fragment) = createFragment<ViewModelStoreTestFragment, TestActivity>()
-        withState(fragment.viewModelActivity) { state ->
+        withAsyncState(fragment.viewModelActivity) { state ->
             assertEquals(1, state.notPersistedCount)
         }
     }
@@ -79,7 +79,7 @@ class ViewModelStoreTest : BaseTest() {
     @Test
     fun testFragmentViewModelCanUseDefaultConstructor() {
         val (_, fragment) = createFragment<ViewModelStoreTestFragment, TestActivity>()
-        withState(fragment.viewModelFragment) { state ->
+        withAsyncState(fragment.viewModelFragment) { state ->
             assertEquals(1, state.notPersistedCount)
         }
     }
@@ -87,7 +87,7 @@ class ViewModelStoreTest : BaseTest() {
     @Test
     fun testActivityViewModelCanBeSetFromArgs() {
         val (_, fragment) = createFragment<ViewModelStoreTestFragment, TestActivity>(args = ViewModelStoreTestArgs(3))
-        withState(fragment.viewModelActivity) { state ->
+        withAsyncState(fragment.viewModelActivity) { state ->
             assertEquals(3, state.notPersistedCount)
         }
     }
@@ -95,7 +95,7 @@ class ViewModelStoreTest : BaseTest() {
     @Test
     fun testFragmentViewModelCanBeSetFromArgs() {
         val (_, fragment) = createFragment<ViewModelStoreTestFragment, TestActivity>(args = ViewModelStoreTestArgs(3))
-        withState(fragment.viewModelFragment) { state ->
+        withAsyncState(fragment.viewModelFragment) { state ->
             assertEquals(3, state.notPersistedCount)
         }
     }
@@ -108,7 +108,7 @@ class ViewModelStoreTest : BaseTest() {
         val bundle = Bundle()
         controller.saveInstanceState(bundle)
         val (_, fragment2) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(savedInstanceState = bundle)
-        withState(fragment2.viewModelActivity) { state ->
+        withAsyncState(fragment2.viewModelActivity) { state ->
             assertEquals(3, state.notPersistedCount)
             assertEquals(3, state.persistedCount)
         }
@@ -121,7 +121,7 @@ class ViewModelStoreTest : BaseTest() {
         val bundle = Bundle()
         controller.saveInstanceState(bundle)
         val (_, fragment2) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(savedInstanceState = bundle)
-        withState(fragment2.viewModelActivity) { state ->
+        withAsyncState(fragment2.viewModelActivity) { state ->
             assertEquals(1, state.notPersistedCount)
             assertEquals(3, state.persistedCount)
         }
@@ -134,7 +134,7 @@ class ViewModelStoreTest : BaseTest() {
         val bundle = Bundle()
         controller.saveInstanceState(bundle)
         val (_, fragment2) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(savedInstanceState = bundle)
-        withState(fragment2.viewModelFragment) { state ->
+        withAsyncState(fragment2.viewModelFragment) { state ->
             assertEquals(3, state.notPersistedCount)
             assertEquals(3, state.persistedCount)
         }
@@ -147,7 +147,7 @@ class ViewModelStoreTest : BaseTest() {
         val bundle = Bundle()
         controller.saveInstanceState(bundle)
         val (_, fragment2) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(savedInstanceState = bundle)
-        withState(fragment2.viewModelFragment) { state ->
+        withAsyncState(fragment2.viewModelFragment) { state ->
             assertEquals(1, state.notPersistedCount)
             assertEquals(3, state.persistedCount)
         }
@@ -175,7 +175,7 @@ class ViewModelStoreTest : BaseTest() {
                 .start()
                 .resume()
                 .visible()
-        withState(controller.get().viewModel) { state ->
+        withAsyncState(controller.get().viewModel) { state ->
             assertEquals(1, state.notPersistedCount)
             assertEquals(1, state.persistedCount)
         }
@@ -192,7 +192,7 @@ class ViewModelStoreTest : BaseTest() {
                 .start()
                 .resume()
                 .visible()
-        withState(controller.get().viewModel) { state ->
+        withAsyncState(controller.get().viewModel) { state ->
             assertEquals(3, state.notPersistedCount)
             assertEquals(3, state.persistedCount)
         }
@@ -222,7 +222,7 @@ class ViewModelStoreTest : BaseTest() {
                 .resume()
                 .visible()
 
-        withState(controller2.get().viewModel) { state ->
+        withAsyncState(controller2.get().viewModel) { state ->
             assertEquals(3, state.notPersistedCount)
             assertEquals(4, state.persistedCount)
         }

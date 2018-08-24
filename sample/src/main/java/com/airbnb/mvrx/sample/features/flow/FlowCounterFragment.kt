@@ -4,7 +4,7 @@ import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.existingViewModel
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.views.marquee
-import com.airbnb.mvrx.withState
+import com.airbnb.mvrx.withRenderingState
 
 class FlowCounterFragment : BaseFragment() {
     /**
@@ -16,7 +16,7 @@ class FlowCounterFragment : BaseFragment() {
      */
     private val viewModel by existingViewModel(FlowViewModel::class)
 
-    override fun EpoxyController.buildModels() = withState(viewModel) { state ->
+    override fun EpoxyController.buildModels() = withRenderingState(viewModel) { state ->
         marquee {
             id("marquee")
             title("Counter: ${state.count}")

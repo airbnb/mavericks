@@ -6,6 +6,7 @@ import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.todoapp.R
 import com.airbnb.mvrx.todomvrx.views.statisticsView
+import com.airbnb.mvrx.withRenderingState
 import com.airbnb.mvrx.withState
 
 class StatisticsFragment : BaseFragment() {
@@ -15,14 +16,14 @@ class StatisticsFragment : BaseFragment() {
         fab.visibility = View.GONE
     }
 
-    override fun EpoxyController.buildModels() = withState(viewModel) { state ->
+    override fun EpoxyController.buildModels() = withRenderingState(viewModel) { state ->
 
         if (state.tasks.isEmpty()) {
             statisticsView {
                 id("no_tasks")
                 statistic(R.string.statistics_no_tasks)
             }
-            return@withState
+            return@withRenderingState
         }
 
         val (completeTasks, activeTasks) = state.tasks.partition { it.complete }
