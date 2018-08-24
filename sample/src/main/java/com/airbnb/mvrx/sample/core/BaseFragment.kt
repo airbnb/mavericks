@@ -18,7 +18,6 @@ import com.airbnb.mvrx.sample.R
 
 abstract class BaseFragment : BaseMvRxFragment() {
 
-    @Suppress("MemberVisibilityCanBePrivate")
     protected lateinit var recyclerView: EpoxyRecyclerView
     protected lateinit var toolbar: Toolbar
     protected lateinit var coordinatorLayout: CoordinatorLayout
