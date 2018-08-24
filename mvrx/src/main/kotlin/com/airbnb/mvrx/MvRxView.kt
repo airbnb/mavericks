@@ -1,9 +1,20 @@
 package com.airbnb.mvrx
 
+import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleOwner
-import io.reactivex.Scheduler
-import io.reactivex.android.schedulers.AndroidSchedulers
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import kotlin.reflect.KProperty1
+
+// Set of MvRxView identity hash codes that have a pending invalidate.
+private val PENDING_INVALIDATES = HashSet<Int>()
+private val HANDLER = Handler(Looper.getMainLooper(), Handler.Callback { message ->
+    val view = message.obj as MvRxView
+    PENDING_INVALIDATES.remove(System.identityHashCode(view))
+    if (view.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) view.invalidate()
+    true
+})
 
 /**
  * Implement this in your MvRx capable Fragment.
@@ -17,22 +28,24 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      */
     fun invalidate()
 
+    fun postInvalidate() {
+        if (PENDING_INVALIDATES.add(System.identityHashCode(this@MvRxView))) {
+            HANDLER.sendMessage(Message.obtain(HANDLER, System.identityHashCode(this@MvRxView), this@MvRxView))
+        }
+    }
+
     /**
      * Subscribes to all state updates for the given viewModel.
-     *
-     * Use shouldUpdate if you only want to subscribe to a subset of all updates. There are some standard ones in ShouldUpdateHelpers.
      */
-    fun <S : MvRxState> BaseMvRxViewModel<S>.subscribe(
-            subscriber: ((S) -> Unit)? = null
-    ) = subscribe(this@MvRxView, subscriber ?: { invalidate() })
+    fun <S : MvRxState> BaseMvRxViewModel<S>.subscribe(subscriber: (S) -> Unit) = subscribe(this@MvRxView, subscriber)
 
     /**
      * Subscribes to state changes for only a specific property and calls the subscribe with
      * only that single property.
      */
     fun <S : MvRxState, A> BaseMvRxViewModel<S>.selectSubscribe(
-            prop1: KProperty1<S, A>,
-            subscriber: (A) -> Unit
+        prop1: KProperty1<S, A>,
+        subscriber: (A) -> Unit
     ) = selectSubscribe(this@MvRxView, prop1, subscriber)
 
     /**
@@ -49,19 +62,19 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      * Subscribes to state changes for two properties.
      */
     fun <S : MvRxState, A, B> BaseMvRxViewModel<S>.selectSubscribe(
-            prop1: KProperty1<S, A>,
-            prop2: KProperty1<S, B>,
-            subscriber: (A, B) -> Unit
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        subscriber: (A, B) -> Unit
     ) = selectSubscribe(this@MvRxView, prop1, prop2, subscriber)
 
     /**
      * Subscribes to state changes for three properties.
      */
     fun <S : MvRxState, A, B, C> BaseMvRxViewModel<S>.selectSubscribe(
-            prop1: KProperty1<S, A>,
-            prop2: KProperty1<S, B>,
-            prop3: KProperty1<S, C>,
-            subscriber: (A, B, C) -> Unit
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        prop3: KProperty1<S, C>,
+        subscriber: (A, B, C) -> Unit
     ) = selectSubscribe(this@MvRxView, prop1, prop2, prop3, subscriber)
 
     /**
