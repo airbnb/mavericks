@@ -29,14 +29,19 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     private val backgroundScheduler = Schedulers.single()
     private val stateStore: MvRxStateStore<S> = MvRxStateStore(initialState)
 
+    /**
+     * `renderingState` is the current state in the main thread, used for ui rendering purpose
+     * For non-rendering purpose, please use withState(block) to access the state asynchronously from merge thread, to avoid race condition
+     */
+    var renderingState: S = initialState
+        private set
+
     init {
         if (debugMode) {
             Observable.fromCallable { validateState(initialState) }.subscribeOn(Schedulers.computation()).subscribe()
         }
+        subscribe { renderingState = it }.disposeOnClear()
     }
-
-    internal val state: S
-        get() = stateStore.state
 
     /**
      * Override this to provide the initial state.
@@ -75,7 +80,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * Access the current ViewModel state. Takes a block of code that will be run after all current pending state
      * updates are processed. The `this` inside of the block is the state.
      */
-    protected fun withState(block: (state: S) -> Unit) {
+    fun withState(block: (state: S) -> Unit) {
         stateStore.get(block)
     }
 
@@ -84,11 +89,11 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * a fair amount of reflection.
      */
     private fun validateState(initialState: S) {
-        if (state::class.visibility != KVisibility.PUBLIC) {
-            throw IllegalStateException("Your state class ${state::class.qualifiedName} must be public.")
+        if (initialState::class.visibility != KVisibility.PUBLIC) {
+            throw IllegalStateException("Your state class ${initialState::class.qualifiedName} must be public.")
         }
-        state::class.assertImmutability()
-        val bundle = state.persistState(assertCollectionPersistability = true)
+        initialState::class.assertImmutability()
+        val bundle = initialState.persistState(assertCollectionPersistability = true)
         bundle.restorePersistedState(initialState)
     }
 
@@ -335,5 +340,5 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         return this
     }
 
-    override fun toString(): String = "${this::class.simpleName} $state"
+    override fun toString(): String = "${this::class.simpleName} $stateStore"
 }

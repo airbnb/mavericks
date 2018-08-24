@@ -50,11 +50,12 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
             .filter { it.value as? BaseMvRxViewModel<MvRxState> != null }
             .map { it.key to it.value as BaseMvRxViewModel<MvRxState> }
             .fold(Bundle()) { bundle, (key, viewModel) ->
-                withState(viewModel) { state ->
+                withRenderingState(viewModel) { state ->
                     val persistedState = state.persistState()
                     val holder = MvRxPersistedViewModelHolder(viewModel::class.java.name, state::class.java.name, persistedState)
                     bundle.apply { putParcelable(key, holder) }
                 }
+                bundle
             }
             .let {
                 outState.putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, it)

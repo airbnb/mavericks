@@ -11,7 +11,7 @@ import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.views.basicRow
 import com.airbnb.mvrx.sample.views.loadingRow
 import com.airbnb.mvrx.sample.views.marquee
-import com.airbnb.mvrx.withState
+import com.airbnb.mvrx.withRenderingState
 
 private const val TAG = "DadJokeIndexFragment"
 class DadJokeIndexFragment : BaseFragment() {
@@ -35,7 +35,7 @@ class DadJokeIndexFragment : BaseFragment() {
         })
     }
 
-    override fun EpoxyController.buildModels() = withState(viewModel) { state ->
+    override fun EpoxyController.buildModels() = withRenderingState(viewModel) { state ->
         marquee {
             id("marquee")
             title("Dad Jokes")

@@ -30,8 +30,7 @@ class PersistedViewModelTest : BaseTest() {
         class TestViewModel(initialState: SetSaveIntState) : TestMvRxViewModel<SetSaveIntState>(initialState)
         val originalState = SetSaveIntState(count = 7)
         val viewModel = TestViewModel(originalState)
-        val newState = testViewModel(viewModel)
-        assertEquals(7, newState.count)
+        testViewModel(viewModel) { assertEquals(7, it.count) }
     }
 
     data class SetSaveEnumState(@PersistState val enumVal: TestEnum = TestEnum.A) : MvRxState
@@ -39,8 +38,7 @@ class PersistedViewModelTest : BaseTest() {
         class TestViewModel(initialState: SetSaveEnumState) : TestMvRxViewModel<SetSaveEnumState>(initialState)
         val originalState = SetSaveEnumState(enumVal = TestEnum.C)
         val viewModel = TestViewModel(originalState)
-        val newState = testViewModel(viewModel)
-        assertEquals(TestEnum.C, newState.enumVal)
+        testViewModel(viewModel) { assertEquals(TestEnum.C, it.enumVal) }
     }
 
     data class SetSaveOneIntState(@PersistState val count1: Int = 0, val count2: Int = 0) : MvRxState
@@ -48,9 +46,10 @@ class PersistedViewModelTest : BaseTest() {
         class TestViewModel(initialState: SetSaveOneIntState) : TestMvRxViewModel<SetSaveOneIntState>(initialState)
         val originalState = SetSaveOneIntState(count1 = 7, count2 = 9)
         val viewModel = TestViewModel(originalState)
-        val newState = testViewModel(viewModel)
-        assertEquals(originalState.count1, newState.count1)
-        assertEquals(0, newState.count2)
+        testViewModel(viewModel) {
+            assertEquals(originalState.count1, it.count1)
+            assertEquals(0, it.count2)
+        }
     }
 
     data class InvalidViewModelState(@PersistState val count1: Int = 0, val count2: Int) : MvRxState
@@ -58,7 +57,7 @@ class PersistedViewModelTest : BaseTest() {
         class TestViewModel(initialState: InvalidViewModelState) : TestMvRxViewModel<InvalidViewModelState>(initialState)
         val originalState = InvalidViewModelState(count1 = 7, count2 = 9)
         val viewModel = TestViewModel(originalState)
-        testViewModel(viewModel)
+        testViewModel(viewModel, block = {})
     }
 
     data class Args(val initialCount: Int)
@@ -69,9 +68,10 @@ class PersistedViewModelTest : BaseTest() {
         class TestViewModel(initialState: ArgState) : TestMvRxViewModel<ArgState>(initialState)
         val originalState = ArgState(count1 = 7, count2 = 9)
         val viewModel = TestViewModel(originalState)
-        val newState = testViewModel(viewModel, Args(1))
-        assertEquals(1, newState.count2)
-        assertEquals(0, newState.count1)
+        testViewModel(viewModel, Args(1)) {
+            assertEquals(1, it.count2)
+            assertEquals(0, it.count1)
+        }
     }
 
     data class ArgPersistState(val count1: Int = 0, @PersistState val count2: Int) : MvRxState {
@@ -81,12 +81,13 @@ class PersistedViewModelTest : BaseTest() {
         class TestViewModel(initialState: ArgPersistState) : TestMvRxViewModel<ArgPersistState>(initialState)
         val originalState = ArgPersistState(count1 = 7, count2 = 9)
         val viewModel = TestViewModel(originalState)
-        val newState = testViewModel(viewModel, Args(1))
-        assertEquals(9, newState.count2)
-        assertEquals(0, newState.count1)
+        testViewModel(viewModel, Args(1)) {
+            assertEquals(9, it.count2)
+            assertEquals(0, it.count1)
+        }
     }
 
-    private fun <VM : TestMvRxViewModel<S>, S : MvRxState> testViewModel(viewModel: VM, args: Any? = null): S {
+    private fun <VM : TestMvRxViewModel<S>, S : MvRxState> testViewModel(viewModel: VM, args: Any? = null, block: (S) -> Unit) {
         val map = mutableMapOf("vm" to viewModel)
         val bundle = Bundle()
         store.saveViewModels(map, bundle)
@@ -96,6 +97,6 @@ class PersistedViewModelTest : BaseTest() {
         @Suppress("UNCHECKED_CAST")
         val restoredViewModel: VM = outMap.getValue("vm") as VM
         assertNotEquals(viewModel, restoredViewModel)
-        return withState(restoredViewModel) { it }
+        withState(restoredViewModel, block)
     }
 }

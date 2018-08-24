@@ -27,7 +27,7 @@ class FactoryTest : BaseTest() {
     fun createDefaultViewModel() {
         class MyViewModel(initialState: FactoryState) : TestMvRxViewModel<FactoryState>(initialState)
         val viewModel = MvRxViewModelProvider.get(MyViewModel::class, activity) { FactoryState() }
-        withState(viewModel) { state ->
+        withAsyncState(viewModel) { state ->
             assertEquals(FactoryState(), state)
         }
     }
@@ -36,7 +36,7 @@ class FactoryTest : BaseTest() {
     fun createDefaultViewModelWithState() {
         class MyViewModel(initialState: FactoryState) : TestMvRxViewModel<FactoryState>(initialState)
         val viewModel = MvRxViewModelProvider.get(MyViewModel::class, activity) { FactoryState(count = 5) }
-        withState(viewModel) { state ->
+        withAsyncState(viewModel) { state ->
             assertEquals(FactoryState(count = 5), state)
         }
     }
@@ -44,7 +44,7 @@ class FactoryTest : BaseTest() {
     @Test
     fun createWithFactory() {
         val viewModel = MvRxViewModelProvider.get(TestFactoryViewModel::class, activity) { FactoryState(count = 5) }
-        withState(viewModel) { state ->
+        withAsyncState(viewModel) { state ->
             assertEquals(FactoryState(count = 5), state)
         }
         assertEquals(5, viewModel.otherProp)
