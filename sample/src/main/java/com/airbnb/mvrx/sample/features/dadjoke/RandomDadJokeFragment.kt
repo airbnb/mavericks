@@ -41,7 +41,7 @@ class RandomDadJokeViewModel(
 }
 
 class RandomDadJokeFragment : BaseFragment() {
-    private val viewModel by fragmentViewModel(RandomDadJokeViewModel::class)
+    private val viewModel : RandomDadJokeViewModel by fragmentViewModel()
 
 
     override fun EpoxyController.buildModels() = withState(viewModel) { state ->

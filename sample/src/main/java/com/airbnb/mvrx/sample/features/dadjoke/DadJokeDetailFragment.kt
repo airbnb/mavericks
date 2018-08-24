@@ -53,7 +53,7 @@ class DadJokeDetailViewModel(initialState: DadJokeDetailState, private val dadJo
 }
 
 class DadJokeDetailFragment : BaseFragment() {
-    private val viewModel by fragmentViewModel(DadJokeDetailViewModel::class)
+    private val viewModel: DadJokeDetailViewModel by fragmentViewModel()
 
     override fun EpoxyController.buildModels() = withState(viewModel) { state ->
         marquee {
