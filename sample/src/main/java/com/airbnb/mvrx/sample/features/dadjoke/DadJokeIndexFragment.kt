@@ -5,9 +5,7 @@ import android.support.design.widget.Snackbar
 import android.util.Log
 import android.view.View
 import com.airbnb.epoxy.EpoxyController
-import com.airbnb.mvrx.Fail
 import com.airbnb.mvrx.fragmentViewModel
-import com.airbnb.mvrx.onFail
 import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.views.basicRow
