@@ -36,10 +36,4 @@ class LifecycleAwareLazyTest : BaseTest() {
         lazyProp = lifecycleAwareLazy(owner) { "Hello World" }
         assertTrue(lazyProp.isInitialized())
     }
-
-    @Test(expected = IllegalStateException::class)
-    fun testThrowsIfNotCreated() {
-        owner.lifecycle.markState(Lifecycle.State.INITIALIZED)
-        lazyProp.value
-    }
 }
