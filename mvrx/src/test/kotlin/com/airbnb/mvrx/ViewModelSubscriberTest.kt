@@ -2,12 +2,16 @@ package com.airbnb.mvrx
 
 import android.arch.lifecycle.Lifecycle
 import io.reactivex.Maybe
+import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import java.util.concurrent.Semaphore
+import java.util.concurrent.TimeUnit
 
 data class ViewModelTestState(val foo: Int = 0, val bar: Int = 0, val bam: Int = 0, val list: List<Int> = emptyList(), val async: Async<String> = Uninitialized) : MvRxState
 class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewModel<ViewModelTestState>(initialState) {
@@ -48,6 +52,90 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewMod
     fun triggerCleared() {
         onCleared()
     }
+
+    fun testSingleSuccess() {
+        var callCount = 0
+        selectSubscribe(ViewModelTestState::async) {
+            callCount++
+            assertEquals(when (callCount) {
+                1 -> Uninitialized
+                2 -> Loading()
+                3 -> Success("Hello World")
+                else -> throw IllegalArgumentException("Unexpected call count $callCount")
+            }, it)
+        }
+        Single.create<String> { emitter ->
+            emitter.onSuccess("Hello World")
+        }.execute { copy(async = it) }
+        assertEquals(3, callCount)
+    }
+
+    fun testSingleFail() {
+        var callCount = 0
+        val error = IllegalStateException("Fail")
+        selectSubscribe(ViewModelTestState::async) {
+            callCount++
+            assertEquals(when (callCount) {
+                1 -> Uninitialized
+                2 -> Loading()
+                3 -> Fail<String>(error)
+                else -> throw IllegalArgumentException("Unexpected call count $callCount")
+            }, it)
+        }
+        Single.create<String> {
+            throw error
+        }.execute { copy(async = it) }
+        assertEquals(3, callCount)
+    }
+
+    fun testObservableSuccess() {
+        var callCount = 0
+        selectSubscribe(ViewModelTestState::async) {
+            callCount++
+            assertEquals(when (callCount) {
+                1 -> Uninitialized
+                2 -> Loading()
+                3 -> Success("Hello World")
+                else -> throw IllegalArgumentException("Unexpected call count $callCount")
+            }, it)
+        }
+        Observable.just("Hello World").execute { copy(async = it) }
+        assertEquals(3, callCount)
+    }
+
+    fun testObservableFail() {
+        var callCount = 0
+        val error = IllegalStateException("Fail")
+        selectSubscribe(ViewModelTestState::async) {
+            callCount++
+            assertEquals(when (callCount) {
+                1 -> Uninitialized
+                2 -> Loading()
+                3 -> Fail<String>(error)
+                else -> throw IllegalArgumentException("Unexpected call count $callCount")
+            }, it)
+        }
+        Observable.create<String> {
+            throw error
+        }.execute { copy(async = it) }
+        assertEquals(3, callCount)
+    }
+
+    fun testObservableWithMapper() {
+        var callCount = 0
+        selectSubscribe(ViewModelTestState::async) {
+            callCount++
+            assertEquals(when (callCount) {
+                1 -> Uninitialized
+                2 -> Loading()
+                3 -> Success("Hello World!")
+                else -> throw IllegalArgumentException("Unexpected call count $callCount")
+            }, it)
+        }
+        Observable.just("Hello World").execute(mapper = { "$it!" }) { copy(async = it) }
+        assertEquals(3, callCount)
+
+    }
 }
 
 class ViewModelSubscriberTest : BaseTest() {
@@ -86,6 +174,56 @@ class ViewModelSubscriberTest : BaseTest() {
         assertEquals(1, callCount)
         viewModel.setFoo(1)
         assertEquals(2, callCount)
+    }
+
+    @Test
+    fun testSelectSubscribe2External() {
+        var callCount = 0
+        viewModel.selectSubscribe(owner, ViewModelTestState::foo, ViewModelTestState::bar) { _, _ -> callCount++ }
+        assertEquals(1, callCount)
+        viewModel.setFoo(1)
+        assertEquals(2, callCount)
+        viewModel.setBar(2)
+        assertEquals(3, callCount)
+    }
+
+    @Test
+    fun testSelectSubscribe3External() {
+        var callCount = 0
+        viewModel.selectSubscribe(
+            owner,
+            ViewModelTestState::foo,
+            ViewModelTestState::bar,
+            ViewModelTestState::bam
+        ) { _, _, _ -> callCount++ }
+        assertEquals(1, callCount)
+        viewModel.setFoo(1)
+        assertEquals(2, callCount)
+        viewModel.setBar(2)
+        assertEquals(3, callCount)
+        viewModel.setBam(2)
+        assertEquals(4, callCount)
+    }
+
+    @Test
+    fun testSelectSubscribe4External() {
+        var callCount = 0
+        viewModel.selectSubscribe(
+            owner,
+            ViewModelTestState::foo,
+            ViewModelTestState::bar,
+            ViewModelTestState::bam,
+            ViewModelTestState::list
+        ) { _, _, _, _ -> callCount++ }
+        assertEquals(1, callCount)
+        viewModel.setFoo(1)
+        assertEquals(2, callCount)
+        viewModel.setBar(2)
+        assertEquals(3, callCount)
+        viewModel.setBam(2)
+        assertEquals(4, callCount)
+        viewModel.set{ copy(list = listOf(1, 2, 3)) }
+        assertEquals(5, callCount)
     }
 
     @Test
@@ -161,6 +299,32 @@ class ViewModelSubscriberTest : BaseTest() {
         assertFalse(disposable.isDisposed)
         viewModel.triggerCleared()
         assertTrue(disposable.isDisposed)
+    }
+
+    @Test
+    fun testSingleSuccess() {
+        viewModel.testSingleSuccess()
+    }
+
+    @Test
+    fun testSingleFail() {
+        viewModel.testSingleFail()
+    }
+
+    @Test
+    fun testObservableSuccess() {
+        viewModel.testObservableSuccess()
+    }
+
+    @Test
+    fun testObservableWithMapper() {
+        viewModel.testObservableWithMapper()
+    }
+
+
+    @Test
+    fun testObservableFail() {
+        viewModel.testObservableFail()
     }
 
     @Test
@@ -289,6 +453,24 @@ class ViewModelSubscriberTest : BaseTest() {
         viewModel.setFoo(2)
 
         assertEquals(3, callCount)
+    }
+
+
+    @Test
+    fun testAsync() {
+        var callCount = 0
+        val success = "Hello World"
+        val fail = IllegalStateException("Uh oh")
+        viewModel.asyncSubscribe(owner, ViewModelTestState::async, onFail = {
+            callCount++
+            assertEquals(fail, it)
+        }) {
+            callCount++
+            assertEquals(success, it)
+        }
+        viewModel.setAsync(Success(success))
+        viewModel.setAsync(Fail(fail))
+        assertEquals(2, callCount)
     }
 
     @Test

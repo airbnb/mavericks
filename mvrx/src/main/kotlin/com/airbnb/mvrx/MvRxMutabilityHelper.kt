@@ -23,7 +23,7 @@ private const val IMMUTABLE_MAP_MESSAGE = "Use the immutable mapOf(...) method i
  *
  * As a result, you may not use MutableList, mutableListOf(...) or the map variants by convention only.
  */
-@VisibleForTesting fun KClass<*>.assertImmutability() {
+internal fun KClass<*>.assertImmutability() {
     require(this.isData) { "MvRx state must be a data class!" }
 
     fun KProperty1<*, *>.isSubtype(klass: KClass<*>) = returnType.isSubtypeOf(klass.starProjectedType)

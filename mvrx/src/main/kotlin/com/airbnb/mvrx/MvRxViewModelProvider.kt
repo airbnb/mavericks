@@ -2,6 +2,7 @@ package com.airbnb.mvrx
 
 import android.arch.lifecycle.ViewModelProviders
 import android.arch.lifecycle.ViewModelStoreOwner
+import android.support.annotation.RestrictTo
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import kotlin.reflect.KClass
@@ -12,6 +13,7 @@ import kotlin.reflect.full.primaryConstructor
  * Helper ViewModelProvider that has a single method for taking either a [Fragment] or [FragmentActivity] instead
  * of two separate ones. The logic for providing the correct scope is inside the method.
  */
+@RestrictTo(RestrictTo.Scope.LIBRARY)
 object MvRxViewModelProvider {
     /**
      * MvRx specific ViewModelProvider used for creating a BaseMvRxViewModel scoped to either a [Fragment] or [FragmentActivity].

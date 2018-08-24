@@ -13,17 +13,11 @@ import kotlin.reflect.full.isSupertypeOf
  * Gets or creates a ViewModel scoped to this Fragment. You will get the same instance every time for this Fragment, even
  * through rotation, or other configuration changes.
  *
- * If the ViewModel does not yet exist, the stateFactory will be used to create the initial state.
- *
- * If your ViewModel has no additional dependencies, just make sure that it has a single constructor parameter for initialState.
- *
- * If it it has additional dependencies, override [com.airbnb.mvrx.MvRxViewModelFactory] in its companion object. You will be given this state
+ * If it it has additional dependencies, override [MvRxViewModelFactory] in its companion object. You will be given this state
  * as well as a FragmentActivity with which you can use the getOrCreateSubcomponent extension method on FragmentActivity to
  * access your Dagger subcomponent where the rest of your dependencies live.
  *
- * MvRx will also handle persistence across process restarts. Refer to [com.airbnb.mvrx.PersistState] for more info.
- *
- * Use shouldUpdate if you only want to subscribe to a subset of all updates. There are some standard ones in ShouldUpdateHelpers.
+ * MvRx will also handle persistence across process restarts. Refer to [PersistState] for more info.
  *
  * Use keyFactory if you have multiple ViewModels of the same class in the same scope.
  */
@@ -172,7 +166,7 @@ inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.viewModel(
  * Fragment argument delegate that makes it possible to set fragment args without
  * creating a key for each one.
  *
- * To create arguments, define a propety in your fragment like:
+ * To create arguments, define a property in your fragment like:
  *     `private val listingId by arg<MyArgs>()`
  *
  * Each fragment can only have a single argument with the key [MvRx.KEY_ARG]
