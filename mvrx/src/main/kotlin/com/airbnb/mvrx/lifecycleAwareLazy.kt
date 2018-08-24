@@ -5,6 +5,7 @@ import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.OnLifecycleEvent
+import android.support.annotation.RestrictTo
 import android.util.Log
 import java.io.Serializable
 
@@ -13,7 +14,8 @@ private object UNINITIALIZED_VALUE
 /**
  * This was copied from SynchronizedLazyImpl but modified to automatically initialize in ON_CREATE.
  */
-class lifecycleAwareLazy<out T>(owner: LifecycleOwner, initializer: () -> T) : Lazy<T>, Serializable {
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+class lifecycleAwareLazy<out T>(private val owner: LifecycleOwner, initializer: () -> T) : Lazy<T>, Serializable {
     private var initializer: (() -> T)? = initializer
     @Volatile private var _value: Any? = UNINITIALIZED_VALUE
     // final field is required to enable safe publication of constructed instance
@@ -32,6 +34,10 @@ class lifecycleAwareLazy<out T>(owner: LifecycleOwner, initializer: () -> T) : L
     @Suppress("LocalVariableName")
     override val value: T
         get() {
+            val state = owner.lifecycle.currentState
+            if (!state.isAtLeast(Lifecycle.State.CREATED)) {
+                throw IllegalStateException("This value can only be accessed during or after onCreate. It is currently $state")
+            }
             val _v1 = _value
             if (_v1 !== UNINITIALIZED_VALUE) {
                 @Suppress("UNCHECKED_CAST")

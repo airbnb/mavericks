@@ -9,7 +9,7 @@ import org.junit.Test
 class LifecycleAwareLazyTest : BaseTest() {
 
     private lateinit var owner: TestLifecycleOwner
-    lateinit var lazyProp: lifecycleAwareLazy<String>
+    private lateinit var lazyProp: lifecycleAwareLazy<String>
 
     @Before
     fun setup() {
@@ -35,5 +35,11 @@ class LifecycleAwareLazyTest : BaseTest() {
         owner.lifecycle.markState(Lifecycle.State.STARTED)
         lazyProp = lifecycleAwareLazy(owner) { "Hello World" }
         assertTrue(lazyProp.isInitialized())
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun testThrowsIfNotCreated() {
+        owner.lifecycle.markState(Lifecycle.State.INITIALIZED)
+        lazyProp.value
     }
 }
