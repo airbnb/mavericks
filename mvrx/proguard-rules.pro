@@ -14,6 +14,7 @@
 # the state exists. Need to make sure to keep the constructor arround.
 -keepclassmembers class * extends com.airbnb.android.lib.mvrx.MvRxViewModel {
     public <init>(...);
+    public static create(...);
 }
 
 # Members of the Kotlin data classes used as the state in MvRx are read via Kotlin reflection which cause trouble with Proguard if they are not
