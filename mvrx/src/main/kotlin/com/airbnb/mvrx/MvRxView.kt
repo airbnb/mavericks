@@ -1,9 +1,18 @@
 package com.airbnb.mvrx
 
 import android.arch.lifecycle.LifecycleOwner
+import android.os.Handler
+import android.os.Looper
+import android.os.Message
 import io.reactivex.Scheduler
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlin.reflect.KProperty1
+
+
+private val handler = Handler(Looper.getMainLooper(), Handler.Callback { message ->
+    (message.obj as MvRxView).invalidate()
+    true
+})
 
 /**
  * Implement this in your MvRx capable Fragment.
@@ -17,6 +26,11 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      */
     fun invalidate()
 
+    fun postInvalidate() {
+        handler.removeMessages(System.identityHashCode(this@MvRxView))
+        handler.sendMessage(Message.obtain(handler, System.identityHashCode(this@MvRxView), this@MvRxView))
+    }
+
     /**
      * Subscribes to all state updates for the given viewModel.
      *
@@ -24,7 +38,7 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      */
     fun <S : MvRxState> BaseMvRxViewModel<S>.subscribe(
             subscriber: ((S) -> Unit)? = null
-    ) = subscribe(this@MvRxView, subscriber ?: { invalidate() })
+    ) = subscribe(this@MvRxView, subscriber ?: { postInvalidate() })
 
     /**
      * Subscribes to state changes for only a specific property and calls the subscribe with
