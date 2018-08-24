@@ -6,8 +6,6 @@ import android.support.v4.app.FragmentActivity
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
-import kotlin.reflect.full.createType
-import kotlin.reflect.full.isSupertypeOf
 
 /**
  * Gets or creates a ViewModel scoped to this Fragment. You will get the same instance every time for this Fragment, even
@@ -27,7 +25,7 @@ inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragmentViewM
 ) where T : Fragment,
         T : MvRxView = lazy {
     val stateFactory: () -> S = ::_fragmentViewModelInitialStateProvider
-    MvRxViewModelProvider.get(viewModelClass, this, keyFactory(), stateFactory)
+    MvRxViewModelProvider.get(viewModelClass.java, this, keyFactory(), stateFactory)
         .apply { subscribe(requireActivity(), subscriber = { postInvalidate() }) }
 }
 
@@ -59,7 +57,7 @@ inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activityViewM
         T : MvRxView = lazy {
     val stateFactory: () -> S = { _activityViewModelInitialStateProvider(keyFactory) }
     if (requireActivity() !is MvRxViewModelStoreOwner) throw IllegalArgumentException("Your Activity must be a MvRxViewModelStoreOwner!")
-    MvRxViewModelProvider.get(viewModelClass, requireActivity(), keyFactory(), stateFactory)
+    MvRxViewModelProvider.get(viewModelClass.java, requireActivity(), keyFactory(), stateFactory)
         .apply { subscribe(this@activityViewModel, subscriber = { postInvalidate() }) }
 }
 
@@ -83,7 +81,7 @@ inline fun <reified S : MvRxState, T : Fragment> T._activityViewModelInitialStat
     } else {
         throw IllegalArgumentException("Your Activity must be a MvRxViewModelStoreOwner!")
     }
-    return _initialStateProvider(S::class, args)
+    return _initialStateProvider(S::class.java, args)
 }
 
 /**
@@ -97,7 +95,7 @@ inline fun <reified S : MvRxState, T : Fragment> T._activityViewModelInitialStat
 @Suppress("FunctionName")
 inline fun <reified S : MvRxState, T : Fragment> T._fragmentViewModelInitialStateProvider(): S {
     val args: Any? = arguments?.get(MvRx.KEY_ARG)
-    return _initialStateProvider(S::class, args)
+    return _initialStateProvider(S::class.java, args)
 }
 
 /**
@@ -111,7 +109,7 @@ inline fun <reified S : MvRxState, T : Fragment> T._fragmentViewModelInitialStat
 @Suppress("FunctionName")
 inline fun <reified S : MvRxState, T : FragmentActivity> T._activityViewModelInitialStateProvider(): S {
     val args: Any? = intent.extras?.get(MvRx.KEY_ARG)
-    return _initialStateProvider(S::class, args)
+    return _initialStateProvider(S::class.java, args)
 }
 
 /**
@@ -122,30 +120,24 @@ inline fun <reified S : MvRxState, T : FragmentActivity> T._activityViewModelIni
  *
  */
 @Suppress("FunctionName") // Public for inline.
-fun <S : MvRxState> _initialStateProvider(stateClass: KClass<S>, args: Any?): S {
+fun <S : MvRxState> _initialStateProvider(stateClass: Class<S>, args: Any?): S {
     val argsConstructor = args?.let {
-        val argType = it::class.createType()
-        stateClass.constructors
-            .firstOrNull {
-                it.parameters
-                    .singleOrNull()
-                    ?.type
-                    ?.isSupertypeOf(argType)
-                    ?: false
-            }
-    }
+        val argType = it::class.java
 
-    // TODO eli_hart: 5/29/18 If/when arguments are hidden from public usage, and can only be used to create state, we can fail if args exist
-    // with no matching constructor. For now we support the legacy case of fragment args existing but
-    // the empty constructor still being used (when the dev accesses args directly).
-    return argsConstructor?.call(args)
+        stateClass.constructors.firstOrNull { constructor ->
+            constructor.parameterTypes.size == 1 && isAssignableTo(constructor.parameterTypes[0], argType)
+            }
+        }
+
+    @Suppress("UNCHECKED_CAST")
+    return argsConstructor?.newInstance(args) as? S
         ?: try {
-            stateClass.java.newInstance()
+            stateClass.newInstance()
         } catch (@Suppress("TooGenericExceptionCaught") e: Throwable) {
             null
         }
         ?: throw IllegalStateException(
-            "Attempt to auto create the mvrx state class ${stateClass.simpleName} has failed. It must have default values for every property or a " +
+            "Attempt to auto create the MvRX state class ${stateClass.simpleName} has failed. It must have default values for every property or a " +
                 "secondary constructor for ${args?.javaClass?.simpleName ?: "a fragment argument"}. "
         )
 }
@@ -159,7 +151,7 @@ inline fun <T, VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.viewModel(
 ) where T : FragmentActivity,
         T : MvRxViewModelStoreOwner = lazy {
     val stateFactory: () -> S = { _activityViewModelInitialStateProvider() }
-    MvRxViewModelProvider.get(viewModelClass, this, keyFactory(), stateFactory)
+    MvRxViewModelProvider.get(viewModelClass.java, this, keyFactory(), stateFactory)
 }
 
 /**

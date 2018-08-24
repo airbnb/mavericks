@@ -1,6 +1,5 @@
 package com.airbnb.mvrx.todomvrx.core
 
-import android.app.TaskStackBuilder
 import android.os.Bundle
 import android.os.Parcelable
 import android.support.annotation.CallSuper
@@ -16,7 +15,6 @@ import com.airbnb.epoxy.EpoxyRecyclerView
 import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.activityViewModel
-import com.airbnb.mvrx.propertyWhitelist
 import com.airbnb.mvrx.todomvrx.TasksState
 import com.airbnb.mvrx.todomvrx.TasksViewModel
 import com.airbnb.mvrx.todomvrx.data.Tasks

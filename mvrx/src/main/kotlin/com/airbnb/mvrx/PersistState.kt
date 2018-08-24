@@ -5,13 +5,10 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.support.annotation.VisibleForTesting
 import java.io.Serializable
-import kotlin.reflect.KClass
-import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.instanceParameter
-import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.primaryConstructor
 
 /**
@@ -121,34 +118,6 @@ internal fun <T : Any> Bundle.restorePersistedState(initialState: T): T {
         initialState
     return copyMethod.callBy(copyArgs)
 }
-
-/**
- * Recreates the actual state object given state persisted with [PersistState] in a [Bundle].
- */
-internal fun <T : Any> Bundle.createInitialStateFromPersistedState(klass: Class<T>): T {
-    // If we don't set the correct class loader, when the bundle is restored in a new process, it will have the system class loader which
-    // can't unmarshall any custom classes.
-    classLoader = klass.classLoader
-    val constructor = klass.kotlin.primaryConstructor ?: throw IllegalStateException("${klass.simpleName} has no primary constructor!")
-    val argsMap = constructor.parameters.asSequence()
-        .filter { it.name != null }
-        .fold(mutableMapOf<KParameter, Any?>()) { map, param ->
-            // We do the containsKey check to differentiate between a missing key and one that is explicitly null.
-            if (containsKey(param.name)) map[param] = this[param.name]
-            map
-        }
-    try {
-        return constructor.callBy(argsMap)
-    } catch (e: IllegalArgumentException) {
-        throw IllegalStateException(
-            "All state parameters must either be @PersistState or have a default value or it must have a secondary " +
-                "constructor that takes Fragment/View arguments and populates the rest of the properties.", e
-        )
-    }
-}
-
-@Suppress("UNCHECKED_CAST")
-internal fun <T : Any> KClass<T>.copyMethod(): KFunction<T> = this.memberFunctions.first { it.name == "copy" } as KFunction<T>
 
 /**
  * For some reason, Buck doesn't allow you to call internal methods from the same package in test/

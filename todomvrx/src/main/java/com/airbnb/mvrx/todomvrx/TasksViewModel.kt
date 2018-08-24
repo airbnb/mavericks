@@ -65,7 +65,7 @@ class TasksViewModel(initialState: TasksState, private val sources: List<TasksDa
     }
 
     companion object : MvRxViewModelFactory<TasksState> {
-        override fun create(activity: FragmentActivity, state: TasksState): BaseMvRxViewModel<TasksState> {
+        @JvmStatic override fun create(activity: FragmentActivity, state: TasksState): BaseMvRxViewModel<TasksState> {
             val database = ToDoDatabase.getInstance(activity)
             // Simulate data sources of different speeds.
             // The slower one can be thought of as the network data source.
