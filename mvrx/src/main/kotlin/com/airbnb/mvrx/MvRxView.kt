@@ -1,5 +1,6 @@
 package com.airbnb.mvrx
 
+import android.arch.lifecycle.Lifecycle
 import android.arch.lifecycle.LifecycleOwner
 import android.os.Handler
 import android.os.Looper
@@ -10,7 +11,8 @@ import kotlin.reflect.KProperty1
 
 
 private val handler = Handler(Looper.getMainLooper(), Handler.Callback { message ->
-    (message.obj as MvRxView).invalidate()
+    val view = message.obj as MvRxView
+    if (view.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) view.invalidate()
     true
 })
 
