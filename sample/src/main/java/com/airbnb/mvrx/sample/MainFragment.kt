@@ -24,7 +24,7 @@ class MainFragment : BaseFragment() {
         basicRow {
             id("hello_world_epoxy")
             title("Hello World (Epoxy)")
-            subtitle(demonstrates("Simple MvRx + Epoxy usage"))
+            subtitle(demonstrates("Simple MvRx usage", "Epoxy integration"))
             clickListener { _ -> navigateTo(R.id.action_main_to_helloWorldEpoxyFragment) }
         }
 
