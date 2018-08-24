@@ -1,12 +1,8 @@
 package com.airbnb.mvrx
 
-import android.arch.lifecycle.LifecycleOwner
 import io.reactivex.Observable
-import io.reactivex.Scheduler
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 import java.util.LinkedList
@@ -22,7 +18,7 @@ import java.util.LinkedList
  * until the subscriber callback completes. This will prevent the state from updating in the middle
  * of the subscription callback.
  */
-open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
+internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
     /**
      * The subject is where state changes should be pushed to.
      */
@@ -30,7 +26,6 @@ open class MvRxStateStore<S : Any>(private val initialState: S) : Disposable {
     /**
      * The observable observes the subject but only emits events when the state actually changed.
      */
-    private val defaultObserveOnScheduler = AndroidSchedulers.mainThread()
     private val disposables = CompositeDisposable()
 
     /**

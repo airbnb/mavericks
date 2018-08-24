@@ -1,6 +1,5 @@
 package com.airbnb.mvrx
 
-import android.annotation.SuppressLint
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.ViewModel
 import android.support.annotation.CallSuper
@@ -16,7 +15,11 @@ import io.reactivex.schedulers.Schedulers
 import kotlin.reflect.KProperty1
 import kotlin.reflect.KVisibility
 
-
+/**
+ * To use MvRx, create your own base MvRxViewModel that extends this one and sets debugMode.
+ *
+ * All subsequent ViewModels in your app should use that one.
+ */
 abstract class BaseMvRxViewModel<S : MvRxState>(
     initialState: S,
     private val debugMode: Boolean = false
@@ -32,7 +35,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         }
     }
 
-    val state: S
+    internal val state: S
         get() = stateStore.state
 
     /**

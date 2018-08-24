@@ -7,6 +7,9 @@ import kotlin.reflect.KProperty1
 
 /**
  * Implement this in your MvRx capable Fragment.
+ *
+ * When you get a ViewModel with fragmentViewModel, activityViewModel, or existingViewModel, it
+ * will automatically subscribe to all state changes in the ViewModel and call [invalidate].
  */
 interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
     /**

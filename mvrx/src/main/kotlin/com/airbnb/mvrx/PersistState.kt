@@ -15,7 +15,7 @@ import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.primaryConstructor
 
 /**
- * Annotate a field in your [MvRxViewModel] state with [PersistState] to have it automatically persisted when Android kills your process
+ * Annotate a field in your MvRxViewModel state with [PersistState] to have it automatically persisted when Android kills your process
  * to free up memory. MvRx will automatically recreate your ViewModel when the process restarts with these fields saved.
  *
  * You should ONLY SAVE what you need to refetch data, not fetched data itself. For example, for search, save the search filters not the

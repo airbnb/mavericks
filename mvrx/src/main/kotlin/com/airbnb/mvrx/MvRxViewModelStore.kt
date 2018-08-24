@@ -16,9 +16,7 @@ import kotlin.reflect.full.companionObjectInstance
  * should override their getViewModelStore function and return an instance of this class.
  *
  * Then, to support persistence across processes, you must:
- * Save: Call [saveViewModels] from the same method in your StoreOwner.
- *
- * @see MvRxViewModelFactory
+ * Save: Call [restoreViewModels] from *before onCreate* and [saveViewModels] in onSaveInstanceState.
  */
 class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
 
