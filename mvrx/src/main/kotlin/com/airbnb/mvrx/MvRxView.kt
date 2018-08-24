@@ -29,10 +29,9 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
     fun invalidate()
 
     fun postInvalidate() {
-        if (PENDING_INVALIDATES.contains(System.identityHashCode(this@MvRxView))) return
-
-        PENDING_INVALIDATES.add(System.identityHashCode(this@MvRxView))
-        HANDLER.sendMessage(Message.obtain(HANDLER, System.identityHashCode(this@MvRxView), this@MvRxView))
+        if (PENDING_INVALIDATES.add(System.identityHashCode(this@MvRxView))) {
+            HANDLER.sendMessage(Message.obtain(HANDLER, System.identityHashCode(this@MvRxView), this@MvRxView))
+        }
     }
 
     /**
@@ -45,8 +44,8 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      * only that single property.
      */
     fun <S : MvRxState, A> BaseMvRxViewModel<S>.selectSubscribe(
-            prop1: KProperty1<S, A>,
-            subscriber: (A) -> Unit
+        prop1: KProperty1<S, A>,
+        subscriber: (A) -> Unit
     ) = selectSubscribe(this@MvRxView, prop1, subscriber)
 
     /**
@@ -63,19 +62,19 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      * Subscribes to state changes for two properties.
      */
     fun <S : MvRxState, A, B> BaseMvRxViewModel<S>.selectSubscribe(
-            prop1: KProperty1<S, A>,
-            prop2: KProperty1<S, B>,
-            subscriber: (A, B) -> Unit
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        subscriber: (A, B) -> Unit
     ) = selectSubscribe(this@MvRxView, prop1, prop2, subscriber)
 
     /**
      * Subscribes to state changes for three properties.
      */
     fun <S : MvRxState, A, B, C> BaseMvRxViewModel<S>.selectSubscribe(
-            prop1: KProperty1<S, A>,
-            prop2: KProperty1<S, B>,
-            prop3: KProperty1<S, C>,
-            subscriber: (A, B, C) -> Unit
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        prop3: KProperty1<S, C>,
+        subscriber: (A, B, C) -> Unit
     ) = selectSubscribe(this@MvRxView, prop1, prop2, prop3, subscriber)
 
     /**
