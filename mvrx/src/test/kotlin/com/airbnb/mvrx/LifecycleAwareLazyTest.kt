@@ -29,4 +29,11 @@ class LifecycleAwareLazyTest : BaseTest() {
         owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
         assertTrue(lazyProp.isInitialized())
     }
+
+    @Test
+    fun testInitializedIfAlreadyStarted() {
+        owner.lifecycle.markState(Lifecycle.State.STARTED)
+        lazyProp = lifecycleAwareLazy(owner) { "Hello World" }
+        assertTrue(lazyProp.isInitialized())
+    }
 }
