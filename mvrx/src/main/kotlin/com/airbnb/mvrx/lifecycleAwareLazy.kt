@@ -34,10 +34,6 @@ class lifecycleAwareLazy<out T>(private val owner: LifecycleOwner, initializer: 
     @Suppress("LocalVariableName")
     override val value: T
         get() {
-            val state = owner.lifecycle.currentState
-            if (!state.isAtLeast(Lifecycle.State.CREATED)) {
-                throw IllegalStateException("This value can only be accessed during or after onCreate. It is currently $state")
-            }
             val _v1 = _value
             if (_v1 !== UNINITIALIZED_VALUE) {
                 @Suppress("UNCHECKED_CAST")

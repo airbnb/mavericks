@@ -153,7 +153,7 @@ class ViewModelStoreTest : BaseTest() {
         }
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test(expected = RuntimeException::class)
     fun testNoRestoreInActivityCrashes() {
         val (_, fragment) = createFragment<ViewModelStoreTestFragment, NoRestoreActivity>()
         fragment.viewModelActivity
