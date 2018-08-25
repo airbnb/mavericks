@@ -8,14 +8,10 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.airbnb.mvrx.BaseMvRxFragment
-import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.views.Marquee
-import com.airbnb.mvrx.withState
 
 class HelloWorldFragment : BaseMvRxFragment() {
-    private val viewModel: HelloWorldViewModel by fragmentViewModel()
-
     private lateinit var marquee: Marquee
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
@@ -24,7 +20,7 @@ class HelloWorldFragment : BaseMvRxFragment() {
             marquee = findViewById(R.id.marquee)
         }
 
-    override fun invalidate() = withState(viewModel) { state ->
-        marquee.setTitle(state.title)
+    override fun invalidate() {
+        marquee.setTitle("Hello World")
     }
 }

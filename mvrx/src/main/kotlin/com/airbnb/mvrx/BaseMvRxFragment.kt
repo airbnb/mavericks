@@ -21,4 +21,11 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
         super.onSaveInstanceState(outState)
         mvrxViewModelStore.saveViewModels(outState)
     }
+
+    override fun onStart() {
+        super.onStart()
+        // This ensures that invalidate() is called for static screens that don't
+        // subscribe to a ViewModel.
+        postInvalidate()
+    }
 }
