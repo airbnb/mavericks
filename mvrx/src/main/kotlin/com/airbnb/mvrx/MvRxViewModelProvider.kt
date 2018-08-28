@@ -25,11 +25,6 @@ object MvRxViewModelProvider {
      *            ViewModel class in the same scope.
      * @param stateFactory A factory to create the initial state if the ViewModel does not yet exist.
      *
-     * The ViewModel stateFactory is lazily queried so you can safely use things like intent extras as long as you don't try and use your ViewModel
-     * until after all of your parameters are available.
-     *
-     * You can also supply a vararg whitelist of state property to receive updates for. The property can be specified with
-     * property syntax: `YourState::yourProperty`
      */
     fun <VM : BaseMvRxViewModel<S>, S : MvRxState> get(
         viewModelClass: Class<VM>,

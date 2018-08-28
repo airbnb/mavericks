@@ -14,9 +14,6 @@ import java.util.LinkedList
  * All state reducers are run in a single background thread to ensure that they don't have race
  * conditions with each other.
  *
- * When subscribers get notified of state changes, the store will stop processing state updates
- * until the subscriber callback completes. This will prevent the state from updating in the middle
- * of the subscription callback.
  */
 internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
     /**

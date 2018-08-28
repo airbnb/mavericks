@@ -11,13 +11,13 @@ import kotlin.reflect.KProperty
  * Gets or creates a ViewModel scoped to this Fragment. You will get the same instance every time for this Fragment, even
  * through rotation, or other configuration changes.
  *
- * If it it has additional dependencies, override [MvRxViewModelFactory] in its companion object. You will be given this state
- * as well as a FragmentActivity with which you can use the getOrCreateSubcomponent extension method on FragmentActivity to
- * access your Dagger subcomponent where the rest of your dependencies live.
+ * If the ViewModel has additional dependencies, implement [MvRxViewModelFactory] in its companion object.
+ * You will be given the initial state as well as a FragmentActivity with which you can access other dependencies to
+ * pass to the ViewModel's constructor.
  *
  * MvRx will also handle persistence across process restarts. Refer to [PersistState] for more info.
  *
- * Use keyFactory if you have multiple ViewModels of the same class in the same scope.
+ * Use [keyFactory] if you have multiple ViewModels of the same class in the same scope.
  */
 inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragmentViewModel(
     viewModelClass: KClass<VM> = VM::class,
@@ -43,10 +43,6 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, S : MvRxState> T.existingViewM
 
 /**
  * [fragmentViewModel] except scoped to the current Activity. Use this to share state between different Fragments.
- *
- * @param stateFactory A lambda that provides an instance of your State class; this will be used to initialize the ViewModel. If no lambda is provided,
- * the default will attempt to instantiate your state class with the arguments provided to the fragment.
- * If the fragment has no arguments set then state will be initialized with a zero argument constructor. If neither exist an exception will be thrown.
  */
 inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activityViewModel(
     viewModelClass: KClass<VM> = VM::class,
