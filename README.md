@@ -35,8 +35,9 @@ Gradle is the only supported build configuration, so just add the dependency to 
 
 ```groovy
 dependencies {
-  implementation 'com.airbnb.android:mvrx:0.5.0'
+  implementation 'com.airbnb.android:mvrx:$mvrxVersion'
 }
 ```
+The latest version of mvrx is ![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx/badge.svg)
 
 ## For full documentation, check out the [wiki](https://github.com/airbnb/MvRx/wiki)
