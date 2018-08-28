@@ -29,6 +29,7 @@ import com.airbnb.mvrx.todomvrx.data.Task
 import com.airbnb.mvrx.todomvrx.data.findTask
 import com.airbnb.mvrx.todomvrx.todoapp.R
 import com.airbnb.mvrx.todomvrx.util.asSequence
+import com.airbnb.mvrx.todomvrx.util.simpleController
 import com.airbnb.mvrx.todomvrx.views.AddEditView
 import com.airbnb.mvrx.todomvrx.views.addEditView
 import com.airbnb.mvrx.withState
@@ -63,7 +64,7 @@ class AddEditTaskFragment : BaseFragment() {
         }
     }
 
-    override fun EpoxyController.buildModels() = withState(viewModel) { state ->
+    override fun epoxyController() = simpleController(viewModel) { state ->
         val task = state.tasks.findTask(args.id)
         addEditView {
             id("add_edit")

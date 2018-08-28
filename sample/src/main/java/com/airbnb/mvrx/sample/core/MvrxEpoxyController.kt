@@ -1,6 +1,5 @@
 package com.airbnb.mvrx.sample.core
 
-import android.os.Bundle
 import com.airbnb.epoxy.AsyncEpoxyController
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.BaseMvRxViewModel
@@ -19,21 +18,6 @@ open class MvRxEpoxyController(
 
     override fun buildModels() {
         buildModelsCallback()
-    }
-
-    override fun onRestoreInstanceState(inState: Bundle?) {
-        // In Epoxy, you normally own your adapter and save it as a field so you can safely call onSave and onRestoreInstanceState.
-        // MvRx provides an epoxy controller by default but allows it to be manually set. In onSaveInstanceState, we query the RecyclerView
-        // for its adapter and save its state. This works unless onDestroyView was called first in which case the adapter gets cleared.
-        // This happens if onSaveInstanceState is called while a Fragment is on the back stack.
-        // In this case, when return, savedInstanceState will be called with a non-null bundle but the epoxy state was never saved.
-        // Epoxy crashes in this case because it's normally a sign that you forgot to save the state. However, in this case, it happens because
-        // we don't own the EpoxyController.
-        // This does the hacky thing of checking for the epoxy key because Epoxy has no way of handling this since. TBD if it is something
-        // it should support.
-        if (inState?.containsKey("saved_state_view_holders") == true) {
-            super.onRestoreInstanceState(inState)
-        }
     }
 }
 

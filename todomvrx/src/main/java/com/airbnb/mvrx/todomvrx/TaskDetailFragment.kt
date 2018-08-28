@@ -27,6 +27,7 @@ import com.airbnb.mvrx.args
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.data.findTask
 import com.airbnb.mvrx.todomvrx.todoapp.R
+import com.airbnb.mvrx.todomvrx.util.simpleController
 import com.airbnb.mvrx.todomvrx.views.taskDetailView
 import com.airbnb.mvrx.withState
 import kotlinx.android.parcel.Parcelize
@@ -50,7 +51,7 @@ class TaskDetailFragment : BaseFragment() {
         }
     }
 
-    override fun EpoxyController.buildModels() = withState(viewModel) { state ->
+    override fun epoxyController() = simpleController(viewModel) { state ->
         taskDetailView {
             id("detail")
             task(state.tasks.findTask(args.id))

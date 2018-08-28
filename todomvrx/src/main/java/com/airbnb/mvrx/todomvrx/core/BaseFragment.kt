@@ -10,7 +10,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
-import com.airbnb.epoxy.EpoxyController
 import com.airbnb.epoxy.EpoxyRecyclerView
 import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.MvRx
@@ -30,15 +29,17 @@ abstract class BaseFragment : BaseMvRxFragment() {
     protected lateinit var coordinatorLayout: CoordinatorLayout
     protected lateinit var recyclerView: EpoxyRecyclerView
     protected lateinit var fab: FloatingActionButton
+    protected val epoxyController by lazy {epoxyController() }
     // Used to keep track of task changes to determine if we should show a snackbar.
     private var oldTasks: Tasks? = null
+
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
             inflater.inflate(R.layout.fragment_base, container, false).apply {
                 coordinatorLayout = findViewById(R.id.coordinator_layout)
                 fab = findViewById(R.id.fab)
                 recyclerView = findViewById(R.id.recycler_view)
-                recyclerView.setController(ToDoEpoxyController { buildModels() })
+                recyclerView.setController(epoxyController)
             }
 
     @CallSuper
@@ -80,7 +81,7 @@ abstract class BaseFragment : BaseMvRxFragment() {
         recyclerView.requestModelBuild()
     }
 
-    open fun EpoxyController.buildModels() {}
+    abstract fun epoxyController(): ToDoEpoxyController
 
     protected fun navigate(@IdRes id: Int, args: Parcelable? = null) {
         findNavController().navigate(id, Bundle().apply { putParcelable(MvRx.KEY_ARG, args) })
