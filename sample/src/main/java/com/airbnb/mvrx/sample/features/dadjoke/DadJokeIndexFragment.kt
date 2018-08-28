@@ -4,16 +4,16 @@ import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.util.Log
 import android.view.View
-import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.core.BaseFragment
+import com.airbnb.mvrx.sample.core.simpleController
 import com.airbnb.mvrx.sample.views.basicRow
 import com.airbnb.mvrx.sample.views.loadingRow
 import com.airbnb.mvrx.sample.views.marquee
-import com.airbnb.mvrx.withState
 
 private const val TAG = "DadJokeIndexFragment"
+
 class DadJokeIndexFragment : BaseFragment() {
 
     /**
@@ -30,12 +30,13 @@ class DadJokeIndexFragment : BaseFragment() {
          * call the subscriber. onSuccess, onFail, and propertyWhitelist ship with MvRx.
          */
         viewModel.asyncSubscribe(DadJokeIndexState::request, onFail = { error ->
-            Snackbar.make(coordinatorLayout, "Jokes request failed.", Snackbar.LENGTH_INDEFINITE).show()
+            Snackbar.make(coordinatorLayout, "Jokes request failed.", Snackbar.LENGTH_INDEFINITE)
+                .show()
             Log.w(TAG, "Jokes request failed", error)
         })
     }
 
-    override fun EpoxyController.buildModels() = withState(viewModel) { state ->
+    override fun epoxyController() = simpleController(viewModel) { state ->
         marquee {
             id("marquee")
             title("Dad Jokes")
@@ -45,7 +46,12 @@ class DadJokeIndexFragment : BaseFragment() {
             basicRow {
                 id(joke.id)
                 title(joke.joke)
-                clickListener { _ -> navigateTo(R.id.action_dadJokeIndex_to_dadJokeDetailFragment, DadJokeDetailArgs(joke.id)) }
+                clickListener { _ ->
+                    navigateTo(
+                        R.id.action_dadJokeIndex_to_dadJokeDetailFragment,
+                        DadJokeDetailArgs(joke.id)
+                    )
+                }
             }
         }
 
