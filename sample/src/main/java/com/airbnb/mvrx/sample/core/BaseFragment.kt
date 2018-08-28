@@ -10,7 +10,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
-import com.airbnb.epoxy.EpoxyController
 import com.airbnb.epoxy.EpoxyRecyclerView
 import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.MvRx
@@ -21,16 +20,21 @@ abstract class BaseFragment : BaseMvRxFragment() {
     protected lateinit var recyclerView: EpoxyRecyclerView
     protected lateinit var toolbar: Toolbar
     protected lateinit var coordinatorLayout: CoordinatorLayout
+    protected val epoxyController by lazy { epoxyController() }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         return inflater.inflate(R.layout.fragment_base_mvrx, container, false).apply {
             recyclerView = findViewById(R.id.recycler_view)
             toolbar = findViewById(R.id.toolbar)
             coordinatorLayout = findViewById(R.id.coordinator_layout)
 
-            recyclerView.buildModelsWith {
-                it.buildModels()
-            }
+            epoxyController.onRestoreInstanceState(savedInstanceState)
+            recyclerView.setController(epoxyController)
+
             toolbar.setupWithNavController(findNavController())
         }
     }
@@ -39,7 +43,21 @@ abstract class BaseFragment : BaseMvRxFragment() {
         recyclerView.requestModelBuild()
     }
 
-    abstract fun EpoxyController.buildModels()
+    /**
+     * Provide the EpoxyController to use when building models for this Fragment.
+     * Basic usages can simply use [simpleController]
+     */
+    abstract fun epoxyController(): MvRxEpoxyController
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        epoxyController.onSaveInstanceState(outState)
+    }
+
+    override fun onDestroyView() {
+        epoxyController.cancelPendingModelBuild()
+        super.onDestroyView()
+    }
 
     protected fun navigateTo(@IdRes actionId: Int, arg: Parcelable? = null) {
         /**
