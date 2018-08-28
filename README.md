@@ -29,4 +29,16 @@ class HelloWorldFragment : BaseFragment() {
 }
 ```
 
+## Installation
+
+Gradle is the only supported build configuration, so just add the dependency to your project `build.gradle` file:
+
+```groovy
+dependencies {
+  implementation 'com.airbnb.android:mvrx:x.y.z'
+}
+```
+
+Replace `x`, `y`, and `z` with the latest version number: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/epoxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx)
+
 ## For full documentation, check out the [wiki](https://github.com/airbnb/MvRx/wiki)
