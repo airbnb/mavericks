@@ -7,6 +7,7 @@ This ToDo app follows the [specification](https://github.com/googlesamples/andro
 
 It is 100% feature complete and has significantly fewer lines of code compared to other archtiecture blueprints.
 Running `cloc` on `src/main` for MvRx yields:
+
 | Language LOC     | **MvRx**   | **mvp-kotlin** | **mvvm-live-kotlin** |  **mvp** | **mvp-clean** | **mvp-java** |
 | -------------    |     -----  |     ---------  |     ---------------- |  ------- | ------------- | ------------ |
 | **Kotlin**       |         803|           1541 |                 1564 |        0 |             0 |            0 |
