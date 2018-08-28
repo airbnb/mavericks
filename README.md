@@ -39,6 +39,6 @@ dependencies {
 }
 ```
 
-Replace `x`, `y`, and `z` with the latest version number: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/epoxy/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx)
+Replace `x`, `y`, and `z` with the latest version number: [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx)
 
 ## For full documentation, check out the [wiki](https://github.com/airbnb/MvRx/wiki)
