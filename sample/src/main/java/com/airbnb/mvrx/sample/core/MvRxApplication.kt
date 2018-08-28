@@ -34,14 +34,5 @@ class MvRxApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin(this, listOf(dadJokeServiceModule))
-        setupAsyncEpoxy()
-    }
-
-    private fun setupAsyncEpoxy() {
-        val handlerThread = HandlerThread("epoxy")
-        handlerThread.start()
-        val handler = Handler(handlerThread.looper)
-        EpoxyController.defaultDiffingHandler = handler
-        EpoxyController.defaultModelBuildingHandler = handler
     }
 }
