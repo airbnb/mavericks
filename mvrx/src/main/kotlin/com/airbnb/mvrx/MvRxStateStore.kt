@@ -5,7 +5,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
-import java.util.LinkedList
+import java.util.*
 
 /**
  * This is a container class around the actual state itself. It has a few optimizations to ensure
@@ -14,9 +14,6 @@ import java.util.LinkedList
  * All state reducers are run in a single background thread to ensure that they don't have race
  * conditions with each other.
  *
- * When subscribers get notified of state changes, the store will stop processing state updates
- * until the subscriber callback completes. This will prevent the state from updating in the middle
- * of the subscription callback.
  */
 internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
     /**

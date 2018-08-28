@@ -18,10 +18,6 @@ import kotlin.reflect.full.primaryConstructor
  * You should ONLY SAVE what you need to refetch data, not fetched data itself. For example, for search, save the search filters not the
  * search results.
  *
- * Any fields without [PersistState] should have a default value so that state can be successfully restored.
- *
- * A field can have both [PersistState] as well as a default value if needed.
- *
  * You can also only annotate [Serializable] and [android.os.Parcelable] fields.
  *
  * An example state class could look like:
