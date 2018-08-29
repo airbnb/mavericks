@@ -43,7 +43,7 @@ internal fun <T : Any> T.persistState(assertCollectionPersistability: Boolean = 
      */
     return constructor.parameters.asSequence()
         .filter { props[it.name] != null }
-        .filter { it.annotations.map { it.annotationClass }.firstOrNull { it == PersistState::class } != null }
+        .filter { it.annotations.any { it.annotationClass == PersistState::class } }
         .map {
             @Suppress("UNCHECKED_CAST")
             val prop = props[it.name] as? KProperty1<T, Any?>
