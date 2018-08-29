@@ -51,7 +51,7 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
             .fold(Bundle()) { bundle, (key, viewModel) ->
                 withState(viewModel) { state ->
                     val persistedState = state.persistState()
-                    val holder = MvRxPersistedViewModelHolder(viewModel::class.java.name, state::class.java.name, persistedState)
+                    val holder = MvRxPersistedViewModelHolder(viewModel::class.java, state::class.java, persistedState)
                     bundle.apply { putParcelable(key, holder) }
                 }
             }
@@ -105,11 +105,7 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
     }
 
     private fun restoreViewModel(activity: FragmentActivity, holder: MvRxPersistedViewModelHolder, arguments: Any?): ViewModel {
-        val (viewModelClassName, stateClassName, viewModelState) = holder
-        @Suppress("UNCHECKED_CAST")
-        val viewModelClass = (Class.forName(viewModelClassName) as Class<BaseMvRxViewModel<MvRxState>>)
-        @Suppress("UNCHECKED_CAST")
-        val stateClass = Class.forName(stateClassName) as Class<MvRxState>
+        val (viewModelClass, stateClass, viewModelState) = holder
         // If there is a key in the fragmentArgsForActivityViewModelState map, then this is an activity ViewModel. The map value will contain
         // the Fragment args that the ViewModel was created with.
         val state = _initialStateProvider(stateClass, arguments).let(viewModelState::restorePersistedState)
