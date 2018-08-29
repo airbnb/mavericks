@@ -15,6 +15,7 @@
  */
 package com.airbnb.mvrx.todomvrx
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Parcelable
 import android.view.Menu
@@ -22,16 +23,15 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.navigation.fragment.findNavController
-import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.args
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.data.findTask
 import com.airbnb.mvrx.todomvrx.todoapp.R
 import com.airbnb.mvrx.todomvrx.util.simpleController
 import com.airbnb.mvrx.todomvrx.views.taskDetailView
-import com.airbnb.mvrx.withState
 import kotlinx.android.parcel.Parcelize
 
+@SuppressLint("ParcelCreator")
 @Parcelize
 data class TaskDetailArgs(val id: String) : Parcelable
 
