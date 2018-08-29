@@ -32,10 +32,10 @@ jobs:
     script: "./gradlew :sample:lintRelease"
   - name: Sample Unit Tests
     script: "./gradlew :sample:testReleaseUnitTest"
-  - name: ToDo-MvRx Lint
-    script: "./gradlew :todo-mvrx:lintRelease"
-  - name: ToDo-MvRx Unit Tests
-    script: "./gradlew :todo-mvrx:testReleaseUnitTest"
+  - name: ToDo MvRx Lint
+    script: "./gradlew :todomvrx:lintRelease"
+  - name: ToDo MvRx Unit Tests
+    script: "./gradlew :todomvrx:testReleaseUnitTest"
 
 sudo: false
 
