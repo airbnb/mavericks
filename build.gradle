@@ -11,8 +11,8 @@ buildscript {
     ext.roomVersion = "1.1.1"
 
     repositories {
-        jcenter()
         google()
+        jcenter()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.1.4'
