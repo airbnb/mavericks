@@ -16,9 +16,10 @@ import java.util.*
  *
  */
 internal open class MvRxStateStore<S : Any>(
-    initialState: S,
-    private val mocker: ViewModelMocker<S>? = null
+    initialState: S
 ) : Disposable {
+
+    internal val isMocked = MvRxMocker.enabled
 
     /**
      * The subject is where state changes should be pushed to.
@@ -28,8 +29,6 @@ internal open class MvRxStateStore<S : Any>(
      * The observable observes the subject but only emits events when the state actually changed.
      */
     private val disposables = CompositeDisposable()
-
-    internal val isMocked = mocker != null
 
     /**
      * A subject that is used to flush the setState and getState queue. The value emitted on the subject is
@@ -46,7 +45,7 @@ internal open class MvRxStateStore<S : Any>(
      */
     val state: S
     // value must be present here, since the subject is created with initialState
-        get() = mocker?.stateProvider?.invoke() ?: subject.value!!
+        get() = MvRxMocker.getMockedState(this) ?: subject.value!!
 
     init {
 
@@ -63,9 +62,7 @@ internal open class MvRxStateStore<S : Any>(
      * are guaranteed to run before the get block is run.
      */
     fun get(block: (S) -> Unit) {
-        if (mocker != null) {
-            block(mocker.stateProvider())
-        } else {
+        MvRxMocker.getMockedState(this)?.let(block) ?: run {
             jobs.enqueueGetStateBlock(block)
             flushQueueSubject.onNext(Unit)
         }

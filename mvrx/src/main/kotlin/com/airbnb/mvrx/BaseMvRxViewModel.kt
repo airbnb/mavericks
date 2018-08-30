@@ -23,13 +23,12 @@ import kotlin.reflect.KVisibility
  */
 abstract class BaseMvRxViewModel<S : MvRxState>(
     initialState: S,
-    private val debugMode: Boolean = false,
-    mocker: ViewModelMocker<S>? = null
+    private val debugMode: Boolean = false
 ) : ViewModel() {
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
     private val backgroundScheduler = Schedulers.single()
-    private val stateStore: MvRxStateStore<S> = MvRxStateStore(initialState, mocker)
+    private val stateStore: MvRxStateStore<S> = MvRxStateStore(initialState)
 
     init {
         if (debugMode) {
