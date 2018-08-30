@@ -15,6 +15,7 @@
  */
 package com.airbnb.mvrx.todomvrx
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
@@ -22,7 +23,6 @@ import android.support.design.widget.Snackbar
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.navigation.fragment.findNavController
-import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.args
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.data.Task
@@ -35,7 +35,7 @@ import com.airbnb.mvrx.todomvrx.views.addEditView
 import com.airbnb.mvrx.withState
 import kotlinx.android.parcel.Parcelize
 
-
+@SuppressLint("ParcelCreator")
 @Parcelize
 data class AddEditTaskArgs(val id: String? = null) : Parcelable
 

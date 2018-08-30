@@ -1,0 +1,45 @@
+language: android
+
+android:
+  components:
+  - tools
+  - platform-tools
+  - build-tools-27.0.3
+  - android-27
+  - extra-google-google_play_services
+  - extra-android-m2repository
+  - extra-android-support
+  - extra-google-m2repository
+
+jdk:
+- oraclejdk8
+
+branches:
+  except:
+  - gh-pages
+
+notifications:
+  email: false
+
+jobs:
+  include:
+  - stage: test
+    name: MvRx Lint
+    script: "./gradlew :mvrx:lintRelease"
+  - name: MvRx Unit Tests
+    script: "./gradlew :mvrx:testReleaseUnitTest"
+  - name: Sample Lint
+    script: "./gradlew :sample:lintRelease"
+  - name: Sample Unit Tests
+    script: "./gradlew :sample:testReleaseUnitTest"
+  - name: ToDo MvRx Lint
+    script: "./gradlew :todomvrx:lintRelease"
+  - name: ToDo MvRx Unit Tests
+    script: "./gradlew :todomvrx:testReleaseUnitTest"
+
+sudo: false
+
+cache:
+  directories:
+  - $HOME/.m2
+  - $HOME/.gradle
