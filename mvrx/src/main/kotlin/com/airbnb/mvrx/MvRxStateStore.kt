@@ -5,7 +5,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
-import java.util.LinkedList
+import java.util.*
 
 /**
  * This is a container class around the actual state itself. It has a few optimizations to ensure
@@ -15,7 +15,11 @@ import java.util.LinkedList
  * conditions with each other.
  *
  */
-internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
+internal open class MvRxStateStore<S : Any>(
+    initialState: S,
+    private val mocker: ViewModelMocker<S>? = null
+) : Disposable {
+
     /**
      * The subject is where state changes should be pushed to.
      */
@@ -24,6 +28,8 @@ internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
      * The observable observes the subject but only emits events when the state actually changed.
      */
     private val disposables = CompositeDisposable()
+
+    internal val isMocked = mocker != null
 
     /**
      * A subject that is used to flush the setState and getState queue. The value emitted on the subject is
@@ -39,8 +45,8 @@ internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
      * current state.
      */
     val state: S
-        // value must be present here, since the subject is created with initialState
-        get() = subject.value!!
+    // value must be present here, since the subject is created with initialState
+        get() = mocker?.stateProvider?.invoke() ?: subject.value!!
 
     init {
 
@@ -57,8 +63,12 @@ internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
      * are guaranteed to run before the get block is run.
      */
     fun get(block: (S) -> Unit) {
-        jobs.enqueueGetStateBlock(block)
-        flushQueueSubject.onNext(Unit)
+        if (mocker != null) {
+            block(mocker.stateProvider())
+        } else {
+            jobs.enqueueGetStateBlock(block)
+            flushQueueSubject.onNext(Unit)
+        }
     }
 
     /**
@@ -72,6 +82,8 @@ internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
      * all of the code required.
      */
     fun set(stateReducer: S.() -> S) {
+        if (mocker != null) return
+
         jobs.enqueueSetStateBlock(stateReducer)
         flushQueueSubject.onNext(Unit)
     }
@@ -131,8 +143,8 @@ internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
         val blocks = jobs.dequeueAllSetStateBlocks() ?: return
 
         blocks
-                .fold(state) { state, reducer -> state.reducer() }
-                .run { subject.onNext(this) }
+            .fold(state) { state, reducer -> state.reducer() }
+            .run { subject.onNext(this) }
     }
 
     private fun handleError(throwable: Throwable) {
