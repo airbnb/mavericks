@@ -148,7 +148,6 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         setState { stateReducer(Loading()) }
 
         return observeOn(backgroundScheduler)
-            .subscribeOn(backgroundScheduler)
             .map {
                 val success = Success(mapper(it))
                 success.metadata = successMetaData?.invoke(it)
