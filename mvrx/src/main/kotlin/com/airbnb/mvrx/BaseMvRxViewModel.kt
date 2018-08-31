@@ -147,8 +147,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         // This will ensure that Loading is dispatched immediately rather than being posted to `backgroundScheduler` before emitting Loading.
         setState { stateReducer(Loading()) }
 
-        return observeOn(backgroundScheduler)
-            .map {
+        return map {
                 val success = Success(mapper(it))
                 success.metadata = successMetaData?.invoke(it)
                 success as Async<V>
