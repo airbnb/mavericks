@@ -11,11 +11,11 @@ This is what it looks like:
 
 data class HelloWorldState(val title: String = "Hello World") : MvRxState
 
-class HelloWorldViewModel(initialState: HelloWorldState) : MvRxViewModel<HelloWorldState>(initialState) {
+class HelloWorldViewModel(initialState: HelloWorldState) : BaseMvRxViewModel<HelloWorldState>(initialState) {
     fun getMoreExcited() = setState { copy(title = "$title!") }
 }
 
-class HelloWorldFragment : BaseFragment() {
+class HelloWorldFragment : BaseMvRxFragment() {
     private val viewModel: HelloWorldViewModel by fragmentViewModel()
 
     override fun EpoxyController.buildModels() = withState(viewModel) { state ->
