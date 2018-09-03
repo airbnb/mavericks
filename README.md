@@ -12,7 +12,7 @@ This is what it looks like:
 data class HelloWorldState(val title: String = "Hello World") : MvRxState
 
 /**
- * Refer to the wiki for how to set up your base ViewMdoel.
+ * Refer to the wiki for how to set up your base ViewModel.
  */
 class HelloWorldViewModel(initialState: HelloWorldState) : MyBaseMvRxViewModel<HelloWorldState>(initialState) {
     fun getMoreExcited() = setState { copy(title = "$title!") }
