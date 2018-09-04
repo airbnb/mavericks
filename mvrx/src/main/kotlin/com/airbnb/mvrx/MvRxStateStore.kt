@@ -20,7 +20,6 @@ internal open class MvRxStateStore<S : Any>(
 ) : Disposable {
 
     internal val isMocked = MvRxMocker.enabled
-
     /**
      * The subject is where state changes should be pushed to.
      */
@@ -79,8 +78,6 @@ internal open class MvRxStateStore<S : Any>(
      * all of the code required.
      */
     fun set(stateReducer: S.() -> S) {
-        if (mocker != null) return
-
         jobs.enqueueSetStateBlock(stateReducer)
         flushQueueSubject.onNext(Unit)
     }

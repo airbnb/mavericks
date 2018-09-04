@@ -1,23 +1,21 @@
 package com.airbnb.mvrx
 
-import android.os.Parcelable
-
 
 object MvRxMocker {
 
     var enabled: Boolean = false
-    private val mockedState: MutableMap<BaseMvRxViewModel<*>, Any> = mutableMapOf()
+    private val mockedState: MutableMap<MvRxStateStore<*>, MvRxState> = mutableMapOf()
 
-     fun <S : MvRxState> setMockedState(viewModel: BaseMvRxViewModel<S>, state: S) {
-        mockedState[viewModel] = state
+    fun <S : MvRxState> setMockedState(viewModel: BaseMvRxViewModel<S>, state: S) {
+        mockedState[viewModel.stateStore] = state
     }
 
-     fun <S : MvRxState> setMockedStateFromArg(viewModel: BaseMvRxViewModel<S>, args: Parcelable) {
-        mockedState[viewModel] = TODO()
+    fun <S : MvRxState> setMockedStateFromArgs(viewModel: BaseMvRxViewModel<S>, args: Any?) {
+        mockedState[viewModel.stateStore] = _initialStateProvider(viewModel.state::class.java, args)
     }
 
-
-    internal fun <S : MvRxState> getMockedState(viewModel: BaseMvRxViewModel<S>): S? {
-        return if (enabled) mockedState[viewModel] as S else null
+    internal fun <S : Any> getMockedState(stateStore: MvRxStateStore<S>): S? {
+        @Suppress("UNCHECKED_CAST")
+        return if (enabled) mockedState[stateStore] as? S else null
     }
 }

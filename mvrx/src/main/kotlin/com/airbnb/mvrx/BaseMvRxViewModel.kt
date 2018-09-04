@@ -25,10 +25,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     initialState: S,
     private val debugMode: Boolean = false
 ) : ViewModel() {
+
+    internal val stateStore: MvRxStateStore<S> = MvRxStateStore(initialState)
+
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
     private val backgroundScheduler = Schedulers.single()
-    private val stateStore: MvRxStateStore<S> = MvRxStateStore(initialState)
 
     init {
         if (debugMode) {
