@@ -10,6 +10,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.Disposables
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import kotlin.reflect.KProperty1
@@ -57,17 +58,16 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      *    mutable variables or properties from outside the lambda or else it may crash.
      */
     protected fun setState(reducer: S.() -> S) {
-        if (debugMode) {
-            // Must use `set` to ensure the validated state is the same as the actual state used in reducer
-            // Do not use `get` since `getState` queue has lower priority and the validated state would be the state after reduced
-            stateStore.set {
-                val firstState = this.reducer()
-                val secondState = this.reducer()
-                if (firstState != secondState) throw IllegalArgumentException("Your reducer must be pure!")
-                firstState
-            }
-        } else {
-            stateStore.set(reducer)
+        when {
+            debugMode -> // Must use `set` to ensure the validated state is the same as the actual state used in reducer
+                // Do not use `get` since `getState` queue has lower priority and the validated state would be the state after reduced
+                stateStore.set {
+                    val firstState = this.reducer()
+                    val secondState = this.reducer()
+                    if (firstState != secondState) throw IllegalArgumentException("Your reducer must be pure!")
+                    firstState
+                }
+            else -> stateStore.set(reducer)
         }
     }
 
@@ -137,6 +137,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         successMetaData: ((T) -> Any)? = null,
         stateReducer: S.(Async<V>) -> S
     ): Disposable {
+        if (stateStore.isMocked) {
+            return Disposables.disposed()
+        }
+
         // This will ensure that Loading is dispatched immediately rather than being posted to `backgroundScheduler` before emitting Loading.
         setState { stateReducer(Loading()) }
 

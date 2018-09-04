@@ -5,7 +5,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
-import java.util.LinkedList
+import java.util.*
 
 /**
  * This is a container class around the actual state itself. It has a few optimizations to ensure
@@ -15,7 +15,12 @@ import java.util.LinkedList
  * conditions with each other.
  *
  */
-internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
+internal open class MvRxStateStore<S : Any>(
+    initialState: S
+) : Disposable {
+
+    internal val isMocked = MvRxMocker.enabled
+
     /**
      * The subject is where state changes should be pushed to.
      */
@@ -39,8 +44,8 @@ internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
      * current state.
      */
     val state: S
-        // value must be present here, since the subject is created with initialState
-        get() = subject.value!!
+    // value must be present here, since the subject is created with initialState
+        get() = MvRxMocker.getMockedState(this) ?: subject.value!!
 
     init {
 
@@ -57,8 +62,10 @@ internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
      * are guaranteed to run before the get block is run.
      */
     fun get(block: (S) -> Unit) {
-        jobs.enqueueGetStateBlock(block)
-        flushQueueSubject.onNext(Unit)
+        MvRxMocker.getMockedState(this)?.let(block) ?: run {
+            jobs.enqueueGetStateBlock(block)
+            flushQueueSubject.onNext(Unit)
+        }
     }
 
     /**
@@ -72,6 +79,8 @@ internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
      * all of the code required.
      */
     fun set(stateReducer: S.() -> S) {
+        if (mocker != null) return
+
         jobs.enqueueSetStateBlock(stateReducer)
         flushQueueSubject.onNext(Unit)
     }
@@ -131,8 +140,8 @@ internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
         val blocks = jobs.dequeueAllSetStateBlocks() ?: return
 
         blocks
-                .fold(state) { state, reducer -> state.reducer() }
-                .run { subject.onNext(this) }
+            .fold(state) { state, reducer -> state.reducer() }
+            .run { subject.onNext(this) }
     }
 
     private fun handleError(throwable: Throwable) {
