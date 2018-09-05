@@ -15,7 +15,7 @@ import java.util.LinkedList
  * conditions with each other.
  *
  */
-internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
+internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable, IMvRxStateStore<S> {
     /**
      * The subject is where state changes should be pushed to.
      */
@@ -33,12 +33,12 @@ internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
 
     private val jobs = Jobs<S>()
 
-    val observable: Observable<S> = subject.distinctUntilChanged()
+    override val observable: Observable<S> = subject.distinctUntilChanged()
     /**
      * This is automatically updated from a subscription on the subject for easy access to the
      * current state.
      */
-    val state: S
+    override val state: S
         // value must be present here, since the subject is created with initialState
         get() = subject.value!!
 
@@ -56,7 +56,7 @@ internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
      * Get the current state. The block of code is posted to a queue and all pending setState blocks
      * are guaranteed to run before the get block is run.
      */
-    fun get(block: (S) -> Unit) {
+    override fun get(block: (S) -> Unit) {
         jobs.enqueueGetStateBlock(block)
         flushQueueSubject.onNext(Unit)
     }
@@ -71,7 +71,7 @@ internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
      * of the reducer. In this case, it will also implicitly return the only expression so that is
      * all of the code required.
      */
-    fun set(stateReducer: S.() -> S) {
+    override fun set(stateReducer: S.() -> S) {
         jobs.enqueueSetStateBlock(stateReducer)
         flushQueueSubject.onNext(Unit)
     }

@@ -13,6 +13,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.exceptions.CompositeException
 import io.reactivex.internal.schedulers.ExecutorScheduler
 import io.reactivex.plugins.RxJavaPlugins
+import kotlinx.coroutines.experimental.Unconfined
 import org.junit.BeforeClass
 import org.junit.Ignore
 import org.junit.runner.RunWith

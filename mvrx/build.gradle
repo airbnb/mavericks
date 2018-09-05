@@ -5,6 +5,15 @@ apply plugin: 'kotlin-kapt'
 apply from: 'gradle-maven-push.gradle'
 apply plugin: "jacoco"
 
+buildscript {
+
+    repositories {
+        google()
+        mavenCentral()
+        jcenter()
+    }
+}
+
 android {
     compileSdkVersion 27
     resourcePrefix 'mvrx_'
@@ -51,10 +60,20 @@ jacoco {
     toolVersion = "0.8.2"
 }
 
+allprojects {
+    repositories {
+        jcenter()
+    }
+}
+
+
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:0.25.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:0.25.3'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-rx2:0.25.3'
     implementation "com.android.support:appcompat-v7:$supportLibVersion"
     implementation "android.arch.lifecycle:extensions:$lifecycleVersion"
     kapt "android.arch.lifecycle:compiler:$lifecycleVersion"
