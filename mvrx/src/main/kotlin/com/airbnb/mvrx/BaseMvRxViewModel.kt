@@ -27,7 +27,6 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 ) : ViewModel() {
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
-    private val backgroundScheduler = Schedulers.single()
     private lateinit var mutableStateChecker: MutableStateChecker<S>
 
     init {
@@ -144,7 +143,6 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         successMetaData: ((T) -> Any)? = null,
         stateReducer: S.(Async<V>) -> S
     ): Disposable {
-        // This will ensure that Loading is dispatched immediately rather than being posted to `backgroundScheduler` before emitting Loading.
         setState { stateReducer(Loading()) }
 
         return map {
