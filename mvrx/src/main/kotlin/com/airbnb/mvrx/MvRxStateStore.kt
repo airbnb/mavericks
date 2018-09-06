@@ -78,6 +78,8 @@ internal open class MvRxStateStore<S : Any>(
      * all of the code required.
      */
     fun set(stateReducer: S.() -> S) {
+        if (MvRxMocker.getMockedState(this) != null) return
+
         jobs.enqueueSetStateBlock(stateReducer)
         flushQueueSubject.onNext(Unit)
     }
