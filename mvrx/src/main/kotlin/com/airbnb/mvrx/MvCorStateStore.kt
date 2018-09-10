@@ -4,6 +4,7 @@ import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.experimental.CompletableDeferred
+import kotlinx.coroutines.experimental.CoroutineDispatcher
 import kotlinx.coroutines.experimental.DefaultDispatcher
 import kotlinx.coroutines.experimental.channels.*
 import kotlinx.coroutines.experimental.rx2.asObservable
@@ -18,7 +19,7 @@ import java.util.LinkedList
  *
  */
 
-internal open class MvCorStateStore<S : Any>(initialState: S) : Disposable, IMvRxStateStore<S> {
+internal open class MvCorStateStore<S : Any>(initialState: S, coroutineDispatcher: CoroutineDispatcher = DefaultDispatcher) : Disposable, IMvRxStateStore<S> {
     /**
      * The channel is where state changes should be pushed to.
      */
@@ -29,7 +30,7 @@ internal open class MvCorStateStore<S : Any>(initialState: S) : Disposable, IMvR
     private val disposables = CompositeDisposable()
 
 
-    override val observable: Observable<S> = channel.openSubscription().asObservable(DefaultDispatcher).distinctUntilChanged()
+    override val observable: Observable<S> = channel.openSubscription().asObservable(coroutineDispatcher).distinctUntilChanged()
     /**
      * This is automatically updated from a subscription on the channel for easy access to the
      * current state.
@@ -43,7 +44,7 @@ internal open class MvCorStateStore<S : Any>(initialState: S) : Disposable, IMvR
         class GetSyncValue<S>(val completable: CompletableDeferred<S>) : Job<S>()
     }
 
-    val actor = actor<Job<S>>(capacity = Channel.UNLIMITED){
+    val actor = actor<Job<S>>(context = coroutineDispatcher, capacity = Channel.UNLIMITED){
 
 
         val getStateQueue = LinkedList<(state: S) -> Unit>()

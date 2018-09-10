@@ -34,56 +34,49 @@ class StateStoreTest(val param: Any) : BaseTest() {
 
     @Before
     fun setup() {
-        store = MvCorStateStore(StateStoreTestState())
+        store = MvCorStateStore(StateStoreTestState(),Unconfined)
     }
 
      @Test
-     fun testGetRunsSynchronouslyForTests() = runBlocking {
+     fun testGetRunsSynchronouslyForTests() {
          var callCount = 0
          store.get { callCount++ }
-         delay(10)
          assertEquals(1, callCount)
      }
 
      @Test
-     fun testSetState()  = runBlocking {
+     fun testSetState()  {
          store.set {
              copy(count = 2)
          }
          var called = false
-         delay(10)
          store.get {
              assertEquals(2, it.count)
              called = true
          }
-         delay(10)
          assertTrue(called)
      }
 
      @Test
-     fun testSubscribeNotCalledForNoop() = runBlocking {
+     fun testSubscribeNotCalledForNoop()  {
          var callCount = 0
          store.observable.subscribe {
              callCount++
          }
-         delay(5)
          assertEquals(1, callCount)
          store.set { this }
-         delay(5)
          assertEquals(1, callCount)
      }
 
 
      @Test
-     fun testSubscribeNotCalledForSameValue() = runBlocking {
+     fun testSubscribeNotCalledForSameValue() {
          var callCount = 0
          store.observable.subscribe {
              callCount++
          }
-         delay(10)
          assertEquals(1, callCount)
          store.set { copy() }
-         delay(5)
          assertEquals(1, callCount)
      }
 
@@ -91,7 +84,6 @@ class StateStoreTest(val param: Any) : BaseTest() {
     @Test
     fun testConcurrency() = runBlocking {
 
-        val cur = System.currentTimeMillis()
         List(5000) {
             launch {
                 store.set {
@@ -100,15 +92,9 @@ class StateStoreTest(val param: Any) : BaseTest() {
                 store.get {
                     store.state
                 }
-
-
             }
-
         }.joinAll()
 
-        while(store.state.count<5001 && cur+50>System.currentTimeMillis()) {
-
-        }
         assertEquals(5001, store.state.count)
     }
 }
