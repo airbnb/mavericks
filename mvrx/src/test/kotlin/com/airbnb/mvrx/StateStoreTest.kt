@@ -13,7 +13,8 @@ import org.junit.runners.Parameterized
 import java.util.*
 import org.junit.rules.TestRule
 import org.junit.Rule
-
+import java.util.concurrent.TimeUnit
+import kotlin.coroutines.experimental.CoroutineContext
 
 
 data class StateStoreTestState(val count: Int = 1, val list: List<Int> = emptyList())
@@ -26,7 +27,7 @@ class StateStoreTest(val param: Any) : BaseTest() {
         @JvmStatic
         @Parameterized.Parameters
         fun data(): Array<Any> {
-            return Array(1000) { 0 }
+            return Array(100) { 0 }
         }
     }
 
@@ -83,19 +84,22 @@ class StateStoreTest(val param: Any) : BaseTest() {
 
     @Test
     fun testConcurrency() = runBlocking {
-
-        List(5000) {
-            launch {
-                store.set {
-                    copy(count + 1)
+        val iterations = 5000
+        val cur = System.currentTimeMillis()
+        for(i in 1..100) {
+            List(iterations) {
+                launch {
+                    store.set {
+                        copy(count + 1)
+                    }
+                    store.get {
+                        store.state
+                    }
                 }
-                store.get {
-                    store.state
-                }
-            }
-        }.joinAll()
-
-        assertEquals(5001, store.state.count)
+            }.joinAll()
+        }
+        println(System.currentTimeMillis() - cur)
+        assertEquals(iterations*100 + 1, store.state.count)
     }
 }
 
