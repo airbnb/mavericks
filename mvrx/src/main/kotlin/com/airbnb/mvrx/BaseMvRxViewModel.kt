@@ -22,12 +22,12 @@ import kotlin.reflect.KVisibility
  */
 abstract class BaseMvRxViewModel<S : MvRxState>(
     initialState: S,
-    private val debugMode: Boolean = false
+    private val debugMode: Boolean = false,
+    private val stateStore: MvRxStateStore<S> = MvRxStateStore(initialState)
 ) : ViewModel() {
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
     private val backgroundScheduler = Schedulers.single()
-    private val stateStore: MvRxStateStore<S> = MvRxStateStore(initialState)
     private lateinit var mutableStateChecker: MutableStateChecker<S>
 
     init {

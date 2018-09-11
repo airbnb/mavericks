@@ -15,7 +15,7 @@ import java.util.*
  * conditions with each other.
  *
  */
-internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
+class MvRxStateStore<S : Any>(initialState: S) : Disposable {
     /**
      * The subject is where state changes should be pushed to.
      */
