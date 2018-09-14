@@ -23,7 +23,7 @@ import kotlin.reflect.KVisibility
 abstract class BaseMvRxViewModel<S : MvRxState>(
     initialState: S,
     private val debugMode: Boolean = false,
-    private val stateStore: MvRxStateStore<S> = MvRxStateStore(initialState)
+    private val stateStore: MvRxStateStore<S> = RealMvRxStateStore(initialState)
 ) : ViewModel() {
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()

@@ -1,11 +1,44 @@
 package com.airbnb.mvrx
 
 import io.reactivex.Observable
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
+import java.util.*
 
-interface MvRxStateStore<S : Any> : Disposable {
-    val state: S
-<<<<<<< HEAD
+/**
+ * This is a container class around the actual state itself. It has a few optimizations to ensure
+ * safe usage of state.
+ *
+ * All state reducers are run in a single background thread to ensure that they don't have race
+ * conditions with each other.
+ *
+ */
+internal class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
+    /**
+     * The subject is where state changes should be pushed to.
+     */
+    private val subject: BehaviorSubject<S> = BehaviorSubject.createDefault(initialState)
+    /**
+     * The observable observes the subject but only emits events when the state actually changed.
+     */
+    private val disposables = CompositeDisposable()
+
+    /**
+     * A subject that is used to flush the setState and getState queue. The value emitted on the subject is
+     * not used. It is only used as a signal to flush the queues.
+     */
+    private val flushQueueSubject = BehaviorSubject.create<Unit>()
+
+    private val jobs = Jobs<S>()
+
+    override val observable: Observable<S> = subject.distinctUntilChanged()
+    /**
+     * This is automatically updated from a subscription on the subject for easy access to the
+     * current state.
+     */
+    override val state: S
         // value must be present here, since the subject is created with initialState
         get() = subject.value!!
 
@@ -23,7 +56,7 @@ interface MvRxStateStore<S : Any> : Disposable {
      * Get the current state. The block of code is posted to a queue and all pending setState blocks
      * are guaranteed to run before the get block is run.
      */
-    fun get(block: (S) -> Unit) {
+    override fun get(block: (S) -> Unit) {
         jobs.enqueueGetStateBlock(block)
         flushQueueSubject.onNext(Unit)
     }
@@ -38,7 +71,7 @@ interface MvRxStateStore<S : Any> : Disposable {
      * of the reducer. In this case, it will also implicitly return the only expression so that is
      * all of the code required.
      */
-    fun set(stateReducer: S.() -> S) {
+    override fun set(stateReducer: S.() -> S) {
         jobs.enqueueSetStateBlock(stateReducer)
         flushQueueSubject.onNext(Unit)
     }
@@ -50,12 +83,12 @@ interface MvRxStateStore<S : Any> : Disposable {
 
         @Synchronized
         fun enqueueGetStateBlock(block: (state: S) -> Unit) {
-            getStateQueue.add(block)
+            getStateQueue.push(block)
         }
 
         @Synchronized
         fun enqueueSetStateBlock(block: S.() -> S) {
-            setStateQueue.add(block)
+            setStateQueue.push(block)
         }
 
         @Synchronized
@@ -79,7 +112,7 @@ interface MvRxStateStore<S : Any> : Disposable {
     /**
      * Flushes the setState and getState queues.
      *
-     * This will flush the setState queue then call the first element on the getState queue.
+     * This will flush he setState queue then call the first element on the getState queue.
      *
      * In case the setState queue calls setState, we call flushQueues recursively to flush the setState queue
      * in between every getState block gets processed.
@@ -115,10 +148,9 @@ interface MvRxStateStore<S : Any> : Disposable {
     override fun dispose() {
         disposables.dispose()
     }
-=======
-    fun get(block: (S) -> Unit)
-    fun set(stateReducer: S.() -> S)
-    val observable: Observable<S>
->>>>>>> ScriptableStore
 
+    private fun Disposable.registerDisposable(): Disposable {
+        disposables.add(this)
+        return this
+    }
 }
