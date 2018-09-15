@@ -69,8 +69,8 @@ class FactoryTest : BaseTest() {
 
     @Test(expected = IllegalArgumentException::class)
     fun failOnWrongSingleParameterType() {
-        class OptionalParamViewModel(initialState: String) : BaseMvRxViewModel<FactoryState>(initialState = FactoryState(), debugMode = false)
-        MvRxViewModelProvider.get(OptionalParamViewModel::class.java, activity) { FactoryState(count = 5) }
+        class ViewModel : BaseMvRxViewModel<FactoryState>(initialState = FactoryState(), debugMode = false)
+        MvRxViewModelProvider.get(ViewModel::class.java, activity) { FactoryState(count = 5) }
     }
 
     @Test(expected = IllegalArgumentException::class)

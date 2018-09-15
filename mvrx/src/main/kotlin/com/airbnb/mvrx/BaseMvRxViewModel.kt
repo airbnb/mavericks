@@ -28,10 +28,14 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     private val disposables = CompositeDisposable()
     private val backgroundScheduler = Schedulers.single()
     private val stateStore: MvRxStateStore<S> = MvRxStateStore(initialState)
+    private lateinit var mutableStateChecker: MutableStateChecker<S>
 
     init {
         if (debugMode) {
-            Observable.fromCallable { validateState(initialState) }.subscribeOn(Schedulers.computation()).subscribe()
+            mutableStateChecker = MutableStateChecker(initialState)
+
+            Observable.fromCallable { validateState(initialState) }
+                .subscribeOn(Schedulers.computation()).subscribe()
         }
     }
 
@@ -63,7 +67,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             stateStore.set {
                 val firstState = this.reducer()
                 val secondState = this.reducer()
+
                 if (firstState != secondState) throw IllegalArgumentException("Your reducer must be pure!")
+                mutableStateChecker.onStateChanged(firstState)
+
                 firstState
             }
         } else {
@@ -163,10 +170,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     /**
      * For ViewModels that want to subscribe to itself.
      */
-    protected fun subscribe(subscriber: (S) -> Unit) = stateStore.observable.subscribeLifecycle(null, subscriber)
+    protected fun subscribe(subscriber: (S) -> Unit) =
+        stateStore.observable.subscribeLifecycle(null, subscriber)
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
-    fun subscribe(owner: LifecycleOwner, subscriber: (S) -> Unit) = stateStore.observable.subscribeLifecycle(owner, subscriber)
+    fun subscribe(owner: LifecycleOwner, subscriber: (S) -> Unit) =
+        stateStore.observable.subscribeLifecycle(owner, subscriber)
 
     /**
      * Subscribe to state changes for only a single property.
@@ -279,7 +288,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ) = stateStore.observable
         .map { MvRxTuple3(prop1.get(it), prop2.get(it), prop3.get(it)) }
         .distinctUntilChanged()
-        .subscribeLifecycle(owner) { (a, b, c) -> subscriber(a, b ,c) }
+        .subscribeLifecycle(owner) { (a, b, c) -> subscriber(a, b, c) }
 
     /**
      * Subscribe to state changes for four properties.
@@ -312,14 +321,16 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ) = stateStore.observable
         .map { MvRxTuple4(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it)) }
         .distinctUntilChanged()
-        .subscribeLifecycle(owner) { (a, b, c, d) -> subscriber(a, b ,c, d) }
+        .subscribeLifecycle(owner) { (a, b, c, d) -> subscriber(a, b, c, d) }
 
     private fun <T> Observable<T>.subscribeLifecycle(
         lifecycleOwner: LifecycleOwner? = null,
         subscriber: (T) -> Unit
     ): Disposable {
         if (lifecycleOwner == null) {
-            return observeOn(AndroidSchedulers.mainThread()).subscribe(subscriber).disposeOnClear()
+            return observeOn(AndroidSchedulers.mainThread())
+                .subscribe(subscriber)
+                .disposeOnClear()
         }
 
         val lifecycleAwareObserver = MvRxLifecycleAwareObserver(
@@ -327,7 +338,9 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             alwaysDeliverLastValueWhenUnlocked = true,
             onNext = Consumer<T> { subscriber(it) }
         )
-        return observeOn(AndroidSchedulers.mainThread()).subscribeWith(lifecycleAwareObserver).disposeOnClear()
+        return observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(lifecycleAwareObserver)
+            .disposeOnClear()
     }
 
     protected fun Disposable.disposeOnClear(): Disposable {

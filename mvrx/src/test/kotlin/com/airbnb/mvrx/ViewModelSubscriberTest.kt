@@ -534,16 +534,15 @@ class ViewModelSubscriberTest : BaseTest() {
     }
 
     @Test
-    fun testGettingAroundImmutabilityDoesntWork() {
+    fun testNoEventEmittedIfSameStateIsSet() {
         var callCount = 0
         viewModel.subscribe(owner) {
             callCount++
         }
         assertEquals(1, callCount)
-        viewModel.set { copy(list = ArrayList<Int>().apply { add(5) }) }
-        assertEquals(2, callCount)
-        // This is bad. Don't do this. Your subscribers won't get called.
-        viewModel.set { copy(list = (list as ArrayList<Int>).apply { set(0, 3) }) }
-        assertEquals(2, callCount)
+
+        viewModel.set { copy() }
+        assertEquals(1, callCount)
+
     }
 }
