@@ -5,7 +5,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
-import java.util.LinkedList
+import java.util.*
 
 /**
  * This is a container class around the actual state itself. It has a few optimizations to ensure
@@ -83,12 +83,12 @@ internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
 
         @Synchronized
         fun enqueueGetStateBlock(block: (state: S) -> Unit) {
-            getStateQueue.push(block)
+            getStateQueue.add(block)
         }
 
         @Synchronized
         fun enqueueSetStateBlock(block: S.() -> S) {
-            setStateQueue.push(block)
+            setStateQueue.add(block)
         }
 
         @Synchronized
@@ -112,7 +112,7 @@ internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable {
     /**
      * Flushes the setState and getState queues.
      *
-     * This will flush he setState queue then call the first element on the getState queue.
+     * This will flush the setState queue then call the first element on the getState queue.
      *
      * In case the setState queue calls setState, we call flushQueues recursively to flush the setState queue
      * in between every getState block gets processed.

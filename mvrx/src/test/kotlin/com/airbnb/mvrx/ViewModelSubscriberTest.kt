@@ -10,8 +10,6 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import java.util.concurrent.Semaphore
-import java.util.concurrent.TimeUnit
 
 data class ViewModelTestState(val foo: Int = 0, val bar: Int = 0, val bam: Int = 0, val list: List<Int> = emptyList(), val async: Async<String> = Uninitialized) : MvRxState
 class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewModel<ViewModelTestState>(initialState) {
@@ -101,6 +99,24 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewMod
         }
         Observable.just("Hello World").execute { copy(async = it) }
         assertEquals(3, callCount)
+    }
+
+    fun testSequentialSetStatesWithinWithStateBlock() {
+        var callCount = 0
+        withState {
+            selectSubscribe(ViewModelTestState::foo) {
+                callCount++
+                assertEquals(when (callCount) {
+                    1 -> 0
+                    2 -> 2
+                    else -> throw IllegalArgumentException("Unexpected call count $callCount")
+                }, it)
+            }
+            // These will be coalesced into one update
+            setState { copy(foo = 1) }
+            setState { copy(foo = 2) }
+        }
+        assertEquals(2, callCount)
     }
 
     fun testObservableFail() {
@@ -317,10 +333,14 @@ class ViewModelSubscriberTest : BaseTest() {
     }
 
     @Test
+    fun testSequentialSetStatesWithinWithStateBlock() {
+        viewModel.testSequentialSetStatesWithinWithStateBlock()
+    }
+
+    @Test
     fun testObservableWithMapper() {
         viewModel.testObservableWithMapper()
     }
-
 
     @Test
     fun testObservableFail() {
