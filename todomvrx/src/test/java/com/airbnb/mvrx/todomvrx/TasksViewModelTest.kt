@@ -7,13 +7,11 @@ import com.airbnb.mvrx.todomvrx.data.source.TasksDataSource
 import com.airbnb.mvrx.todomvrx.todoapp.BuildConfig
 import com.airbnb.mvrx.todomvrx.util.RxSchedulersOverrideRule
 import com.airbnb.mvrx.withState
-import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import de.jodamob.reflect.SuperReflect
 import io.reactivex.Single
-import io.reactivex.internal.disposables.DisposableHelper
 import io.reactivex.subjects.SingleSubject
 import org.junit.Assert.*
 import org.junit.Before
@@ -81,7 +79,6 @@ class TasksViewModelTest {
     @Test fun upsertTask_insert() {
         // make `getTasks` emit an error to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.error(Exception("Server not found")))
-        whenever(dataSource.upsertTask(any())).thenReturn(DisposableHelper.DISPOSED)
 
         // given the viewmodel with some tasks
         viewModel = TasksViewModel(TasksState(tasks = tasks), listOf(dataSource))
@@ -109,7 +106,6 @@ class TasksViewModelTest {
     @Test fun upsertTask_update() {
         // make `getTasks` emit an error to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.error(Exception("Server not found")))
-        whenever(dataSource.upsertTask(any())).thenReturn(DisposableHelper.DISPOSED)
 
         // given the viewmodel with some tasks
         viewModel = TasksViewModel(TasksState(tasks = tasks), listOf(dataSource))
@@ -138,7 +134,6 @@ class TasksViewModelTest {
     @Test fun setComplete() {
         // make `getTasks` emit an error to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.error(Exception("Server not found")))
-        whenever(dataSource.upsertTask(any())).thenReturn(DisposableHelper.DISPOSED)
 
         // given the viewmodel with some tasks
         viewModel = TasksViewModel(TasksState(tasks = tasks), listOf(dataSource))
@@ -165,7 +160,6 @@ class TasksViewModelTest {
     @Test fun setComplete_noTaskInList() {
         // make `getTasks` emit an error to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.error(Exception("Server not found")))
-        whenever(dataSource.upsertTask(any())).thenReturn(DisposableHelper.DISPOSED)
 
         // given the viewmodel with some tasks
         viewModel = TasksViewModel(TasksState(tasks = tasks), listOf(dataSource))
@@ -191,7 +185,6 @@ class TasksViewModelTest {
     @Test fun setComplete_taskIsAlreadyCompleted() {
         // make `getTasks` emit an error to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.error(Exception("Server not found")))
-        whenever(dataSource.upsertTask(any())).thenReturn(DisposableHelper.DISPOSED)
 
         // given the viewmodel with some tasks
         viewModel = TasksViewModel(TasksState(tasks = tasks), listOf(dataSource))
@@ -217,7 +210,6 @@ class TasksViewModelTest {
     @Test fun clearCompletedTasks() {
         // make `getTasks` emit an error to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.error(Exception("Server not found")))
-        whenever(dataSource.deleteTask(any())).thenReturn(DisposableHelper.DISPOSED)
 
         // given the viewmodel with some tasks
         viewModel = TasksViewModel(TasksState(tasks = tasks), listOf(dataSource))
@@ -245,7 +237,6 @@ class TasksViewModelTest {
     @Test fun deleteTask() {
         // make `getTasks` emit an error to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.error(Exception("Server not found")))
-        whenever(dataSource.deleteTask(any())).thenReturn(DisposableHelper.DISPOSED)
 
         // given the viewmodel with some tasks
         viewModel = TasksViewModel(TasksState(tasks = tasks), listOf(dataSource))
