@@ -15,7 +15,7 @@ import java.util.*
  * conditions with each other.
  *
  */
-internal class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
+class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
     /**
      * The subject is where state changes should be pushed to.
      */
@@ -83,12 +83,12 @@ internal class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> 
 
         @Synchronized
         fun enqueueGetStateBlock(block: (state: S) -> Unit) {
-            getStateQueue.push(block)
+            getStateQueue.add(block)
         }
 
         @Synchronized
         fun enqueueSetStateBlock(block: S.() -> S) {
-            setStateQueue.push(block)
+            setStateQueue.add(block)
         }
 
         @Synchronized

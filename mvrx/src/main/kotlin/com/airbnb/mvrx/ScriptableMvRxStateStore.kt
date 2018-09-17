@@ -5,7 +5,9 @@ import io.reactivex.subjects.BehaviorSubject
 
 /**
  * A [MvRxStateStore] which ignores standard calls to [set]. Instead it can be scripted via calls to
- * [next]. This is intended to be used to test how
+ * [next]. This is intended to be used for tests only, and in particular UI tests where you wish to test
+ * how your UI code reacts to different ViewModel states. This is not as useful for unit testing your view model,
+ * as business logic in state reducers will not be used.
  */
 class ScriptableMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
 

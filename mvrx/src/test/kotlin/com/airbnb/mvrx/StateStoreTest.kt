@@ -9,7 +9,7 @@ data class MvRxStateStoreTestState(val count: Int = 1, val list: List<Int> = emp
 
 class StateStoreTest : BaseTest() {
 
-    private lateinit var store: RealMvRxStateStore<MvRxStateStoreTestState>
+    private lateinit var store: MvRxStateStore<MvRxStateStoreTestState>
 
     @Before
     fun setup() {
