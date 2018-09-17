@@ -13,7 +13,8 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.exceptions.CompositeException
 import io.reactivex.internal.schedulers.ExecutorScheduler
 import io.reactivex.plugins.RxJavaPlugins
-import kotlinx.coroutines.experimental.Unconfined
+import kotlinx.coroutines.experimental.CoroutineScope
+import kotlinx.coroutines.experimental.Dispatchers
 import org.junit.BeforeClass
 import org.junit.Ignore
 import org.junit.runner.RunWith
@@ -23,10 +24,11 @@ import org.robolectric.android.controller.ActivityController
 import org.robolectric.shadows.ShadowLog
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
+import kotlin.coroutines.experimental.CoroutineContext
 
 @RunWith(RobolectricTestRunner::class)
 @Ignore
-abstract class BaseTest {
+abstract class BaseTest(override val coroutineContext: CoroutineContext = Dispatchers.Unconfined):CoroutineScope {
     companion object {
         @JvmStatic
         @BeforeClass

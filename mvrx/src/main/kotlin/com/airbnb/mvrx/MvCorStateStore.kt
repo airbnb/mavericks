@@ -1,15 +1,19 @@
 package com.airbnb.mvrx
 
 import io.reactivex.Observable
-import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import kotlinx.coroutines.experimental.CoroutineDispatcher
-import kotlinx.coroutines.experimental.DefaultDispatcher
+import kotlinx.coroutines.experimental.CoroutineScope
+import kotlinx.coroutines.experimental.Dispatchers
+import kotlinx.coroutines.experimental.cancel
 import kotlinx.coroutines.experimental.channels.Channel
 import kotlinx.coroutines.experimental.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.experimental.channels.actor
+import kotlinx.coroutines.experimental.channels.consumeEach
+import kotlinx.coroutines.experimental.isActive
 import kotlinx.coroutines.experimental.rx2.asObservable
 import java.util.*
+import kotlin.coroutines.experimental.CoroutineContext
+
 
 /**
  * This is a container class around the actual state itself. It has a few optimizations to ensure
@@ -20,7 +24,8 @@ import java.util.*
  *
  */
 
-internal open class MvCorStateStore<S : Any>(initialState: S, coroutineDispatcher: CoroutineDispatcher = DefaultDispatcher) : Disposable, IMvRxStateStore<S> {
+internal open class MvCorStateStore<S : Any>(initialState: S, final override val coroutineContext: CoroutineContext = Dispatchers.Default) : Disposable, CoroutineScope, StateStore<S> {
+
     /**
      * The stateChannel is where state changes should be pushed to.
      */
@@ -29,10 +34,7 @@ internal open class MvCorStateStore<S : Any>(initialState: S, coroutineDispatche
      * The observable observes the stateChannel but only emits events when the state actually changed.
      */
 
-    private val disposables = CompositeDisposable()
-
-
-    override val observable: Observable<S> = stateChannel.openSubscription().asObservable(coroutineDispatcher).distinctUntilChanged()
+    override val observable: Observable<S> = stateChannel.openSubscription().asObservable(coroutineContext).distinctUntilChanged()
     /**
      * This is automatically updated from a subscription on the stateChannel for easy access to the
      * current state.
@@ -45,23 +47,27 @@ internal open class MvCorStateStore<S : Any>(initialState: S, coroutineDispatche
         class GetQueueElement<S>(val block: (S) -> Unit) : Job<S>()
     }
 
-    private val actor = actor<Job<S>>(context = coroutineDispatcher, capacity = Channel.UNLIMITED) {
+    /**
+     * Actor responsible for processing get and set blocks. Sequentially processes every block, SetQueueElement in higher priority.
+     * Once every SetQueueElement is processed actor iterates over GetQueueElements until no elements are left, or a new message
+     * is sent to an actor
+     */
+    private val actor = actor<Job<S>>(coroutineContext, capacity = Channel.UNLIMITED) {
 
-        val getQueue = LinkedList<(S)->Unit>()
 
-        for (msg in channel) { // iterate over incoming messages
+        val getQueue = ArrayDeque<(S) -> Unit>()
+        consumeEach { msg ->
             try {
                 when (msg) {
-                    is Job.GetQueueElement<S> -> getQueue.push(msg.block)
+                    is Job.GetQueueElement<S> -> getQueue.offer(msg.block)
 
                     is Job.SetQueueElement<S> -> stateChannel.value
-                                .let { msg.reducer(it) }
-                                .let(stateChannel::offer)
+                            .let { msg.reducer(it) }
+                            .let(stateChannel::offer)
                 }
 
-                if(channel.isEmpty) {
-                    getQueue.forEach { it(stateChannel.value) }
-                    getQueue.clear()
+                while (channel.isEmpty) {
+                    stateChannel.value.let(getQueue.poll() ?: break)
                 }
 
             } catch (t: Throwable) {
@@ -102,14 +108,10 @@ internal open class MvCorStateStore<S : Any>(initialState: S, coroutineDispatche
         e?.let { throw it }
     }
 
-    override fun isDisposed() = disposables.isDisposed
+    override fun isDisposed() = coroutineContext.isActive
 
     override fun dispose() {
-        disposables.dispose()
+        coroutineContext.cancel()
     }
 
-    private fun Disposable.registerDisposable(): Disposable {
-        disposables.add(this)
-        return this
-    }
 }

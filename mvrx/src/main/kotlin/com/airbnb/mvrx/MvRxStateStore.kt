@@ -5,7 +5,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
-import java.util.LinkedList
+import java.util.*
 
 /**
  * This is a container class around the actual state itself. It has a few optimizations to ensure
@@ -15,7 +15,7 @@ import java.util.LinkedList
  * conditions with each other.
  *
  */
-internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable, IMvRxStateStore<S> {
+internal open class MvRxStateStore<S : Any>(initialState: S) : Disposable, StateStore<S> {
     /**
      * The subject is where state changes should be pushed to.
      */

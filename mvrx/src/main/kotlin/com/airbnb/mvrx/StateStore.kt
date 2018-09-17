@@ -2,7 +2,7 @@ package com.airbnb.mvrx
 
 import io.reactivex.Observable
 
-interface IMvRxStateStore<S : Any> {
+interface StateStore<S : Any> {
 
     val observable: Observable<S>
     /**
