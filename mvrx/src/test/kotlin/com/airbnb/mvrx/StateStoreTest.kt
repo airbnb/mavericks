@@ -1,6 +1,5 @@
 package com.airbnb.mvrx
 
-import android.arch.lifecycle.Lifecycle
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -14,7 +13,7 @@ class StateStoreTest : BaseTest() {
 
     @Before
     fun setup() {
-        store = MvRxStateStore(MvRxStateStoreTestState())
+        store = RealMvRxStateStore(MvRxStateStoreTestState())
     }
 
     @Test
