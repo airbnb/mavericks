@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicReference
  * When in a lower lifecycle state, the most recent update will be saved, and delivered when active again.
  */
 internal class MvRxLifecycleAwareObserver<T>(
-    owner: LifecycleOwner,
+    private var owner: LifecycleOwner?,
     private val activeState: Lifecycle.State = DEFAULT_ACTIVE_STATE,
     private val alwaysDeliverLastValueWhenUnlocked: Boolean = false,
     private var sourceObserver: Observer<T>?) : AtomicReference<Disposable>(), LifecycleObserver, Observer<T>, Disposable {
@@ -37,7 +37,6 @@ internal class MvRxLifecycleAwareObserver<T>(
         onNext: Consumer<T> = Functions.emptyConsumer()
     ) : this(owner, activeState, alwaysDeliverLastValueWhenUnlocked, LambdaObserver<T>(onNext, onError, onComplete, onSubscribe))
 
-    private var owner: LifecycleOwner? = owner
     private var lastUndeliveredValue: T? = null
     private var lastValue: T? = null
     private val locked = AtomicBoolean(true)
