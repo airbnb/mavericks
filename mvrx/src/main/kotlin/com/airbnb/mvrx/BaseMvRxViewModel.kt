@@ -331,7 +331,6 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 
         val lifecycleAwareObserver = MvRxLifecycleAwareObserver(
             lifecycleOwner,
-            alwaysDeliverLastValueWhenUnlocked = true,
             onNext = Consumer<T> { subscriber(it) }
         )
         return observeOn(AndroidSchedulers.mainThread())

@@ -475,6 +475,39 @@ class ViewModelSubscriberTest : BaseTest() {
         assertEquals(3, callCount)
     }
 
+    @Test
+    fun testSubscribeCalledOnStartIfUpdateOccurredInStop() {
+        owner.lifecycle.markState(Lifecycle.State.STARTED)
+
+        var callCount = 0
+        viewModel.subscribe(owner) {
+            callCount++
+        }
+
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+
+        viewModel.setFoo(1)
+        assertEquals(1, callCount)
+
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+        assertEquals(2, callCount)
+    }
+
+    @Test
+    fun testSubscribeNotCalledOnStartIfNoUpdateOccurredInStop() {
+        owner.lifecycle.markState(Lifecycle.State.STARTED)
+
+        var callCount = 0
+        viewModel.subscribe(owner) {
+            callCount++
+        }
+
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        assertEquals(1, callCount)
+
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+        assertEquals(1, callCount)
+    }
 
     @Test
     fun testAsync() {
