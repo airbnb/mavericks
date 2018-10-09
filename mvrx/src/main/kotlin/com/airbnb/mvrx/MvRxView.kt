@@ -38,8 +38,11 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      * Subscribes to all state updates for the given viewModel.
      *
      * @param uniqueOnly If true, when this MvRxView goes from a stopped to start lifecycle a state value
-     * will only be emitted if the state changed. This is useful for transient views that should only be shown once,
-     * or logging. Default: false.
+     * will only be emitted if the state changed. This is useful for transient views that should only
+     * be shown once (toasts, poptarts), or logging. Most other views should use false, as when a view is destroyed
+     * and recreated the previous state is necessary to recreate the view.
+     *
+     * Default: false.
      */
     fun <S : MvRxState> BaseMvRxViewModel<S>.subscribe(uniqueOnly: Boolean = false, subscriber: (S) -> Unit) = subscribe(this@MvRxView, uniqueOnly, subscriber)
 
@@ -48,8 +51,11 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      * only that single property.
      *
      * @param uniqueOnly If true, when this MvRxView goes from a stopped to start lifecycle a state value
-     * will only be emitted if the state changed. This is useful for transient views that should only be shown once,
-     * or logging. Default: false.
+     * will only be emitted if the state changed. This is useful for transient views that should only
+     * be shown once (toasts, poptarts), or logging. Most other views should use false, as when a view is destroyed
+     * and recreated the previous state is necessary to recreate the view.
+     *
+     * Default: false.
      */
     fun <S : MvRxState, A> BaseMvRxViewModel<S>.selectSubscribe(
         prop1: KProperty1<S, A>,
@@ -62,8 +68,11 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      * and onFail which automatically unwrap the value or error.
      *
      * @param uniqueOnly If true, when this MvRxView goes from a stopped to start lifecycle a state value
-     * will only be emitted if the state changed. This is useful for transient views that should only be shown once,
-     * or logging. Default: false.
+     * will only be emitted if the state changed. This is useful for transient views that should only
+     * be shown once (toasts, poptarts), or logging. Most other views should use false, as when a view is destroyed
+     * and recreated the previous state is necessary to recreate the view.
+     *
+     * Default: false.
      */
     fun <S : MvRxState, T> BaseMvRxViewModel<S>.asyncSubscribe(
         asyncProp: KProperty1<S, Async<T>>,
@@ -76,8 +85,11 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      * Subscribes to state changes for two properties.
      *
      * @param uniqueOnly If true, when this MvRxView goes from a stopped to start lifecycle a state value
-     * will only be emitted if the state changed. This is useful for transient views that should only be shown once,
-     * or logging. Default: false.
+     * will only be emitted if the state changed. This is useful for transient views that should only
+     * be shown once (toasts, poptarts), or logging. Most other views should use false, as when a view is destroyed
+     * and recreated the previous state is necessary to recreate the view.
+     *
+     * Default: false.
      */
     fun <S : MvRxState, A, B> BaseMvRxViewModel<S>.selectSubscribe(
         prop1: KProperty1<S, A>,
@@ -90,8 +102,11 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      * Subscribes to state changes for three properties.
      *
      * @param uniqueOnly If true, when this MvRxView goes from a stopped to start lifecycle a state value
-     * will only be emitted if the state changed. This is useful for transient views that should only be shown once,
-     * or logging. Default: false.
+     * will only be emitted if the state changed. This is useful for transient views that should only
+     * be shown once (toasts, poptarts), or logging. Most other views should use false, as when a view is destroyed
+     * and recreated the previous state is necessary to recreate the view.
+     *
+     * Default: false.
      */
     fun <S : MvRxState, A, B, C> BaseMvRxViewModel<S>.selectSubscribe(
         prop1: KProperty1<S, A>,
@@ -105,8 +120,11 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      * Subscribes to state changes for four properties.
      *
      * @param uniqueOnly If true, when this MvRxView goes from a stopped to start lifecycle a state value
-     * will only be emitted if the state changed. This is useful for transient views that should only be shown once,
-     * or logging. Default: false.
+     * will only be emitted if the state changed. This is useful for transient views that should only
+     * be shown once (toasts, poptarts), or logging. Most other views should use false, as when a view is destroyed
+     * and recreated the previous state is necessary to recreate the view.
+     *
+     * Default: false.
      */
     fun <S : MvRxState, A, B, C, D> BaseMvRxViewModel<S>.selectSubscribe(
         prop1: KProperty1<S, A>,
