@@ -476,11 +476,27 @@ class ViewModelSubscriberTest : BaseTest() {
     }
 
     @Test
-    fun testSubscribeCalledOnStartIfUpdateOccurredInStop() {
+    fun testSubscribeCalledOnRestart() {
+        owner.lifecycle.markState(Lifecycle.State.RESUMED)
+        var callCount = 0
+        viewModel.subscribe(owner) {
+            callCount++
+        }
+        assertEquals(1, callCount)
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+        assertEquals(1, callCount)
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        assertEquals(1, callCount)
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+        assertEquals(2, callCount)
+    }
+
+    @Test
+    fun testUniqueOnlySubscribeCalledOnStartIfUpdateOccurredInStop() {
         owner.lifecycle.markState(Lifecycle.State.STARTED)
 
         var callCount = 0
-        viewModel.subscribe(owner) {
+        viewModel.subscribe(owner, uniqueOnly = true) {
             callCount++
         }
 
@@ -498,7 +514,7 @@ class ViewModelSubscriberTest : BaseTest() {
         owner.lifecycle.markState(Lifecycle.State.STARTED)
 
         var callCount = 0
-        viewModel.subscribe(owner) {
+        viewModel.subscribe(owner, uniqueOnly = true) {
             callCount++
         }
 
