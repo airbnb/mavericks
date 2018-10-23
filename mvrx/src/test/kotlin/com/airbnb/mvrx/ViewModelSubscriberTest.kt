@@ -475,6 +475,55 @@ class ViewModelSubscriberTest : BaseTest() {
         assertEquals(3, callCount)
     }
 
+    @Test
+    fun testSubscribeCalledOnRestart() {
+        owner.lifecycle.markState(Lifecycle.State.RESUMED)
+        var callCount = 0
+        viewModel.subscribe(owner) {
+            callCount++
+        }
+        assertEquals(1, callCount)
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+        assertEquals(1, callCount)
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        assertEquals(1, callCount)
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+        assertEquals(2, callCount)
+    }
+
+    @Test
+    fun testUniqueOnlySubscribeCalledOnStartIfUpdateOccurredInStop() {
+        owner.lifecycle.markState(Lifecycle.State.STARTED)
+
+        var callCount = 0
+        viewModel.subscribe(owner, uniqueOnly = true) {
+            callCount++
+        }
+
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+
+        viewModel.setFoo(1)
+        assertEquals(1, callCount)
+
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+        assertEquals(2, callCount)
+    }
+
+    @Test
+    fun testSubscribeNotCalledOnStartIfNoUpdateOccurredInStop() {
+        owner.lifecycle.markState(Lifecycle.State.STARTED)
+
+        var callCount = 0
+        viewModel.subscribe(owner, uniqueOnly = true) {
+            callCount++
+        }
+
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        assertEquals(1, callCount)
+
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+        assertEquals(1, callCount)
+    }
 
     @Test
     fun testAsync() {
@@ -490,23 +539,6 @@ class ViewModelSubscriberTest : BaseTest() {
         }
         viewModel.setAsync(Success(success))
         viewModel.setAsync(Fail(fail))
-        assertEquals(2, callCount)
-    }
-
-    @Test
-    fun testSubscribeCalledOnRestart() {
-        owner.lifecycle.markState(Lifecycle.State.RESUMED)
-
-        var callCount = 0
-        viewModel.subscribe(owner) {
-            callCount++
-        }
-        assertEquals(1, callCount)
-        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-        assertEquals(1, callCount)
-        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
-        assertEquals(1, callCount)
-        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
         assertEquals(2, callCount)
     }
 
