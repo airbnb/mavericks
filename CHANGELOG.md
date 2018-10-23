@@ -5,7 +5,7 @@
 - New: Add ScriptableStateStore interface for UI testing. [#88](https://github.com/airbnb/MvRx/pull/88)
 - New: Debug validation for state immutability [#90](https://github.com/airbnb/MvRx/pull/90)
 - Fix: Execute no longer sets a default subscribeOn thread. [#75](https://github.com/airbnb/MvRx/pull/75)
-- Fix: Memory leaks. #110, [#111](https://github.com/airbnb/MvRx/pull/111)
+- Fix: Memory leaks. [#110](https://github.com/airbnb/MvRx/pull/110), [#111](https://github.com/airbnb/MvRx/pull/111)
 - Fix: Proper Proguard Rules. [#78](https://github.com/airbnb/MvRx/pull/78)
 - Fix: Multiple `setState` called within a `withState` will execute in expected order. [#89](https://github.com/airbnb/MvRx/pull/89)
 
