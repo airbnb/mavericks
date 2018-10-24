@@ -11,7 +11,16 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-data class ViewModelTestState(val foo: Int = 0, val bar: Int = 0, val bam: Int = 0, val list: List<Int> = emptyList(), val async: Async<String> = Uninitialized) : MvRxState
+data class ViewModelTestState(
+        val foo: Int = 0,
+        val bar: Int = 0,
+        val bam: Int = 0,
+        val list: List<Int> = emptyList(),
+        val async: Async<String> = Uninitialized,
+        val prop6: Int = 0,
+        val prop7: Int = 0
+) : MvRxState
+
 class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewModel<ViewModelTestState>(initialState) {
 
     var subscribeCallCount = 0
@@ -207,10 +216,10 @@ class ViewModelSubscriberTest : BaseTest() {
     fun testSelectSubscribe3External() {
         var callCount = 0
         viewModel.selectSubscribe(
-            owner,
-            ViewModelTestState::foo,
-            ViewModelTestState::bar,
-            ViewModelTestState::bam
+                owner,
+                ViewModelTestState::foo,
+                ViewModelTestState::bar,
+                ViewModelTestState::bam
         ) { _, _, _ -> callCount++ }
         assertEquals(1, callCount)
         viewModel.setFoo(1)
@@ -225,11 +234,11 @@ class ViewModelSubscriberTest : BaseTest() {
     fun testSelectSubscribe4External() {
         var callCount = 0
         viewModel.selectSubscribe(
-            owner,
-            ViewModelTestState::foo,
-            ViewModelTestState::bar,
-            ViewModelTestState::bam,
-            ViewModelTestState::list
+                owner,
+                ViewModelTestState::foo,
+                ViewModelTestState::bar,
+                ViewModelTestState::bam,
+                ViewModelTestState::list
         ) { _, _, _, _ -> callCount++ }
         assertEquals(1, callCount)
         viewModel.setFoo(1)
@@ -238,8 +247,90 @@ class ViewModelSubscriberTest : BaseTest() {
         assertEquals(3, callCount)
         viewModel.setBam(2)
         assertEquals(4, callCount)
-        viewModel.set{ copy(list = listOf(1, 2, 3)) }
+        viewModel.set { copy(list = listOf(1, 2, 3)) }
         assertEquals(5, callCount)
+    }
+
+
+    @Test
+    fun testSelectSubscribe5External() {
+        var callCount = 0
+        viewModel.selectSubscribe(
+                owner,
+                ViewModelTestState::foo,
+                ViewModelTestState::bar,
+                ViewModelTestState::bam,
+                ViewModelTestState::list,
+                ViewModelTestState::async
+        ) { _, _, _, _, _ -> callCount++ }
+        assertEquals(1, callCount)
+        viewModel.setFoo(1)
+        assertEquals(2, callCount)
+        viewModel.setBar(2)
+        assertEquals(3, callCount)
+        viewModel.setBam(2)
+        assertEquals(4, callCount)
+        viewModel.set { copy(list = listOf(1, 2, 3)) }
+        assertEquals(5, callCount)
+        viewModel.set { copy(async = Loading()) }
+        assertEquals(6, callCount)
+    }
+
+    @Test
+    fun testSelectSubscribe6External() {
+        var callCount = 0
+        viewModel.selectSubscribe(
+                owner,
+                ViewModelTestState::foo,
+                ViewModelTestState::bar,
+                ViewModelTestState::bam,
+                ViewModelTestState::list,
+                ViewModelTestState::async,
+                ViewModelTestState::prop6
+        ) { _, _, _, _, _, _ -> callCount++ }
+        assertEquals(1, callCount)
+        viewModel.setFoo(1)
+        assertEquals(2, callCount)
+        viewModel.setBar(2)
+        assertEquals(3, callCount)
+        viewModel.setBam(2)
+        assertEquals(4, callCount)
+        viewModel.set { copy(list = listOf(1, 2, 3)) }
+        assertEquals(5, callCount)
+        viewModel.set { copy(async = Loading()) }
+        assertEquals(6, callCount)
+        viewModel.set { copy(prop6 = 1) }
+        assertEquals(7, callCount)
+    }
+
+    @Test
+    fun testSelectSubscribe7External() {
+        var callCount = 0
+        viewModel.selectSubscribe(
+                owner,
+                ViewModelTestState::foo,
+                ViewModelTestState::bar,
+                ViewModelTestState::bam,
+                ViewModelTestState::list,
+                ViewModelTestState::async,
+                ViewModelTestState::prop6,
+                ViewModelTestState::prop7
+        ) { _, _, _, _, _, _, _ -> callCount++ }
+        assertEquals(1, callCount)
+        viewModel.setFoo(1)
+        assertEquals(2, callCount)
+        viewModel.setBar(2)
+        assertEquals(3, callCount)
+        viewModel.setBam(2)
+        assertEquals(4, callCount)
+        viewModel.set { copy(list = listOf(1, 2, 3)) }
+        assertEquals(5, callCount)
+        viewModel.set { copy(async = Loading()) }
+        assertEquals(6, callCount)
+        viewModel.set { copy(prop6 = 1) }
+        assertEquals(7, callCount)
+        viewModel.set { copy(prop7 = 1) }
+        assertEquals(8, callCount)
     }
 
     @Test
