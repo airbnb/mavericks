@@ -1,6 +1,7 @@
 # Change log
 
-## Version 0.6.0 (Current development)
+## Version 0.6.0
+*(2018-10-23)*
 - New: Option to not re-emit the most recent state value when transitioning from stopped -> start. [#113](https://github.com/airbnb/MvRx/pull/113)
 - New: Add ScriptableStateStore interface for UI testing. [#88](https://github.com/airbnb/MvRx/pull/88)
 - New: Debug validation for state immutability [#90](https://github.com/airbnb/MvRx/pull/90)
