@@ -11,8 +11,10 @@ import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.starProjectedType
 
-private const val IMMUTABLE_LIST_MESSAGE = "Use the immutable listOf(...) method instead. You can append it with `val newList = listA + listB`"
-private const val IMMUTABLE_MAP_MESSAGE = "Use the immutable mapOf(...) method instead. You can append it with `val newMap = mapA + mapB`"
+private const val IMMUTABLE_LIST_MESSAGE =
+    "Use the immutable listOf(...) method instead. You can append it with `val newList = listA + listB`"
+private const val IMMUTABLE_MAP_MESSAGE =
+    "Use the immutable mapOf(...) method instead. You can append it with `val newMap = mapA + mapB`"
 
 /**
  * Ensures that the state class is immutable.
@@ -25,7 +27,8 @@ private const val IMMUTABLE_MAP_MESSAGE = "Use the immutable mapOf(...) method i
 internal fun KClass<*>.assertImmutability() {
     require(this.isData) { "MvRx state must be a data class!" }
 
-    fun KProperty1<*, *>.isSubtype(klass: KClass<*>) = returnType.isSubtypeOf(klass.starProjectedType)
+    fun KProperty1<*, *>.isSubtype(klass: KClass<*>) =
+        returnType.isSubtypeOf(klass.starProjectedType)
 
     this.declaredMemberProperties.forEach {
         when {
@@ -41,3 +44,31 @@ internal fun KClass<*>.assertImmutability() {
         }?.let { throw IllegalArgumentException(it) }
     }
 }
+
+/**
+ * Checks that a state's value is not changed over its lifetime.
+ */
+internal class MutableStateChecker<S : MvRxState>(val initialState: S) {
+
+    data class StateWrapper<S : MvRxState>(val state: S) {
+        private val originalHashCode = hashCode()
+
+        fun validate() = require(originalHashCode == hashCode()) {
+            "${state::class.java.simpleName} was mutated. State classes should be immutable."
+        }
+    }
+
+    private var previousState = StateWrapper(initialState)
+
+    /**
+     * Should be called whenever state changes. This validates that the hashcode of each state
+     * instance does not change between when it is first set and when the next state is set.
+     * If it does change it means different state instances share some mutable data structure.
+     */
+    fun onStateChanged(newState: S) {
+        previousState.validate()
+        previousState = StateWrapper(newState)
+    }
+}
+
+

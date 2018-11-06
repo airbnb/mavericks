@@ -10,10 +10,17 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import java.util.concurrent.Semaphore
-import java.util.concurrent.TimeUnit
 
-data class ViewModelTestState(val foo: Int = 0, val bar: Int = 0, val bam: Int = 0, val list: List<Int> = emptyList(), val async: Async<String> = Uninitialized) : MvRxState
+data class ViewModelTestState(
+        val foo: Int = 0,
+        val bar: Int = 0,
+        val bam: Int = 0,
+        val list: List<Int> = emptyList(),
+        val async: Async<String> = Uninitialized,
+        val prop6: Int = 0,
+        val prop7: Int = 0
+) : MvRxState
+
 class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewModel<ViewModelTestState>(initialState) {
 
     var subscribeCallCount = 0
@@ -101,6 +108,24 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewMod
         }
         Observable.just("Hello World").execute { copy(async = it) }
         assertEquals(3, callCount)
+    }
+
+    fun testSequentialSetStatesWithinWithStateBlock() {
+        var callCount = 0
+        withState {
+            selectSubscribe(ViewModelTestState::foo) {
+                callCount++
+                assertEquals(when (callCount) {
+                    1 -> 0
+                    2 -> 2
+                    else -> throw IllegalArgumentException("Unexpected call count $callCount")
+                }, it)
+            }
+            // These will be coalesced into one update
+            setState { copy(foo = 1) }
+            setState { copy(foo = 2) }
+        }
+        assertEquals(2, callCount)
     }
 
     fun testObservableFail() {
@@ -191,10 +216,10 @@ class ViewModelSubscriberTest : BaseTest() {
     fun testSelectSubscribe3External() {
         var callCount = 0
         viewModel.selectSubscribe(
-            owner,
-            ViewModelTestState::foo,
-            ViewModelTestState::bar,
-            ViewModelTestState::bam
+                owner,
+                ViewModelTestState::foo,
+                ViewModelTestState::bar,
+                ViewModelTestState::bam
         ) { _, _, _ -> callCount++ }
         assertEquals(1, callCount)
         viewModel.setFoo(1)
@@ -209,11 +234,11 @@ class ViewModelSubscriberTest : BaseTest() {
     fun testSelectSubscribe4External() {
         var callCount = 0
         viewModel.selectSubscribe(
-            owner,
-            ViewModelTestState::foo,
-            ViewModelTestState::bar,
-            ViewModelTestState::bam,
-            ViewModelTestState::list
+                owner,
+                ViewModelTestState::foo,
+                ViewModelTestState::bar,
+                ViewModelTestState::bam,
+                ViewModelTestState::list
         ) { _, _, _, _ -> callCount++ }
         assertEquals(1, callCount)
         viewModel.setFoo(1)
@@ -222,8 +247,90 @@ class ViewModelSubscriberTest : BaseTest() {
         assertEquals(3, callCount)
         viewModel.setBam(2)
         assertEquals(4, callCount)
-        viewModel.set{ copy(list = listOf(1, 2, 3)) }
+        viewModel.set { copy(list = listOf(1, 2, 3)) }
         assertEquals(5, callCount)
+    }
+
+
+    @Test
+    fun testSelectSubscribe5External() {
+        var callCount = 0
+        viewModel.selectSubscribe(
+                owner,
+                ViewModelTestState::foo,
+                ViewModelTestState::bar,
+                ViewModelTestState::bam,
+                ViewModelTestState::list,
+                ViewModelTestState::async
+        ) { _, _, _, _, _ -> callCount++ }
+        assertEquals(1, callCount)
+        viewModel.setFoo(1)
+        assertEquals(2, callCount)
+        viewModel.setBar(2)
+        assertEquals(3, callCount)
+        viewModel.setBam(2)
+        assertEquals(4, callCount)
+        viewModel.set { copy(list = listOf(1, 2, 3)) }
+        assertEquals(5, callCount)
+        viewModel.set { copy(async = Loading()) }
+        assertEquals(6, callCount)
+    }
+
+    @Test
+    fun testSelectSubscribe6External() {
+        var callCount = 0
+        viewModel.selectSubscribe(
+                owner,
+                ViewModelTestState::foo,
+                ViewModelTestState::bar,
+                ViewModelTestState::bam,
+                ViewModelTestState::list,
+                ViewModelTestState::async,
+                ViewModelTestState::prop6
+        ) { _, _, _, _, _, _ -> callCount++ }
+        assertEquals(1, callCount)
+        viewModel.setFoo(1)
+        assertEquals(2, callCount)
+        viewModel.setBar(2)
+        assertEquals(3, callCount)
+        viewModel.setBam(2)
+        assertEquals(4, callCount)
+        viewModel.set { copy(list = listOf(1, 2, 3)) }
+        assertEquals(5, callCount)
+        viewModel.set { copy(async = Loading()) }
+        assertEquals(6, callCount)
+        viewModel.set { copy(prop6 = 1) }
+        assertEquals(7, callCount)
+    }
+
+    @Test
+    fun testSelectSubscribe7External() {
+        var callCount = 0
+        viewModel.selectSubscribe(
+                owner,
+                ViewModelTestState::foo,
+                ViewModelTestState::bar,
+                ViewModelTestState::bam,
+                ViewModelTestState::list,
+                ViewModelTestState::async,
+                ViewModelTestState::prop6,
+                ViewModelTestState::prop7
+        ) { _, _, _, _, _, _, _ -> callCount++ }
+        assertEquals(1, callCount)
+        viewModel.setFoo(1)
+        assertEquals(2, callCount)
+        viewModel.setBar(2)
+        assertEquals(3, callCount)
+        viewModel.setBam(2)
+        assertEquals(4, callCount)
+        viewModel.set { copy(list = listOf(1, 2, 3)) }
+        assertEquals(5, callCount)
+        viewModel.set { copy(async = Loading()) }
+        assertEquals(6, callCount)
+        viewModel.set { copy(prop6 = 1) }
+        assertEquals(7, callCount)
+        viewModel.set { copy(prop7 = 1) }
+        assertEquals(8, callCount)
     }
 
     @Test
@@ -317,10 +424,14 @@ class ViewModelSubscriberTest : BaseTest() {
     }
 
     @Test
+    fun testSequentialSetStatesWithinWithStateBlock() {
+        viewModel.testSequentialSetStatesWithinWithStateBlock()
+    }
+
+    @Test
     fun testObservableWithMapper() {
         viewModel.testObservableWithMapper()
     }
-
 
     @Test
     fun testObservableFail() {
@@ -455,6 +566,55 @@ class ViewModelSubscriberTest : BaseTest() {
         assertEquals(3, callCount)
     }
 
+    @Test
+    fun testSubscribeCalledOnRestart() {
+        owner.lifecycle.markState(Lifecycle.State.RESUMED)
+        var callCount = 0
+        viewModel.subscribe(owner) {
+            callCount++
+        }
+        assertEquals(1, callCount)
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
+        assertEquals(1, callCount)
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        assertEquals(1, callCount)
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+        assertEquals(2, callCount)
+    }
+
+    @Test
+    fun testUniqueOnlySubscribeCalledOnStartIfUpdateOccurredInStop() {
+        owner.lifecycle.markState(Lifecycle.State.STARTED)
+
+        var callCount = 0
+        viewModel.subscribe(owner, uniqueOnly = true) {
+            callCount++
+        }
+
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+
+        viewModel.setFoo(1)
+        assertEquals(1, callCount)
+
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+        assertEquals(2, callCount)
+    }
+
+    @Test
+    fun testSubscribeNotCalledOnStartIfNoUpdateOccurredInStop() {
+        owner.lifecycle.markState(Lifecycle.State.STARTED)
+
+        var callCount = 0
+        viewModel.subscribe(owner, uniqueOnly = true) {
+            callCount++
+        }
+
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+        assertEquals(1, callCount)
+
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
+        assertEquals(1, callCount)
+    }
 
     @Test
     fun testAsync() {
@@ -470,23 +630,6 @@ class ViewModelSubscriberTest : BaseTest() {
         }
         viewModel.setAsync(Success(success))
         viewModel.setAsync(Fail(fail))
-        assertEquals(2, callCount)
-    }
-
-    @Test
-    fun testSubscribeCalledOnRestart() {
-        owner.lifecycle.markState(Lifecycle.State.RESUMED)
-
-        var callCount = 0
-        viewModel.subscribe(owner) {
-            callCount++
-        }
-        assertEquals(1, callCount)
-        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_PAUSE)
-        assertEquals(1, callCount)
-        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
-        assertEquals(1, callCount)
-        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_START)
         assertEquals(2, callCount)
     }
 
@@ -534,16 +677,15 @@ class ViewModelSubscriberTest : BaseTest() {
     }
 
     @Test
-    fun testGettingAroundImmutabilityDoesntWork() {
+    fun testNoEventEmittedIfSameStateIsSet() {
         var callCount = 0
         viewModel.subscribe(owner) {
             callCount++
         }
         assertEquals(1, callCount)
-        viewModel.set { copy(list = ArrayList<Int>().apply { add(5) }) }
-        assertEquals(2, callCount)
-        // This is bad. Don't do this. Your subscribers won't get called.
-        viewModel.set { copy(list = (list as ArrayList<Int>).apply { set(0, 3) }) }
-        assertEquals(2, callCount)
+
+        viewModel.set { copy() }
+        assertEquals(1, callCount)
+
     }
 }

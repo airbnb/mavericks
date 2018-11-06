@@ -22,16 +22,19 @@ import kotlin.reflect.KVisibility
  */
 abstract class BaseMvRxViewModel<S : MvRxState>(
     initialState: S,
-    private val debugMode: Boolean = false
+    private val debugMode: Boolean = false,
+    private val stateStore: MvRxStateStore<S> = RealMvRxStateStore(initialState)
 ) : ViewModel() {
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
-    private val backgroundScheduler = Schedulers.single()
-    private val stateStore: MvRxStateStore<S> = MvRxStateStore(initialState)
+    private lateinit var mutableStateChecker: MutableStateChecker<S>
 
     init {
         if (debugMode) {
-            Observable.fromCallable { validateState(initialState) }.subscribeOn(Schedulers.computation()).subscribe()
+            mutableStateChecker = MutableStateChecker(initialState)
+
+            Observable.fromCallable { validateState(initialState) }
+                .subscribeOn(Schedulers.computation()).subscribe()
         }
     }
 
@@ -63,7 +66,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             stateStore.set {
                 val firstState = this.reducer()
                 val secondState = this.reducer()
+
                 if (firstState != secondState) throw IllegalArgumentException("Your reducer must be pure!")
+                mutableStateChecker.onStateChanged(firstState)
+
                 firstState
             }
         } else {
@@ -137,16 +143,13 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         successMetaData: ((T) -> Any)? = null,
         stateReducer: S.(Async<V>) -> S
     ): Disposable {
-        // This will ensure that Loading is dispatched immediately rather than being posted to `backgroundScheduler` before emitting Loading.
         setState { stateReducer(Loading()) }
 
-        return observeOn(backgroundScheduler)
-            .subscribeOn(backgroundScheduler)
-            .map {
-                val success = Success(mapper(it))
-                success.metadata = successMetaData?.invoke(it)
-                success as Async<V>
-            }
+        return map {
+            val success = Success(mapper(it))
+            success.metadata = successMetaData?.invoke(it)
+            success as Async<V>
+        }
             .onErrorReturn { Fail(it) }
             .subscribe { asyncData -> setState { stateReducer(asyncData) } }
             .disposeOnClear()
@@ -163,10 +166,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     /**
      * For ViewModels that want to subscribe to itself.
      */
-    protected fun subscribe(subscriber: (S) -> Unit) = stateStore.observable.subscribeLifecycle(null, subscriber)
+    protected fun subscribe(subscriber: (S) -> Unit) =
+        stateStore.observable.subscribeLifecycle(null, false, subscriber)
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
-    fun subscribe(owner: LifecycleOwner, subscriber: (S) -> Unit) = stateStore.observable.subscribeLifecycle(owner, subscriber)
+    fun subscribe(owner: LifecycleOwner, uniqueOnly: Boolean = false, subscriber: (S) -> Unit) =
+        stateStore.observable.subscribeLifecycle(owner, uniqueOnly, subscriber)
 
     /**
      * Subscribe to state changes for only a single property.
@@ -174,23 +179,25 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     protected fun <A> selectSubscribe(
         prop1: KProperty1<S, A>,
         subscriber: (A) -> Unit
-    ) = selectSubscribeInternal(null, prop1, subscriber)
+    ) = selectSubscribeInternal(null, prop1, false, subscriber)
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun <A> selectSubscribe(
         owner: LifecycleOwner,
         prop1: KProperty1<S, A>,
+        uniqueOnly: Boolean = false,
         subscriber: (A) -> Unit
-    ) = selectSubscribeInternal(owner, prop1, subscriber)
+    ) = selectSubscribeInternal(owner, prop1, uniqueOnly, subscriber)
 
     private fun <A> selectSubscribeInternal(
         owner: LifecycleOwner?,
         prop1: KProperty1<S, A>,
+        uniqueOnly: Boolean = false,
         subscriber: (A) -> Unit
     ) = stateStore.observable
         .map { MvRxTuple1(prop1.get(it)) }
         .distinctUntilChanged()
-        .subscribeLifecycle(owner) { (a) -> subscriber(a) }
+        .subscribeLifecycle(owner, uniqueOnly) { (a) -> subscriber(a) }
 
     /**
      * Subscribe to changes in an async property. There are optional parameters for onSuccess
@@ -200,22 +207,24 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         asyncProp: KProperty1<S, Async<T>>,
         onFail: ((Throwable) -> Unit)? = null,
         onSuccess: ((T) -> Unit)? = null
-    ) = asyncSubscribeInternal(null, asyncProp, onFail, onSuccess)
+    ) = asyncSubscribeInternal(null, asyncProp, false, onFail, onSuccess)
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun <T> asyncSubscribe(
         owner: LifecycleOwner,
         asyncProp: KProperty1<S, Async<T>>,
+        uniqueOnly: Boolean = false,
         onFail: ((Throwable) -> Unit)? = null,
         onSuccess: ((T) -> Unit)? = null
-    ) = asyncSubscribeInternal(owner, asyncProp, onFail, onSuccess)
+    ) = asyncSubscribeInternal(owner, asyncProp, uniqueOnly, onFail, onSuccess)
 
     private fun <T> asyncSubscribeInternal(
         owner: LifecycleOwner?,
         asyncProp: KProperty1<S, Async<T>>,
+        uniqueOnly: Boolean = false,
         onFail: ((Throwable) -> Unit)? = null,
         onSuccess: ((T) -> Unit)? = null
-    ) = selectSubscribeInternal(owner, asyncProp) {
+    ) = selectSubscribeInternal(owner, asyncProp, uniqueOnly) {
         if (onSuccess != null && it is Success) {
             onSuccess(it())
         } else if (onFail != null && it is Fail) {
@@ -230,26 +239,27 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         subscriber: (A, B) -> Unit
-    ) = selectSubscribeInternal(null, prop1, prop2, subscriber)
+    ) = selectSubscribeInternal(null, prop1, prop2, false, subscriber)
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun <A, B> selectSubscribe(
         owner: LifecycleOwner,
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
+        uniqueOnly: Boolean = false,
         subscriber: (A, B) -> Unit
-    ) = selectSubscribeInternal(owner, prop1, prop2, subscriber)
-
+    ) = selectSubscribeInternal(owner, prop1, prop2, uniqueOnly, subscriber)
 
     private fun <A, B> selectSubscribeInternal(
         owner: LifecycleOwner?,
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
+        uniqueOnly: Boolean = false,
         subscriber: (A, B) -> Unit
     ) = stateStore.observable
         .map { MvRxTuple2(prop1.get(it), prop2.get(it)) }
         .distinctUntilChanged()
-        .subscribeLifecycle(owner) { (a, b) -> subscriber(a, b) }
+        .subscribeLifecycle(owner, uniqueOnly) { (a, b) -> subscriber(a, b) }
 
     /**
      * Subscribe to state changes for three properties.
@@ -259,7 +269,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
         subscriber: (A, B, C) -> Unit
-    ) = selectSubscribeInternal(null, prop1, prop2, prop3, subscriber)
+    ) = selectSubscribeInternal(null, prop1, prop2, prop3, false, subscriber)
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun <A, B, C> selectSubscribe(
@@ -267,19 +277,21 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
+        uniqueOnly: Boolean = false,
         subscriber: (A, B, C) -> Unit
-    ) = selectSubscribeInternal(owner, prop1, prop2, prop3, subscriber)
+    ) = selectSubscribeInternal(owner, prop1, prop2, prop3, uniqueOnly, subscriber)
 
     private fun <A, B, C> selectSubscribeInternal(
         owner: LifecycleOwner?,
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
+        uniqueOnly: Boolean = false,
         subscriber: (A, B, C) -> Unit
     ) = stateStore.observable
         .map { MvRxTuple3(prop1.get(it), prop2.get(it), prop3.get(it)) }
         .distinctUntilChanged()
-        .subscribeLifecycle(owner) { (a, b, c) -> subscriber(a, b ,c) }
+        .subscribeLifecycle(owner, uniqueOnly) { (a, b, c) -> subscriber(a, b, c) }
 
     /**
      * Subscribe to state changes for four properties.
@@ -290,7 +302,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop3: KProperty1<S, C>,
         prop4: KProperty1<S, D>,
         subscriber: (A, B, C, D) -> Unit
-    ) = selectSubscribeInternal(null, prop1, prop2, prop3, prop4, subscriber)
+    ) = selectSubscribeInternal(null, prop1, prop2, prop3, prop4, false, subscriber)
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun <A, B, C, D> selectSubscribe(
@@ -299,8 +311,9 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
         prop4: KProperty1<S, D>,
+        uniqueOnly: Boolean = false,
         subscriber: (A, B, C, D) -> Unit
-    ) = selectSubscribeInternal(owner, prop1, prop2, prop3, prop4, subscriber)
+    ) = selectSubscribeInternal(owner, prop1, prop2, prop3, prop4, uniqueOnly, subscriber)
 
     private fun <A, B, C, D> selectSubscribeInternal(
         owner: LifecycleOwner?,
@@ -308,26 +321,155 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
         prop4: KProperty1<S, D>,
+        uniqueOnly: Boolean,
         subscriber: (A, B, C, D) -> Unit
     ) = stateStore.observable
         .map { MvRxTuple4(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it)) }
         .distinctUntilChanged()
-        .subscribeLifecycle(owner) { (a, b, c, d) -> subscriber(a, b ,c, d) }
+        .subscribeLifecycle(owner, uniqueOnly) { (a, b, c, d) -> subscriber(a, b, c, d) }
+
+    /**
+     * Subscribe to state changes for five properties.
+     */
+    protected fun <A, B, C, D, E> selectSubscribe(
+            prop1: KProperty1<S, A>,
+            prop2: KProperty1<S, B>,
+            prop3: KProperty1<S, C>,
+            prop4: KProperty1<S, D>,
+            prop5: KProperty1<S, E>,
+            subscriber: (A, B, C, D, E) -> Unit
+    ) = selectSubscribeInternal(null, prop1, prop2, prop3, prop4, prop5, false, subscriber)
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun <A, B, C, D, E> selectSubscribe(
+            owner: LifecycleOwner,
+            prop1: KProperty1<S, A>,
+            prop2: KProperty1<S, B>,
+            prop3: KProperty1<S, C>,
+            prop4: KProperty1<S, D>,
+            prop5: KProperty1<S, E>,
+            uniqueOnly: Boolean = false,
+            subscriber: (A, B, C, D, E) -> Unit
+    ) = selectSubscribeInternal(owner, prop1, prop2, prop3, prop4, prop5, uniqueOnly, subscriber)
+
+    private fun <A, B, C, D, E> selectSubscribeInternal(
+            owner: LifecycleOwner?,
+            prop1: KProperty1<S, A>,
+            prop2: KProperty1<S, B>,
+            prop3: KProperty1<S, C>,
+            prop4: KProperty1<S, D>,
+            prop5: KProperty1<S, E>,
+            uniqueOnly: Boolean,
+            subscriber: (A, B, C, D, E) -> Unit
+    ) = stateStore.observable
+            .map { MvRxTuple5(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it)) }
+            .distinctUntilChanged()
+            .subscribeLifecycle(owner, uniqueOnly) { (a, b, c, d, e) -> subscriber(a, b, c, d, e) }
+
+    /**
+     * Subscribe to state changes for six properties.
+     */
+    protected fun <A, B, C, D, E, F> selectSubscribe(
+            prop1: KProperty1<S, A>,
+            prop2: KProperty1<S, B>,
+            prop3: KProperty1<S, C>,
+            prop4: KProperty1<S, D>,
+            prop5: KProperty1<S, E>,
+            prop6: KProperty1<S, F>,
+            subscriber: (A, B, C, D, E, F) -> Unit
+    ) = selectSubscribeInternal(null, prop1, prop2, prop3, prop4, prop5, prop6, false, subscriber)
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun <A, B, C, D, E, F> selectSubscribe(
+            owner: LifecycleOwner,
+            prop1: KProperty1<S, A>,
+            prop2: KProperty1<S, B>,
+            prop3: KProperty1<S, C>,
+            prop4: KProperty1<S, D>,
+            prop5: KProperty1<S, E>,
+            prop6: KProperty1<S, F>,
+            uniqueOnly: Boolean = false,
+            subscriber: (A, B, C, D, E, F) -> Unit
+    ) = selectSubscribeInternal(owner, prop1, prop2, prop3, prop4, prop5, prop6, uniqueOnly, subscriber)
+
+    private fun <A, B, C, D, E, F> selectSubscribeInternal(
+            owner: LifecycleOwner?,
+            prop1: KProperty1<S, A>,
+            prop2: KProperty1<S, B>,
+            prop3: KProperty1<S, C>,
+            prop4: KProperty1<S, D>,
+            prop5: KProperty1<S, E>,
+            prop6: KProperty1<S, F>,
+            uniqueOnly: Boolean,
+            subscriber: (A, B, C, D, E, F) -> Unit
+    ) = stateStore.observable
+            .map { MvRxTuple6(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it), prop6.get(it)) }
+            .distinctUntilChanged()
+            .subscribeLifecycle(owner, uniqueOnly) { (a, b, c, d, e, f) -> subscriber(a, b, c, d, e, f) }
+
+    /**
+     * Subscribe to state changes for seven properties.
+     */
+    protected fun <A, B, C, D, E, F, G> selectSubscribe(
+            prop1: KProperty1<S, A>,
+            prop2: KProperty1<S, B>,
+            prop3: KProperty1<S, C>,
+            prop4: KProperty1<S, D>,
+            prop5: KProperty1<S, E>,
+            prop6: KProperty1<S, F>,
+            prop7: KProperty1<S, G>,
+            subscriber: (A, B, C, D, E, F, G) -> Unit
+    ) = selectSubscribeInternal(null, prop1, prop2, prop3, prop4, prop5, prop6, prop7, false, subscriber)
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun <A, B, C, D, E, F, G> selectSubscribe(
+            owner: LifecycleOwner,
+            prop1: KProperty1<S, A>,
+            prop2: KProperty1<S, B>,
+            prop3: KProperty1<S, C>,
+            prop4: KProperty1<S, D>,
+            prop5: KProperty1<S, E>,
+            prop6: KProperty1<S, F>,
+            prop7: KProperty1<S, G>,
+            uniqueOnly: Boolean = false,
+            subscriber: (A, B, C, D, E, F, G) -> Unit
+    ) = selectSubscribeInternal(owner, prop1, prop2, prop3, prop4, prop5, prop6, prop7, uniqueOnly, subscriber)
+
+    private fun <A, B, C, D, E, F, G> selectSubscribeInternal(
+            owner: LifecycleOwner?,
+            prop1: KProperty1<S, A>,
+            prop2: KProperty1<S, B>,
+            prop3: KProperty1<S, C>,
+            prop4: KProperty1<S, D>,
+            prop5: KProperty1<S, E>,
+            prop6: KProperty1<S, F>,
+            prop7: KProperty1<S, G>,
+            uniqueOnly: Boolean,
+            subscriber: (A, B, C, D, E, F, G) -> Unit
+    ) = stateStore.observable
+            .map { MvRxTuple7(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it), prop6.get(it), prop7.get(it)) }
+            .distinctUntilChanged()
+            .subscribeLifecycle(owner, uniqueOnly) { (a, b, c, d, e, f, g) -> subscriber(a, b, c, d, e, f, g) }
 
     private fun <T> Observable<T>.subscribeLifecycle(
         lifecycleOwner: LifecycleOwner? = null,
+        uniqueOnly: Boolean,
         subscriber: (T) -> Unit
     ): Disposable {
         if (lifecycleOwner == null) {
-            return observeOn(AndroidSchedulers.mainThread()).subscribe(subscriber).disposeOnClear()
+            return observeOn(AndroidSchedulers.mainThread())
+                .subscribe(subscriber)
+                .disposeOnClear()
         }
 
         val lifecycleAwareObserver = MvRxLifecycleAwareObserver(
             lifecycleOwner,
-            alwaysDeliverLastValueWhenUnlocked = true,
+            alwaysDeliverLastValueWhenUnlocked = !uniqueOnly,
             onNext = Consumer<T> { subscriber(it) }
         )
-        return observeOn(AndroidSchedulers.mainThread()).subscribeWith(lifecycleAwareObserver).disposeOnClear()
+        return observeOn(AndroidSchedulers.mainThread())
+            .subscribeWith(lifecycleAwareObserver)
+            .disposeOnClear()
     }
 
     protected fun Disposable.disposeOnClear(): Disposable {
