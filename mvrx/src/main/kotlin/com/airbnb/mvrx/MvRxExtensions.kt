@@ -25,7 +25,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragm
 ) where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
     val stateFactory: () -> S = ::_fragmentViewModelInitialStateProvider
     MvRxViewModelProvider.get(viewModelClass.java, this, keyFactory(), stateFactory)
-        .apply { subscribe(requireActivity(), subscriber = { postInvalidate() }) }
+        .apply { subscribe(this@fragmentViewModel, subscriber = { postInvalidate() }) }
 }
 
 /**
@@ -38,7 +38,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, S : MvRxState> T.existingViewM
 ) where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
     val factory = MvRxFactory { throw IllegalStateException("ViewModel for ${requireActivity()}[${keyFactory()}] does not exist yet!") }
     ViewModelProviders.of(requireActivity(), factory).get(keyFactory(), viewModelClass.java)
-        .apply { subscribe(requireActivity(), subscriber = { postInvalidate() }) }
+        .apply { subscribe(this@existingViewModel, subscriber = { postInvalidate() }) }
 }
 
 /**

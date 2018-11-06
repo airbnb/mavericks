@@ -16,7 +16,9 @@ class DatabaseDataSource(
         private val delayMs: Long = 2000,
         private val scheduler: Scheduler = Schedulers.io()
 ) : TasksDataSource {
-    override fun getTasks(): Single<Tasks> = dao.getTasks().delay(delayMs, TimeUnit.MILLISECONDS)
+    override fun getTasks(): Single<Tasks> = dao.getTasks()
+            .subscribeOn(scheduler)
+            .delay(delayMs, TimeUnit.MILLISECONDS, scheduler)
 
     override fun upsertTask(task: Task): Disposable = fromAction { dao.saveTask(task) }
 

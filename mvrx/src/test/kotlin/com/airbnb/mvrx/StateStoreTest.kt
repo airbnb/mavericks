@@ -1,7 +1,6 @@
 package com.airbnb.mvrx
 
-import kotlinx.coroutines.experimental.Dispatchers
-import kotlinx.coroutines.experimental.runBlocking
+import kotlinx.coroutines.Dispatchers
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -9,26 +8,26 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
-
-data class StateStoreTestState(val count: Int = 1, val list: List<Int> = emptyList())
-
+data class MvRxStateStoreTestState(val count: Int = 1, val list: List<Int> = emptyList())
 
 @RunWith(Parameterized::class)
-class StateStoreTest(val param: Any) : BaseTest() {
+class StateStoreTest(val rx: Boolean) : BaseTest() {
 
     companion object {
         @JvmStatic
         @Parameterized.Parameters
-        fun data(): Array<Any> {
-            return Array(100) { 0 }
-        }
+        fun data() = listOf(
+                false,
+                true
+        )
     }
 
-    private lateinit var store: StateStore<StateStoreTestState>
+
+    private lateinit var store: MvRxStateStore<MvRxStateStoreTestState>
 
     @Before
     fun setup() {
-        store = MvCorStateStore(StateStoreTestState(),Dispatchers.Unconfined)
+        store = if (rx) RealMvRxStateStore(MvRxStateStoreTestState()) else MvCorStateStore(MvRxStateStoreTestState(), Dispatchers.Unconfined)
     }
 
     @Test
@@ -62,7 +61,6 @@ class StateStoreTest(val param: Any) : BaseTest() {
         assertEquals(1, callCount)
     }
 
-
     @Test
     fun testSubscribeNotCalledForSameValue() {
         var callCount = 0
@@ -73,31 +71,4 @@ class StateStoreTest(val param: Any) : BaseTest() {
         store.set { copy() }
         assertEquals(1, callCount)
     }
-
-
-    @Test
-    fun testConcurrency() = runBlocking {
-        val iterations = 100
-
-        for (i in 1..iterations) {
-
-                    store.set {
-                        store.set {
-                            copy(count + 1)
-                        }
-                        copy(count + 1)
-                    }
-                    store.get {
-                        store.set {
-                            copy(count + 1)
-                        }
-                        store.state
-                    }
-                }
-
-
-        assertEquals(3 * iterations + 1, store.state.count)
-    }
 }
-
-

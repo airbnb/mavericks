@@ -13,8 +13,8 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
     override val mvrxViewModelStore by lazy { MvRxViewModelStore(viewModelStore) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         mvrxViewModelStore.restoreViewModels(this, savedInstanceState)
+        super.onCreate(savedInstanceState)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

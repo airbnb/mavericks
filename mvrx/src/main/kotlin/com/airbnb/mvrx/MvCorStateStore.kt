@@ -2,17 +2,17 @@ package com.airbnb.mvrx
 
 import io.reactivex.Observable
 import io.reactivex.disposables.Disposable
-import kotlinx.coroutines.experimental.CoroutineScope
-import kotlinx.coroutines.experimental.Dispatchers
-import kotlinx.coroutines.experimental.cancel
-import kotlinx.coroutines.experimental.channels.Channel
-import kotlinx.coroutines.experimental.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.experimental.channels.actor
-import kotlinx.coroutines.experimental.channels.consumeEach
-import kotlinx.coroutines.experimental.isActive
-import kotlinx.coroutines.experimental.rx2.asObservable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.channels.actor
+import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.rx2.asObservable
 import java.util.*
-import kotlin.coroutines.experimental.CoroutineContext
+import kotlin.coroutines.CoroutineContext
 
 
 /**
@@ -24,7 +24,7 @@ import kotlin.coroutines.experimental.CoroutineContext
  *
  */
 
-internal open class MvCorStateStore<S : Any>(initialState: S, final override val coroutineContext: CoroutineContext = Dispatchers.Default) : Disposable, CoroutineScope, StateStore<S> {
+internal open class MvCorStateStore<S : Any>(initialState: S, final override val coroutineContext: CoroutineContext = Dispatchers.Default) : Disposable, CoroutineScope, MvRxStateStore<S> {
 
     /**
      * The stateChannel is where state changes should be pushed to.
