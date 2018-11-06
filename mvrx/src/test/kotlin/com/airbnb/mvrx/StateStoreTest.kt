@@ -1,19 +1,33 @@
 package com.airbnb.mvrx
 
+import kotlinx.coroutines.Dispatchers
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.Parameterized
 
 data class MvRxStateStoreTestState(val count: Int = 1, val list: List<Int> = emptyList())
 
-class StateStoreTest : BaseTest() {
+@RunWith(Parameterized::class)
+class StateStoreTest(val rx: Boolean) : BaseTest() {
+
+    companion object {
+        @JvmStatic
+        @Parameterized.Parameters
+        fun data() = listOf(
+                false,
+                true
+        )
+    }
+
 
     private lateinit var store: MvRxStateStore<MvRxStateStoreTestState>
 
     @Before
     fun setup() {
-        store = RealMvRxStateStore(MvRxStateStoreTestState())
+        store = if (rx) RealMvRxStateStore(MvRxStateStoreTestState()) else MvCorStateStore(MvRxStateStoreTestState(), Dispatchers.Unconfined)
     }
 
     @Test
