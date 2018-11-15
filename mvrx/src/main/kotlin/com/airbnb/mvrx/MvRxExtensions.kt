@@ -118,7 +118,7 @@ fun <S : MvRxState> _initialStateProvider(stateClass: Class<S>, args: Any?): S {
         val argType = it::class.java
 
         stateClass.constructors.firstOrNull { constructor ->
-            constructor.parameterTypes.size == 1 && isAssignableTo(constructor.parameterTypes[0], argType)
+            constructor.parameterTypes.size == 1 && isAssignableTo(argType, constructor.parameterTypes[0])
             }
         }
 
