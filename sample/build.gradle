@@ -14,7 +14,14 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-    buildToolsVersion '27.0.3'
+    buildToolsVersion '28.0.3'
+    buildTypes {
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.pro'
+        }
+    }
 }
 
 androidExtensions {
