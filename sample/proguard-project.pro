@@ -41,11 +41,6 @@
    long consumerIndex;
 }
 
-# Keep the models, this can be done in a better way but for this sample we just keep all the models
--keep class com.airbnb.mvrx.sample.models.** {
-  *;
-}
-
 # Oddly need to keep that even though Evernote state is not used in the app.
 -keepnames class * { @com.evernote.android.state.State *;}
 
