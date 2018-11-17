@@ -177,6 +177,6 @@ fun <V : Any> args() = object : ReadOnlyProperty<Fragment, V> {
  * at the offset it was requested at.
  *
  * This will replace *all contents* starting at the offset with the new list.
- * For example: [1,2,3].appendAt([4], 2) == [1,4]]
+ * For example: [1,2,3].appendAt([4], 2) == [1,2,4]]
  */
 fun <T : Any> List<T>.appendAt(other: List<T>?, offset: Int) = subList(0, offset.coerceIn(0, size)) + (other ?: emptyList())
