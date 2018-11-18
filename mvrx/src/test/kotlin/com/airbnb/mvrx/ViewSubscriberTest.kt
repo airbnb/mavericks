@@ -1,17 +1,20 @@
 package com.airbnb.mvrx
 
+import android.arch.lifecycle.ViewModel
+import android.arch.lifecycle.ViewModelProvider
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
 data class ViewSubscriberState(val foo: Int = 0) : MvRxState
 
-class ViewSubscriberViewModel(initialState: ViewSubscriberState) : TestMvRxViewModel<ViewSubscriberState>(initialState) {
+class ViewSubscriberViewModel : TestMvRxViewModel<ViewSubscriberState>(ViewSubscriberState()) {
     fun setFoo(foo: Int) = setState { copy(foo = foo) }
 }
 
 
-class ViewSubscriberFragment : BaseMvRxFragment() {
+class ViewSubscriberFragment : Fragment(), MvRxView, ViewModelFactoryOwner {
     private val viewModel: ViewSubscriberViewModel by fragmentViewModel()
 
     var subscribeCallCount = 0
@@ -24,6 +27,13 @@ class ViewSubscriberFragment : BaseMvRxFragment() {
     var selectSubscribeUniqueOnlyCallCount = 0
 
     var invalidateCallCount = 0
+
+    override val viewModelFactory: ViewModelProvider.Factory = object: ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+            return ViewSubscriberViewModel() as T
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -1,6 +1,5 @@
 package com.airbnb.mvrx.sample.features.dadjoke
 
-import android.support.v4.app.FragmentActivity
 import com.airbnb.mvrx.*
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.core.MvRxViewModel
@@ -10,31 +9,19 @@ import com.airbnb.mvrx.sample.network.DadJokeService
 import com.airbnb.mvrx.sample.views.basicRow
 import com.airbnb.mvrx.sample.views.loadingRow
 import com.airbnb.mvrx.sample.views.marquee
-import org.koin.android.ext.android.inject
+import javax.inject.Inject
 
 data class RandomDadJokeState(val joke: Async<Joke> = Uninitialized) : MvRxState
 
-class RandomDadJokeViewModel(
-    initialState: RandomDadJokeState,
+class RandomDadJokeViewModel @Inject constructor(
     private val dadJokeService: DadJokeService
-) : MvRxViewModel<RandomDadJokeState>(initialState) {
+) : MvRxViewModel<RandomDadJokeState>(RandomDadJokeState()) {
     init {
         fetchRandomJoke()
     }
 
     fun fetchRandomJoke() {
         dadJokeService.random().execute { copy(joke = it) }
-    }
-
-    companion object : MvRxViewModelFactory<RandomDadJokeState> {
-        @JvmStatic
-        override fun create(
-            activity: FragmentActivity,
-            state: RandomDadJokeState
-        ): BaseMvRxViewModel<RandomDadJokeState> {
-            val service: DadJokeService by activity.inject()
-            return RandomDadJokeViewModel(state, service)
-        }
     }
 }
 

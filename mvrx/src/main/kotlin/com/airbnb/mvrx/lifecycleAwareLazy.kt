@@ -6,7 +6,6 @@ import android.arch.lifecycle.LifecycleObserver
 import android.arch.lifecycle.LifecycleOwner
 import android.arch.lifecycle.OnLifecycleEvent
 import android.support.annotation.RestrictTo
-import android.util.Log
 import java.io.Serializable
 
 private object UNINITIALIZED_VALUE

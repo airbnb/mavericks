@@ -2,22 +2,22 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-apply from: 'gradle-maven-push.gradle'
+//apply from: 'gradle-maven-push.gradle'
 apply plugin: "jacoco"
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     resourcePrefix 'mvrx_'
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 27
+        targetSdkVersion 28
     }
-    buildTypes {
-        release {
-            consumerProguardFiles 'proguard-rules.pro'
-        }
-    }
+//    buildTypes {
+//        release {
+//            consumerProguardFiles 'proguard-rules.pro'
+//        }
+//    }
     lintOptions {
         abortOnError true
         textReport true
@@ -58,8 +58,8 @@ dependencies {
     implementation "com.android.support:appcompat-v7:$supportLibVersion"
     implementation "android.arch.lifecycle:extensions:$lifecycleVersion"
     kapt "android.arch.lifecycle:compiler:$lifecycleVersion"
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
-    implementation "io.reactivex.rxjava2:rxjava:2.2.0"
+    implementation "io.reactivex.rxjava2:rxjava:$rxjavaVersion"
+    implementation "io.reactivex.rxjava2:rxandroid:$rxandroidVersion"
 
     testImplementation "org.mockito:mockito-core:2.15.0"
     testImplementation 'junit:junit:4.12'

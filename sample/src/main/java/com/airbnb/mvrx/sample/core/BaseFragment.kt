@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.support.annotation.IdRes
 import android.support.design.widget.CoordinatorLayout
+import android.support.v4.app.Fragment
 import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
@@ -11,18 +12,29 @@ import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.airbnb.epoxy.EpoxyRecyclerView
-import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.MvRx
+import com.airbnb.mvrx.MvRxView
+import com.airbnb.mvrx.ViewModelFactoryOwner
 import com.airbnb.mvrx.sample.R
+import com.airbnb.mvrx.sample.di.ViewModelFactory
+import javax.inject.Inject
 
-abstract class BaseFragment : BaseMvRxFragment() {
+/**
+ * Usually you use a BaseFragment to implement [MvRxView] and [ViewModelFactoryOwner].
+ * You are not forced to extend any specific class.
+ */
+abstract class BaseFragment : Fragment(), MvRxView, ViewModelFactoryOwner {
 
-    protected lateinit var recyclerView: EpoxyRecyclerView
+    private lateinit var recyclerView: EpoxyRecyclerView
     protected lateinit var toolbar: Toolbar
     protected lateinit var coordinatorLayout: CoordinatorLayout
     protected val epoxyController by lazy { epoxyController() }
 
+    @Inject
+    override lateinit var viewModelFactory: ViewModelFactory
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        (context?.applicationContext as? MvRxApplication)?.appComponent?.inject(this)
         super.onCreate(savedInstanceState)
         epoxyController.onRestoreInstanceState(savedInstanceState)
     }
@@ -41,6 +53,13 @@ abstract class BaseFragment : BaseMvRxFragment() {
 
             toolbar.setupWithNavController(findNavController())
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // This ensures that invalidate() is called for static screens that don't
+        // subscribe to a ViewModel.
+        postInvalidate()
     }
 
     override fun invalidate() {
@@ -65,8 +84,8 @@ abstract class BaseFragment : BaseMvRxFragment() {
 
     protected fun navigateTo(@IdRes actionId: Int, arg: Parcelable? = null) {
         /**
-         * If we put a parcelable arg in [MvRx.KEY_ARG] then MvRx will attempt to call a secondary
-         * constructor on any MvRxState objects and pass in this arg directly.
+         * You can put a parcelable arg in [MvRx.KEY_ARG]. It is just an convenient way to pass arguments,
+         * this will not init the State, but you can use the argument in the initializer of ViewModel.
          * @see [com.airbnb.mvrx.sample.features.dadjoke.DadJokeDetailState]
          */
         val bundle = arg?.let { Bundle().apply { putParcelable(MvRx.KEY_ARG, it) } }

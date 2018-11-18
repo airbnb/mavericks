@@ -19,10 +19,10 @@ private val HANDLER = Handler(Looper.getMainLooper(), Handler.Callback { message
 /**
  * Implement this in your MvRx capable Fragment.
  *
- * When you get a ViewModel with fragmentViewModel, activityViewModel, or existingViewModel, it
+ * When you get a ViewModel with fragmentViewModel, parentFragmentViewModel, activityViewModel, or existingViewModel, it
  * will automatically subscribe to all state changes in the ViewModel and call [invalidate].
  */
-interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
+interface MvRxView : LifecycleOwner {
     /**
      * Override this to handle any state changes from MvRxViewModels created through MvRx Fragment delegates.
      */
@@ -72,11 +72,12 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      * be shown once (toasts, poptarts), or logging. Most other views should use false, as when a view is destroyed
      * and recreated the previous state is necessary to recreate the view.
      *
-     * Default: false.
+     * Default: true.
+     * The default value is different from other subscribe functions, because `asyncSubscribe` is always use to show toasts, poptarts...
      */
     fun <S : MvRxState, T> BaseMvRxViewModel<S>.asyncSubscribe(
         asyncProp: KProperty1<S, Async<T>>,
-        uniqueOnly: Boolean = false,
+        uniqueOnly: Boolean = true,
         onFail: ((Throwable) -> Unit)? = null,
         onSuccess: ((T) -> Unit)? = null
     ) = asyncSubscribe(this@MvRxView, asyncProp, uniqueOnly, onFail, onSuccess)

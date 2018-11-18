@@ -1,19 +1,3 @@
-/*
- * Copyright 2016, The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package com.airbnb.mvrx.todomvrx
 
 import android.os.Bundle
@@ -22,7 +6,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
@@ -34,11 +17,11 @@ import com.airbnb.mvrx.todomvrx.views.fullScreenMessageView
 import com.airbnb.mvrx.todomvrx.views.header
 import com.airbnb.mvrx.todomvrx.views.horizontalLoader
 import com.airbnb.mvrx.todomvrx.views.taskItemView
-import com.airbnb.mvrx.withState
+import javax.inject.Inject
 
 data class TaskListState(val filter: TaskListFilter = TaskListFilter.All) : MvRxState
 
-class TaskListViewModel(initialState: TaskListState) : MvRxViewModel<TaskListState>(initialState) {
+class TaskListViewModel @Inject constructor() : MvRxViewModel<TaskListState>(TaskListState()) {
     fun setFilter(filter: TaskListFilter) = setState { copy(filter = filter) }
 }
 

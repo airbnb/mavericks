@@ -17,7 +17,7 @@ class ToDoEpoxyController(
 }
 
 /**
- * Create a [MvRxEpoxyController] that builds models with the given callback.
+ * Create a [ToDoEpoxyController] that builds models with the given callback.
  */
 fun BaseFragment.simpleController(
     buildModels: EpoxyController.() -> Unit

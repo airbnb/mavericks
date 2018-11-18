@@ -2,8 +2,8 @@ package com.airbnb.mvrx
 
 object MvRx {
     /**
-     * If your initial state needs to use Fragment arguments, store your arguments
-     * as a parcelable class stored at this key.
+     * You can store your argument as a parcelable class stored at this key.
+     * But this argument has nothing to do with the initial State.
      */
     const val KEY_ARG = "mvrx:arg"
 }

@@ -1,26 +1,26 @@
 package com.airbnb.mvrx.sample.features.helloworld
 
 import android.os.Bundle
+import android.support.v4.app.Fragment
 import android.support.v7.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
-import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.views.Marquee
 
-class HelloWorldFragment : BaseMvRxFragment() {
+/**
+ * Static Fragment. It has nothing to do with MvRx, just use it in the simplest way.
+ */
+class HelloWorldFragment : Fragment() {
     private lateinit var marquee: Marquee
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_hello_world, container, false).apply {
             findViewById<Toolbar>(R.id.toolbar).setupWithNavController(findNavController())
             marquee = findViewById(R.id.marquee)
+            marquee.setTitle("Hello World")
         }
-
-    override fun invalidate() {
-        marquee.setTitle("Hello World")
-    }
 }

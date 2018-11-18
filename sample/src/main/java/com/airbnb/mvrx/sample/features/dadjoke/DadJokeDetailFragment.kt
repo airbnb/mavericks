@@ -2,7 +2,6 @@ package com.airbnb.mvrx.sample.features.dadjoke
 
 import android.annotation.SuppressLint
 import android.os.Parcelable
-import android.support.v4.app.FragmentActivity
 import com.airbnb.mvrx.*
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.core.MvRxViewModel
@@ -13,48 +12,29 @@ import com.airbnb.mvrx.sample.views.basicRow
 import com.airbnb.mvrx.sample.views.loadingRow
 import com.airbnb.mvrx.sample.views.marquee
 import kotlinx.android.parcel.Parcelize
-import org.koin.android.ext.android.inject
+import javax.inject.Inject
 
 @SuppressLint("ParcelCreator")
 @Parcelize
 data class DadJokeDetailArgs(val id: String) : Parcelable
 
-data class DadJokeDetailState(val id: String, val joke: Async<Joke> = Uninitialized) : MvRxState {
-    /**
-     * This secondary constructor will automatically called if your Fragment has
-     * a parcelable in its arguments at key [com.airbnb.mvrx.MvRx.KEY_ARG]
-     */
-    constructor(args: DadJokeDetailArgs) : this(id = args.id)
-}
+data class DadJokeDetailState(val joke: Async<Joke> = Uninitialized) : MvRxState
 
-class DadJokeDetailViewModel(
-    initialState: DadJokeDetailState,
+class DadJokeDetailViewModel @Inject constructor(
     private val dadJokeService: DadJokeService
-) : MvRxViewModel<DadJokeDetailState>(initialState) {
+) : MvRxViewModel<DadJokeDetailState>(DadJokeDetailState()) {
 
-    init {
-        fetchJoke()
-    }
-
-    private fun fetchJoke() = withState { state ->
+    fun fetchJoke(id: String) = withState { state ->
         if (!state.joke.shouldLoad) return@withState
-        dadJokeService.fetch(state.id).execute { copy(joke = it) }
-    }
-
-    companion object : MvRxViewModelFactory<DadJokeDetailState> {
-        @JvmStatic
-        override fun create(
-            activity: FragmentActivity,
-            state: DadJokeDetailState
-        ): BaseMvRxViewModel<DadJokeDetailState> {
-            val service: DadJokeService by activity.inject()
-            return DadJokeDetailViewModel(state, service)
-        }
+        dadJokeService.fetch(id).execute { copy(joke = it) }
     }
 }
 
 class DadJokeDetailFragment : BaseFragment() {
-    private val viewModel: DadJokeDetailViewModel by fragmentViewModel()
+    private val dadJokeDetailArgs by args<DadJokeDetailArgs>()
+    private val viewModel: DadJokeDetailViewModel by fragmentViewModel(initializer = {
+        it.fetchJoke(dadJokeDetailArgs.id)
+    })
 
     override fun epoxyController() = simpleController(viewModel) { state ->
         marquee {

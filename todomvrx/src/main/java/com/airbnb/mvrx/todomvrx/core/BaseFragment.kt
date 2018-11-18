@@ -6,33 +6,49 @@ import android.support.annotation.CallSuper
 import android.support.annotation.IdRes
 import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.FloatingActionButton
+import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
 import com.airbnb.epoxy.EpoxyRecyclerView
-import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.MvRx
+import com.airbnb.mvrx.MvRxView
+import com.airbnb.mvrx.ViewModelFactoryOwner
 import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.todomvrx.TasksState
 import com.airbnb.mvrx.todomvrx.TasksViewModel
 import com.airbnb.mvrx.todomvrx.data.Tasks
 import com.airbnb.mvrx.todomvrx.data.findTask
+import com.airbnb.mvrx.todomvrx.di.ViewModelFactory
 import com.airbnb.mvrx.todomvrx.todoapp.R
 import com.airbnb.mvrx.todomvrx.util.ToDoEpoxyController
 import com.airbnb.mvrx.todomvrx.util.showLongSnackbar
+import javax.inject.Inject
 
-abstract class BaseFragment : BaseMvRxFragment() {
+/**
+ * Usually you use a BaseFragment to implement [MvRxView] and [ViewModelFactoryOwner].
+ * You are not forced to extend any specific class.
+ */
+abstract class BaseFragment : Fragment(), MvRxView, ViewModelFactoryOwner {
 
     protected val viewModel by activityViewModel(TasksViewModel::class)
 
     protected lateinit var coordinatorLayout: CoordinatorLayout
     protected lateinit var recyclerView: EpoxyRecyclerView
     protected lateinit var fab: FloatingActionButton
-    protected val epoxyController by lazy {epoxyController() }
+    private val epoxyController by lazy { epoxyController() }
     // Used to keep track of task changes to determine if we should show a snackbar.
     private var oldTasks: Tasks? = null
 
+    @Inject
+    override lateinit var viewModelFactory: ViewModelFactory
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        (context?.applicationContext as? MvRxApplication)?.appComponent?.inject(this)
+        super.onCreate(savedInstanceState)
+        epoxyController.onRestoreInstanceState(savedInstanceState)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
             inflater.inflate(R.layout.fragment_base, container, false).apply {
@@ -75,6 +91,16 @@ abstract class BaseFragment : BaseMvRxFragment() {
         viewModel.asyncSubscribe(TasksState::taskRequest, onFail = {
             coordinatorLayout.showLongSnackbar(R.string.loading_tasks_error)
         })
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        epoxyController.onSaveInstanceState(outState)
+    }
+
+    override fun onDestroyView() {
+        epoxyController.cancelPendingModelBuild()
+        super.onDestroyView()
     }
 
     override fun invalidate() {

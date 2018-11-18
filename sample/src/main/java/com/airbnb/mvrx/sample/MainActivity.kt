@@ -1,23 +1,19 @@
 package com.airbnb.mvrx.sample
 
 import android.os.Bundle
-import com.airbnb.mvrx.BaseMvRxActivity
+import android.support.v7.app.AppCompatActivity
+import com.airbnb.mvrx.ViewModelFactoryOwner
+import com.airbnb.mvrx.viewModel
 
 /**
- * Extend this class to get MvRx support out of the box.
- *
- * The purpose of this class is to:
- * 1) Be the host of MvRxFragments. MvRxFragments are the screen unit in MvRx. Activities are meant
- *    to just be the shell for your Fragments. There should be no business logic in your
- *    Activities anymore. Use activityViewModel to share state between screens.
- * 2) Properly configure MvRx so it has things like the correct ViewModelStore.
- *
- * To integrate this into your app. you may:
- * 1) Extend this directly.
- * 2) Replace your BaseActivity super class with this one.
- * 3) Manually integrate this into your base Activity (not recommended).
+ * Be the host of MvRxFragments. MvRxFragments are the screen unit in MvRx. Activities are meant
+ * to just be the shell for your Fragments. There should be no business logic in yourActivities anymore.
+ * Use activityViewModel to share state between screens.
+ * You rarely need to implement [ViewModelFactoryOwner] in Activity unless you want to use [viewModel]
+ * to create ViewModel directly in Activity. If you use activityViewModel to share state, the Activity do
+ * *NOT* need to implement [ViewModelFactoryOwner] either, because the Fragment can provide the ViewModelFactory.
  */
-class MainActivity : BaseMvRxActivity() {
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

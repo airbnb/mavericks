@@ -23,6 +23,7 @@ import kotlin.reflect.KVisibility
 abstract class BaseMvRxViewModel<S : MvRxState>(
     initialState: S,
     private val debugMode: Boolean = false,
+    private val logTag: String? = null,
     private val stateStore: MvRxStateStore<S> = RealMvRxStateStore(initialState)
 ) : ViewModel() {
     private val tag by lazy { javaClass.simpleName }
@@ -33,7 +34,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         if (debugMode) {
             mutableStateChecker = MutableStateChecker(initialState)
 
-            Observable.fromCallable { validateState(initialState) }
+            Observable.fromCallable { validateState() }
                 .subscribeOn(Schedulers.computation()).subscribe()
         }
     }
@@ -89,13 +90,11 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * Validates a number of properties on the state class. This cannot be called from the main thread because it does
      * a fair amount of reflection.
      */
-    private fun validateState(initialState: S) {
+    private fun validateState() {
         if (state::class.visibility != KVisibility.PUBLIC) {
             throw IllegalStateException("Your state class ${state::class.qualifiedName} must be public.")
         }
         state::class.assertImmutability()
-        val bundle = state.persistState(assertCollectionPersistability = true)
-        bundle.restorePersistedState(initialState)
     }
 
     /**
@@ -145,14 +144,15 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ): Disposable {
         setState { stateReducer(Loading()) }
 
-        return map {
-            val success = Success(mapper(it))
-            success.metadata = successMetaData?.invoke(it)
-            success as Async<V>
-        }
-            .onErrorReturn { Fail(it) }
-            .subscribe { asyncData -> setState { stateReducer(asyncData) } }
-            .disposeOnClear()
+        return subscribeOn(Schedulers.io())
+                .map {
+                    val success = Success(mapper(it))
+                    success.metadata = successMetaData?.invoke(it)
+                    success as Async<V>
+                }
+                .onErrorReturn { Fail(it) }
+                .subscribe { asyncData -> setState { stateReducer(asyncData) } }
+                .disposeOnClear()
     }
 
     /**
@@ -160,7 +160,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      */
     fun logStateChanges() {
         if (!debugMode) return
-        subscribe { Log.d(tag, "New State: $it") }
+        subscribe {
+            if (logTag.isNullOrEmpty())
+                Log.d(tag, "New State: $it")
+            else
+                Log.d(logTag, "New State: $it")
+        }
     }
 
     /**
