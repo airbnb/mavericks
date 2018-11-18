@@ -1,3 +1,4 @@
+[中文文档](https://github.com/luozejiaqun/DiMvRx/blob/master/README-CN.md)
 # DiMvRx
 
 简化了 [MvRx](https://github.com/airbnb/MvRx), 使其可以更加方便的使用Dagger2.  
