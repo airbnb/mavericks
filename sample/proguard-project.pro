@@ -5,6 +5,13 @@
 # Print out the full proguard config used for every build
 -printconfiguration build/outputs/fullProguardConfig.pro
 
+
+#
+# Keep rules that are used because MvRx uses Kotlin and Kotlin reflection. These are not defined in the lib
+# as they are not specific to the lib itself but need to be most likley present in any project that uses Kotlin 
+# and Kotlin reflection.
+#
+
 # These classes are used via kotlin reflection and the keep might not be required anymore once Progurad supports
 # Kotlin reflection directlty.
 -keep class kotlin.reflect.jvm.internal.impl.builtins.BuiltInsLoaderImpl
@@ -27,14 +34,6 @@
 # https://stackoverflow.com/questions/33547643/how-to-use-kotlin-with-proguard
 -dontwarn kotlin.**
 
-# https://app.bugsnag.com/airbnb/android-1/errors/59f6c07487a5c5001a49d882?filters[event.since][0]=all&filters[event.severity][0][value]=error&filters[event.severity][0][type]=eq
-# https://github.com/square/okhttp/issues/3582
--keep class okhttp3.internal.publicsuffix.PublicSuffixDatabase
-
-# The code is safeguarded against API28 use so we can just ignore the warning bout Handler.createAsync(looper) not existing.
-# Can be removed when compiled against API >=28
--dontwarn com.airbnb.epoxy.EpoxyAsyncUtil
-
 # RxJava
 -keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
    long producerIndex;
@@ -43,6 +42,14 @@
 
 # Oddly need to keep that even though Evernote state is not used in the app.
 -keepnames class * { @com.evernote.android.state.State *;}
+
+#
+# Keep rules that are unique to the sample project because it uses epoxy, okhttp3, moshi and retrofit.
+#
+
+# The code is safeguarded against API28 use so we can just ignore the warning bout Handler.createAsync(looper) not existing.
+# Can be removed when compiled against API >=28
+-dontwarn com.airbnb.epoxy.EpoxyAsyncUtil
 
 #
 # From: https://github.com/square/retrofit/blob/master/retrofit/src/main/resources/META-INF/proguard/retrofit2.pro
@@ -70,7 +77,6 @@
 -dontwarn retrofit2.-KotlinExtensions
 
 
-
 #
 # From https://github.com/square/okhttp/blob/master/okhttp/src/main/resources/META-INF/proguard/okhttp3.pro
 #
@@ -86,7 +92,6 @@
 
 # OkHttp platform used only on JVM and when Conscrypt dependency is available.
 -dontwarn okhttp3.internal.platform.ConscryptPlatform
-
 
 
 #
@@ -145,7 +150,6 @@
 #}
 
 
-
 # 
 # From: https://github.com/square/moshi/blob/master/kotlin/reflect/src/main/resources/META-INF/proguard/moshi-kotlin.pro
 #
@@ -155,4 +159,3 @@
 -keepclassmembers class kotlin.Metadata {
     public <methods>;
 }
-
