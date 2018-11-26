@@ -7,9 +7,9 @@
 
 
 #
-# Keep rules that are used because MvRx uses Kotlin and Kotlin reflection. These are not defined in the lib
-# as they are not specific to the lib itself but need to be most likley present in any project that uses Kotlin 
-# and Kotlin reflection.
+# Keep rules that are used because MvRx uses Kotlin, Kotlin reflection and RxJava. These are not defined in the 
+# lib as they are not specific to the lib itself but need to be most likley present in any project that uses 
+# Kotlin, Kotlin reflection and RxJava.
 #
 
 # These classes are used via kotlin reflection and the keep might not be required anymore once Progurad supports
