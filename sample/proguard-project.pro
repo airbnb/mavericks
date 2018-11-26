@@ -8,19 +8,19 @@
 
 #
 # Keep rules that are used because MvRx uses Kotlin, Kotlin reflection and RxJava. These are not defined in the 
-# lib as they are not specific to the lib itself but need to be most likley present in any project that uses 
+# lib as they are not specific to the lib itself but need to be most likely present in any project that uses 
 # Kotlin, Kotlin reflection and RxJava.
 #
 
-# These classes are used via kotlin reflection and the keep might not be required anymore once Progurad supports
-# Kotlin reflection directlty.
+# These classes are used via kotlin reflection and the keep might not be required anymore once Proguard supports
+# Kotlin reflection directly.
 -keep class kotlin.reflect.jvm.internal.impl.builtins.BuiltInsLoaderImpl
 -keep class kotlin.reflect.jvm.internal.impl.load.java.FieldOverridabilityCondition
 -keep class kotlin.reflect.jvm.internal.impl.load.java.ErasedOverridabilityCondition
 -keep class kotlin.reflect.jvm.internal.impl.load.java.JavaIncompatibilityRulesOverridabilityCondition
 
 # If Companion objects are instantiated via Kotlin reflection and they extend/implement a class that Proguard
-# would have removed or inlined we run into trouble as the inheritance is still in the Metadata annoation 
+# would have removed or inlined we run into trouble as the inheritance is still in the Metadata annotation 
 # read by Kotlin reflection.
 # FIXME Remove if Kotlin reflection is supported by Pro/Dexguard
 -if class **$Companion extends **
