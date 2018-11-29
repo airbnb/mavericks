@@ -6,7 +6,7 @@ apply from: 'gradle-maven-push.gradle'
 apply plugin: "jacoco"
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     resourcePrefix 'mvrx_'
 
     defaultConfig {
