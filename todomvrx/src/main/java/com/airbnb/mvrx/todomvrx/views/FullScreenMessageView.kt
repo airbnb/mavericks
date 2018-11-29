@@ -1,7 +1,7 @@
 package com.airbnb.mvrx.todomvrx.views
 
 import android.content.Context
-import android.support.annotation.DrawableRes
+import androidx.annotation.DrawableRes
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import android.widget.ImageView

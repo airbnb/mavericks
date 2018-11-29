@@ -1,17 +1,17 @@
 package com.airbnb.mvrx
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelStore
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import com.airbnb.mvrx.MvRxViewModelProvider.createViewModel
 import kotlin.collections.set
 
 /**
  * Custom ViewModelStore that supports persisting and restoring ViewModels.
  *
- * A [android.arch.lifecycle.ViewModelStoreOwner] such as a [android.support.v4.app.Fragment] or [android.support.v4.app.FragmentActivity]
+ * A [androidx.lifecycle.ViewModelStoreOwner] such as a [androidx.fragment.app.Fragment] or [androidx.fragment.app.FragmentActivity]
  * should override their getViewModelStore function and return an instance of this class.
  *
  * Then, to support persistence across processes, you must:
@@ -36,8 +36,8 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
     /**
      * Iterates through all ViewModels, persists its current state with [PersistState] and stores it in outState.
      *
-     * This should be called from [android.support.v4.app.Fragment.onSaveInstanceState] or
-     * [android.support.v4.app.FragmentActivity.onSaveInstanceState].
+     * This should be called from [androidx.fragment.app.Fragment.onSaveInstanceState] or
+     * [androidx.fragment.app.FragmentActivity.onSaveInstanceState].
      */
     fun saveViewModels(outState: Bundle) {
         saveViewModels(map, outState)
@@ -64,8 +64,8 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
     /**
      * Iterates through all persisted ViewModels saved with [saveViewModels] and stores them in the store map.
      *
-     * This should be called from [android.support.v4.app.Fragment.onCreate] or
-     * [android.support.v4.app.FragmentActivity.onCreate].
+     * This should be called from [androidx.fragment.app.Fragment.onCreate] or
+     * [androidx.fragment.app.FragmentActivity.onCreate].
      */
     fun restoreViewModels(activity: FragmentActivity, savedInstanceState: Bundle?) {
         restoreViewModelsCalled = true

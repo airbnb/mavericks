@@ -1,8 +1,8 @@
 package com.airbnb.mvrx
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
-import android.support.annotation.RestrictTo
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.annotation.RestrictTo
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class MvRxFactory<V>(private val factory: (Class<*>) -> V) : ViewModelProvider.Factory {

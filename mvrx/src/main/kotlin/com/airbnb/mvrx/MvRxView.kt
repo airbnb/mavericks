@@ -1,7 +1,7 @@
 package com.airbnb.mvrx
 
-import android.arch.lifecycle.Lifecycle
-import android.arch.lifecycle.LifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import android.os.Handler
 import android.os.Looper
 import android.os.Message

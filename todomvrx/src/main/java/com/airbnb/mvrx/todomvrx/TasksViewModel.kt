@@ -1,6 +1,6 @@
 package com.airbnb.mvrx.todomvrx
 
-import android.support.v4.app.FragmentActivity
+import androidx.fragment.app.FragmentActivity
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.MvRxState

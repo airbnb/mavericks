@@ -1,21 +1,26 @@
 buildscript {
-    ext.kotlinVersion = '1.2.41'
-    ext.supportLibVersion = '28.0.0'
-    ext.lifecycleVersion = '1.1.1'
+    ext.kotlinVersion = '1.2.51'
+    ext.androidxVersion = '1.0.0'
+    ext.lifecycleVersion = '2.0.0'
     ext.robolectricVersion = '3.8'
-    ext.epoxyVersion = '2.16.4'
+    ext.constraintLayoutVersion = '1.1.2'
+    ext.epoxyVersion = '3.0.0'
     ext.moshiVersion = '1.6.0'
     ext.koinVersion = '0.9.3'
     ext.retrofitVersion = '2.4.0'
     ext.navVersion = '1.0.0-alpha04'
-    ext.roomVersion = "1.1.1"
+    ext.roomVersion = '2.0.0'
+    ext.androidTestVersion = '1.1.0'
+    ext.espressoVersion = '3.1.0'
+    
+    ext.agpVersion = '3.2.0'
 
     repositories {
         google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.4'
+        classpath "com.android.tools.build:gradle:$agpVersion"
         classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlinVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }

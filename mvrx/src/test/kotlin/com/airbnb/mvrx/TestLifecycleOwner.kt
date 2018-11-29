@@ -1,7 +1,7 @@
 package com.airbnb.mvrx
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.LifecycleRegistry
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 
 class TestLifecycleOwner : LifecycleOwner {
 

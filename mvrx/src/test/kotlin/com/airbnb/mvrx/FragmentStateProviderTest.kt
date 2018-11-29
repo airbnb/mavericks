@@ -2,7 +2,7 @@ package com.airbnb.mvrx
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.MvRx.KEY_ARG
 import org.junit.Assert.assertEquals
 import kotlinx.android.parcel.Parcelize

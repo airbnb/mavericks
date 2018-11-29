@@ -14,7 +14,6 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-    buildToolsVersion '27.0.3'
 }
 
 androidExtensions {
@@ -25,11 +24,12 @@ dependencies {
     implementation project(':mvrx')
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     // TODO: clean up the support library dependency resolution.
-    implementation("com.android.support:appcompat-v7:$supportLibVersion") { exclude group: 'android.arch.lifecycle' }
-    implementation("com.android.support:recyclerview-v7:$supportLibVersion") { exclude group: 'android.arch.lifecycle' }
-    implementation "android.arch.lifecycle:extensions:$lifecycleVersion"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation("androidx.appcompat:appcompat:$androidxVersion") { exclude group: 'android.arch.lifecycle' }
+    implementation("androidx.recyclerview:recyclerview:$androidxVersion") { exclude group: 'android.arch.lifecycle' }
+    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
+    implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
     implementation("com.airbnb.android:epoxy:$epoxyVersion") { exclude group: 'com.android.support' }
     kapt "com.airbnb.android:epoxy-processor:$epoxyVersion"
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
@@ -44,6 +44,6 @@ dependencies {
     implementation "android.arch.navigation:navigation-fragment-ktx:$navVersion"
     implementation "android.arch.navigation:navigation-ui-ktx:$navVersion"
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'androidx.test:runner:1.1.0-alpha4'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.0-alpha4'
+    androidTestImplementation "androidx.test:runner:$androidTestVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
 }

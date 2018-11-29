@@ -1,8 +1,8 @@
 package com.airbnb.mvrx
 
-import android.support.v4.util.ArrayMap
-import android.support.v4.util.LongSparseArray
-import android.support.v4.util.SparseArrayCompat
+import androidx.collection.ArrayMap
+import androidx.collection.LongSparseArray
+import androidx.collection.SparseArrayCompat
 import android.util.SparseArray
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
