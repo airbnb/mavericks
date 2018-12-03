@@ -26,8 +26,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     // TODO: clean up the support library dependency resolution.
-    implementation("androidx.appcompat:appcompat:$androidxVersion") { exclude group: 'android.arch.lifecycle' }
-    implementation("androidx.recyclerview:recyclerview:$androidxVersion") { exclude group: 'android.arch.lifecycle' }
+    implementation("androidx.appcompat:appcompat:$appCompatVersion") { exclude group: 'android.arch.lifecycle' }
+    implementation("androidx.recyclerview:recyclerview:$recyclerViewVersion") { exclude group: 'android.arch.lifecycle' }
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
     implementation("com.airbnb.android:epoxy:$epoxyVersion") { exclude group: 'com.android.support' }
