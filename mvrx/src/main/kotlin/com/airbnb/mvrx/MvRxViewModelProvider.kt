@@ -35,12 +35,13 @@ object MvRxViewModelProvider {
         // This wraps the fact that ViewModelProvider.of has individual methods for Fragment and FragmentActivity.
         val activityOwner = storeOwner as? FragmentActivity
         val fragmentOwner = storeOwner as? Fragment
-        val fragmentActivity = activityOwner
-                ?: fragmentOwner?.activity
-                ?: throw IllegalArgumentException("$storeOwner must either be an Activity or a Fragment that is attached to an Activity")
 
         val factory = MvRxFactory {
-            createViewModel(viewModelClass, fragmentActivity, stateFactory())
+            when {
+                activityOwner != null -> createViewModel(viewModelClass, activityOwner, stateFactory())
+                fragmentOwner != null -> createViewModel(viewModelClass, fragmentOwner, stateFactory())
+                else -> throw IllegalArgumentException("$storeOwner must either be an Activity or a Fragment that is attached to an Activity")
+            }
         }
         return when {
             activityOwner != null -> ViewModelProviders.of(activityOwner, factory)
@@ -53,9 +54,22 @@ object MvRxViewModelProvider {
         viewModelClass: Class<VM>,
         fragmentActivity: FragmentActivity,
         state: S
+    ): VM = createFactoryViewModel(viewModelClass, fragmentActivity, state)
+        .let { validateViewModel(it, viewModelClass, state) }
+
+    @Suppress("UNCHECKED_CAST")
+    fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModel(
+        viewModelClass: Class<VM>,
+        fragment: Fragment,
+        state: S
+    ): VM = createFactoryViewModel(viewModelClass, fragment, state)
+        .let { validateViewModel(it, viewModelClass, state) }
+
+    private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> validateViewModel(
+        viewModel: VM?,
+        viewModelClass: Class<VM>,
+        state: S
     ): VM {
-        val viewModel = createFactoryViewModel(viewModelClass, fragmentActivity, state)
-            ?: createDefaultViewModel(viewModelClass, state)
         return requireNotNull(viewModel) {
 
             // We are about to crash, so accessing Kotlin reflect is okay for a better error message.
@@ -96,22 +110,38 @@ object MvRxViewModelProvider {
                         "initial state of ${state::class.java.simpleName}."
                 }
             }
-
         }
     }
 
     @Suppress("UNCHECKED_CAST")
     private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createFactoryViewModel(
         viewModelClass: Class<VM>,
-        fragmentActivity: FragmentActivity,
+        fragment: Fragment,
         state: S
-    ) : VM? {
+    ): VM? {
+        val method = try {
+            viewModelClass.getMethod("create", Fragment::class.java, state::class.java)
+        } catch (exception: NoSuchMethodException) {
+            // No fragment create found check for activity create.
+            return createFactoryViewModel(viewModelClass, fragment.requireActivity(), state)
+        }
+        val viewModel = method?.invoke(null, fragment, state) as? VM
+        return viewModel ?: createDefaultViewModel(viewModelClass, state)
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createFactoryViewModel(
+        viewModelClass: Class<VM>,
+        activity: FragmentActivity,
+        state: S
+    ): VM? {
         val method = try {
             viewModelClass.getMethod("create", FragmentActivity::class.java, state::class.java)
         } catch (exception: NoSuchMethodException) {
             null
         }
-        return method?.invoke(null, fragmentActivity, state) as? VM
+        val viewModel = method?.invoke(null, activity, state) as? VM
+        return viewModel ?: createDefaultViewModel(viewModelClass, state)
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -120,7 +150,7 @@ object MvRxViewModelProvider {
         // is a misconfiguration and we will throw an appropriate error under further inspection.
         if (viewModelClass.constructors.size == 1) {
             val primaryConstructor = viewModelClass.constructors[0]
-            if ( primaryConstructor.parameterTypes.size == 1 && primaryConstructor.parameterTypes[0].isAssignableFrom(state::class.java)) {
+            if (primaryConstructor.parameterTypes.size == 1 && primaryConstructor.parameterTypes[0].isAssignableFrom(state::class.java)) {
                 return primaryConstructor?.newInstance(state) as? VM
             }
         }
