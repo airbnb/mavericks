@@ -14,6 +14,7 @@ android {
         targetSdkVersion 27
         consumerProguardFiles 'proguard-rules.pro'
     }
+    buildToolsVersion "buildToolsVersion"
     lintOptions {
         abortOnError true
         textReport true
