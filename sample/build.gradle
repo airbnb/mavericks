@@ -14,7 +14,7 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-    buildToolsVersion '28.0.3'
+    buildToolsVersion "$buildToolsVersion"
     buildTypes {
         release {
             minifyEnabled true
