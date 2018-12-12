@@ -1,13 +1,16 @@
 package com.airbnb.mvrx
 
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Parcelable
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.parcel.Parcelize
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
 import org.junit.Test
 import org.robolectric.Robolectric
+import org.robolectric.annotation.Config
 
 @Parcelize
 data class ViewModelStoreTestArgs(val count: Int = 2) : Parcelable
@@ -100,20 +103,6 @@ class ViewModelStoreTest : BaseTest() {
         }
     }
 
-
-    @Test
-    fun testPersistedStateForActivityViewModelWhenSetFromFragmentArgs() {
-        val (controller, fragment) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(args = ViewModelStoreTestArgs(3))
-        fragment.viewModelActivity
-        val bundle = Bundle()
-        controller.saveInstanceState(bundle)
-        val (_, fragment2) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(savedInstanceState = bundle)
-        withState(fragment2.viewModelActivity) { state ->
-            assertEquals(3, state.notPersistedCount)
-            assertEquals(3, state.persistedCount)
-        }
-    }
-
     @Test
     fun testPersistedStateForActivityViewModel() {
         val (controller, fragment) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>()
@@ -128,15 +117,63 @@ class ViewModelStoreTest : BaseTest() {
     }
 
     @Test
+    fun testPersistedStateForActivityViewModelWhenSetFromFragmentArgs() {
+        val (controller, fragment) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(args = ViewModelStoreTestArgs(3))
+        fragment.viewModelActivity.setCount(2)
+        val bundle = Bundle()
+        controller.saveInstanceState(bundle)
+        val (_, fragment2) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(savedInstanceState = bundle)
+        withState(fragment2.viewModelActivity) { state ->
+            assertEquals(3, state.notPersistedCount)
+            assertEquals(2, state.persistedCount)
+        }
+    }
+
+    @Test
+    fun testActivityViewModelRetainedAcrossConfigurationChanges() {
+        val (controller, fragment) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>()
+        fragment.viewModelActivity.setCount(2)
+        controller.configurationChange(Configuration().apply {
+            setToDefaults()
+            this.orientation = Configuration.ORIENTATION_LANDSCAPE
+        })
+        val recreatedFragment = controller.mvRxFragment<ViewModelStoreTestFragment>()
+        assertNotEquals(fragment, recreatedFragment)
+        withState(recreatedFragment.viewModelActivity) { state ->
+            assertEquals(2, state.notPersistedCount)
+            assertEquals(2, state.persistedCount)
+        }
+    }
+
+    @Test
+    @Config(qualifiers = "+port")
+    fun testPersistedStateForActivityViewModelWhenSetFromFragmentArgsAfterConfigurationChange() {
+        val (controller, fragment) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(args = ViewModelStoreTestArgs(3))
+        fragment.viewModelActivity.setCount(2)
+        controller.configurationChange(Configuration().apply {
+            setToDefaults()
+            this.orientation = Configuration.ORIENTATION_LANDSCAPE
+        })
+        val bundleTwo = Bundle()
+        controller.saveInstanceState(bundleTwo)
+
+        val (_, fragment2) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(savedInstanceState = bundleTwo)
+        withState(fragment2.viewModelActivity) { state ->
+            assertEquals(3, state.notPersistedCount)
+            assertEquals(2, state.persistedCount)
+        }
+    }
+
+    @Test
     fun testPersistedStateForFragmentViewModelWhenSetFromFragmentArgs() {
         val (controller, fragment) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(args = ViewModelStoreTestArgs(3))
-        fragment.viewModelFragment
+        fragment.viewModelFragment.setCount(2)
         val bundle = Bundle()
         controller.saveInstanceState(bundle)
         val (_, fragment2) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(savedInstanceState = bundle)
         withState(fragment2.viewModelFragment) { state ->
             assertEquals(3, state.notPersistedCount)
-            assertEquals(3, state.persistedCount)
+            assertEquals(2, state.persistedCount)
         }
     }
 
@@ -150,6 +187,41 @@ class ViewModelStoreTest : BaseTest() {
         withState(fragment2.viewModelFragment) { state ->
             assertEquals(1, state.notPersistedCount)
             assertEquals(3, state.persistedCount)
+        }
+    }
+
+    @Test
+    fun testFragmentViewModelRetainedAcrossConfigurationChanges() {
+        val (controller, fragment) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>()
+        fragment.viewModelFragment.setCount(2)
+        controller.configurationChange(Configuration().apply {
+            setToDefaults()
+            this.orientation = Configuration.ORIENTATION_LANDSCAPE
+        })
+        val recreatedFragment = controller.mvRxFragment<ViewModelStoreTestFragment>()
+        assertNotEquals(fragment, recreatedFragment)
+        withState(recreatedFragment.viewModelFragment) { state ->
+            assertEquals(2, state.notPersistedCount)
+            assertEquals(2, state.persistedCount)
+        }
+    }
+
+    @Test
+    @Config(qualifiers = "+port")
+    fun testPersistedStateForFragmentViewModelWhenSetFromFragmentArgsAfterConfigurationChange() {
+        val (controller, fragment) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(args = ViewModelStoreTestArgs(3))
+        fragment.viewModelFragment.setCount(2)
+        controller.configurationChange(Configuration().apply {
+            setToDefaults()
+            this.orientation = Configuration.ORIENTATION_LANDSCAPE
+        })
+        val bundleTwo = Bundle()
+        controller.saveInstanceState(bundleTwo)
+
+        val (_, fragment2) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(savedInstanceState = bundleTwo)
+        withState(fragment2.viewModelFragment) { state ->
+            assertEquals(3, state.notPersistedCount)
+            assertEquals(2, state.persistedCount)
         }
     }
 
@@ -170,11 +242,7 @@ class ViewModelStoreTest : BaseTest() {
 
     @Test
     fun testViewModelInActivityWithoutArgs() {
-        val controller = Robolectric.buildActivity(ViewModelStoreActivity::class.java)
-                .create(null)
-                .start()
-                .resume()
-                .visible()
+        val controller = Robolectric.buildActivity(ViewModelStoreActivity::class.java).setup()
         withState(controller.get().viewModel) { state ->
             assertEquals(1, state.notPersistedCount)
             assertEquals(1, state.persistedCount)
@@ -187,11 +255,7 @@ class ViewModelStoreTest : BaseTest() {
         val intent = Intent()
         intent.putExtra(MvRx.KEY_ARG, args)
 
-        val controller = Robolectric.buildActivity(ViewModelStoreActivity::class.java, intent)
-                .create(null)
-                .start()
-                .resume()
-                .visible()
+        val controller = Robolectric.buildActivity(ViewModelStoreActivity::class.java, intent).setup()
         withState(controller.get().viewModel) { state ->
             assertEquals(3, state.notPersistedCount)
             assertEquals(3, state.persistedCount)
@@ -204,11 +268,7 @@ class ViewModelStoreTest : BaseTest() {
         val intent = Intent()
         intent.putExtra(MvRx.KEY_ARG, args)
 
-        val controller = Robolectric.buildActivity(ViewModelStoreActivity::class.java, intent)
-                .create(null)
-                .start()
-                .resume()
-                .visible()
+        val controller = Robolectric.buildActivity(ViewModelStoreActivity::class.java, intent).setup()
 
         controller.get().viewModel.setCount(4)
 
@@ -216,11 +276,7 @@ class ViewModelStoreTest : BaseTest() {
         controller.saveInstanceState(savedInstanceState)
 
 
-        val controller2 = Robolectric.buildActivity(ViewModelStoreActivity::class.java, intent)
-                .create(savedInstanceState)
-                .start()
-                .resume()
-                .visible()
+        val controller2 = Robolectric.buildActivity(ViewModelStoreActivity::class.java, intent).setup(savedInstanceState)
 
         withState(controller2.get().viewModel) { state ->
             assertEquals(3, state.notPersistedCount)
