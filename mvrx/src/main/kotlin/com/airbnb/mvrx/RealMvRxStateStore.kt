@@ -33,7 +33,9 @@ class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
 
     private val jobs = Jobs<S>()
 
-    override val observable: Observable<S> = subject.distinctUntilChanged()
+    // We have already checked distinct before calling `subject.onNext`
+    // This avoids unnecessary comparison for each downstream subscription
+    override val observable: Observable<S> = subject
     /**
      * This is automatically updated from a subscription on the subject for easy access to the
      * current state.
@@ -132,7 +134,7 @@ class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
 
         blocks
                 .fold(state) { state, reducer -> state.reducer() }
-                .run { subject.onNext(this) }
+                .run { if (this != state) subject.onNext(this) }
     }
 
     private fun handleError(throwable: Throwable) {
