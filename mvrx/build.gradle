@@ -6,12 +6,12 @@ apply from: 'gradle-maven-push.gradle'
 apply plugin: "jacoco"
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
     resourcePrefix 'mvrx_'
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 27
+        targetSdkVersion 28
         consumerProguardFiles 'proguard-rules.pro'
     }
     buildToolsVersion "$buildToolsVersion"
