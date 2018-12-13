@@ -1,0 +1,69 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
+
+apply from: '../gradle-maven-push.gradle'
+
+android {
+    compileSdkVersion 27
+    resourcePrefix 'mvrx_'
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 27
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+    buildToolsVersion "$buildToolsVersion"
+    lintOptions {
+        abortOnError true
+        textReport true
+        textOutput 'stdout'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+    }
+}
+
+androidExtensions {
+    experimental = true
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    implementation "com.android.support:appcompat-v7:$supportLibVersion"
+    implementation project(':mvrx')
+    implementation 'junit:junit:4.12'
+}
+
+// Ensure custom source sets are included:
+// https://www.virag.si/2015/01/publishing-gradle-android-library-to-jcenter/
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+tasks.withType(Javadoc).all {
+    enabled = false
+}

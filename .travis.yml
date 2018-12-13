@@ -25,18 +25,10 @@ notifications:
 jobs:
   include:
   - stage: test
-    name: MvRx Lint
-    script: "./gradlew :mvrx:lintRelease"
-  - name: MvRx Unit Tests
-    script: "./gradlew :mvrx:testReleaseUnitTest"
-  - name: Sample Lint
-    script: "./gradlew :sample:lintRelease"
-  - name: Sample Unit Tests
-    script: "./gradlew :sample:testReleaseUnitTest"
-  - name: ToDo MvRx Lint
-    script: "./gradlew :todomvrx:lintRelease"
-  - name: ToDo MvRx Unit Tests
-    script: "./gradlew :todomvrx:testReleaseUnitTest"
+    name: Lint
+    script: "./gradlew lintRelease"
+  - name: Unit Tests
+    script: "./gradlew testReleaseUnitTest"
 
 sudo: false
 

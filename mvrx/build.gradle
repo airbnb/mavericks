@@ -2,8 +2,9 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-apply from: 'gradle-maven-push.gradle'
 apply plugin: "jacoco"
+
+apply from: '../gradle-maven-push.gradle'
 
 android {
     compileSdkVersion 28
@@ -56,7 +57,7 @@ dependencies {
     implementation "android.arch.lifecycle:extensions:$lifecycleVersion"
     kapt "android.arch.lifecycle:compiler:$lifecycleVersion"
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
-    implementation "io.reactivex.rxjava2:rxjava:2.2.0"
+    api "io.reactivex.rxjava2:rxjava:2.2.0"
 
     testImplementation "org.mockito:mockito-core:2.15.0"
     testImplementation 'junit:junit:4.12'
