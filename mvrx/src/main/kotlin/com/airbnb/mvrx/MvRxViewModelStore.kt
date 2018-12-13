@@ -83,8 +83,8 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
     internal fun restoreViewModels(map: MutableMap<String, ViewModel>, activity: FragmentActivity, savedInstanceState: Bundle?, ownerArgs: Any? = null) {
         savedInstanceState ?: return
         val viewModelsState = savedInstanceState.getBundle(KEY_MVRX_SAVED_INSTANCE_STATE) ?: throw IllegalStateException("You are trying to call restoreViewModels but you never called saveViewModels!")
-        if (map.isNotEmpty()) return
         restoreFragmentArgsFromSavedInstanceState(savedInstanceState)
+        if (map.isNotEmpty()) return
         viewModelsState.keySet()?.forEach {
             // In the case that we are restoring an Activity ViewModel created by a Fragment, `ownerArgs` will be those of the Activity. So we
             // need to use the persisted Fragment args instead.

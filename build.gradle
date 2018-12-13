@@ -1,13 +1,13 @@
 buildscript {
     ext.kotlinVersion = '1.2.51'
-    ext.supportLibVersion = '27.1.1'
+    ext.supportLibVersion = '28.0.0'
     ext.lifecycleVersion = '1.1.1'
-    ext.robolectricVersion = '3.8'
+    ext.robolectricVersion = '4.0.2'
     ext.epoxyVersion = '2.16.4'
     ext.moshiVersion = '1.6.0'
     ext.koinVersion = '0.9.3'
     ext.retrofitVersion = '2.4.0'
-    ext.navVersion = '1.0.0-alpha04'
+    ext.navVersion = '1.0.0-alpha08'
     ext.roomVersion = '1.1.1'
     ext.buildToolsVersion = '28.0.3'
 
@@ -16,7 +16,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.2.0'
+        classpath 'com.android.tools.build:gradle:3.2.1'
         classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlinVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
     }

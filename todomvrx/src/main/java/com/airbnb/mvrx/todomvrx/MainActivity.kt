@@ -26,22 +26,22 @@ class MainActivity : BaseMvRxActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val navView: NavigationView = findViewById(R.id.nav_view)
+        val navView = findViewById<NavigationView>(R.id.nav_view)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
 
         setSupportActionBar(toolbar)
         navView.setupWithNavController(navController)
         setupActionBarWithNavController(navController)
 
-        navController.addOnNavigatedListener { _, destination ->
+        navController.addOnDestinationChangedListener { _, destination, _ ->
             val isDrawer = destination.isDrawerDestination()
             toolbar.setNavigationIcon(if (isDrawer) R.drawable.ic_menu else R.drawable.ic_back)
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?) = when(item?.itemId ?: 0) {
+    override fun onOptionsItemSelected(item: MenuItem?) = when (item?.itemId ?: 0) {
         android.R.id.home -> {
-            if (navController.currentDestination.isDrawerDestination()) {
+            if (navController.currentDestination?.isDrawerDestination() == true) {
                 drawerLayout.openDrawer(GravityCompat.START)
             } else {
                 navController.navigateUp()
