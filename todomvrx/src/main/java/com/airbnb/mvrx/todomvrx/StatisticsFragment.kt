@@ -11,7 +11,7 @@ class StatisticsFragment : BaseFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        fab.visibility = View.GONE
+        fab.hide()
     }
 
     override fun epoxyController() = simpleController(viewModel) { state ->
