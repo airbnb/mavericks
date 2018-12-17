@@ -89,7 +89,7 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
         restoreViewModels(fragment, map, savedInstanceState, ownerArgs)
     }
 
-    private inline fun <reified H> restoreViewModels(host: H, map: MutableMap<String, ViewModel>, savedInstanceState: Bundle?, ownerArgs: Any? = null) {
+    private fun <H> restoreViewModels(host: H, map: MutableMap<String, ViewModel>, savedInstanceState: Bundle?, ownerArgs: Any? = null) {
         savedInstanceState ?: return
         val viewModelsState = savedInstanceState.getBundle(KEY_MVRX_SAVED_INSTANCE_STATE)
             ?: throw IllegalStateException("You are trying to call restoreViewModels but you never called saveViewModels!")
@@ -103,11 +103,9 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
             } else {
                 ownerArgs
             }
-            if (H::class is Fragment) {
-                map[it] = restoreViewModel(host as Fragment, viewModelsState.getParcelable(it), arguments)
-            } else {
-                map[it] = restoreViewModel(host as FragmentActivity, viewModelsState.getParcelable(it), arguments)
-            }
+            map[it] = (host as? Fragment)
+                    ?.let { fragment -> restoreViewModel(fragment, viewModelsState.getParcelable(it), arguments) }
+                    ?: restoreViewModel(host as FragmentActivity, viewModelsState.getParcelable(it), arguments)
         }
     }
 
