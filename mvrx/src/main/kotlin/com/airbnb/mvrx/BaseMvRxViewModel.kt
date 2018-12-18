@@ -39,7 +39,6 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         // called synchronously in onSaveInstanceState() on the main thread, it will be
         // much faster.
         // This improved performance 10-100x for a state with 100 @PersistStae properties.
-        //
         Completable.fromCallable {
             initialState::class.primaryConstructor?.parameters?.forEach { it.annotations }
             initialState::class.declaredMemberProperties.forEach {
