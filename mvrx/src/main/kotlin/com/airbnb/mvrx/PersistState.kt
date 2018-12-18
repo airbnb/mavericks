@@ -33,25 +33,28 @@ annotation class PersistState
  */
 internal fun <T : Any> T.persistState(assertCollectionPersistability: Boolean = false): Bundle {
     val klass = this::class
-    val props = klass.declaredMemberProperties.associateBy { it.name }
-    val constructor = klass.primaryConstructor ?: throw IllegalStateException("${klass.simpleName} has no primary constructor!")
+    val persistStateArgs = klass.primaryConstructor
+            ?.parameters
+            ?.filter { it.annotations.any { it.annotationClass == PersistState::class } }
+    if (persistStateArgs?.isEmpty() != false) {
+        return Bundle()
+    }
+
+    val persistStateArgNames = persistStateArgs.map { it.name }
     /**
-     * Filter out non @PersistState constructor params.
-     * Filter out params that don't have an associated property.
+     * Filter out params that don't have an associated @PersistState prop.
      * Map the parameter name to the current value of its associated property
      * Reduce the @PersistState parameters into a bundle mapping the parameter name to the property value.
      */
-    return constructor.parameters.asSequence()
-        .filter { props[it.name] != null }
-        .filter { it.annotations.any { it.annotationClass == PersistState::class } }
-        .map {
-            @Suppress("UNCHECKED_CAST")
-            val prop = props[it.name] as? KProperty1<T, Any?>
-            val value = prop?.get(this@persistState)
-            if (assertCollectionPersistability) assertCollectionPersistability(value)
-            it to value
-        }
-        .fold(Bundle()) { bundle, (param, value) -> bundle.putAny(param.name, value) }
+    return klass.declaredMemberProperties.asSequence()
+            .filter { persistStateArgNames.contains(it.name) }
+            .map { prop ->
+                @Suppress("UNCHECKED_CAST")
+                val value = (prop as? KProperty1<T, Any?>)?.get(this@persistState)
+                if (assertCollectionPersistability) assertCollectionPersistability(value)
+                prop to value
+            }
+            .fold(Bundle()) { bundle, (param, value) -> bundle.putAny(param.name, value) }
 }
 
 private fun assertCollectionPersistability(value: Any?) {
