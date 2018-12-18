@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModel
 import android.support.annotation.CallSuper
 import android.support.annotation.RestrictTo
 import android.util.Log
+import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -39,7 +40,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         // much faster.
         // This improved performance 10-100x for a state with 100 @PersistStae properties.
         //
-        Observable.fromCallable {
+        Completable.fromCallable {
             initialState::class.primaryConstructor?.parameters?.forEach { it.annotations }
             initialState::class.declaredMemberProperties.forEach {
                 @Suppress("UNCHECKED_CAST")
@@ -50,7 +51,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         if (debugMode) {
             mutableStateChecker = MutableStateChecker(initialState)
 
-            Observable.fromCallable { validateState(initialState) }
+            Completable.fromCallable { validateState(initialState) }
                 .subscribeOn(Schedulers.computation()).subscribe()
         }
     }
