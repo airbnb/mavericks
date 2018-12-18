@@ -1,3 +1,4 @@
+
 package com.airbnb.mvrx
 
 import android.arch.lifecycle.ViewModel
@@ -77,12 +78,21 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
     fun restoreViewModels(fragment: Fragment, savedInstanceState: Bundle?) {
         savedInstanceState ?: return
         val args = fragment.arguments?.get(MvRx.KEY_ARG)
-        restoreViewModels(map, fragment.requireActivity(), savedInstanceState, args)
+        restoreViewModels(map, fragment, savedInstanceState, args)
     }
 
     internal fun restoreViewModels(map: MutableMap<String, ViewModel>, activity: FragmentActivity, savedInstanceState: Bundle?, ownerArgs: Any? = null) {
+        restoreViewModels(activity, map, savedInstanceState, ownerArgs)
+    }
+
+    internal fun restoreViewModels(map: MutableMap<String, ViewModel>, fragment: Fragment, savedInstanceState: Bundle?, ownerArgs: Any? = null) {
+        restoreViewModels(fragment, map, savedInstanceState, ownerArgs)
+    }
+
+    private fun <H> restoreViewModels(host: H, map: MutableMap<String, ViewModel>, savedInstanceState: Bundle?, ownerArgs: Any? = null) {
         savedInstanceState ?: return
-        val viewModelsState = savedInstanceState.getBundle(KEY_MVRX_SAVED_INSTANCE_STATE) ?: throw IllegalStateException("You are trying to call restoreViewModels but you never called saveViewModels!")
+        val viewModelsState = savedInstanceState.getBundle(KEY_MVRX_SAVED_INSTANCE_STATE)
+            ?: throw IllegalStateException("You are trying to call restoreViewModels but you never called saveViewModels!")
         restoreFragmentArgsFromSavedInstanceState(savedInstanceState)
         if (map.isNotEmpty()) return
         viewModelsState.keySet()?.forEach {
@@ -93,7 +103,9 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
             } else {
                 ownerArgs
             }
-            map[it] = restoreViewModel(activity, viewModelsState.getParcelable(it), arguments)
+            map[it] = (host as? Fragment)
+                    ?.let { fragment -> restoreViewModel(fragment, viewModelsState.getParcelable(it), arguments) }
+                    ?: restoreViewModel(host as FragmentActivity, viewModelsState.getParcelable(it), arguments)
         }
     }
 
@@ -110,6 +122,14 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
         // the Fragment args that the ViewModel was created with.
         val state = _initialStateProvider(stateClass, arguments).let(viewModelState::restorePersistedState)
         return createViewModel(viewModelClass, activity, state)
+    }
+
+    private fun restoreViewModel(fragment: Fragment, holder: MvRxPersistedViewModelHolder, arguments: Any?): ViewModel {
+        val (viewModelClass, stateClass, viewModelState) = holder
+        // If there is a key in the fragmentArgsForActivityViewModelState map, then this is an activity ViewModel. The map value will contain
+        // the Fragment args that the ViewModel was created with.
+        val state = _initialStateProvider(stateClass, arguments).let(viewModelState::restorePersistedState)
+        return createViewModel(viewModelClass, fragment, state)
     }
 
     /**

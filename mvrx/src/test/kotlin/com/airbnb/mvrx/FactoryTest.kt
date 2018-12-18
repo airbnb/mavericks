@@ -1,5 +1,6 @@
 package com.airbnb.mvrx
 
+import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -14,6 +15,15 @@ class TestFactoryViewModel(initialState: FactoryState, val otherProp: Long) : Te
         override fun create(activity: FragmentActivity, state: FactoryState) = TestFactoryViewModel(state, 5)
     }
 }
+
+class TestFragmentFactoryViewModel(initialState: FactoryState, val otherProp: Long) : TestMvRxViewModel<FactoryState>(initialState) {
+    companion object : MvRxFragmentViewModelFactory<FactoryState> {
+        @JvmStatic
+        override fun create(fragment: Fragment, state: FactoryState) = TestFragmentFactoryViewModel(state, 5)
+    }
+}
+
+class ViewModelFactoryTestFragment : Fragment()
 
 class FactoryTest : BaseTest() {
 
@@ -34,6 +44,16 @@ class FactoryTest : BaseTest() {
     }
 
     @Test
+    fun createDefaultViewModelFromFragment() {
+        val (_, fragment) = createFragment<ViewModelFactoryTestFragment, TestActivity>()
+        class MyViewModel(initialState: FactoryState) : TestMvRxViewModel<FactoryState>(initialState)
+        val viewModel = MvRxViewModelProvider.get(MyViewModel::class.java, fragment) { FactoryState() }
+        withState(viewModel) { state ->
+            assertEquals(FactoryState(), state)
+        }
+    }
+
+    @Test
     fun createDefaultViewModelWithState() {
         class MyViewModel(initialState: FactoryState) : TestMvRxViewModel<FactoryState>(initialState)
         val viewModel = MvRxViewModelProvider.get(MyViewModel::class.java, activity) { FactoryState(count = 5) }
@@ -43,8 +63,38 @@ class FactoryTest : BaseTest() {
     }
 
     @Test
+    fun createDefaultViewModelWithStateFromFragment() {
+        val (_, fragment) = createFragment<ViewModelFactoryTestFragment, TestActivity>()
+        class MyViewModel(initialState: FactoryState) : TestMvRxViewModel<FactoryState>(initialState)
+        val viewModel = MvRxViewModelProvider.get(MyViewModel::class.java, fragment) { FactoryState(count = 5) }
+        withState(viewModel) { state ->
+            assertEquals(FactoryState(count = 5), state)
+        }
+    }
+
+    @Test
     fun createWithFactory() {
         val viewModel = MvRxViewModelProvider.get(TestFactoryViewModel::class.java, activity) { FactoryState(count = 5) }
+        withState(viewModel) { state ->
+            assertEquals(FactoryState(count = 5), state)
+        }
+        assertEquals(5, viewModel.otherProp)
+    }
+
+    @Test
+    fun createWithActivityFactoryFromFragment() {
+        val (_, fragment) = createFragment<ViewModelFactoryTestFragment, TestActivity>()
+        val viewModel = MvRxViewModelProvider.get(TestFactoryViewModel::class.java, fragment) { FactoryState(count = 5) }
+        withState(viewModel) { state ->
+            assertEquals(FactoryState(count = 5), state)
+        }
+        assertEquals(5, viewModel.otherProp)
+    }
+
+    @Test
+    fun createWithFragmentFactoryFromFragment() {
+        val (_, fragment) = createFragment<ViewModelFactoryTestFragment, TestActivity>()
+        val viewModel = MvRxViewModelProvider.get(TestFragmentFactoryViewModel::class.java, fragment) { FactoryState(count = 5) }
         withState(viewModel) { state ->
             assertEquals(FactoryState(count = 5), state)
         }
