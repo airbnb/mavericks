@@ -14,6 +14,8 @@ import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import kotlin.reflect.KProperty1
 import kotlin.reflect.KVisibility
+import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.primaryConstructor
 
 /**
  * To use MvRx, create your own base MvRxViewModel that extends this one and sets debugMode.
@@ -30,6 +32,21 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     private lateinit var mutableStateChecker: MutableStateChecker<S>
 
     init {
+        // Kotlin reflection has a large overhead the first time you run it
+        // but then is pretty fast on subsequent times. Running these methods now will
+        // initialize kotlin reflect and warm the cache so that when persistState() gets
+        // called synchronously in onSaveInstanceState() on the main thread, it will be
+        // much faster.
+        // This improved performance 10-100x for a state with 100 @PersistStae properties.
+        //
+        Observable.fromCallable {
+            initialState::class.primaryConstructor?.parameters?.forEach { it.annotations }
+            initialState::class.declaredMemberProperties.forEach {
+                @Suppress("UNCHECKED_CAST")
+                (it as? KProperty1<S, Any?>)?.get(initialState)
+            }
+        }.subscribeOn(Schedulers.computation()).subscribe()
+
         if (debugMode) {
             mutableStateChecker = MutableStateChecker(initialState)
 
