@@ -46,10 +46,11 @@ class MvRxTestRule(
             override fun evaluate() {
                 RxAndroidPlugins.reset()
                 RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
+                RxAndroidPlugins.setMainThreadSchedulerHandler { immediateScheduler }
                 if (setRxImmediateSchedulers) setRxImmediateSchedulers()
                 MvRxTestOverridesProxy.forceMvRxDebug(debugMode.value)
                 try {
-                    base.evaluate();
+                    base.evaluate()
                 } finally {
                     RxAndroidPlugins.reset()
                     MvRxTestOverridesProxy.forceMvRxDebug(DebugMode.Unset.value)
