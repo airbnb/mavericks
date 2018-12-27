@@ -32,13 +32,6 @@ class MvRxTestRule(
          */
         private val setRxImmediateSchedulers: Boolean = true
 ) : TestRule {
-    private val immediateScheduler = object : Scheduler() {
-        // this prevents StackOverflowErrors when scheduling with a delay
-        override fun scheduleDirect(@NonNull run: Runnable, delay: Long, @NonNull unit: TimeUnit): Disposable = super.scheduleDirect(run, 0, unit)
-
-        override fun createWorker(): Scheduler.Worker = ExecutorScheduler.ExecutorWorker(Executor { it.run() })
-    }
-
     private var defaultExceptionHandler: Thread.UncaughtExceptionHandler? = null
 
     override fun apply(base: Statement, description: Description): Statement {
@@ -46,7 +39,7 @@ class MvRxTestRule(
             override fun evaluate() {
                 RxAndroidPlugins.reset()
                 RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
-                RxAndroidPlugins.setMainThreadSchedulerHandler { immediateScheduler }
+                RxAndroidPlugins.setMainThreadSchedulerHandler { Schedulers.trampoline() }
                 if (setRxImmediateSchedulers) setRxImmediateSchedulers()
                 MvRxTestOverridesProxy.forceMvRxDebug(debugMode.value)
                 try {
@@ -62,10 +55,10 @@ class MvRxTestRule(
 
     private fun setRxImmediateSchedulers() {
         RxJavaPlugins.reset()
-        RxJavaPlugins.setNewThreadSchedulerHandler { immediateScheduler }
-        RxJavaPlugins.setComputationSchedulerHandler { immediateScheduler }
-        RxJavaPlugins.setInitIoSchedulerHandler { immediateScheduler }
-        RxJavaPlugins.setSingleSchedulerHandler { immediateScheduler }
+        RxJavaPlugins.setNewThreadSchedulerHandler { Schedulers.trampoline() }
+        RxJavaPlugins.setComputationSchedulerHandler { Schedulers.trampoline() }
+        RxJavaPlugins.setInitIoSchedulerHandler { Schedulers.trampoline() }
+        RxJavaPlugins.setSingleSchedulerHandler { Schedulers.trampoline() }
         // This is necessary to prevent rxjava from swallowing errors
         // https://github.com/ReactiveX/RxJava/issues/5234
         defaultExceptionHandler = Thread.getDefaultUncaughtExceptionHandler()
