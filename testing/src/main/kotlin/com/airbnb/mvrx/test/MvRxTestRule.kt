@@ -57,7 +57,7 @@ class MvRxTestRule(
         RxJavaPlugins.reset()
         RxJavaPlugins.setNewThreadSchedulerHandler { Schedulers.trampoline() }
         RxJavaPlugins.setComputationSchedulerHandler { Schedulers.trampoline() }
-        RxJavaPlugins.setInitIoSchedulerHandler { Schedulers.trampoline() }
+        RxJavaPlugins.setIoSchedulerHandler { Schedulers.trampoline() }
         RxJavaPlugins.setSingleSchedulerHandler { Schedulers.trampoline() }
         // This is necessary to prevent rxjava from swallowing errors
         // https://github.com/ReactiveX/RxJava/issues/5234
