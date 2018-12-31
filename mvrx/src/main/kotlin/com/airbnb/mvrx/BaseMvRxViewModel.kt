@@ -91,7 +91,8 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
                             .map { it as KProperty1<S, *> }
                             .first { it.get(firstState) != it.get(secondState) }
                     throw IllegalArgumentException("Your reducer must be pure! ${changedProp.name} changed from " +
-                            "${changedProp.get(firstState)} to ${changedProp.get(secondState)}")
+                            "${changedProp.get(firstState)} to ${changedProp.get(secondState)}. " +
+                            "Ensure that your state properties properly implement hashCode.")
                 }
                 mutableStateChecker.onStateChanged(firstState)
 
