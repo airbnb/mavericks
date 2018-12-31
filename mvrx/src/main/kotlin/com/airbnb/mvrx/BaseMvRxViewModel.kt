@@ -16,6 +16,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlin.reflect.KProperty1
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 
 /**
@@ -84,7 +85,14 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
                 val firstState = this.reducer()
                 val secondState = this.reducer()
 
-                if (firstState != secondState) throw IllegalArgumentException("Your reducer must be pure!")
+                if (firstState != secondState) {
+                    @Suppress("UNCHECKED_CAST")
+                    val changedProp = firstState::class.memberProperties
+                            .map { it as KProperty1<S, *> }
+                            .first { it.get(firstState) != it.get(secondState) }
+                    throw IllegalArgumentException("Your reducer must be pure! ${changedProp.name} changed from " +
+                            "${changedProp.get(firstState)} to ${changedProp.get(secondState)}")
+                }
                 mutableStateChecker.onStateChanged(firstState)
 
                 firstState
