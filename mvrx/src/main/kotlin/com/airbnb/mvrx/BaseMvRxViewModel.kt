@@ -25,9 +25,11 @@ import kotlin.reflect.full.primaryConstructor
  */
 abstract class BaseMvRxViewModel<S : MvRxState>(
     initialState: S,
-    private val debugMode: Boolean = false,
+    debugMode: Boolean = false,
     private val stateStore: MvRxStateStore<S> = RealMvRxStateStore(initialState)
 ) : ViewModel() {
+    private val debugMode = if (MvRxTestOverrides.FORCE_DEBUG == null) debugMode else MvRxTestOverrides.FORCE_DEBUG
+
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
     private lateinit var mutableStateChecker: MutableStateChecker<S>
@@ -47,7 +49,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             }
         }.subscribeOn(Schedulers.computation()).subscribe()
 
-        if (debugMode) {
+        if (this.debugMode) {
             mutableStateChecker = MutableStateChecker(initialState)
 
             Completable.fromCallable { validateState(initialState) }

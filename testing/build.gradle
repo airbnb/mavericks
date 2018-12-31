@@ -2,7 +2,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-apply plugin: "jacoco"
 
 apply from: '../gradle-maven-push.gradle'
 
@@ -29,24 +28,10 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
         test.java.srcDirs += 'src/test/kotlin'
     }
-    testOptions {
-        unitTests {
-            includeAndroidResources = true
-            all {
-                jacoco {
-                    includeNoLocationClasses = true
-                }
-            }
-        }
-    }
 }
 
 androidExtensions {
     experimental = true
-}
-
-jacoco {
-    toolVersion = "0.8.2"
 }
 
 dependencies {
@@ -54,15 +39,9 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     implementation "com.android.support:appcompat-v7:$supportLibVersion"
-    implementation "android.arch.lifecycle:extensions:$lifecycleVersion"
-    kapt "android.arch.lifecycle:compiler:$lifecycleVersion"
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
-    api "io.reactivex.rxjava2:rxjava:2.2.0"
-
-    testImplementation "org.mockito:mockito-core:2.15.0"
-    testImplementation 'junit:junit:4.12'
-    testImplementation "org.robolectric:robolectric:$robolectricVersion"
-    testImplementation "org.robolectric:shadows-supportv4:$robolectricVersion"
+    implementation project(':mvrx')
+    implementation 'junit:junit:4.12'
 }
 
 // Ensure custom source sets are included:
@@ -89,30 +68,4 @@ artifacts {
 
 tasks.withType(Javadoc).all {
     enabled = false
-}
-
-task coverage(type: JacocoReport, dependsOn: "testDebugUnitTest") {
-    group = "Reporting"
-    description = "Generate Jacoco coverage reports for Debug build"
-
-    reports {
-        xml.enabled = true
-        html.enabled = true
-    }
-
-    def excludes = [
-            '**/R.class',
-            '**/R$*.class',
-            '**/BuildConfig.*',
-            '**/Manifest*.*',
-    ]
-    def debugTree = fileTree(dir: "${buildDir}/intermediates/classes/debug", excludes: excludes)
-    def kotlinDebugTree = fileTree(dir: "${buildDir}/tmp/kotlin-classes/debug", excludes: excludes)
-    classDirectories = files([debugTree], [kotlinDebugTree])
-
-    sourceDirectories = files([
-            android.sourceSets.main.java.srcDirs,
-            "${project.projectDir}/src/main/kotlin"
-    ])
-    executionData = files("$buildDir/jacoco/testDebugUnitTest.exec")
 }
