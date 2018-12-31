@@ -497,4 +497,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     }
 
     override fun toString(): String = "${this::class.simpleName} $state"
+
+    @RestrictTo(RestrictTo.Scope.TESTS)
+    internal fun getStateForTestRuleDoNotCallOnYourOwn() = state
 }

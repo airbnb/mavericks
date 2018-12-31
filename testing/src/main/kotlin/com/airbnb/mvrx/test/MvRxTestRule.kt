@@ -1,19 +1,16 @@
 package com.airbnb.mvrx.test
 
-import android.support.annotation.NonNull
+import com.airbnb.mvrx.BaseMvRxViewModel
+import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MvRxTestOverridesKt
 import com.airbnb.mvrx.MvRxTestOverridesProxy
-import io.reactivex.Scheduler
 import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.disposables.Disposable
 import io.reactivex.exceptions.CompositeException
-import io.reactivex.internal.schedulers.ExecutorScheduler
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
 
 enum class DebugMode(internal val value: Boolean?) {
     Debug(true),
@@ -73,4 +70,9 @@ class MvRxTestRule(
         defaultExceptionHandler = null
         RxJavaPlugins.reset()
     }
+
+    /**
+     * Call this to synchronously get the state of your ViewModel to run assertions on it.
+     */
+    fun <S : MvRxState> getState(viewModel: BaseMvRxViewModel<S>) = MvRxTestOverridesKt.getStateForTestRuleDoNotCallOnYourOwn(viewModel)
 }
