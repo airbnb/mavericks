@@ -2,27 +2,21 @@ package com.airbnb.mvrx.todomvrx
 
 import com.airbnb.mvrx.Fail
 import com.airbnb.mvrx.Success
+import com.airbnb.mvrx.test.MvRxTestRule
 import com.airbnb.mvrx.todomvrx.data.Task
 import com.airbnb.mvrx.todomvrx.data.source.TasksDataSource
-import com.airbnb.mvrx.todomvrx.todoapp.BuildConfig
-import com.airbnb.mvrx.todomvrx.util.RxSchedulersOverrideRule
 import com.airbnb.mvrx.withState
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
-import de.jodamob.reflect.SuperReflect
 import io.reactivex.Single
 import io.reactivex.subjects.SingleSubject
 import org.junit.Assert.*
 import org.junit.Before
-import org.junit.BeforeClass
-import org.junit.Rule
+import org.junit.ClassRule
 import org.junit.Test
 
 class TasksViewModelTest {
-
-    // A rule that makes all subscriptions to be subscribed and observed on a trampoline scheduler
-    @get:Rule val rxSchedulersOverrideRule = RxSchedulersOverrideRule()
 
     private val dataSource: TasksDataSource = mock()
 
@@ -78,7 +72,7 @@ class TasksViewModelTest {
 
     @Test fun upsertTask_insert() {
         // make `getTasks` emit an error to use tasks from the initial state
-        whenever(dataSource.getTasks()).thenReturn(Single.error(Exception("Server not found")))
+        whenever(dataSource.getTasks()).thenReturn(Single.never())
 
         // given the viewmodel with some tasks
         viewModel = TasksViewModel(TasksState(tasks = tasks), listOf(dataSource))
@@ -105,7 +99,7 @@ class TasksViewModelTest {
 
     @Test fun upsertTask_update() {
         // make `getTasks` emit an error to use tasks from the initial state
-        whenever(dataSource.getTasks()).thenReturn(Single.error(Exception("Server not found")))
+        whenever(dataSource.getTasks()).thenReturn(Single.never())
 
         // given the viewmodel with some tasks
         viewModel = TasksViewModel(TasksState(tasks = tasks), listOf(dataSource))
@@ -133,7 +127,7 @@ class TasksViewModelTest {
 
     @Test fun setComplete() {
         // make `getTasks` emit an error to use tasks from the initial state
-        whenever(dataSource.getTasks()).thenReturn(Single.error(Exception("Server not found")))
+        whenever(dataSource.getTasks()).thenReturn(Single.never())
 
         // given the viewmodel with some tasks
         viewModel = TasksViewModel(TasksState(tasks = tasks), listOf(dataSource))
@@ -159,7 +153,7 @@ class TasksViewModelTest {
 
     @Test fun setComplete_noTaskInList() {
         // make `getTasks` emit an error to use tasks from the initial state
-        whenever(dataSource.getTasks()).thenReturn(Single.error(Exception("Server not found")))
+        whenever(dataSource.getTasks()).thenReturn(Single.never())
 
         // given the viewmodel with some tasks
         viewModel = TasksViewModel(TasksState(tasks = tasks), listOf(dataSource))
@@ -184,7 +178,7 @@ class TasksViewModelTest {
 
     @Test fun setComplete_taskIsAlreadyCompleted() {
         // make `getTasks` emit an error to use tasks from the initial state
-        whenever(dataSource.getTasks()).thenReturn(Single.error(Exception("Server not found")))
+        whenever(dataSource.getTasks()).thenReturn(Single.never())
 
         // given the viewmodel with some tasks
         viewModel = TasksViewModel(TasksState(tasks = tasks), listOf(dataSource))
@@ -209,7 +203,7 @@ class TasksViewModelTest {
 
     @Test fun clearCompletedTasks() {
         // make `getTasks` emit an error to use tasks from the initial state
-        whenever(dataSource.getTasks()).thenReturn(Single.error(Exception("Server not found")))
+        whenever(dataSource.getTasks()).thenReturn(Single.never())
 
         // given the viewmodel with some tasks
         viewModel = TasksViewModel(TasksState(tasks = tasks), listOf(dataSource))
@@ -236,7 +230,7 @@ class TasksViewModelTest {
 
     @Test fun deleteTask() {
         // make `getTasks` emit an error to use tasks from the initial state
-        whenever(dataSource.getTasks()).thenReturn(Single.error(Exception("Server not found")))
+        whenever(dataSource.getTasks()).thenReturn(Single.never())
 
         // given the viewmodel with some tasks
         viewModel = TasksViewModel(TasksState(tasks = tasks), listOf(dataSource))
@@ -267,12 +261,8 @@ class TasksViewModelTest {
         private val task3 = Task(title = "title3", description = "description3", id = "task_3", complete = true)
         private val task4 = Task(title = "title4", description = "description4", id = "task_4")
 
-        /**
-         * The [BuildConfig] behavior has to be mocked via reflection, as [TasksViewModel] doesn't have an exposed parameter for [debugMode]
-         */
-        @JvmStatic
-        @BeforeClass fun setupBuildConfig() {
-            SuperReflect.on(BuildConfig::class.java).set("DEBUG", false)
-        }
+        @JvmField
+        @ClassRule
+        val mvrxTestRule = MvRxTestRule()
     }
 }
