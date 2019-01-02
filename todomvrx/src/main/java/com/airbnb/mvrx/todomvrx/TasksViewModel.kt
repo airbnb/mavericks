@@ -40,7 +40,7 @@ class TasksViewModel(initialState: TasksState, private val sources: List<TasksDa
     }
 
     fun upsertTask(task: Task) {
-        setState { copy(tasks = tasks.upsert(task) { it.id == task.id }, lastEditedTask =  task.id) }
+        setState { copy(tasks = tasks.upsert(task) { it.id == task.id }, lastEditedTask = task.id) }
         sources.forEach { it.upsertTask(task) }
     }
 
