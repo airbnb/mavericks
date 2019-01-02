@@ -71,7 +71,7 @@ class TasksViewModelTest {
     }
 
     @Test fun upsertTask_insert() {
-        // make `getTasks` emit an error to use tasks from the initial state
+        // make `getTasks` emit nothing to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.never())
 
         // given the viewmodel with some tasks
@@ -98,7 +98,7 @@ class TasksViewModelTest {
     }
 
     @Test fun upsertTask_update() {
-        // make `getTasks` emit an error to use tasks from the initial state
+        // make `getTasks` emit nothing to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.never())
 
         // given the viewmodel with some tasks
@@ -126,7 +126,7 @@ class TasksViewModelTest {
     }
 
     @Test fun setComplete() {
-        // make `getTasks` emit an error to use tasks from the initial state
+        // make `getTasks` emit nothing to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.never())
 
         // given the viewmodel with some tasks
@@ -152,7 +152,7 @@ class TasksViewModelTest {
     }
 
     @Test fun setComplete_noTaskInList() {
-        // make `getTasks` emit an error to use tasks from the initial state
+        // make `getTasks` emit nothing to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.never())
 
         // given the viewmodel with some tasks
@@ -177,7 +177,7 @@ class TasksViewModelTest {
     }
 
     @Test fun setComplete_taskIsAlreadyCompleted() {
-        // make `getTasks` emit an error to use tasks from the initial state
+        // make `getTasks` emit nothing to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.never())
 
         // given the viewmodel with some tasks
@@ -202,7 +202,7 @@ class TasksViewModelTest {
     }
 
     @Test fun clearCompletedTasks() {
-        // make `getTasks` emit an error to use tasks from the initial state
+        // make `getTasks` emit nothing to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.never())
 
         // given the viewmodel with some tasks
@@ -229,7 +229,7 @@ class TasksViewModelTest {
     }
 
     @Test fun deleteTask() {
-        // make `getTasks` emit an error to use tasks from the initial state
+        // make `getTasks` emit nothing to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.never())
 
         // given the viewmodel with some tasks
