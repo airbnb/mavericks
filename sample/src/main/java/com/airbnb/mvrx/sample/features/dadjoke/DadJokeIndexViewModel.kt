@@ -11,6 +11,7 @@ import com.airbnb.mvrx.sample.core.MvRxViewModel
 import com.airbnb.mvrx.sample.models.Joke
 import com.airbnb.mvrx.sample.models.JokesResponse
 import com.airbnb.mvrx.sample.network.DadJokeService
+import io.reactivex.schedulers.Schedulers
 import org.koin.android.ext.android.inject
 
 private const val JOKES_PER_PAGE = 5
@@ -39,8 +40,8 @@ class DadJokeIndexViewModel(
 
         dadJokeService
                 .search(page = state.jokes.size / JOKES_PER_PAGE + 1, limit = JOKES_PER_PAGE)
+                .subscribeOn(Schedulers.io())
                 .execute { copy(request = it, jokes = jokes + (it()?.results ?: emptyList())) }
-
     }
 
     /**
