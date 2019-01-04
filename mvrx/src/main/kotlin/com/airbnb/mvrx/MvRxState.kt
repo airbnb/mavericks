@@ -9,4 +9,7 @@ package com.airbnb.mvrx
  * that takes a parcelable object. If the Fragment that initializes this ViewModel has an argument
  * at [MvRx.KEY_ARG], it will be passed to your secondary constructor automatically.
  */
-interface MvRxState
+interface MvRxState {
+
+    operator fun <A> A.unaryPlus() = tuple(this)
+}

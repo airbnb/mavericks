@@ -143,4 +143,27 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
         uniqueOnly: Boolean = false,
         subscriber: (T) -> Unit
     ) = selectSubscribe(this@MvRxView, selector, uniqueOnly, subscriber)
+
+    /**
+     * Returns a [MvRxSubscriber] that can be used to observe state changes.
+     * Compared to the [selectSubscribe] methods, this eliminates the use of reflection and allows to write more
+     * concise code.
+     *
+     * Example usages:
+     *
+     * select { prop1 }.subscribe { prop1 -> ... }
+     *
+     * select { tuple(prop1, prop2) }.subscribe { (prop1, prop2) -> ... }
+     *
+     * which is equivalent to
+     *
+     * select { + prop1 + prop2 }.subscribe { (prop1, prop2) -> ... }
+     *
+     * @param selector a lambda function to get the interested aspects of the state.
+     *
+     */
+    fun <S : MvRxState, T> BaseMvRxViewModel<S>.select(
+        uniqueOnly: Boolean = false,
+        selector: S.() -> T
+    ) = select(this@MvRxView, uniqueOnly, selector)
 }

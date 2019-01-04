@@ -505,6 +505,31 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             .distinctUntilChanged()
             .subscribeLifecycle(owner, uniqueOnly, subscriber)
 
+    /**
+     * Select state changes for subscription.
+     */
+    protected fun <T> select(selector: S.() -> T) = selectInternal(null, false, selector)
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun <T> select(
+        owner: LifecycleOwner,
+        uniqueOnly: Boolean,
+        selector: S.() -> T
+    ) = selectInternal(owner, uniqueOnly, selector)
+
+    private fun <T> selectInternal(
+        owner: LifecycleOwner?,
+        uniqueOnly: Boolean,
+        selector: S.() -> T
+    ): MvRxSubscriber<T> {
+        val subscriber = DefaultSubscriber<T>()
+        stateStore.observable
+            .map { it.selector() }
+            .distinctUntilChanged()
+            .subscribeLifecycle(owner, uniqueOnly) { subscriber.emit(it) }
+        return subscriber
+    }
+
     private fun <T> Observable<T>.subscribeLifecycle(
         lifecycleOwner: LifecycleOwner? = null,
         uniqueOnly: Boolean,
