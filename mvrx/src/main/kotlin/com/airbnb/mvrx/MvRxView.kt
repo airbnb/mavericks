@@ -134,4 +134,13 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
         uniqueOnly: Boolean = false,
         subscriber: (A, B, C, D) -> Unit
     ) = selectSubscribe(this@MvRxView, prop1, prop2, prop3, prop4, uniqueOnly, subscriber)
+
+    /**
+     * Subscribes to state changes for custom mapping of the state.
+     */
+    fun <S : MvRxState, T> BaseMvRxViewModel<S>.selectSubscribe(
+        selector: S.() -> T,
+        uniqueOnly: Boolean = false,
+        subscriber: (T) -> Unit
+    ) = selectSubscribe(this@MvRxView, selector, uniqueOnly, subscriber)
 }

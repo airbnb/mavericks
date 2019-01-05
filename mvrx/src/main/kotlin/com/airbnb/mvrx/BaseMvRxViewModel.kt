@@ -479,6 +479,32 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             .distinctUntilChanged()
             .subscribeLifecycle(owner, uniqueOnly) { (a, b, c, d, e, f, g) -> subscriber(a, b, c, d, e, f, g) }
 
+    /**
+     * Subscribe to state changes for custom mapping of the state.
+     */
+    protected fun <T> selectSubscribe(
+            selector: S.() -> T,
+            subscriber: (T) -> Unit
+    ) = selectSubscribeInternal(null, selector, false, subscriber)
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun <T> selectSubscribe(
+            owner: LifecycleOwner,
+            selector: S.() -> T,
+            uniqueOnly: Boolean,
+            subscriber: (T) -> Unit
+    ) = selectSubscribeInternal(owner, selector, uniqueOnly, subscriber)
+
+    private fun <T> selectSubscribeInternal(
+            owner: LifecycleOwner?,
+            selector: S.() -> T,
+            uniqueOnly: Boolean,
+            subscriber: (T) -> Unit
+    ) = stateStore.observable
+            .map { it.selector() }
+            .distinctUntilChanged()
+            .subscribeLifecycle(owner, uniqueOnly, subscriber)
+
     private fun <T> Observable<T>.subscribeLifecycle(
         lifecycleOwner: LifecycleOwner? = null,
         uniqueOnly: Boolean,
