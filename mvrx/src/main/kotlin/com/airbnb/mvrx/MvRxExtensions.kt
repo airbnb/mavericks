@@ -74,7 +74,7 @@ fun <T : Fragment> T._fragmentArgsProvider(): Any? = arguments?.get(MvRx.KEY_ARG
 @Suppress("FunctionName")
 @RestrictTo(LIBRARY)
 inline fun <T : Fragment> T._activityArgsProvider(keyFactory: () -> String): Any? {
-    val args: Any? = arguments?.get(MvRx.KEY_ARG)
+    val args: Any? = _fragmentArgsProvider()
     val activity = requireActivity()
     if (activity is MvRxViewModelStoreOwner) {
         activity.mvrxViewModelStore._saveActivityViewModelArgs(keyFactory(), args)
