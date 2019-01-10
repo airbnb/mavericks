@@ -41,13 +41,9 @@ class DadJokeDetailViewModel(
         dadJokeService.fetch(state.id).execute { copy(joke = it) }
     }
 
-    companion object : MvRxViewModelFactory<DadJokeDetailState> {
-        @JvmStatic
-        override fun create(
-            activity: FragmentActivity,
-            state: DadJokeDetailState
-        ): BaseMvRxViewModel<DadJokeDetailState> {
-            val service: DadJokeService by activity.inject()
+    companion object : MvRxViewModelFactory<DadJokeDetailViewModel, DadJokeDetailState> {
+        override fun create(viewModelContext: ViewModelContext, state: DadJokeDetailState): DadJokeDetailViewModel {
+            val service: DadJokeService by viewModelContext.activity.inject()
             return DadJokeDetailViewModel(state, service)
         }
     }

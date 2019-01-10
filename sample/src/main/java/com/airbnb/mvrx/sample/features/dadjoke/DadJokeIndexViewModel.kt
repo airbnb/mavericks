@@ -1,12 +1,6 @@
 package com.airbnb.mvrx.sample.features.dadjoke
 
-import android.support.v4.app.FragmentActivity
-import com.airbnb.mvrx.Async
-import com.airbnb.mvrx.BaseMvRxViewModel
-import com.airbnb.mvrx.Loading
-import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.MvRxViewModelFactory
-import com.airbnb.mvrx.Uninitialized
+import com.airbnb.mvrx.*
 import com.airbnb.mvrx.sample.core.MvRxViewModel
 import com.airbnb.mvrx.sample.models.Joke
 import com.airbnb.mvrx.sample.models.JokesResponse
@@ -50,9 +44,10 @@ class DadJokeIndexViewModel(
      *
      * @see MvRxViewModelFactory
      */
-    companion object : MvRxViewModelFactory<DadJokeIndexState> {
-        @JvmStatic override fun create(activity: FragmentActivity, state: DadJokeIndexState): BaseMvRxViewModel<DadJokeIndexState> {
-            val service: DadJokeService by activity.inject()
+    companion object : MvRxViewModelFactory<DadJokeIndexViewModel, DadJokeIndexState> {
+
+        override fun create(viewModelContext: ViewModelContext, state: DadJokeIndexState): DadJokeIndexViewModel {
+            val service: DadJokeService by viewModelContext.activity.inject()
             return DadJokeIndexViewModel(state, service)
         }
     }

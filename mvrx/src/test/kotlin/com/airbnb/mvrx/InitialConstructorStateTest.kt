@@ -10,13 +10,13 @@ import org.junit.Test
 import java.io.Serializable
 
 /** Test auto creating state from fragment arguments. */
-class FragmentStateProviderTest : BaseTest() {
+class InitialConstructorStateTest : BaseTest() {
 
     @Test
     fun testParcelableArgs() {
         val args = ParcelableArgs("hello")
         val frag = Frag(args)
-        val state: TestState = frag._fragmentViewModelInitialStateProvider()
+        val state = MvRxViewModelProvider.createStateFromConstructor(TestState::class.java, frag._fragmentArgsProvider())
         assertEquals(args.str, state.str)
         assertEquals(null, state.num)
     }
@@ -25,7 +25,7 @@ class FragmentStateProviderTest : BaseTest() {
     fun testSerializableArgs() {
         val args = SerializableArgs(7)
         val frag = Frag(args)
-        val state: TestState = frag._fragmentViewModelInitialStateProvider()
+        val state = MvRxViewModelProvider.createStateFromConstructor(TestState::class.java, frag._fragmentArgsProvider())
         assertEquals(null, state.str)
         assertEquals(args.num, state.num)
     }
@@ -33,7 +33,7 @@ class FragmentStateProviderTest : BaseTest() {
     @Test
     fun testLongArgs() {
         val frag = Frag(8L)
-        val state: TestState = frag._fragmentViewModelInitialStateProvider()
+        val state = MvRxViewModelProvider.createStateFromConstructor(TestState::class.java, frag._fragmentArgsProvider())
         assertEquals("id", state.str)
         assertEquals(8, state.num)
     }
@@ -41,7 +41,7 @@ class FragmentStateProviderTest : BaseTest() {
     @Test
     fun testNoArgs() {
         val frag = Frag(null)
-        val state: TestState = frag._fragmentViewModelInitialStateProvider()
+        val state = MvRxViewModelProvider.createStateFromConstructor(TestState::class.java, frag._fragmentArgsProvider())
         assertEquals("empty", state.str)
         assertEquals(2, state.num)
     }
@@ -49,7 +49,7 @@ class FragmentStateProviderTest : BaseTest() {
     @Test
     fun testNoMatchingArgsFallsbackToEmptyConstructor() {
         val frag = Frag("unknown arg type")
-        val state: TestState = frag._fragmentViewModelInitialStateProvider()
+        val state = MvRxViewModelProvider.createStateFromConstructor(TestState::class.java, frag._fragmentArgsProvider())
         assertEquals("empty", state.str)
         assertEquals(2, state.num)
     }
@@ -58,7 +58,7 @@ class FragmentStateProviderTest : BaseTest() {
     //    @Test(expected = IllegalStateException::class)
     //    fun testFailsWithNoMatchingConstructor() {
     //        val frag = Frag("string")
-    //        val state: TestState = frag._fragmentViewModelInitialStateProvider()
+    //        val state: TestState = frag._fragmentViewModelConstructorInitialState()
     //    }
 }
 
