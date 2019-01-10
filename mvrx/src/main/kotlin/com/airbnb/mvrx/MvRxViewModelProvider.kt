@@ -115,7 +115,6 @@ object MvRxViewModelProvider {
     }
 
     /**
-     * For internal use only. Public for inline.
      *
      * Searches [stateClass] for a single argument constructor matching the type of [args]. If [args] is null, then
      * no arg constructor is invoked.
@@ -140,9 +139,9 @@ object MvRxViewModelProvider {
             }
             ?: throw IllegalStateException(
                 "Attempt to create the MvRx state class ${stateClass.simpleName} has failed. One of the following must be true:" +
-                    "\n 1) The state class has default values for every property." +
+                    "\n 1) The state class has default values for every constructor property." +
                     "\n 2) The state class has a secondary constructor for ${args?.javaClass?.simpleName ?: "a fragment argument"}." +
-                    "\n 3) The ViewModel using the state must has a companion object implementing MvRxFactory with an initialState function " +
+                    "\n 3) The ViewModel using the state must have a companion object implementing MvRxFactory with an initialState function " +
                     "that does not return null. "
             )
     }

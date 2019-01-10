@@ -1,6 +1,8 @@
 package com.airbnb.mvrx
 
 import android.arch.lifecycle.ViewModelProviders
+import android.support.annotation.RestrictTo
+import android.support.annotation.RestrictTo.Scope.LIBRARY
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import kotlin.properties.ReadOnlyProperty
@@ -58,6 +60,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activ
  * Looks for [MvRx.KEY_ARG] on the arguments of the fragments.
  */
 @Suppress("FunctionName")
+@RestrictTo(LIBRARY)
 fun <T : Fragment> T._fragmentArgsProvider(): Any? = arguments?.get(MvRx.KEY_ARG)
 
 /**
@@ -69,6 +72,7 @@ fun <T : Fragment> T._fragmentArgsProvider(): Any? = arguments?.get(MvRx.KEY_ARG
  * in a new process.
  */
 @Suppress("FunctionName")
+@RestrictTo(LIBRARY)
 inline fun <T : Fragment> T._activityArgsProvider(keyFactory: () -> String): Any? {
     val args: Any? = arguments?.get(MvRx.KEY_ARG)
     val activity = requireActivity()
