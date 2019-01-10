@@ -46,16 +46,23 @@ sealed class ViewModelContext {
      * The activity which is using the ViewModel.
      */
     abstract val activity: FragmentActivity
+
+    /**
+     * Convenience method to type [activity].
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun <A : FragmentActivity> activity() : A = activity as A
+
     /**
      * Fragment arguments set via [MvRx.KEY_ARG].
      */
-    abstract val rawArgs: Any?
+    abstract val args: Any?
 
     /**
-     * Convenience method to type [rawArgs].
+     * Convenience method to type [args].
      */
     @Suppress("UNCHECKED_CAST")
-    fun <A> args(): A = rawArgs as A
+    fun <A> args(): A = args as A
 }
 
 /**
@@ -65,7 +72,7 @@ sealed class ViewModelContext {
  */
 class ActivityViewModelContext(
     override val activity: FragmentActivity,
-    override val rawArgs: Any?
+    override val args: Any?
 ) : ViewModelContext()
 
 /**
@@ -74,6 +81,15 @@ class ActivityViewModelContext(
  */
 class FragmentViewModelContext(
     override val activity: FragmentActivity,
-    override val rawArgs: Any?,
+    override val args: Any?,
+    /**
+     * The fragment owner of the ViewModel.
+     */
     val fragment: Fragment
-) : ViewModelContext()
+) : ViewModelContext() {
+    /**
+     * Convenience method to type [fragment].
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun <F : Fragment> fragment() : F = fragment as F
+}

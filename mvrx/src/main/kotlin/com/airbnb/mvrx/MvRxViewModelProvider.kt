@@ -98,7 +98,7 @@ object MvRxViewModelProvider {
             }
         }
         return stateRestorer(factoryState
-            ?: createStateFromConstructor(stateClass, viewModelContext.rawArgs))
+            ?: createStateFromConstructor(stateClass, viewModelContext.args))
     }
 
     @Suppress("UNCHECKED_CAST")
