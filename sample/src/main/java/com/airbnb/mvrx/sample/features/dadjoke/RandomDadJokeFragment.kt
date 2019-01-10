@@ -10,6 +10,7 @@ import com.airbnb.mvrx.sample.network.DadJokeService
 import com.airbnb.mvrx.sample.views.basicRow
 import com.airbnb.mvrx.sample.views.loadingRow
 import com.airbnb.mvrx.sample.views.marquee
+import io.reactivex.schedulers.Schedulers
 import org.koin.android.ext.android.inject
 
 data class RandomDadJokeState(val joke: Async<Joke> = Uninitialized) : MvRxState
@@ -23,7 +24,7 @@ class RandomDadJokeViewModel(
     }
 
     fun fetchRandomJoke() {
-        dadJokeService.random().execute { copy(joke = it) }
+        dadJokeService.random().subscribeOn(Schedulers.io()).execute { copy(joke = it) }
     }
 
     companion object : MvRxViewModelFactory<RandomDadJokeState> {
