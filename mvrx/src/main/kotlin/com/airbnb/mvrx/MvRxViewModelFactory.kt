@@ -4,9 +4,8 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 
 /**
- * Implement this on your ViewModel's companion object for hooks into state creation and ViewModel
- * creation. See [MvRxViewModelArgFactory] for a version which automatically types your argument
- * class.
+ * Implement this on your ViewModel's companion object for hooks into state creation and ViewModel creation. For example, if you need access
+ * to the fragment or activity owner for dependency injection.
  */
 interface MvRxViewModelFactory<VM: BaseMvRxViewModel<S>, S : MvRxState> {
 
