@@ -1,5 +1,6 @@
 package com.airbnb.mvrx
 
+import android.os.Bundle
 import android.os.Parcelable
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
@@ -94,7 +95,14 @@ class FactoryViewModelTest : BaseTest() {
 
     private class TestFactoryViewModel(initialState: FactoryState, val otherProp: Long) : TestMvRxViewModel<FactoryState>(initialState) {
         companion object : MvRxViewModelFactory<TestFactoryViewModel, FactoryState> {
-            override fun create(viewModelContext: ViewModelContext, state: FactoryState) = TestFactoryViewModel(state, 5)
+            override fun create(viewModelContext: ViewModelContext, state: FactoryState): TestFactoryViewModel {
+                return when (viewModelContext) {
+                    // Use Fragment args to test that there is a valid fragment reference.
+                    is FragmentViewModelContext -> TestFactoryViewModel(state, viewModelContext.fragment.arguments?.getLong("otherProp")!!)
+                    else -> TestFactoryViewModel(state, 5L)
+                }
+            }
+
         }
     }
 
@@ -130,11 +138,12 @@ class FactoryViewModelTest : BaseTest() {
     @Test
     fun createFromFragmentOwner() {
         val (_, fragment) = createFragment<ViewModelFactoryTestFragment, TestActivity>()
+        fragment.arguments = Bundle().apply { putLong("otherProp", 6L) }
         val viewModel = MvRxViewModelProvider.get(TestFactoryViewModel::class.java, FactoryState::class.java, FragmentViewModelContext(activity, TestArgs("hello"), fragment))
         withState(viewModel) { state ->
             assertEquals(FactoryState("hello constructor"), state)
         }
-        assertEquals(5, viewModel.otherProp)
+        assertEquals(6, viewModel.otherProp)
     }
 
     @Test
@@ -147,7 +156,7 @@ class FactoryViewModelTest : BaseTest() {
     }
 
     @Test
-    fun nullInitialStateDelgatesToConstructor() {
+    fun nullInitialStateDelegatesToConstructor() {
         val viewModel = MvRxViewModelProvider.get(TestNullFactory::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello")))
         withState(viewModel) { state ->
             assertEquals(FactoryState("hello constructor"), state)
@@ -162,7 +171,13 @@ class FactoryStateTest : BaseTest() {
 
     private class TestFactoryViewModel(initialState: FactoryState) : TestMvRxViewModel<FactoryState>(initialState) {
         companion object : MvRxViewModelFactory<TestFactoryViewModel, FactoryState> {
-            override fun initialState(viewModelContext: ViewModelContext): FactoryState? = FactoryState("${viewModelContext.args<TestArgs>().greeting} factory")
+            override fun initialState(viewModelContext: ViewModelContext): FactoryState? {
+                return when (viewModelContext) {
+                    is FragmentViewModelContext -> FactoryState("${viewModelContext.fragment.arguments?.getString("greeting")!!} and ${viewModelContext.args<TestArgs>().greeting} factory")
+                    else -> FactoryState("${viewModelContext.args<TestArgs>().greeting} factory")
+                }
+
+            }
         }
     }
 
@@ -196,10 +211,10 @@ class FactoryStateTest : BaseTest() {
     @Test
     fun createFromFragmentOwner() {
         val (_, fragment) = createFragment<ViewModelFactoryTestFragment, TestActivity>()
-
+        fragment.arguments = Bundle().apply { putString("greeting", "howdy") }
         val viewModel = MvRxViewModelProvider.get(TestFactoryViewModel::class.java, FactoryState::class.java, FragmentViewModelContext(activity, TestArgs("hello"), fragment))
         withState(viewModel) { state ->
-            assertEquals(FactoryState("hello factory"), state)
+            assertEquals(FactoryState("howdy and hello factory"), state)
         }
     }
 
@@ -212,7 +227,7 @@ class FactoryStateTest : BaseTest() {
     }
 
     @Test
-    fun nullInitialStateDelgatesToConstructor() {
+    fun nullInitialStateDelegatesToConstructor() {
         val viewModel = MvRxViewModelProvider.get(TestNullFactory::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello")))
         withState(viewModel) { state ->
             assertEquals(FactoryState("hello constructor"), state)

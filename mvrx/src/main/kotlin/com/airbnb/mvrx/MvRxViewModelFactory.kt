@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentActivity
  * Implement this on your ViewModel's companion object for hooks into state creation and ViewModel creation. For example, if you need access
  * to the fragment or activity owner for dependency injection.
  */
-interface MvRxViewModelFactory<VM: BaseMvRxViewModel<S>, S : MvRxState> {
+interface MvRxViewModelFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> {
 
     /**
      * @param viewModelContext [ViewModelContext] which contains the ViewModel owner and arguments.
@@ -54,34 +54,26 @@ sealed class ViewModelContext {
     /**
      * Convenience method to type [rawArgs].
      */
-    abstract fun <A> args(): A
+    @Suppress("UNCHECKED_CAST")
+    fun <A> args(): A = rawArgs as A
 }
 
 /**
- * The [ViewModelContext] for a ViewModel created with an
- * activity scope (`val viewModel by activityViewModel<MyViewModel>`).
+ * The [ViewModelContext] for a ViewModel created with an activity scope (`val viewModel by activityViewModel<MyViewModel>`). Although a fragment
+ * reference is available when an activity scoped ViewModel is first created, during process restoration, activity scoped ViewModels will be created
+ * _without_ a fragment reference, so it is only safe to reference the activity.
  */
 class ActivityViewModelContext(
-        override val activity: FragmentActivity,
-        override val rawArgs: Any?
-) : ViewModelContext() {
-    override fun <A> args(): A {
-        @Suppress("UNCHECKED_CAST")
-        return rawArgs as A
-    }
-}
+    override val activity: FragmentActivity,
+    override val rawArgs: Any?
+) : ViewModelContext()
 
 /**
  * The [ViewModelContext] for a ViewModel created with a
  * fragment scope (`val viewModel by fragmentViewModel<MyViewModel>`).
  */
 class FragmentViewModelContext(
-        override val activity: FragmentActivity,
-        override val rawArgs: Any?,
-        val fragment: Fragment
-) : ViewModelContext() {
-    override fun <A> args(): A {
-        @Suppress("UNCHECKED_CAST")
-        return rawArgs as A
-    }
-}
+    override val activity: FragmentActivity,
+    override val rawArgs: Any?,
+    val fragment: Fragment
+) : ViewModelContext()
