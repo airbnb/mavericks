@@ -1,4 +1,4 @@
-package com.airbnb.aindroid.mvrx.test
+package com.airbnb.android.mvrx.test
 
 import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.MvRxState
