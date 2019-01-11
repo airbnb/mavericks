@@ -5,9 +5,9 @@
 - **BREAKING:** `MvRxViewModelFactory` has been updated to provide more flexiblity when creating ViewModel and initial state [#169](https://github.com/airbnb/MvRx/pull/169): 
   - Type signature changed from `MvRxFactory<S>` to `MvRxFactory<VM, S>` for better type safety.
   - Changed signature of `MvRxViewModelFactory#create(activity: FragmentActivity, state: S) : VM` to `MvRxViewModelFactory#create(viewModelContext: ViewModelContext, state: S) : VM?`. `ViewModelContext` contains a reference to the owning activity and MvRx fragment arguments. For fragment scoped ViewModels, it will be of type `FragmentViewModelContext` with a reference to the creating fragment. These changes allow depedency injection of your ViewModel.
-  - New: Added `MvRxViewModelFactory#initialState(viewModelContext: ViewModelContext) : S?`. This is useful if the initial state requires information from not available in `args`.
+  - New: Added `MvRxViewModelFactory#initialState(viewModelContext: ViewModelContext) : S?`. This is useful if the initial state requires information not available in `args`.
   - New: `@JvmStatic` no longer required on `MvRxViewModelFactory#create` and new `MvRxViewModelFactory#initialState`.
-- Migration guide, required changes in `**`
+- Migration guide, required changes marked with `**`:
 ```kotlin
     companion object : MvRxViewModelFactory<**RandomDadJokeViewModel**, RandomDadJokeState> { 
 
@@ -29,9 +29,9 @@ class MyTest {
    }
 }
 ```
-- New: Add selectSubscribe for 5-7 properties [#125](https://github.com/airbnb/MvRx/pull/125)
+- New: Add `selectSubscribe` for 5-7 properties [#125](https://github.com/airbnb/MvRx/pull/125)
 - New: Add `Completable#executue` [#170](https://github.com/airbnb/MvRx/pull/170)
-- Improved speed of @PersistState when resuming ViewModel in new process. [#159](https://github.com/airbnb/MvRx/pull/159)
+- Improved speed of `@PersistState` when resuming ViewModel in new process. [#159](https://github.com/airbnb/MvRx/pull/159)
 - Upgrade Kotlin to 1.3.11
 - Upgrade to support lib 28.0.0 and fix bug when using 28.0.0 and restoring in a new process. [#150](https://github.com/airbnb/MvRx/pull/150)
 - Fix: Allow state arg constructors to accept subtypes [#144](https://github.com/airbnb/MvRx/pull/144).
