@@ -11,14 +11,20 @@
 ```kotlin
     companion object : MvRxViewModelFactory<**RandomDadJokeViewModel**, RandomDadJokeState> { 
 
-        // No JvmStatic needed
+        ** // No JvmStatic needed **
         override fun create(viewModelContext: ViewModelContext, state: RandomDadJokeState): **RandomDadJokeViewModel** {
             val service: DadJokeService by **viewModelContext.activity**.inject()
             return RandomDadJokeViewModel(state, service)
         }
     }
 ```
-- New: [#154](https://github.com/airbnb/MvRx/pull/154) Created `MvRxTestRule` in `mvrx-testing` artifact to disable debug checks and change RxSchedulers. Just add the following to a test file:
+- New: [#154](https://github.com/airbnb/MvRx/pull/154) Created `MvRxTestRule` in `mvrx-testing` artifact to disable debug checks and change RxSchedulers. Add the test library:
+```
+dependencies {
+  testImplementation 'com.airbnb.android:mvrx-testing:0.7.0'
+}
+```
+To use the rule, add the following to a test file:
 ```kotlin
 class MyTest {
 
@@ -29,13 +35,11 @@ class MyTest {
    }
 }
 ```
-- New: Add `selectSubscribe` for 5-7 properties [#125](https://github.com/airbnb/MvRx/pull/125)
 - New: Add `Completable#executue` [#170](https://github.com/airbnb/MvRx/pull/170)
-- Improved speed of `@PersistState` when resuming ViewModel in new process. [#159](https://github.com/airbnb/MvRx/pull/159)
+- Improved speed of saving and recreating state with `@PersistState`. [#159](https://github.com/airbnb/MvRx/pull/159)
 - Upgrade Kotlin to 1.3.11
 - Upgrade to support lib 28.0.0 and fix bug when using 28.0.0 and restoring in a new process. [#150](https://github.com/airbnb/MvRx/pull/150)
 - Fix: Allow state arg constructors to accept subtypes [#144](https://github.com/airbnb/MvRx/pull/144).
-
 
 ## Version 0.6.0
 *(2018-10-23)*
