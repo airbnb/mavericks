@@ -4,26 +4,92 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 
 /**
- * Implement this in the companion object of a MvRxViewModel if your ViewModel needs more dependencies than just initial state.
- * If all you need is initial state, you don't need to implement this at all.
+ * Implement this on your ViewModel's companion object for hooks into state creation and ViewModel creation. For example, if you need access
+ * to the fragment or activity owner for dependency injection.
  */
-interface MvRxViewModelFactory<S : MvRxState> {
+interface MvRxViewModelFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> {
+
     /**
-     * This will be called when your ViewModel needs to created. This *needs* to be annotated with [JvmStatic].
-     * @param state: The initial state for your ViewModel. This will be populated from activity persisted state.
+     * @param viewModelContext [ViewModelContext] which contains the ViewModel owner and arguments.
+     * @param state The initial state to pass to the ViewModel. In a new process, state will have all [PersistState] annotated members restored,
+     * therefore you should never create a custom state in this method. To customize the initial state, override [initialState].
+     *
+     * @return The ViewModel. If you return `null` the ViewModel must have a single argument
+     * constructor only taking the initial state.
      */
-    fun create(activity: FragmentActivity, state: S): BaseMvRxViewModel<S>
+    fun create(viewModelContext: ViewModelContext, state: S): VM? = null
+
+    /**
+     * The initial state for the ViewModel. Override this if the initial state requires information from arguments, or the ViewModel owner.
+     * This function will take precedence over any secondary constructors defined in the state class, [S].
+     *
+     * The return value of this function will be transformed with any [PersistState] values before being used in [create].
+     *
+     * @return the initial state. If `null`, the state class constructors will be used for initial state creation.
+     */
+    fun initialState(viewModelContext: ViewModelContext): S? = null
+
 }
 
 /**
- * Implement this in the companion object of a MvRxViewModel if your ViewModel needs more dependencies than just initial state.
- * If you only need the [FragmentActivity] then you can use the [MvRxViewModelFactory].
- * If all you need is initial state, you don't need to implement this at all.
+ * Creation context for the ViewModel. Includes the ViewModel store owner (either an activity or fragment), and fragment arguments
+ * set via [MvRx.KEY_ARG].
+ *
+ * For activity scoped ViewModels see [ActivityViewModelContext].
+ * For fragment scoped ViewModels see [FragmentViewModelContext].
+ *
+ * Never store a reference to this context, or the activity/fragment.
+ *
  */
-interface MvRxFragmentViewModelFactory<S : MvRxState> {
+sealed class ViewModelContext {
     /**
-     * This will be called when your ViewModel needs to created. This *needs* to be annotated with [JvmStatic].
-     * @param state: The initial state for your ViewModel. This will be populated from fragment args and persisted state.
+     * The activity which is using the ViewModel.
      */
-    fun create(fragment: Fragment, state: S): BaseMvRxViewModel<S>
+    abstract val activity: FragmentActivity
+
+    /**
+     * Convenience method to type [activity].
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun <A : FragmentActivity> activity() : A = activity as A
+
+    /**
+     * Fragment arguments set via [MvRx.KEY_ARG].
+     */
+    abstract val args: Any?
+
+    /**
+     * Convenience method to type [args].
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun <A> args(): A = args as A
+}
+
+/**
+ * The [ViewModelContext] for a ViewModel created with an activity scope (`val viewModel by activityViewModel<MyViewModel>`). Although a fragment
+ * reference is available when an activity scoped ViewModel is first created, during process restoration, activity scoped ViewModels will be created
+ * _without_ a fragment reference, so it is only safe to reference the activity.
+ */
+class ActivityViewModelContext(
+    override val activity: FragmentActivity,
+    override val args: Any?
+) : ViewModelContext()
+
+/**
+ * The [ViewModelContext] for a ViewModel created with a
+ * fragment scope (`val viewModel by fragmentViewModel<MyViewModel>`).
+ */
+class FragmentViewModelContext(
+    override val activity: FragmentActivity,
+    override val args: Any?,
+    /**
+     * The fragment owner of the ViewModel.
+     */
+    val fragment: Fragment
+) : ViewModelContext() {
+    /**
+     * Convenience method to type [fragment].
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun <F : Fragment> fragment() : F = fragment as F
 }

@@ -1,6 +1,5 @@
 package com.airbnb.mvrx.sample.features.dadjoke
 
-import android.support.v4.app.FragmentActivity
 import com.airbnb.mvrx.*
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.core.MvRxViewModel
@@ -27,13 +26,10 @@ class RandomDadJokeViewModel(
         dadJokeService.random().subscribeOn(Schedulers.io()).execute { copy(joke = it) }
     }
 
-    companion object : MvRxViewModelFactory<RandomDadJokeState> {
-        @JvmStatic
-        override fun create(
-            activity: FragmentActivity,
-            state: RandomDadJokeState
-        ): BaseMvRxViewModel<RandomDadJokeState> {
-            val service: DadJokeService by activity.inject()
+    companion object : MvRxViewModelFactory<RandomDadJokeViewModel, RandomDadJokeState> {
+
+        override fun create(viewModelContext: ViewModelContext, state: RandomDadJokeState): RandomDadJokeViewModel {
+            val service: DadJokeService by viewModelContext.activity.inject()
             return RandomDadJokeViewModel(state, service)
         }
     }

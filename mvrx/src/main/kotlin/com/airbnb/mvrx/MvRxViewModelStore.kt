@@ -118,18 +118,12 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
 
     private fun restoreViewModel(activity: FragmentActivity, holder: MvRxPersistedViewModelHolder, arguments: Any?): ViewModel {
         val (viewModelClass, stateClass, viewModelState) = holder
-        // If there is a key in the fragmentArgsForActivityViewModelState map, then this is an activity ViewModel. The map value will contain
-        // the Fragment args that the ViewModel was created with.
-        val state = _initialStateProvider(stateClass, arguments).let(viewModelState::restorePersistedState)
-        return createViewModel(viewModelClass, activity, state)
+        return createViewModel(viewModelClass, stateClass, ActivityViewModelContext(activity, arguments), viewModelState::restorePersistedState)
     }
 
     private fun restoreViewModel(fragment: Fragment, holder: MvRxPersistedViewModelHolder, arguments: Any?): ViewModel {
         val (viewModelClass, stateClass, viewModelState) = holder
-        // If there is a key in the fragmentArgsForActivityViewModelState map, then this is an activity ViewModel. The map value will contain
-        // the Fragment args that the ViewModel was created with.
-        val state = _initialStateProvider(stateClass, arguments).let(viewModelState::restorePersistedState)
-        return createViewModel(viewModelClass, fragment, state)
+        return createViewModel(viewModelClass, stateClass, FragmentViewModelContext(fragment.requireActivity(), arguments, fragment), viewModelState::restorePersistedState)
     }
 
     /**

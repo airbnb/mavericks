@@ -1,11 +1,7 @@
 package com.airbnb.mvrx.todomvrx
 
 import android.support.v4.app.FragmentActivity
-import com.airbnb.mvrx.Async
-import com.airbnb.mvrx.BaseMvRxViewModel
-import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.MvRxViewModelFactory
-import com.airbnb.mvrx.Uninitialized
+import com.airbnb.mvrx.*
 import com.airbnb.mvrx.todomvrx.core.MvRxViewModel
 import com.airbnb.mvrx.todomvrx.data.Task
 import com.airbnb.mvrx.todomvrx.data.Tasks
@@ -64,15 +60,17 @@ class TasksViewModel(initialState: TasksState, private val sources: List<TasksDa
         sources.forEach { it.deleteTask(id) }
     }
 
-    companion object : MvRxViewModelFactory<TasksState> {
-        @JvmStatic override fun create(activity: FragmentActivity, state: TasksState): BaseMvRxViewModel<TasksState> {
-            val database = ToDoDatabase.getInstance(activity)
+    companion object : MvRxViewModelFactory<TasksViewModel, TasksState> {
+
+        override fun create(viewModelContext: ViewModelContext, state: TasksState): TasksViewModel {
+            val database = ToDoDatabase.getInstance(viewModelContext.activity)
             // Simulate data sources of different speeds.
             // The slower one can be thought of as the network data source.
             val dataSource1 = DatabaseDataSource(database.taskDao(), 2000)
             val dataSource2 = DatabaseDataSource(database.taskDao(), 3500)
             return TasksViewModel(state, listOf(dataSource1, dataSource2))
         }
+
     }
 }
 

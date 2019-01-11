@@ -1,6 +1,8 @@
 package com.airbnb.mvrx
 
 import android.arch.lifecycle.ViewModelProviders
+import android.support.annotation.RestrictTo
+import android.support.annotation.RestrictTo.Scope.LIBRARY
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import kotlin.properties.ReadOnlyProperty
@@ -23,8 +25,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragm
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
-    val stateFactory: () -> S = ::_fragmentViewModelInitialStateProvider
-    MvRxViewModelProvider.get(viewModelClass.java, this, keyFactory(), stateFactory)
+    MvRxViewModelProvider.get(viewModelClass.java, S::class.java, FragmentViewModelContext(this.requireActivity(), _fragmentArgsProvider(), this), keyFactory())
         .apply { subscribe(this@fragmentViewModel, subscriber = { postInvalidate() }) }
 }
 
@@ -48,91 +49,39 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activ
     viewModelClass: KClass<VM> = VM::class,
     noinline keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
-    val stateFactory: () -> S = { _activityViewModelInitialStateProvider(keyFactory) }
     if (requireActivity() !is MvRxViewModelStoreOwner) throw IllegalArgumentException("Your Activity must be a MvRxViewModelStoreOwner!")
-    MvRxViewModelProvider.get(viewModelClass.java, requireActivity(), keyFactory(), stateFactory)
+    MvRxViewModelProvider.get(viewModelClass.java, S::class.java, ActivityViewModelContext(requireActivity(), _activityArgsProvider(keyFactory)), keyFactory())
         .apply { subscribe(this@activityViewModel, subscriber = { postInvalidate() }) }
 }
 
 /**
  * For internal use only. Public for inline.
  *
- * Looks for [MvRx.KEY_ARG] on the arguments of the fragment receiver to create an instance of the State class.
- * The state class must have a matching single arg constructor.
+ * Looks for [MvRx.KEY_ARG] on the arguments of the fragments.
+ */
+@Suppress("FunctionName")
+@RestrictTo(LIBRARY)
+fun <T : Fragment> T._fragmentArgsProvider(): Any? = arguments?.get(MvRx.KEY_ARG)
+
+/**
+ * For internal use only. Public for inline.
  *
- * If no MvRx fragment args exist it attempts to use a empty constructor. Otherwise an exception is thrown.
+ * Looks for [MvRx.KEY_ARG] on the arguments of the fragment receiver.
  *
  * Also adds the fragment's MvRx args to the host Activity's [MvRxViewModelStore] so that they can be used to recreate initial state
  * in a new process.
  */
 @Suppress("FunctionName")
-inline fun <reified S : MvRxState, T : Fragment> T._activityViewModelInitialStateProvider(keyFactory: () -> String): S {
-    val args: Any? = arguments?.get(MvRx.KEY_ARG)
+@RestrictTo(LIBRARY)
+inline fun <T : Fragment> T._activityArgsProvider(keyFactory: () -> String): Any? {
+    val args: Any? = _fragmentArgsProvider()
     val activity = requireActivity()
     if (activity is MvRxViewModelStoreOwner) {
         activity.mvrxViewModelStore._saveActivityViewModelArgs(keyFactory(), args)
     } else {
         throw IllegalArgumentException("Your Activity must be a MvRxViewModelStoreOwner!")
     }
-    return _initialStateProvider(S::class.java, args)
-}
-
-/**
- * For internal use only. Public for inline.
- *
- * Looks for [MvRx.KEY_ARG] on the arguments of the fragment receiver to create an instance of the State class.
- * The state class must have a matching single arg constructor.
- *
- * If no MvRx fragment args exist it attempts to use a empty constructor. Otherwise an exception is thrown.
- */
-@Suppress("FunctionName")
-inline fun <reified S : MvRxState, T : Fragment> T._fragmentViewModelInitialStateProvider(): S {
-    val args: Any? = arguments?.get(MvRx.KEY_ARG)
-    return _initialStateProvider(S::class.java, args)
-}
-
-/**
- * For internal use only. Public for inline.
- *
- * Looks for [MvRx.KEY_ARG] in intent extras on activity receiver to create an instance of the State class.
- * The state class must have a matching single arg constructor.
- *
- * If no MvRx activity args exist it attempts to use a empty constructor. Otherwise an exception is thrown.
- */
-@Suppress("FunctionName")
-inline fun <reified S : MvRxState, T : FragmentActivity> T._activityViewModelInitialStateProvider(): S {
-    val args: Any? = intent.extras?.get(MvRx.KEY_ARG)
-    return _initialStateProvider(S::class.java, args)
-}
-
-/**
- * For internal use only. Public for inline.
- *
- * Searches [stateClass] for a single argument constructor matching the type of [args]. If [args] is null, then
- * no arg constructor is invoked.
- *
- */
-@Suppress("FunctionName") // Public for inline.
-fun <S : MvRxState> _initialStateProvider(stateClass: Class<S>, args: Any?): S {
-    val argsConstructor = args?.let {
-        val argType = it::class.java
-
-        stateClass.constructors.firstOrNull { constructor ->
-            constructor.parameterTypes.size == 1 && isAssignableTo(argType, constructor.parameterTypes[0])
-            }
-        }
-
-    @Suppress("UNCHECKED_CAST")
-    return argsConstructor?.newInstance(args) as? S
-        ?: try {
-            stateClass.newInstance()
-        } catch (@Suppress("TooGenericExceptionCaught") e: Throwable) {
-            null
-        }
-        ?: throw IllegalStateException(
-            "Attempt to auto create the MvRx state class ${stateClass.simpleName} has failed. It must have default values for every property or a " +
-                "secondary constructor for ${args?.javaClass?.simpleName ?: "a fragment argument"}. "
-        )
+    return args
 }
 
 /**
@@ -143,8 +92,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.viewM
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : FragmentActivity,
         T : MvRxViewModelStoreOwner = lifecycleAwareLazy(this) {
-    val stateFactory: () -> S = { _activityViewModelInitialStateProvider() }
-    MvRxViewModelProvider.get(viewModelClass.java, this, keyFactory(), stateFactory)
+    MvRxViewModelProvider.get(viewModelClass.java, S::class.java, ActivityViewModelContext(this, intent.extras?.get(MvRx.KEY_ARG)), keyFactory())
 }
 
 /**
