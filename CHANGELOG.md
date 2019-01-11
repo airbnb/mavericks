@@ -3,10 +3,38 @@
 ## Version 0.7.0
 *(2019-1-11)*
 - **BREAKING:** `MvRxViewModelFactory` has been updated to provide more flexiblity when creating ViewModel and initial state [#169](https://github.com/airbnb/MvRx/pull/169): 
-  - Type signature changed from `MvRxFactory<S>` to `MvRxFactory<S, VM>` for better type safety.
-  - Changed signature of `MvRxViewModelFactory#create(activity: FragmentActivity, state: S) : VM` to `MvRxViewModelFactory#create(viewModelContext: ViewModelContext, state: S) : VM?`. `ViewModelContext` contains a reference to the owning activity, and MvRx fragment arguments. For fragment scoped view models, it will be of type `FragmentViewModelContext` with a reference to the creating fragment. This changes allow Depedency injection on the your ViewModel.
-  - New: Added `MvRxViewModelFactory#initialState(viewModelContext: ViewModelContext) : S?`. This is useful if your initial state requires information from a component other than `args`.
-  - New: `@JvmStatic` no longer required on `MvRxViewModelFactory#create` and new `MvRxViewModelFactory#initialState`
+  - Type signature changed from `MvRxFactory<S>` to `MvRxFactory<VM, S>` for better type safety.
+  - Changed signature of `MvRxViewModelFactory#create(activity: FragmentActivity, state: S) : VM` to `MvRxViewModelFactory#create(viewModelContext: ViewModelContext, state: S) : VM?`. `ViewModelContext` contains a reference to the owning activity and MvRx fragment arguments. For fragment scoped ViewModels, it will be of type `FragmentViewModelContext` with a reference to the creating fragment. These changes allow depedency injection of your ViewModel.
+  - New: Added `MvRxViewModelFactory#initialState(viewModelContext: ViewModelContext) : S?`. This is useful if the initial state requires information from not available in `args`.
+  - New: `@JvmStatic` no longer required on `MvRxViewModelFactory#create` and new `MvRxViewModelFactory#initialState`.
+- Migration guide, required changes in `**`
+```kotlin
+    companion object : MvRxViewModelFactory<**RandomDadJokeViewModel**, RandomDadJokeState> { 
+
+        // No JvmStatic needed
+        override fun create(viewModelContext: ViewModelContext, state: RandomDadJokeState): **RandomDadJokeViewModel** {
+            val service: DadJokeService by **viewModelContext.activity**.inject()
+            return RandomDadJokeViewModel(state, service)
+        }
+    }
+```
+- New: [#154](https://github.com/airbnb/MvRx/pull/154) Created `MvRxTestRule` in `mvrx-testing` artifact to disable debug checks and change RxSchedulers. Just add the following to a test file:
+```kotlin
+class MyTest {
+
+  companion object {
+        @JvmField
+        @ClassRule
+        val mvrxTestRule = MvRxTestRule()
+   }
+}
+```
+- New: Add selectSubscribe for 5-7 properties [#125](https://github.com/airbnb/MvRx/pull/125)
+- New: Add `Completable#executue` [#170](https://github.com/airbnb/MvRx/pull/170)
+- Improved speed of @PersistState when resuming ViewModel in new process. [#159](https://github.com/airbnb/MvRx/pull/159)
+- Upgrade Kotlin to 1.3.11
+- Upgrade to support lib 28.0.0 and fix bug when using 28.0.0 and restoring in a new process. [#150](https://github.com/airbnb/MvRx/pull/150)
+- Fix: Allow state arg constructors to accept subtypes [#144](https://github.com/airbnb/MvRx/pull/144).
 
 
 ## Version 0.6.0
