@@ -1,6 +1,7 @@
 package com.airbnb.mvrx
 
 import android.arch.lifecycle.Lifecycle
+import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -16,7 +17,10 @@ data class ViewModelTestState(
         val bar: Int = 0,
         val bam: Int = 0,
         val list: List<Int> = emptyList(),
+        // for Single and Observable tests
         val async: Async<String> = Uninitialized,
+        // for Completable tests
+        val asyncUnit: Async<Unit> = Uninitialized,
         val prop6: Int = 0,
         val prop7: Int = 0
 ) : MvRxState
@@ -58,6 +62,41 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewMod
 
     fun triggerCleared() {
         onCleared()
+    }
+
+    fun testCompletableSuccess() {
+        var callCount = 0
+        selectSubscribe(ViewModelTestState::asyncUnit) {
+            callCount++
+            assertEquals(when (callCount) {
+                1 -> Uninitialized
+                2 -> Loading()
+                3 -> Success(Unit)
+                else -> throw IllegalArgumentException("Unexpected call count $callCount")
+            }, it)
+        }
+        Completable.create { emitter ->
+            emitter.onComplete()
+        }.execute { copy(asyncUnit = it) }
+        assertEquals(3, callCount)
+    }
+
+    fun testCompletableFail() {
+        var callCount = 0
+        val error = IllegalStateException("Fail")
+        selectSubscribe(ViewModelTestState::asyncUnit) {
+            callCount++
+            assertEquals(when (callCount) {
+                1 -> Uninitialized
+                2 -> Loading()
+                3 -> Fail<Unit>(error)
+                else -> throw IllegalArgumentException("Unexpected call count $callCount")
+            }, it)
+        }
+        Completable.create {
+            throw error
+        }.execute { copy(asyncUnit = it) }
+        assertEquals(3, callCount)
     }
 
     fun testSingleSuccess() {
@@ -406,6 +445,16 @@ class ViewModelSubscriberTest : BaseTest() {
         assertFalse(disposable.isDisposed)
         viewModel.triggerCleared()
         assertTrue(disposable.isDisposed)
+    }
+
+    @Test
+    fun testCompletableSuccess() {
+        viewModel.testCompletableSuccess()
+    }
+
+    @Test
+    fun testCompletableFail() {
+        viewModel.testCompletableFail()
     }
 
     @Test
