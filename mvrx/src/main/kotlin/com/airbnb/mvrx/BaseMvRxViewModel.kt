@@ -153,6 +153,13 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ) = execute({ it }, null, stateReducer)
 
     /**
+     * Helper to map a Completable to an Async property on the state object.
+     */
+    fun Completable.execute(
+        stateReducer: S.(Async<Unit>) -> S
+    ) = toSingle { Unit }.execute(stateReducer)
+
+    /**
      * Execute an observable and wrap its progression with AsyncData reduced to the global state.
      *
      * @param mapper A map converting the observable type to the desired AsyncData type.
