@@ -35,7 +35,7 @@ class MyTest {
    }
 }
 ```
-- New: Add `Completable#executue` [#170](https://github.com/airbnb/MvRx/pull/170)
+- New: Add `Completable#execute` [#170](https://github.com/airbnb/MvRx/pull/170)
 - Improved speed of saving and recreating state with `@PersistState`. [#159](https://github.com/airbnb/MvRx/pull/159)
 - Upgrade Kotlin to 1.3.11
 - Upgrade to support lib 28.0.0 and fix bug when using 28.0.0 and restoring in a new process. [#150](https://github.com/airbnb/MvRx/pull/150)
