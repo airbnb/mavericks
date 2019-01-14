@@ -92,12 +92,18 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 
                 if (firstState != secondState) {
                     @Suppress("UNCHECKED_CAST")
-                    val changedProp = firstState::class.memberProperties
+                    val changedProp = firstState::class.memberProperties.asSequence()
                             .map { it as KProperty1<S, *> }
-                            .first { it.get(firstState) != it.get(secondState) }
-                    throw IllegalArgumentException("Your reducer must be pure! ${changedProp.name} changed from " +
-                            "${changedProp.get(firstState)} to ${changedProp.get(secondState)}. " +
-                            "Ensure that your state properties properly implement hashCode.")
+                            .filter { it.isAccessible }
+                            .firstOrNull { it.get(firstState) != it.get(secondState) }
+                    if (changedProp != null) {
+                        throw IllegalArgumentException("Your reducer must be pure! ${changedProp.name} changed from " +
+                                "${changedProp.get(firstState)} to ${changedProp.get(secondState)}. " +
+                                "Ensure that your state properties properly implement hashCode.")
+                    } else {
+                        throw java.lang.IllegalArgumentException("Your reducer must be pure! A private property was modified. Ensure that your state properties properly implement hashCode. $firstState -> $secondState")
+                    }
+
                 }
                 mutableStateChecker.onStateChanged(firstState)
 
