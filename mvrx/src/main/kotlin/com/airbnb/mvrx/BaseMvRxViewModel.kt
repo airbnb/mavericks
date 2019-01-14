@@ -18,6 +18,7 @@ import kotlin.reflect.KVisibility
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
+import kotlin.reflect.jvm.isAccessible
 
 /**
  * To use MvRx, create your own base MvRxViewModel that extends this one and sets debugMode.
@@ -44,10 +45,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         // This improved performance 10-100x for a state with 100 @PersistStae properties.
         Completable.fromCallable {
             initialState::class.primaryConstructor?.parameters?.forEach { it.annotations }
-            initialState::class.declaredMemberProperties.forEach {
-                @Suppress("UNCHECKED_CAST")
-                (it as? KProperty1<S, Any?>)?.get(initialState)
-            }
+            initialState::class.declaredMemberProperties.asSequence()
+                    .filter { it.isAccessible }
+                    .forEach {
+                        @Suppress("UNCHECKED_CAST")
+                        (it as? KProperty1<S, Any?>)?.get(initialState)
+                    }
         }.subscribeOn(Schedulers.computation()).subscribe()
 
         if (this.debugMode) {

@@ -3,6 +3,8 @@ package com.airbnb.mvrx
 import org.junit.Test
 
 data class PureReducerValidationState(val count: Int = 0) : MvRxState
+data class StateWithPrivateVal(private val foo: Int = 0) : MvRxState
+
 class PureReducerValidationTest : BaseTest() {
 
     @Test(expected = IllegalArgumentException::class)
@@ -30,5 +32,15 @@ class PureReducerValidationTest : BaseTest() {
             }
         }
         PureViewModel(PureReducerValidationState()).pureReducer()
+    }
+
+    @Test
+    fun shouldBeAbleToUsePrivateProps() {
+        class PureViewModel(initialState: StateWithPrivateVal) : TestMvRxViewModel<StateWithPrivateVal>(initialState) {
+            fun pureReducer() {
+                setState { this }
+            }
+        }
+        PureViewModel(StateWithPrivateVal()).pureReducer()
     }
 }
