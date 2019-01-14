@@ -18,6 +18,7 @@ import kotlin.reflect.KVisibility
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
+import kotlin.reflect.jvm.isAccessible
 
 /**
  * To use MvRx, create your own base MvRxViewModel that extends this one and sets debugMode.
@@ -44,10 +45,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         // This improved performance 10-100x for a state with 100 @PersistStae properties.
         Completable.fromCallable {
             initialState::class.primaryConstructor?.parameters?.forEach { it.annotations }
-            initialState::class.declaredMemberProperties.forEach {
-                @Suppress("UNCHECKED_CAST")
-                (it as? KProperty1<S, Any?>)?.get(initialState)
-            }
+            initialState::class.declaredMemberProperties.asSequence()
+                    .filter { it.isAccessible }
+                    .forEach {
+                        @Suppress("UNCHECKED_CAST")
+                        (it as? KProperty1<S, Any?>)?.get(initialState)
+                    }
         }.subscribeOn(Schedulers.computation()).subscribe()
 
         if (this.debugMode) {
@@ -89,12 +92,18 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 
                 if (firstState != secondState) {
                     @Suppress("UNCHECKED_CAST")
-                    val changedProp = firstState::class.memberProperties
+                    val changedProp = firstState::class.memberProperties.asSequence()
                             .map { it as KProperty1<S, *> }
-                            .first { it.get(firstState) != it.get(secondState) }
-                    throw IllegalArgumentException("Your reducer must be pure! ${changedProp.name} changed from " +
-                            "${changedProp.get(firstState)} to ${changedProp.get(secondState)}. " +
-                            "Ensure that your state properties properly implement hashCode.")
+                            .filter { it.isAccessible }
+                            .firstOrNull { it.get(firstState) != it.get(secondState) }
+                    if (changedProp != null) {
+                        throw IllegalArgumentException("Your reducer must be pure! ${changedProp.name} changed from " +
+                                "${changedProp.get(firstState)} to ${changedProp.get(secondState)}. " +
+                                "Ensure that your state properties properly implement hashCode.")
+                    } else {
+                        throw java.lang.IllegalArgumentException("Your reducer must be pure! A private property was modified. Ensure that your state properties properly implement hashCode. $firstState -> $secondState")
+                    }
+
                 }
                 mutableStateChecker.onStateChanged(firstState)
 
