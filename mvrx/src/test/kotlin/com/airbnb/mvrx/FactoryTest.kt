@@ -1,5 +1,6 @@
 package com.airbnb.mvrx
 
+import android.app.Application
 import android.os.Bundle
 import android.os.Parcelable
 import android.support.v4.app.Fragment
@@ -119,6 +120,16 @@ class FactoryViewModelTest : BaseTest() {
         }
     }
 
+    private class ViewModelContextApplicationFactory(initialState: FactoryState) : TestMvRxViewModel<FactoryState>(initialState) {
+        companion object : MvRxViewModelFactory<TestFactoryJvmStaticViewModel, FactoryState> {
+            override fun create(viewModelContext: ViewModelContext, state: FactoryState): TestFactoryJvmStaticViewModel? {
+                // If this doesn't crash then there was an application that successfully casted.
+                viewModelContext.app<Application>()
+                return null
+            }
+        }
+    }
+
     private lateinit var activity: FragmentActivity
 
     @Before
@@ -161,6 +172,11 @@ class FactoryViewModelTest : BaseTest() {
         withState(viewModel) { state ->
             assertEquals(FactoryState("hello constructor"), state)
         }
+    }
+
+    @Test
+    fun testApplicationCanBeAccessed() {
+        MvRxViewModelProvider.get(ViewModelContextApplicationFactory::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello")))
     }
 }
 

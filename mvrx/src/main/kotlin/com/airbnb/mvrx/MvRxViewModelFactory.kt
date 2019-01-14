@@ -1,5 +1,6 @@
 package com.airbnb.mvrx
 
+import android.app.Application
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 
@@ -52,6 +53,12 @@ sealed class ViewModelContext {
      */
     @Suppress("UNCHECKED_CAST")
     fun <A : FragmentActivity> activity() : A = activity as A
+
+    /**
+     * Convenience method to access a typed Application.
+     */
+    @Suppress("UNCHECKED_CAST")
+    fun <A : Application> app() : A = activity.application as A
 
     /**
      * Fragment arguments set via [MvRx.KEY_ARG].
