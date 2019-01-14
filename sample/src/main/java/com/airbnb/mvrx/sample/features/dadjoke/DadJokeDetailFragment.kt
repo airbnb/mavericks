@@ -42,7 +42,8 @@ class DadJokeDetailViewModel(
     }
 
     companion object : MvRxViewModelFactory<DadJokeDetailViewModel, DadJokeDetailState> {
-        override fun create(viewModelContext: ViewModelContext, state: DadJokeDetailState): DadJokeDetailViewModel {
+        // Intentionally leaving unnecessary JvmStatic to test Proguard rules.
+        @JvmStatic override fun create(viewModelContext: ViewModelContext, state: DadJokeDetailState): DadJokeDetailViewModel {
             val service: DadJokeService by viewModelContext.activity.inject()
             return DadJokeDetailViewModel(state, service)
         }
