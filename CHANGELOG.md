@@ -1,5 +1,11 @@
 # Change log
 
+## Version 0.7.1
+*(2019-1-14)*
+- New: Add app() to ViewModelFactoryContext. [#179](https://github.com/airbnb/MvRx/pull/179)
+- Fix: Prevent private state properties from crashing debug checks. [#178](https://github.com/airbnb/MvRx/pull/178)
+- Fix: Fix proguard docs and rules for new ViewModelFactory APIs. [#181](https://github.com/airbnb/MvRx/pull/181)
+
 ## Version 0.7.0
 *(2019-1-11)*
 - **BREAKING:** `MvRxViewModelFactory` has been updated to provide more flexiblity when creating ViewModel and initial state [#169](https://github.com/airbnb/MvRx/pull/169): 
