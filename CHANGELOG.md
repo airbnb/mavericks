@@ -1,5 +1,9 @@
 # Change log
 
+## Version 0.7.2
+*(2019-1-16)*
+- Fix: mvrx-testing artifact now has the correct group name [#184](https://github.com/airbnb/MvRx/pull/184)
+
 ## Version 0.7.1
 *(2019-1-14)*
 - New: Add app() to ViewModelFactoryContext. [#179](https://github.com/airbnb/MvRx/pull/179)
