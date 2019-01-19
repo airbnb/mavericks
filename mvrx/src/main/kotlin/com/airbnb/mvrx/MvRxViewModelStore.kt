@@ -103,9 +103,12 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
             } else {
                 ownerArgs
             }
-            map[it] = (host as? Fragment)
-                    ?.let { fragment -> restoreViewModel(fragment, viewModelsState.getParcelable(it), arguments) }
-                    ?: restoreViewModel(host as FragmentActivity, viewModelsState.getParcelable(it), arguments)
+            val holder = viewModelsState.getParcelable<MvRxPersistedViewModelHolder>(it)!!
+            map[it] = when(host) {
+                is Fragment -> restoreViewModel(host, holder, arguments)
+                is FragmentActivity -> restoreViewModel(host, holder, arguments)
+                else -> throw IllegalStateException("Host: $host is expected to be either Fragment or FragmentActivity.")
+            }
         }
     }
 
