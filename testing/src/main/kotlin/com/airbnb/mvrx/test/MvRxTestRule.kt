@@ -1,19 +1,11 @@
 package com.airbnb.mvrx.test
 
-import android.support.annotation.NonNull
 import com.airbnb.mvrx.MvRxTestOverridesProxy
-import io.reactivex.Scheduler
 import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.disposables.Disposable
 import io.reactivex.exceptions.CompositeException
-import io.reactivex.internal.schedulers.ExecutorScheduler
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
-import org.junit.rules.TestRule
-import org.junit.runner.Description
-import org.junit.runners.model.Statement
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
+import org.junit.rules.ExternalResource
 
 enum class DebugMode(internal val value: Boolean?) {
     Debug(true),
@@ -31,26 +23,21 @@ class MvRxTestRule(
          * operations including setState reducers to run synchronously so you can test them.
          */
         private val setRxImmediateSchedulers: Boolean = true
-) : TestRule {
+) : ExternalResource() {
     private var defaultExceptionHandler: Thread.UncaughtExceptionHandler? = null
 
-    override fun apply(base: Statement, description: Description): Statement {
-        return object : Statement() {
-            override fun evaluate() {
-                RxAndroidPlugins.reset()
-                RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
-                RxAndroidPlugins.setMainThreadSchedulerHandler { Schedulers.trampoline() }
-                if (setRxImmediateSchedulers) setRxImmediateSchedulers()
-                MvRxTestOverridesProxy.forceMvRxDebug(debugMode.value)
-                try {
-                    base.evaluate()
-                } finally {
-                    RxAndroidPlugins.reset()
-                    MvRxTestOverridesProxy.forceMvRxDebug(DebugMode.Unset.value)
-                    if (setRxImmediateSchedulers) clearRxImmediateScheduleres()
-                }
-            }
-        }
+    override fun before() {
+        RxAndroidPlugins.reset()
+        RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
+        RxAndroidPlugins.setMainThreadSchedulerHandler { Schedulers.trampoline() }
+        if (setRxImmediateSchedulers) setRxImmediateSchedulers()
+        MvRxTestOverridesProxy.forceMvRxDebug(debugMode.value)
+    }
+
+    override fun after() {
+        RxAndroidPlugins.reset()
+        MvRxTestOverridesProxy.forceMvRxDebug(DebugMode.Unset.value)
+        if (setRxImmediateSchedulers) clearRxImmediateScheduleres()
     }
 
     private fun setRxImmediateSchedulers() {
