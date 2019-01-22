@@ -29,7 +29,7 @@ jobs:
     script: "./detekt"
   - stage: test
     name: Lint
-    script: "./gradlew lintRelease"z
+    script: "./gradlew lintRelease"
   - name: Unit Tests
     script: "./gradlew testReleaseUnitTest"
 
