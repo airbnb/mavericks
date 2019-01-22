@@ -25,7 +25,9 @@ notifications:
 jobs:
   include:
   - stage: test
-    name: Lint
+  - name: Detekt
+    script: "./detekt"
+  - name: Lint
     script: "./gradlew lintRelease"
   - name: Unit Tests
     script: "./gradlew testReleaseUnitTest"
