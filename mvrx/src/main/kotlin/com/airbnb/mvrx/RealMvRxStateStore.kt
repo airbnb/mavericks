@@ -5,7 +5,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
-import java.util.*
+import java.util.LinkedList
 
 /**
  * This is a container class around the actual state itself. It has a few optimizations to ensure
@@ -133,8 +133,8 @@ class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
         val blocks = jobs.dequeueAllSetStateBlocks() ?: return
 
         blocks
-                .fold(state) { state, reducer -> state.reducer() }
-                .run { if (this != state) subject.onNext(this) }
+            .fold(state) { state, reducer -> state.reducer() }
+            .run { if (this != state) subject.onNext(this) }
     }
 
     private fun handleError(throwable: Throwable) {

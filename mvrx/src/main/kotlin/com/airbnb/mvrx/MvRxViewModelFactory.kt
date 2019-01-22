@@ -18,6 +18,7 @@ interface MvRxViewModelFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> {
      * @return The ViewModel. If you return `null` the ViewModel must have a single argument
      * constructor only taking the initial state.
      */
+    @Suppress("Detekt.FunctionOnlyReturningConstant")
     fun create(viewModelContext: ViewModelContext, state: S): VM? = null
 
     /**
@@ -28,8 +29,8 @@ interface MvRxViewModelFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> {
      *
      * @return the initial state. If `null`, the state class constructors will be used for initial state creation.
      */
+    @Suppress("Detekt.FunctionOnlyReturningConstant")
     fun initialState(viewModelContext: ViewModelContext): S? = null
-
 }
 
 /**
@@ -52,13 +53,13 @@ sealed class ViewModelContext {
      * Convenience method to type [activity].
      */
     @Suppress("UNCHECKED_CAST")
-    fun <A : FragmentActivity> activity() : A = activity as A
+    fun <A : FragmentActivity> activity(): A = activity as A
 
     /**
      * Convenience method to access a typed Application.
      */
     @Suppress("UNCHECKED_CAST")
-    fun <A : Application> app() : A = activity.application as A
+    fun <A : Application> app(): A = activity.application as A
 
     /**
      * Fragment arguments set via [MvRx.KEY_ARG].
@@ -98,5 +99,5 @@ class FragmentViewModelContext(
      * Convenience method to type [fragment].
      */
     @Suppress("UNCHECKED_CAST")
-    fun <F : Fragment> fragment() : F = fragment as F
+    fun <F : Fragment> fragment(): F = fragment as F
 }

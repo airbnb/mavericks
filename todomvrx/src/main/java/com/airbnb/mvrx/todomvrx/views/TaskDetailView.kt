@@ -15,7 +15,9 @@ import com.airbnb.mvrx.todomvrx.todoapp.R
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_MATCH_HEIGHT)
 class TaskDetailView @JvmOverloads constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : RelativeLayout(context, attrs, defStyleAttr) {
 
     private val titleView by lazy { findViewById<TextView>(R.id.task_title) }
@@ -38,6 +40,6 @@ class TaskDetailView @JvmOverloads constructor(
 
     @CallbackProp
     fun onCheckedChanged(listener: CompoundButton.OnCheckedChangeListener?) {
-            checkbox.setOnCheckedChangeListener(listener)
+        checkbox.setOnCheckedChangeListener(listener)
     }
 }

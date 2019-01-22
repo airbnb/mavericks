@@ -30,16 +30,16 @@ internal fun KClass<*>.assertImmutability() {
     fun KProperty1<*, *>.isSubtype(klass: KClass<*>) =
         returnType.isSubtypeOf(klass.starProjectedType)
 
-    this.declaredMemberProperties.forEach {
+    this.declaredMemberProperties.forEach { prop ->
         when {
-            it is KMutableProperty<*> -> "State property ${it.name} must be a val, not a var."
-            it.isSubtype(ArrayList::class) -> "You cannot use ArrayList for ${it.name}.\n$IMMUTABLE_LIST_MESSAGE"
-            it.isSubtype(SparseArray::class) -> "You cannot use SparseArray for ${it.name}.\n$IMMUTABLE_LIST_MESSAGE"
-            it.isSubtype(LongSparseArray::class) -> "You cannot use LongSparseArray for ${it.name}.\n$IMMUTABLE_LIST_MESSAGE"
-            it.isSubtype(SparseArrayCompat::class) -> "You cannot use SparseArrayCompat for ${it.name}.\n$IMMUTABLE_LIST_MESSAGE"
-            it.isSubtype(ArrayMap::class) -> "You cannot use ArrayMap for ${it.name}.\n$IMMUTABLE_MAP_MESSAGE"
-            it.isSubtype(android.util.ArrayMap::class) -> "You cannot use ArrayMap for ${it.name}.\n$IMMUTABLE_MAP_MESSAGE"
-            it.isSubtype(HashMap::class) -> "You cannot use HashMap for ${it.name}.\n$IMMUTABLE_MAP_MESSAGE"
+            prop is KMutableProperty<*> -> "State property ${prop.name} must be a val, not a var."
+            prop.isSubtype(ArrayList::class) -> "You cannot use ArrayList for ${prop.name}.\n$IMMUTABLE_LIST_MESSAGE"
+            prop.isSubtype(SparseArray::class) -> "You cannot use SparseArray for ${prop.name}.\n$IMMUTABLE_LIST_MESSAGE"
+            prop.isSubtype(LongSparseArray::class) -> "You cannot use LongSparseArray for ${prop.name}.\n$IMMUTABLE_LIST_MESSAGE"
+            prop.isSubtype(SparseArrayCompat::class) -> "You cannot use SparseArrayCompat for ${prop.name}.\n$IMMUTABLE_LIST_MESSAGE"
+            prop.isSubtype(ArrayMap::class) -> "You cannot use ArrayMap for ${prop.name}.\n$IMMUTABLE_MAP_MESSAGE"
+            prop.isSubtype(android.util.ArrayMap::class) -> "You cannot use ArrayMap for ${prop.name}.\n$IMMUTABLE_MAP_MESSAGE"
+            prop.isSubtype(HashMap::class) -> "You cannot use HashMap for ${prop.name}.\n$IMMUTABLE_MAP_MESSAGE"
             else -> null
         }?.let { throw IllegalArgumentException(it) }
     }
@@ -70,5 +70,3 @@ internal class MutableStateChecker<S : MvRxState>(val initialState: S) {
         previousState = StateWrapper(newState)
     }
 }
-
-

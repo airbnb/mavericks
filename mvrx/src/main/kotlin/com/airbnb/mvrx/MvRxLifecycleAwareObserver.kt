@@ -25,7 +25,8 @@ internal class MvRxLifecycleAwareObserver<T>(
     private var owner: LifecycleOwner?,
     private val activeState: Lifecycle.State = DEFAULT_ACTIVE_STATE,
     private val alwaysDeliverLastValueWhenUnlocked: Boolean = false,
-    private var sourceObserver: Observer<T>?) : AtomicReference<Disposable>(), LifecycleObserver, Observer<T>, Disposable {
+    private var sourceObserver: Observer<T>?
+) : AtomicReference<Disposable>(), LifecycleObserver, Observer<T>, Disposable {
 
     constructor(
         owner: LifecycleOwner,
@@ -118,13 +119,9 @@ internal class MvRxLifecycleAwareObserver<T>(
 
     private fun requireOwner(): LifecycleOwner = requireNotNull(owner) { "Cannot access lifecycleOwner after onDestroy." }
 
-
     private fun requireSourceObserver() = requireNotNull(sourceObserver) { "Cannot access observer after onDestroy." }
 
-
     companion object {
-
         private val DEFAULT_ACTIVE_STATE = State.STARTED
-
     }
 }

@@ -10,7 +10,9 @@ import com.airbnb.mvrx.todomvrx.todoapp.R
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_MATCH_HEIGHT)
 class AddEditView @JvmOverloads constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : ScrollView(context, attrs, defStyleAttr) {
 
     private val titleView by lazy { findViewById<EditText>(R.id.task_title) }

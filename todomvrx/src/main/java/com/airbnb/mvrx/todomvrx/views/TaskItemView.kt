@@ -14,7 +14,9 @@ import com.airbnb.mvrx.todomvrx.todoapp.R
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)
 class TaskItemView @JvmOverloads constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private val clickOverlay by lazy { findViewById<View>(R.id.click_overlay) }

@@ -29,18 +29,17 @@ abstract class BaseFragment : BaseMvRxFragment() {
     protected lateinit var coordinatorLayout: CoordinatorLayout
     protected lateinit var recyclerView: EpoxyRecyclerView
     protected lateinit var fab: FloatingActionButton
-    protected val epoxyController by lazy {epoxyController() }
+    protected val epoxyController by lazy { epoxyController() }
     // Used to keep track of task changes to determine if we should show a snackbar.
     private var oldTasks: Tasks? = null
 
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
-            inflater.inflate(R.layout.fragment_base, container, false).apply {
-                coordinatorLayout = findViewById(R.id.coordinator_layout)
-                fab = findViewById(R.id.fab)
-                recyclerView = findViewById(R.id.recycler_view)
-                recyclerView.setController(epoxyController)
-            }
+        inflater.inflate(R.layout.fragment_base, container, false).apply {
+            coordinatorLayout = findViewById(R.id.coordinator_layout)
+            fab = findViewById(R.id.fab)
+            recyclerView = findViewById(R.id.recycler_view)
+            recyclerView.setController(epoxyController)
+        }
 
     @CallSuper
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

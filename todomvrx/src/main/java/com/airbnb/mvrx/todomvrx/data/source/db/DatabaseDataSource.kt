@@ -12,13 +12,13 @@ import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
 class DatabaseDataSource(
-        private val dao: TasksDao,
-        private val delayMs: Long = 2000,
-        private val scheduler: Scheduler = Schedulers.io()
+    private val dao: TasksDao,
+    private val delayMs: Long = 2000,
+    private val scheduler: Scheduler = Schedulers.io()
 ) : TasksDataSource {
     override fun getTasks(): Single<Tasks> = dao.getTasks()
-            .subscribeOn(scheduler)
-            .delay(delayMs, TimeUnit.MILLISECONDS, scheduler)
+        .subscribeOn(scheduler)
+        .delay(delayMs, TimeUnit.MILLISECONDS, scheduler)
 
     override fun upsertTask(task: Task): Disposable = fromAction { dao.saveTask(task) }
 
@@ -29,9 +29,9 @@ class DatabaseDataSource(
     override fun deleteTask(id: String): Disposable = fromAction { dao.deleteTask(id) }
 
     private fun fromAction(action: () -> Unit): Disposable = Completable.fromAction(action)
-            .subscribeOn(scheduler)
-            .delay(delayMs, TimeUnit.MILLISECONDS)
-            .doOnSubscribe { EspressoIdlingResource.increment() }
-            .doOnComplete { EspressoIdlingResource.decrement() }
-            .subscribe()
+        .subscribeOn(scheduler)
+        .delay(delayMs, TimeUnit.MILLISECONDS)
+        .doOnSubscribe { EspressoIdlingResource.increment() }
+        .doOnComplete { EspressoIdlingResource.decrement() }
+        .subscribe()
 }

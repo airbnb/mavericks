@@ -12,9 +12,9 @@ interface DadJokeService {
     @Headers("Accept: application/json")
     @GET("search")
     fun search(
-            @Query("query") query: String? = null,
-            @Query("page") page: Int = 0,
-            @Query("limit") limit: Int = 20
+        @Query("query") query: String? = null,
+        @Query("page") page: Int = 0,
+        @Query("limit") limit: Int = 20
     ): Observable<JokesResponse>
 
     @Headers("Accept: application/json")

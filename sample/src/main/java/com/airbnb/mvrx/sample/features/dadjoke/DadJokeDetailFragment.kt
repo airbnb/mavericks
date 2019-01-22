@@ -2,8 +2,12 @@ package com.airbnb.mvrx.sample.features.dadjoke
 
 import android.annotation.SuppressLint
 import android.os.Parcelable
-import android.support.v4.app.FragmentActivity
-import com.airbnb.mvrx.*
+import com.airbnb.mvrx.Async
+import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MvRxViewModelFactory
+import com.airbnb.mvrx.Uninitialized
+import com.airbnb.mvrx.ViewModelContext
+import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.core.MvRxViewModel
 import com.airbnb.mvrx.sample.core.simpleController
@@ -22,7 +26,7 @@ data class DadJokeDetailArgs(val id: String) : Parcelable
 data class DadJokeDetailState(val id: String, val joke: Async<Joke> = Uninitialized) : MvRxState {
     /**
      * This secondary constructor will automatically called if your Fragment has
-     * a parcelable in its arguments at key [com.airbnb.mvrx.MvRx.KEY_ARG]
+     * a parcelable in its arguments at key [com.airbnb.mvrx.MvRx.KEY_ARG].
      */
     constructor(args: DadJokeDetailArgs) : this(id = args.id)
 }
@@ -43,7 +47,8 @@ class DadJokeDetailViewModel(
 
     companion object : MvRxViewModelFactory<DadJokeDetailViewModel, DadJokeDetailState> {
         // Intentionally leaving unnecessary JvmStatic to test Proguard rules.
-        @JvmStatic override fun create(viewModelContext: ViewModelContext, state: DadJokeDetailState): DadJokeDetailViewModel {
+        @JvmStatic
+        override fun create(viewModelContext: ViewModelContext, state: DadJokeDetailState): DadJokeDetailViewModel {
             val service: DadJokeService by viewModelContext.activity.inject()
             return DadJokeDetailViewModel(state, service)
         }

@@ -11,7 +11,8 @@ import io.reactivex.Single
 /**
  * Data Access Object for the tasks table.
  */
-@Dao interface TasksDao {
+@Dao
+interface TasksDao {
 
     /**
      * Select all tasks from the tasks table.
@@ -30,9 +31,8 @@ import io.reactivex.Single
     fun saveTask(task: Task): Long
 
     /**
-     * Update the complete status of a task
-     *
-     * @param id    id of the task
+     * Update the complete status of a task.
+     * @param id id of the task
      * @param complete status to be updated
      */
     @Query("UPDATE tasks SET complete = :complete WHERE id = :id")
