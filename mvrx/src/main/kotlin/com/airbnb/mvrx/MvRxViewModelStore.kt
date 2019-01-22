@@ -1,4 +1,3 @@
-
 package com.airbnb.mvrx
 
 import android.arch.lifecycle.ViewModel
@@ -95,16 +94,17 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
             ?: throw IllegalStateException("You are trying to call restoreViewModels but you never called saveViewModels!")
         restoreFragmentArgsFromSavedInstanceState(savedInstanceState)
         if (map.isNotEmpty()) return
-        viewModelsState.keySet()?.forEach {
+        viewModelsState.keySet()?.forEach { key ->
             // In the case that we are restoring an Activity ViewModel created by a Fragment, `ownerArgs` will be those of the Activity. So we
             // need to use the persisted Fragment args instead.
-            val arguments = if (fragmentArgsForActivityViewModelState.containsKey(it)) {
-                fragmentArgsForActivityViewModelState[it]
+            val arguments = if (fragmentArgsForActivityViewModelState.containsKey(key)) {
+                fragmentArgsForActivityViewModelState[key]
             } else {
                 ownerArgs
             }
-            val holder = viewModelsState.getParcelable<MvRxPersistedViewModelHolder>(it)!!
-            map[it] = when(host) {
+            val holder = viewModelsState.getParcelable<MvRxPersistedViewModelHolder>(key)
+                ?: throw IllegalStateException("ViewModel key: $key expected to be in stored ViewModels but was not found.")
+            map[key] = when (host) {
                 is Fragment -> restoreViewModel(host, holder, arguments)
                 is FragmentActivity -> restoreViewModel(host, holder, arguments)
                 else -> throw IllegalStateException("Host: $host is expected to be either Fragment or FragmentActivity.")
