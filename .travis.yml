@@ -24,11 +24,12 @@ notifications:
 
 jobs:
   include:
-  - stage: test
+  - stage: format
   - name: Detekt
     script: "./detekt"
-  - name: Lint
-    script: "./gradlew lintRelease"
+  - stage: test
+    name: Lint
+    script: "./gradlew lintRelease"z
   - name: Unit Tests
     script: "./gradlew testReleaseUnitTest"
 
