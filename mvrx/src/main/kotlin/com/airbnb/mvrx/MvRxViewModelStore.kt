@@ -55,8 +55,8 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
                     bundle.apply { putParcelable(key, holder) }
                 }
             }
-            .let {
-                outState.putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, it)
+            .let { bundle ->
+                outState.putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, bundle)
                 outState.putSerializable(KEY_MVRX_ACTIVITY_SCOPED_FRAGMENT_ARGS, fragmentArgsForActivityViewModelState)
             }
     }

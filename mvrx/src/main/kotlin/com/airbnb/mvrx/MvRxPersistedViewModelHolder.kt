@@ -12,4 +12,5 @@ import kotlinx.android.parcel.Parcelize
  * @see MvRxViewModelStore
  */
 @SuppressLint("ParcelCreator")
-@Parcelize data class MvRxPersistedViewModelHolder(val viewModelClass: Class<out BaseMvRxViewModel<MvRxState>>, val stateClass: Class<out MvRxState>, val state: Bundle) : Parcelable
+@Parcelize
+data class MvRxPersistedViewModelHolder(val viewModelClass: Class<out BaseMvRxViewModel<MvRxState>>, val stateClass: Class<out MvRxState>, val state: Bundle) : Parcelable

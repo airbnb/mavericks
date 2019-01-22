@@ -19,12 +19,12 @@ class FlowIntroFragment : BaseFragment() {
             subtitle("Set the initial counter value")
         }
 
-        arrayOf(0, 10, 50, 100, 1_000, 10_000).forEach {
+        arrayOf(0, 10, 50, 100, 1_000, 10_000).forEach { count ->
             basicRow {
-                id(it)
-                title("$it")
+                id(count)
+                title("$count")
                 clickListener { _ ->
-                    viewModel.setCount(it)
+                    viewModel.setCount(count)
                     findNavController().navigate(R.id.action_flowIntroFragment_to_flowCounterFragment)
                 }
             }

@@ -11,9 +11,9 @@ import com.airbnb.mvrx.sample.R
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)
 class Marquee @JvmOverloads constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int = 0
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
 
     private val titleView: TextView
@@ -33,7 +33,7 @@ class Marquee @JvmOverloads constructor(
 
     @TextProp
     fun setSubtitle(subtitle: CharSequence?) {
-        subtitleView.visibility = if(subtitle.isNullOrBlank()) View.GONE else View.VISIBLE
+        subtitleView.visibility = if (subtitle.isNullOrBlank()) View.GONE else View.VISIBLE
         subtitleView.text = subtitle
     }
 }

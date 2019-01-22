@@ -9,8 +9,11 @@ package com.airbnb.mvrx
  */
 interface MvRxViewModelStoreOwner {
     /**
-     * Add this to your Fragment:
+     * Add this to your base Fragment or Activity:
+     * ```
      * override val mvrxViewModelStore by lazy { MvRxViewModelStore(viewModelStore) }
+     * ```
+     * to enable mvrx support.
      */
     val mvrxViewModelStore: MvRxViewModelStore
 }

@@ -6,7 +6,6 @@ import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.withState
 
-
 /**
  * For use with [BaseFragment.epoxyController].
  *
@@ -20,7 +19,6 @@ open class MvRxEpoxyController(
         buildModelsCallback()
     }
 }
-
 
 /**
  * Create a [MvRxEpoxyController] that builds models with the given callback.

@@ -1,0 +1,12 @@
+#!/bin/bash
+
+# Run this to set up git hooks. They can't be auto-configured with the repo.
+
+# Run Detekt on pre-push
+echo "
+#!/bin/bash
+cd Android
+./detekt
+" > .git/hooks/pre-push
+
+chmod +x .git/hooks/pre-push

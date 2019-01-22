@@ -45,7 +45,11 @@ object MvRxViewModelProvider {
         stateRestorer: (S) -> S = { it }
     ): VM {
         val initialState = createInitialState(viewModelClass, stateClass, viewModelContext, stateRestorer)
-        val companionClass = try { Class.forName("${viewModelClass.name}\$Companion") } catch (exception: ClassNotFoundException) { null }
+        val companionClass = try {
+            Class.forName("${viewModelClass.name}\$Companion")
+        } catch (exception: ClassNotFoundException) {
+            null
+        }
         val factoryViewModel = companionClass?.let {
             try {
                 companionClass.getMethod("create", ViewModelContext::class.java, MvRxState::class.java)
@@ -85,7 +89,11 @@ object MvRxViewModelProvider {
         viewModelContext: ViewModelContext,
         stateRestorer: (S) -> S
     ): S {
-        val companionClass = try { Class.forName("${viewModelClass.name}\$Companion") } catch (exception: ClassNotFoundException) { null }
+        val companionClass = try {
+            Class.forName("${viewModelClass.name}\$Companion")
+        } catch (exception: ClassNotFoundException) {
+            null
+        }
         @Suppress("UNCHECKED_CAST")
         val factoryState = companionClass?.let {
             try {
@@ -122,8 +130,8 @@ object MvRxViewModelProvider {
      */
     @Suppress("FunctionName") // Public for inline.
     internal fun <S : MvRxState> createStateFromConstructor(stateClass: Class<S>, args: Any?): S {
-        val argsConstructor = args?.let {
-            val argType = it::class.java
+        val argsConstructor = args?.let { arg ->
+            val argType = arg::class.java
 
             stateClass.constructors.firstOrNull { constructor ->
                 constructor.parameterTypes.size == 1 && isAssignableTo(argType, constructor.parameterTypes[0])
@@ -140,10 +148,10 @@ object MvRxViewModelProvider {
             ?: throw IllegalStateException(
                 "Attempt to create the MvRx state class ${stateClass.simpleName} has failed. One of the following must be true:" +
                     "\n 1) The state class has default values for every constructor property." +
-                    "\n 2) The state class has a secondary constructor for ${args?.javaClass?.simpleName ?: "a fragment argument"}." +
+                    "\n 2) The state class has a secondary constructor for ${args?.javaClass?.simpleName
+                        ?: "a fragment argument"}." +
                     "\n 3) The ViewModel using the state must have a companion object implementing MvRxFactory with an initialState function " +
                     "that does not return null. "
             )
     }
-
 }

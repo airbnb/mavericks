@@ -22,7 +22,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
@@ -34,7 +33,6 @@ import com.airbnb.mvrx.todomvrx.views.fullScreenMessageView
 import com.airbnb.mvrx.todomvrx.views.header
 import com.airbnb.mvrx.todomvrx.views.horizontalLoader
 import com.airbnb.mvrx.todomvrx.views.taskItemView
-import com.airbnb.mvrx.withState
 
 data class TaskListState(val filter: TaskListFilter = TaskListFilter.All) : MvRxState
 
@@ -98,16 +96,16 @@ class TaskListFragment : BaseFragment() {
             }
 
             state.tasks
-                    .filter(taskListState.filter::matches)
-                    .forEach { task ->
-                        taskItemView {
-                            id(task.id)
-                            title(task.title)
-                            checked(task.complete)
-                            onCheckedChanged { completed -> viewModel.setComplete(task.id, completed) }
-                            onClickListener { _ -> navigate(R.id.detailFragment, TaskDetailArgs(task.id)) }
-                        }
+                .filter(taskListState.filter::matches)
+                .forEach { task ->
+                    taskItemView {
+                        id(task.id)
+                        title(task.title)
+                        checked(task.complete)
+                        onCheckedChanged { completed -> viewModel.setComplete(task.id, completed) }
+                        onClickListener { _ -> navigate(R.id.detailFragment, TaskDetailArgs(task.id)) }
                     }
+                }
         }
     }
 
@@ -115,8 +113,8 @@ class TaskListFragment : BaseFragment() {
         PopupMenu(requireContext(), requireActivity().findViewById<View>(R.id.menu_filter)).run {
             menuInflater.inflate(R.menu.filter_tasks, menu)
 
-            setOnMenuItemClickListener {
-                val filter = when (it.itemId) {
+            setOnMenuItemClickListener { item ->
+                val filter = when (item.itemId) {
                     R.id.active -> TaskListFilter.Active
                     R.id.completed -> TaskListFilter.Completed
                     R.id.all -> TaskListFilter.All
@@ -129,6 +127,6 @@ class TaskListFragment : BaseFragment() {
         }
     }
 
-    @Suppress("unused")
+    @Suppress("Detekt.FunctionOnlyReturningConstant")
     private fun Unit.andTrue() = true
 }
