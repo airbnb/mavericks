@@ -26,6 +26,12 @@ class ViewModelFactoryTestFragment : Fragment()
  */
 class NoFactoryTest : BaseTest() {
 
+    class MyViewModelWithNonFactoryCompanion(initialState: FactoryState) : TestMvRxViewModel<FactoryState>(initialState) {
+        companion object {
+            // Companion object does not implement MvRxViewModelFactory
+        }
+    }
+
     private lateinit var activity: FragmentActivity
 
     @Before
@@ -49,6 +55,14 @@ class NoFactoryTest : BaseTest() {
         class MyViewModel(initialState: FactoryState) : TestMvRxViewModel<FactoryState>(initialState)
 
         val viewModel = MvRxViewModelProvider.get(MyViewModel::class.java, FactoryState::class.java, FragmentViewModelContext(activity, TestArgs("hello"), fragment))
+        withState(viewModel) { state ->
+            assertEquals(FactoryState("hello constructor"), state)
+        }
+    }
+
+    @Test
+    fun createWithNonFactoryCompanion() {
+        val viewModel = MvRxViewModelProvider.get(MyViewModelWithNonFactoryCompanion::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello")))
         withState(viewModel) { state ->
             assertEquals(FactoryState("hello constructor"), state)
         }
