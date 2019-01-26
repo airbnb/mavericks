@@ -119,9 +119,9 @@ object MvRxViewModelProvider {
         val companionClass = try {
             Class.forName("$name\$Companion")
         } catch (exception: ClassNotFoundException) {
-            null
+           return null
         }
-        return if (companionClass != null && MvRxViewModelFactory::class.java.isAssignableFrom(companionClass)) {
+        return if (MvRxViewModelFactory::class.java.isAssignableFrom(companionClass)) {
             @Suppress("UNCHECKED_CAST")
             companionClass as Class<out MvRxViewModelFactory<VM, *>>
         } else {
