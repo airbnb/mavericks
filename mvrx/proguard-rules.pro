@@ -28,6 +28,9 @@
      public *** initialState(...);
 }
 
+# MvRxViewModelFactory is referenced via reflection using the Companion class name.
+-keepnames class * implements com.airbnb.mvrx.MvRxViewModelFactory
+
 
 # Members of the Kotlin data classes used as the state in MvRx are read via Kotlin reflection which cause trouble
 # with Proguard if they are not kept.
