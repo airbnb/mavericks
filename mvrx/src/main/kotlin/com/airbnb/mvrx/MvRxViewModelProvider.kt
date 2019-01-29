@@ -45,15 +45,10 @@ object MvRxViewModelProvider {
         stateRestorer: (S) -> S = { it }
     ): VM {
         val initialState = createInitialState(viewModelClass, stateClass, viewModelContext, stateRestorer)
-        val companionClass = try {
-            Class.forName("${viewModelClass.name}\$Companion")
-        } catch (exception: ClassNotFoundException) {
-            null
-        }
-        val factoryViewModel = companionClass?.let {
+        val factoryViewModel = viewModelClass.factoryCompanion()?.let { factoryClass ->
             try {
-                companionClass.getMethod("create", ViewModelContext::class.java, MvRxState::class.java)
-                    .invoke(companionClass.instance(), viewModelContext, initialState) as VM?
+                factoryClass.getMethod("create", ViewModelContext::class.java, MvRxState::class.java)
+                    .invoke(factoryClass.instance(), viewModelContext, initialState) as VM?
             } catch (exception: NoSuchMethodException) {
                 // Check for JvmStatic method.
                 viewModelClass.getMethod("create", ViewModelContext::class.java, MvRxState::class.java)
@@ -89,16 +84,11 @@ object MvRxViewModelProvider {
         viewModelContext: ViewModelContext,
         stateRestorer: (S) -> S
     ): S {
-        val companionClass = try {
-            Class.forName("${viewModelClass.name}\$Companion")
-        } catch (exception: ClassNotFoundException) {
-            null
-        }
         @Suppress("UNCHECKED_CAST")
-        val factoryState = companionClass?.let {
+        val factoryState = viewModelClass.factoryCompanion()?.let { factoryClass ->
             try {
-                companionClass.getMethod("initialState", ViewModelContext::class.java)
-                    .invoke(companionClass.instance(), viewModelContext) as S?
+                factoryClass.getMethod("initialState", ViewModelContext::class.java)
+                    .invoke(factoryClass.instance(), viewModelContext) as S?
             } catch (exception: NoSuchMethodException) {
                 // Check for JvmStatic method.
                 viewModelClass.getMethod("initialState", ViewModelContext::class.java)
@@ -120,6 +110,23 @@ object MvRxViewModelProvider {
             }
         }
         return null
+    }
+
+    /**
+     * Return the [Class] of the [MvRxViewModelFactory] for a given ViewModel class, if it exists.
+     */
+    private fun <VM : BaseMvRxViewModel<*>> Class<VM>.factoryCompanion() : Class<out MvRxViewModelFactory<VM, *>>? {
+        val companionClass = try {
+            Class.forName("$name\$Companion")
+        } catch (exception: ClassNotFoundException) {
+           return null
+        }
+        return if (MvRxViewModelFactory::class.java.isAssignableFrom(companionClass)) {
+            @Suppress("UNCHECKED_CAST")
+            companionClass as Class<out MvRxViewModelFactory<VM, *>>
+        } else {
+            null
+        }
     }
 
     /**
