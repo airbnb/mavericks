@@ -3,7 +3,7 @@ package com.airbnb.mvrx
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting
 import java.io.Serializable
 import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty1

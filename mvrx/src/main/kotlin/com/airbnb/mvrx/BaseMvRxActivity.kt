@@ -1,7 +1,7 @@
 package com.airbnb.mvrx
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 
 /**
  * Extend this class to get MvRx support out of the box.

@@ -2,9 +2,9 @@ package com.airbnb.mvrx.sample.core
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.annotation.IdRes
-import android.support.design.widget.CoordinatorLayout
-import android.support.v7.widget.Toolbar
+import androidx.annotation.IdRes
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.appcompat.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

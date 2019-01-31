@@ -4,7 +4,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.parcel.Parcelize
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals

@@ -1,9 +1,9 @@
 package com.airbnb.mvrx
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.ViewModel
-import android.support.annotation.CallSuper
-import android.support.annotation.RestrictTo
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
+import androidx.annotation.CallSuper
+import androidx.annotation.RestrictTo
 import android.util.Log
 import io.reactivex.Completable
 import io.reactivex.Observable
