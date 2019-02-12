@@ -115,11 +115,11 @@ object MvRxViewModelProvider {
     /**
      * Return the [Class] of the [MvRxViewModelFactory] for a given ViewModel class, if it exists.
      */
-    private fun <VM : BaseMvRxViewModel<*>> Class<VM>.factoryCompanion() : Class<out MvRxViewModelFactory<VM, *>>? {
+    private fun <VM : BaseMvRxViewModel<*>> Class<VM>.factoryCompanion(): Class<out MvRxViewModelFactory<VM, *>>? {
         val companionClass = try {
             Class.forName("$name\$Companion")
         } catch (exception: ClassNotFoundException) {
-           return null
+            return null
         }
         return if (MvRxViewModelFactory::class.java.isAssignableFrom(companionClass)) {
             @Suppress("UNCHECKED_CAST")
