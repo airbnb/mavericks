@@ -6,6 +6,8 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentActivity
 import kotlin.reflect.full.primaryConstructor
 
+typealias MvRxViewModelProviderFactory<VM> = () -> VM
+
 /**
  * Helper ViewModelProvider that has a single method for taking either a [Fragment] or [FragmentActivity] instead
  * of two separate ones. The logic for providing the correct scope is inside the method.
@@ -27,10 +29,11 @@ object MvRxViewModelProvider {
         viewModelClass: Class<VM>,
         stateClass: Class<S>,
         viewModelContext: ViewModelContext,
-        key: String = viewModelClass.name
+        key: String = viewModelClass.name,
+        viewModelFactory: MvRxViewModelProviderFactory<VM>? = null
     ): VM {
         // This wraps the fact that ViewModelProvider.of has individual methods for Fragment and FragmentActivity.
-        val factory = MvRxFactory { createViewModel(viewModelClass, stateClass, viewModelContext) }
+        val factory = MvRxFactory { viewModelFactory?.invoke() ?: createViewModel(viewModelClass, stateClass, viewModelContext) }
         return when (viewModelContext) {
             is ActivityViewModelContext -> ViewModelProviders.of(viewModelContext.activity, factory)
             is FragmentViewModelContext -> ViewModelProviders.of(viewModelContext.fragment, factory)

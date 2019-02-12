@@ -121,6 +121,8 @@ class FactoryViewModelTest : BaseTest() {
         }
     }
 
+    private class TestInjectedFactoryViewModel(initialState: FactoryState, val otherProp: Long) : TestMvRxViewModel<FactoryState>(initialState)
+
     private class TestFactoryJvmStaticViewModel(initialState: FactoryState, val otherProp: Long) : TestMvRxViewModel<FactoryState>(initialState) {
         companion object : MvRxViewModelFactory<TestFactoryJvmStaticViewModel, FactoryState> {
             @JvmStatic
@@ -178,6 +180,44 @@ class FactoryViewModelTest : BaseTest() {
             assertEquals(FactoryState("hello constructor"), state)
         }
         assertEquals(5, viewModel.otherProp)
+    }
+
+    @Test
+    fun createWithInjectedViewModelFactory() {
+        val (_, fragment) = createFragment<ViewModelFactoryTestFragment, TestActivity>()
+        fragment.arguments = Bundle().apply { putLong("otherProp", 6L) }
+
+        val arguments = TestArgs("hello")
+        val context = FragmentViewModelContext(activity, arguments, fragment)
+        val curriedFactory = { args: TestArgs, otherProp: Long ->
+            { TestInjectedFactoryViewModel(FactoryState(args), otherProp) }
+        }
+
+        val factory = curriedFactory(arguments, fragment.arguments!!.getLong("otherProp"))
+        val viewModel = MvRxViewModelProvider.get(TestInjectedFactoryViewModel::class.java, FactoryState::class.java, context, viewModelFactory = factory)
+        withState(viewModel) { state ->
+            assertEquals(FactoryState("hello constructor"), state)
+        }
+        assertEquals(6, viewModel.otherProp)
+    }
+
+    @Test
+    fun createWithInjectedViewModelFactoryUsingCompanionObject() {
+        val (_, fragment) = createFragment<ViewModelFactoryTestFragment, TestActivity>()
+        fragment.arguments = Bundle().apply { putLong("otherProp", 6L) }
+
+        val arguments = TestArgs("hello")
+        val context = FragmentViewModelContext(activity, arguments, fragment)
+        val curriedFactory = { args: TestArgs, otherProp: Long ->
+            { TestInjectedFactoryViewModel(FactoryState(args), otherProp) }
+        }
+
+        val factory = curriedFactory(arguments, fragment.arguments!!.getLong("otherProp"))
+        val viewModel = MvRxViewModelProvider.get(TestInjectedFactoryViewModel::class.java, FactoryState::class.java, context, viewModelFactory = factory)
+        withState(viewModel) { state ->
+            assertEquals(FactoryState("hello constructor"), state)
+        }
+        assertEquals(6, viewModel.otherProp)
     }
 
     @Test
