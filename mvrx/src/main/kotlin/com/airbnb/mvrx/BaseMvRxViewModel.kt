@@ -27,7 +27,7 @@ import kotlin.reflect.jvm.isAccessible
  */
 abstract class BaseMvRxViewModel<S : MvRxState>(
     initialState: S,
-    debugMode: Boolean = false,
+    debugMode: Boolean,
     private val stateStore: MvRxStateStore<S> = RealMvRxStateStore(initialState)
 ) : ViewModel() {
     private val debugMode = if (MvRxTestOverrides.FORCE_DEBUG == null) debugMode else MvRxTestOverrides.FORCE_DEBUG
