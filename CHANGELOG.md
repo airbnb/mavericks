@@ -1,5 +1,8 @@
 # Change log
 
+## Version 0.8.0 (Current development)
+- **BREAKING:** `BaseMvRxViewModel` now requires the debug flag be explicitly set [#196](https://github.com/airbnb/MvRx/pull/196) 
+
 ## Version 0.7.2
 *(2019-1-16)*
 - Fix: mvrx-testing artifact now has the correct group name [#184](https://github.com/airbnb/MvRx/pull/184)
