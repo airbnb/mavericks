@@ -95,17 +95,12 @@ class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
 
         @Synchronized
         fun dequeueGetStateBlock(): ((state: S) -> Unit)? {
-            if (getStateQueue.isEmpty()) return null
-
-            return getStateQueue.removeFirst()
+            return getStateQueue.poll();
         }
 
         @Synchronized
         fun dequeueSetStateBlock(): (S.() -> S)? {
-            // do not allocate empty queue for no-op flushes
-            if (setStateQueue.isEmpty()) return null
-
-            return setStateQueue.removeFirst()
+            return setStateQueue.poll()
         }
     }
 
@@ -124,9 +119,6 @@ class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
         flushQueues()
     }
 
-    /**
-     * Coalesce all updates on the setState queue and clear the queue.
-     */
     private fun flushSetStateQueue() {
         val block = jobs.dequeueSetStateBlock() ?: return
         val newState = block(state)
