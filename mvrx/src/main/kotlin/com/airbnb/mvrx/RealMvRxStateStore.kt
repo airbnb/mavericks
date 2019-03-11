@@ -95,7 +95,7 @@ class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
 
         @Synchronized
         fun dequeueGetStateBlock(): ((state: S) -> Unit)? {
-            return getStateQueue.poll();
+            return getStateQueue.poll()
         }
 
         @Synchronized
