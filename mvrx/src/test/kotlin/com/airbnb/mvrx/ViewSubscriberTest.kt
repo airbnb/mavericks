@@ -144,7 +144,7 @@ class ViewSubscriberTest : BaseTest() {
         assertEquals(2, fragment.selectSubscribeCallCount)
 
         assertEquals(0, fragment.selectSubscribeUniqueOnlyValue)
-        assertEquals(0, fragment.selectSubscribeUniqueOnlyCallCount)
+        assertEquals(1, fragment.selectSubscribeUniqueOnlyCallCount)
     }
 
     @Test
