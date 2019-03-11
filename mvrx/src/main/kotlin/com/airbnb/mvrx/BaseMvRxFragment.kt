@@ -19,7 +19,7 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         mvrxViewModelStore.restoreViewModels(this, savedInstanceState)
-        mvrxPersistedViewId = savedInstanceState?.getString(PERSISTED_VIEW_ID_KEY) ?: UUID.randomUUID().toString()
+        mvrxPersistedViewId = savedInstanceState?.getString(PERSISTED_VIEW_ID_KEY) ?: this::class.java.simpleName + "_" + UUID.randomUUID().toString()
         super.onCreate(savedInstanceState)
     }
 

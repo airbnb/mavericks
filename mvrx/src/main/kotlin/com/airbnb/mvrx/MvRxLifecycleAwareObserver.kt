@@ -26,7 +26,8 @@ internal class MvRxLifecycleAwareObserver<T : Any>(
     private val activeState: Lifecycle.State = DEFAULT_ACTIVE_STATE,
     private val deliveryMode: DeliveryMode = Standard,
     private var lastDeliveredValueFromPriorObserver: T?,
-    private var sourceObserver: Observer<T>?
+    private var sourceObserver: Observer<T>?,
+    private val onDispose: () -> Unit
 ) : AtomicReference<Disposable>(), LifecycleObserver, Observer<T>, Disposable {
 
     constructor(
@@ -37,8 +38,9 @@ internal class MvRxLifecycleAwareObserver<T : Any>(
         onComplete: Action = Functions.EMPTY_ACTION,
         onSubscribe: Consumer<in Disposable> = Functions.emptyConsumer(),
         onError: Consumer<in Throwable> = Functions.ON_ERROR_MISSING,
-        onNext: Consumer<T> = Functions.emptyConsumer()
-    ) : this(owner, activeState, deliveryMode, lastDeliveredValue, LambdaObserver<T>(onNext, onError, onComplete, onSubscribe))
+        onNext: Consumer<T> = Functions.emptyConsumer(),
+        onDispose: () ->  Unit
+    ) : this(owner, activeState, deliveryMode, lastDeliveredValue, LambdaObserver<T>(onNext, onError, onComplete, onSubscribe), onDispose)
 
     private var lastUndeliveredValue: T? = null
     private var lastValue: T? = null
@@ -105,6 +107,7 @@ internal class MvRxLifecycleAwareObserver<T : Any>(
 
     override fun dispose() {
         DisposableHelper.dispose(this)
+        onDispose()
     }
 
     override fun isDisposed(): Boolean {

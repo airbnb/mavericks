@@ -26,8 +26,9 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
 
     /**
      * A globally unique id for this MvRxView. If your MvRxView is being recreated due to a lifecycle event (e.g. rotation)
-     * you should assign a consistent id. Likely this means you should save the id in onSaveInstance state. The
-     * viewId will not be accessed until a subscribe method is called.
+     * you should assign a consistent id. Likely this means you should save the id in onSaveInstance state.
+     * The viewId will not be accessed until a subscribe method is called. Accessing mvrxViewId before calling
+     * super.onCreate() will cause a crash.
      */
     val mvrxViewId: String
 
@@ -45,7 +46,7 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
     /**
      * Subscribes to all state updates for the given viewModel.
      *
-     * @param deliveryMode If [UniqueOnly], when this MvRxView goes from a stopped to start lifecycle a state value
+     * @param deliveryMode If [UniqueOnly] when this MvRxView goes from a stopped to started lifecycle a state value
      * will only be emitted if the state changed. This is useful for transient views that should only
      * be shown once (toasts, poptarts), or logging. Most other views should use false, as when a view is destroyed
      * and recreated the previous state is necessary to recreate the view.

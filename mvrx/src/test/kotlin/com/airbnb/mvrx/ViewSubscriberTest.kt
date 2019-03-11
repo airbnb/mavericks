@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import android.os.Bundle
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import java.lang.IllegalStateException
 
 data class ViewSubscriberState(val foo: Int = 0) : MvRxState
 
@@ -320,5 +321,22 @@ class ViewSubscriberTest : BaseTest() {
         controller.resume()
 
         assertEquals(2, fragment.invalidateCallCount)
+    }
+
+    class DuplicateUniqueSubscriberFragment : BaseMvRxFragment() {
+        private val viewModel: ViewSubscriberViewModel by fragmentViewModel()
+
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            viewModel.subscribe(deliveryMode = uniqueOnly()) {  }
+            viewModel.subscribe(deliveryMode = uniqueOnly()) {  }
+        }
+
+        override fun invalidate() { }
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun duplicateUniqueOnlySubscribeThrowIllegalStateException() {
+         createFragment<DuplicateUniqueSubscriberFragment, TestActivity>()
     }
 }
