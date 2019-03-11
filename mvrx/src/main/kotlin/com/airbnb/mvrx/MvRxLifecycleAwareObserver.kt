@@ -21,26 +21,31 @@ import java.util.concurrent.atomic.AtomicReference
  * than the [activeState] (as defined by [Lifecycle.State.isAtLeast()]) it will deliver values to the [sourceObserver] or [onNext] lambda.
  * When in a lower lifecycle state, the most recent update will be saved, and delivered when active again.
  */
-internal class MvRxLifecycleAwareObserver<T>(
+internal class MvRxLifecycleAwareObserver<T : Any>(
     private var owner: LifecycleOwner?,
     private val activeState: Lifecycle.State = DEFAULT_ACTIVE_STATE,
-    private val alwaysDeliverLastValueWhenUnlocked: Boolean = false,
+    private val deliveryMode: DeliveryMode = Standard,
+    private var lastDeliveredValueFromPriorObserver: T?,
     private var sourceObserver: Observer<T>?
 ) : AtomicReference<Disposable>(), LifecycleObserver, Observer<T>, Disposable {
 
     constructor(
         owner: LifecycleOwner,
         activeState: Lifecycle.State = DEFAULT_ACTIVE_STATE,
-        alwaysDeliverLastValueWhenUnlocked: Boolean = false,
+        deliveryMode: DeliveryMode = Standard,
+        lastDeliveredValue: T? = null,
         onComplete: Action = Functions.EMPTY_ACTION,
         onSubscribe: Consumer<in Disposable> = Functions.emptyConsumer(),
         onError: Consumer<in Throwable> = Functions.ON_ERROR_MISSING,
         onNext: Consumer<T> = Functions.emptyConsumer()
-    ) : this(owner, activeState, alwaysDeliverLastValueWhenUnlocked, LambdaObserver<T>(onNext, onError, onComplete, onSubscribe))
+    ) : this(owner, activeState, deliveryMode, lastDeliveredValue, LambdaObserver<T>(onNext, onError, onComplete, onSubscribe))
 
     private var lastUndeliveredValue: T? = null
     private var lastValue: T? = null
     private val locked = AtomicBoolean(true)
+    private val isUnlocked
+        get() = !locked.get()
+    private val deliveredFirstValue = AtomicBoolean(false)
 
     override fun onSubscribe(d: Disposable) {
         if (DisposableHelper.setOnce(this, d)) {
@@ -72,13 +77,19 @@ internal class MvRxLifecycleAwareObserver<T>(
         }
     }
 
-    override fun onNext(t: T) {
-        if (!locked.get()) {
-            requireSourceObserver().onNext(t)
+    override fun onNext(nextValue: T) {
+        if (isUnlocked) {
+            val suppressRepeatedFirstValue = !deliveredFirstValue.getAndSet(true)
+                && deliveryMode is UniqueOnly
+                && lastDeliveredValueFromPriorObserver == nextValue
+            lastDeliveredValueFromPriorObserver = null
+            if (!suppressRepeatedFirstValue) {
+                requireSourceObserver().onNext(nextValue)
+            }
         } else {
-            lastUndeliveredValue = t
+            lastUndeliveredValue = nextValue
         }
-        lastValue = t
+        lastValue = nextValue
     }
 
     override fun onError(e: Throwable) {
@@ -105,7 +116,12 @@ internal class MvRxLifecycleAwareObserver<T>(
             return
         }
         if (!isDisposed) {
-            val valueToDeliverOnUnlock = if (alwaysDeliverLastValueWhenUnlocked && lastValue != null) lastValue else lastUndeliveredValue
+            val valueToDeliverOnUnlock = when {
+                deliveryMode is UniqueOnly -> lastUndeliveredValue
+                deliveryMode is Standard && lastUndeliveredValue != null -> lastUndeliveredValue
+                deliveryMode is Standard && lastUndeliveredValue == null -> lastValue
+                else -> throw IllegalStateException("Value to deliver on unlock should be exhaustive.")
+            }
             lastUndeliveredValue = null
             if (valueToDeliverOnUnlock != null) {
                 onNext(valueToDeliverOnUnlock)

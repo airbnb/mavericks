@@ -1,5 +1,6 @@
 package com.airbnb.mvrx
 
+import android.content.res.Configuration
 import android.os.Bundle
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -11,7 +12,7 @@ class ViewSubscriberViewModel(initialState: ViewSubscriberState) : TestMvRxViewM
 }
 
 
-class ViewSubscriberFragment : BaseMvRxFragment() {
+open class ViewSubscriberFragment : BaseMvRxFragment() {
     private val viewModel: ViewSubscriberViewModel by fragmentViewModel()
 
     var subscribeCallCount = 0
@@ -28,13 +29,13 @@ class ViewSubscriberFragment : BaseMvRxFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.subscribe { _ -> subscribeCallCount++ }
-        viewModel.subscribe(uniqueOnly = true) { _ -> subscribeUniqueOnlyCallCount++ }
+        viewModel.subscribe(deliveryMode = uniqueOnly("uniqueOnlyId")) { _ -> subscribeUniqueOnlyCallCount++ }
 
         viewModel.selectSubscribe(ViewSubscriberState::foo) {
             selectSubscribeValue = it
             selectSubscribeCallCount++
         }
-        viewModel.selectSubscribe(ViewSubscriberState::foo, uniqueOnly = true) {
+        viewModel.selectSubscribe(ViewSubscriberState::foo, deliveryMode = uniqueOnly("uniqueOnlyId")) {
             selectSubscribeUniqueOnlyValue = it
             selectSubscribeUniqueOnlyCallCount++
         }
@@ -143,7 +144,7 @@ class ViewSubscriberTest : BaseTest() {
         assertEquals(2, fragment.selectSubscribeCallCount)
 
         assertEquals(0, fragment.selectSubscribeUniqueOnlyValue)
-        assertEquals(0, fragment.selectSubscribeUniqueOnlyValue)
+        assertEquals(0, fragment.selectSubscribeUniqueOnlyCallCount)
     }
 
     @Test
@@ -183,6 +184,109 @@ class ViewSubscriberTest : BaseTest() {
 
         assertEquals(2, fragment.subscribeCallCount)
         assertEquals(1, fragment.subscribeUniqueOnlyCallCount)
+    }
+
+    /**
+     * Robolectric always calls paused during it's configuration change. So we have no good place to dispatch
+     * a start change while locked, as calling onPause will unlock the subscriptions. We can achieve this
+     * by changing the state in onStop.
+     */
+    class FragmentWithStateChangeDuringOrientationChange : ViewSubscriberFragment() {
+
+        override fun onStop() {
+            super.onStop()
+            val subscribeCallCountBeforeFooChange = subscribeCallCount
+            val subscribeUniqueOnlyCallCountBeforeFooChange = subscribeUniqueOnlyCallCount
+            this.setFoo(1)
+            assertEquals(subscribeCallCountBeforeFooChange, subscribeCallCount)
+            assertEquals(subscribeUniqueOnlyCallCountBeforeFooChange, subscribeUniqueOnlyCallCount)
+        }
+    }
+
+
+    @Test
+    fun selectSubscribeOnConfigurationChangeWhenStateChanged() {
+        val (controller, fragment) = createFragment<FragmentWithStateChangeDuringOrientationChange, TestActivity>()
+        assertEquals(0, fragment.selectSubscribeValue)
+        assertEquals(1, fragment.selectSubscribeCallCount)
+
+        assertEquals(0, fragment.selectSubscribeUniqueOnlyValue)
+        assertEquals(1, fragment.selectSubscribeUniqueOnlyCallCount)
+
+        // This will set foo to 1. See FragmentWithStateChangeDuringOrientationChange.
+        controller.configurationChange(Configuration().apply {
+            setToDefaults()
+            this.orientation = Configuration.ORIENTATION_LANDSCAPE
+        })
+
+        val recreatedFragment = controller.mvRxFragment<FragmentWithStateChangeDuringOrientationChange>()
+
+        // If unique is not set to true, we always receive an update when unlocked.
+        assertEquals(1, recreatedFragment.selectSubscribeValue)
+        assertEquals(1, recreatedFragment.selectSubscribeCallCount)
+
+        // Even if unique is true, if the state changes we expect a value.
+        assertEquals(1, recreatedFragment.selectSubscribeUniqueOnlyValue)
+        assertEquals(1, recreatedFragment.selectSubscribeUniqueOnlyCallCount)
+    }
+
+    @Test
+    fun selectSubscribeOnConfigurationChangeWhenStateNotChanged() {
+        val (controller, fragment) = createFragment<ViewSubscriberFragment, TestActivity>()
+        assertEquals(0, fragment.selectSubscribeValue)
+        assertEquals(1, fragment.selectSubscribeCallCount)
+
+        assertEquals(0, fragment.selectSubscribeUniqueOnlyValue)
+        assertEquals(1, fragment.selectSubscribeUniqueOnlyCallCount)
+
+        controller.configurationChange(Configuration().apply {
+            setToDefaults()
+            this.orientation = Configuration.ORIENTATION_LANDSCAPE
+        })
+
+        val recreatedFragment = controller.mvRxFragment<ViewSubscriberFragment>()
+
+        // If unique is not set to true, we always receive an update when unlocked.
+        assertEquals(0, recreatedFragment.selectSubscribeValue)
+        assertEquals(1, recreatedFragment.selectSubscribeCallCount)
+
+        assertEquals(-1, recreatedFragment.selectSubscribeUniqueOnlyValue)
+        assertEquals(0, recreatedFragment.selectSubscribeUniqueOnlyCallCount)
+    }
+
+    @Test
+    fun subscribeOnConfigurationChangeWhenStateChanged() {
+        val (controller, fragment) = createFragment<FragmentWithStateChangeDuringOrientationChange, TestActivity>()
+        assertEquals(1, fragment.subscribeCallCount)
+        assertEquals(1, fragment.subscribeUniqueOnlyCallCount)
+
+        // This will set foo to 1. See FragmentWithStateChangeDuringOrientationChange.
+        controller.configurationChange(Configuration().apply {
+            setToDefaults()
+            this.orientation = Configuration.ORIENTATION_LANDSCAPE
+        })
+
+        val recreatedFragment = controller.mvRxFragment<FragmentWithStateChangeDuringOrientationChange>()
+        assertEquals(1, recreatedFragment.subscribeCallCount)
+        // As the value changed, the unique only subscription will be called.
+        assertEquals(1, recreatedFragment.subscribeUniqueOnlyCallCount)
+    }
+
+    @Test
+    fun subscribeOnConfigurationChangeWhenStateNotChanged() {
+        val (controller, fragment) = createFragment<ViewSubscriberFragment, TestActivity>()
+        assertEquals(1, fragment.subscribeCallCount)
+        assertEquals(1, fragment.subscribeUniqueOnlyCallCount)
+
+        controller.configurationChange(Configuration().apply {
+            setToDefaults()
+            this.orientation = Configuration.ORIENTATION_LANDSCAPE
+        })
+
+        val recreatedFragment = controller.mvRxFragment<ViewSubscriberFragment>()
+        assertEquals(1, recreatedFragment.subscribeCallCount)
+        // As the value has not changed, the unique only subscription will not be called.
+        assertEquals(0, recreatedFragment.subscribeUniqueOnlyCallCount)
     }
 
     @Test
