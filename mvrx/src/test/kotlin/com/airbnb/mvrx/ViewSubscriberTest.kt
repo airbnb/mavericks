@@ -465,30 +465,3 @@ class FragmentSubscriberTest : BaseTest() {
          createFragment<DuplicateUniqueSubscriberFragment, TestActivity>(containerId = CONTAINER_ID)
     }
 }
-//
-//class PostCreateFragmentSubscriberTest : BaseTest() {
-//
-//    @Test
-//    fun viewRecreationDoesNotCauseDoubleSubscription() {
-//        val (controller, fragment) = createFragment<PostCreateSubscriberFragment, TestActivity>(containerId = CONTAINER_ID)
-//        assertEquals(1, fragment.subscribeCallCount)
-//
-//        val activity = controller.get()
-//        val activityFragmentManager = activity.supportFragmentManager!!
-//
-//        fragment.setFoo(1)
-//        assertEquals(2, fragment.subscribeCallCount)
-//
-//        controller.configurationChange(Configuration().apply {
-//            setToDefaults()
-//            this.orientation = Configuration.ORIENTATION_LANDSCAPE
-//        })
-//
-//        val recreatedFragment = controller.mvRxFragment<PostCreateSubscriberFragment>()
-//        assertEquals(1, recreatedFragment.subscribeCallCount)
-//        fragment.setFoo(2)
-//        assertEquals(2, recreatedFragment.subscribeCallCount)
-//
-//    }
-//
-//}
