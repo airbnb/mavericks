@@ -64,8 +64,8 @@ object MvRxViewModelProvider {
                     "It must have companion object implementing ${MvRxViewModelFactory::class.java.simpleName} " +
                     "with a create method returning a non-null ViewModel."
             } else {
-                "${viewModelClass.simpleName} must have primary constructor with a " +
-                    "single parameter that takes initial state of ${stateClass.simpleName}."
+                "${viewModelClass::class.java.simpleName} must have primary constructor with a " +
+                    "single non-optional parameter that takes initial state of ${stateClass.simpleName}."
             }
         }
     }
