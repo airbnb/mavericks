@@ -12,7 +12,7 @@ private val pendingInvalidates = HashSet<Int>()
 private val handler = Handler(Looper.getMainLooper(), Handler.Callback { message ->
     val view = message.obj as MvRxView
     pendingInvalidates.remove(System.identityHashCode(view))
-    if (view.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) view.invalidate()
+    if (view.lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) view.invalidate()
     true
 })
 
@@ -22,7 +22,7 @@ private val handler = Handler(Looper.getMainLooper(), Handler.Callback { message
  * When you get a ViewModel with fragmentViewModel, activityViewModel, or existingViewModel, it
  * will automatically subscribe to all state changes in the ViewModel and call [invalidate].
  */
-interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
+interface MvRxView : MvRxViewModelStoreOwner {
 
     /**
      * Override this to supply a globally unique id for this MvRxView. If your MvRxView is being recreated due to
@@ -38,6 +38,22 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      * Override this to handle any state changes from MvRxViewModels created through MvRx Fragment delegates.
      */
     fun invalidate()
+
+    /**
+     * The [LifecycleOwner] which owns the overall lifecycle of this view.
+     */
+    val lifecycleOwner : LifecycleOwner
+
+    /**
+     * The [LifecycleOwner] to use when making new subscriptions. You may want to return different owners depending
+     * on what state your [MvRxView] is in. For fragments, subscriptions made in `onCreate` should use
+     * the fragment's lifecycle owner so that the subscriptions are cleared in `onDestroy`. Subscriptions made in or after
+     * `onCreateView` should use the fragment's _view's_ lifecycle owner so that they are cleared in `onDestroyView`.
+     *
+     * By default this is the same as [lifecycleOwner].
+     */
+    val subscriptionLifecycleOwner
+        get() = lifecycleOwner
 
     fun postInvalidate() {
         if (pendingInvalidates.add(System.identityHashCode(this@MvRxView))) {
@@ -57,7 +73,7 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      *
      * Default: [RedeliverOnStart].
      */
-    fun <S : MvRxState> BaseMvRxViewModel<S>.subscribe(deliveryMode: DeliveryMode = RedeliverOnStart, subscriber: (S) -> Unit) = subscribe(this@MvRxView, deliveryMode, subscriber)
+    fun <S : MvRxState> BaseMvRxViewModel<S>.subscribe(deliveryMode: DeliveryMode = RedeliverOnStart, subscriber: (S) -> Unit) = subscribe(this@MvRxView.subscriptionLifecycleOwner, deliveryMode, subscriber)
 
     /**
      * Subscribes to state changes for only a specific property and calls the subscribe with
@@ -76,7 +92,7 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
         prop1: KProperty1<S, A>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A) -> Unit
-    ) = selectSubscribe(this@MvRxView, prop1, deliveryMode, subscriber)
+    ) = selectSubscribe(this@MvRxView.subscriptionLifecycleOwner, prop1, deliveryMode, subscriber)
 
     /**
      * Subscribe to changes in an async property. There are optional parameters for onSuccess
@@ -96,7 +112,7 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
         deliveryMode: DeliveryMode = RedeliverOnStart,
         onFail: ((Throwable) -> Unit)? = null,
         onSuccess: ((T) -> Unit)? = null
-    ) = asyncSubscribe(this@MvRxView, asyncProp, deliveryMode, onFail, onSuccess)
+    ) = asyncSubscribe(this@MvRxView.subscriptionLifecycleOwner, asyncProp, deliveryMode, onFail, onSuccess)
 
     /**
      * Subscribes to state changes for two properties.
@@ -115,7 +131,7 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
         prop2: KProperty1<S, B>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A, B) -> Unit
-    ) = selectSubscribe(this@MvRxView, prop1, prop2, deliveryMode, subscriber)
+    ) = selectSubscribe(this@MvRxView.subscriptionLifecycleOwner, prop1, prop2, deliveryMode, subscriber)
 
     /**
      * Subscribes to state changes for three properties.
@@ -135,7 +151,7 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
         prop3: KProperty1<S, C>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A, B, C) -> Unit
-    ) = selectSubscribe(this@MvRxView, prop1, prop2, prop3, deliveryMode, subscriber)
+    ) = selectSubscribe(this@MvRxView.subscriptionLifecycleOwner, prop1, prop2, prop3, deliveryMode, subscriber)
 
     /**
      * Subscribes to state changes for four properties.
@@ -156,7 +172,7 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
         prop4: KProperty1<S, D>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A, B, C, D) -> Unit
-    ) = selectSubscribe(this@MvRxView, prop1, prop2, prop3, prop4, deliveryMode, subscriber)
+    ) = selectSubscribe(this@MvRxView.subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, deliveryMode, subscriber)
 
     /**
      * Return a [UniqueOnly] delivery mode with a unique id for this fragment. In rare circumstances, if you

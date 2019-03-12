@@ -68,9 +68,6 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     internal val state: S
         get() = stateStore.state
 
-    /**
-     * Override this to provide the initial state.
-     */
     @CallSuper
     override fun onCleared() {
         super.onCleared()

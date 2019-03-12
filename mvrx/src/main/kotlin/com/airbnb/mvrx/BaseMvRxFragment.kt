@@ -1,5 +1,6 @@
 package com.airbnb.mvrx
 
+import android.arch.lifecycle.LifecycleOwner
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import java.util.*
@@ -22,6 +23,12 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
         mvrxPersistedViewId = savedInstanceState?.getString(PERSISTED_VIEW_ID_KEY) ?: this::class.java.simpleName + "_" + UUID.randomUUID().toString()
         super.onCreate(savedInstanceState)
     }
+
+    override val lifecycleOwner: LifecycleOwner
+        get() = this
+
+    override val subscriptionLifecycleOwner: LifecycleOwner
+        get() = this.viewLifecycleOwnerLiveData.value ?: lifecycleOwner
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
