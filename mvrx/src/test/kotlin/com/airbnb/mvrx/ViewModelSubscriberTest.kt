@@ -636,7 +636,7 @@ class ViewModelSubscriberTest : BaseTest() {
         owner.lifecycle.markState(Lifecycle.State.STARTED)
 
         var callCount = 0
-        viewModel.subscribe(owner, uniqueOnly = true) {
+        viewModel.subscribe(owner, deliveryMode = UniqueOnly("id")) {
             callCount++
         }
 
@@ -654,7 +654,7 @@ class ViewModelSubscriberTest : BaseTest() {
         owner.lifecycle.markState(Lifecycle.State.STARTED)
 
         var callCount = 0
-        viewModel.subscribe(owner, uniqueOnly = true) {
+        viewModel.subscribe(owner, deliveryMode = UniqueOnly("id")) {
             callCount++
         }
 
