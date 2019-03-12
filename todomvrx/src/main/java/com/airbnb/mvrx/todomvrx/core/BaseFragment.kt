@@ -33,6 +33,11 @@ abstract class BaseFragment : BaseMvRxFragment() {
     // Used to keep track of task changes to determine if we should show a snackbar.
     private var oldTasks: Tasks? = null
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        epoxyController.onRestoreInstanceState(savedInstanceState)
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
         inflater.inflate(R.layout.fragment_base, container, false).apply {
             coordinatorLayout = findViewById(R.id.coordinator_layout)
@@ -40,6 +45,11 @@ abstract class BaseFragment : BaseMvRxFragment() {
             recyclerView = findViewById(R.id.recycler_view)
             recyclerView.setController(epoxyController)
         }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        epoxyController.onSaveInstanceState(outState)
+    }
 
     @CallSuper
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
