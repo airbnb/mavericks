@@ -25,10 +25,12 @@ private val handler = Handler(Looper.getMainLooper(), Handler.Callback { message
 interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
 
     /**
-     * A globally unique id for this MvRxView. If your MvRxView is being recreated due to a lifecycle event (e.g. rotation)
-     * you should assign a consistent id. Likely this means you should save the id in onSaveInstance state.
-     * The viewId will not be accessed until a subscribe method is called. Accessing mvrxViewId before calling
-     * super.onCreate() will cause a crash.
+     * Override this to supply a globally unique id for this MvRxView. If your MvRxView is being recreated due to
+     * a lifecycle event (e.g. rotation) you should assign a consistent id. Likely this means you should save the id
+     * in onSaveInstance state. The viewId will not be accessed until a subscribe method is called.
+     * Accessing mvrxViewId before calling super.onCreate() will cause a crash.
+     *
+     * For an example implementation see [BaseMvRxFragment].
      */
     val mvrxViewId: String
 
@@ -53,9 +55,9 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      *
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
-     * Default: [Standard].
+     * Default: [RedeliverOnStart].
      */
-    fun <S : MvRxState> BaseMvRxViewModel<S>.subscribe(deliveryMode: DeliveryMode = Standard, subscriber: (S) -> Unit) = subscribe(this@MvRxView, deliveryMode, subscriber)
+    fun <S : MvRxState> BaseMvRxViewModel<S>.subscribe(deliveryMode: DeliveryMode = RedeliverOnStart, subscriber: (S) -> Unit) = subscribe(this@MvRxView, deliveryMode, subscriber)
 
     /**
      * Subscribes to state changes for only a specific property and calls the subscribe with
@@ -68,11 +70,11 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      *
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
-     * Default: [Standard].
+     * Default: [RedeliverOnStart].
      */
     fun <S : MvRxState, A> BaseMvRxViewModel<S>.selectSubscribe(
         prop1: KProperty1<S, A>,
-        deliveryMode: DeliveryMode = Standard,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A) -> Unit
     ) = selectSubscribe(this@MvRxView, prop1, deliveryMode, subscriber)
 
@@ -87,11 +89,11 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      *
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
-     * Default: [Standard].
+     * Default: [RedeliverOnStart].
      */
     fun <S : MvRxState, T> BaseMvRxViewModel<S>.asyncSubscribe(
         asyncProp: KProperty1<S, Async<T>>,
-        deliveryMode: DeliveryMode = Standard,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
         onFail: ((Throwable) -> Unit)? = null,
         onSuccess: ((T) -> Unit)? = null
     ) = asyncSubscribe(this@MvRxView, asyncProp, deliveryMode, onFail, onSuccess)
@@ -106,12 +108,12 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      *
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
-     * Default: [Standard].
+     * Default: [RedeliverOnStart].
      */
     fun <S : MvRxState, A, B> BaseMvRxViewModel<S>.selectSubscribe(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
-        deliveryMode: DeliveryMode = Standard,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A, B) -> Unit
     ) = selectSubscribe(this@MvRxView, prop1, prop2, deliveryMode, subscriber)
 
@@ -125,13 +127,13 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      *
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
-     * Default: [Standard].
+     * Default: [RedeliverOnStart].
      */
     fun <S : MvRxState, A, B, C> BaseMvRxViewModel<S>.selectSubscribe(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
-        deliveryMode: DeliveryMode = Standard,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A, B, C) -> Unit
     ) = selectSubscribe(this@MvRxView, prop1, prop2, prop3, deliveryMode, subscriber)
 
@@ -145,14 +147,14 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      *
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
-     * Default: [Standard].
+     * Default: [RedeliverOnStart].
      */
     fun <S : MvRxState, A, B, C, D> BaseMvRxViewModel<S>.selectSubscribe(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
         prop4: KProperty1<S, D>,
-        deliveryMode: DeliveryMode = Standard,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A, B, C, D) -> Unit
     ) = selectSubscribe(this@MvRxView, prop1, prop2, prop3, prop4, deliveryMode, subscriber)
 

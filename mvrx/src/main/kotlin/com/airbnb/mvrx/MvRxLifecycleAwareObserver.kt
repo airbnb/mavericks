@@ -24,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference
 internal class MvRxLifecycleAwareObserver<T : Any>(
     private var owner: LifecycleOwner?,
     private val activeState: Lifecycle.State = DEFAULT_ACTIVE_STATE,
-    private val deliveryMode: DeliveryMode = Standard,
+    private val deliveryMode: DeliveryMode = RedeliverOnStart,
     private var lastDeliveredValueFromPriorObserver: T?,
     private var sourceObserver: Observer<T>?,
     private val onDispose: () -> Unit
@@ -33,7 +33,7 @@ internal class MvRxLifecycleAwareObserver<T : Any>(
     constructor(
         owner: LifecycleOwner,
         activeState: Lifecycle.State = DEFAULT_ACTIVE_STATE,
-        deliveryMode: DeliveryMode = Standard,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
         lastDeliveredValue: T? = null,
         onComplete: Action = Functions.EMPTY_ACTION,
         onSubscribe: Consumer<in Disposable> = Functions.emptyConsumer(),
@@ -47,7 +47,6 @@ internal class MvRxLifecycleAwareObserver<T : Any>(
     private val locked = AtomicBoolean(true)
     private val isUnlocked
         get() = !locked.get()
-    private val deliveredFirstValue = AtomicBoolean(false)
 
     override fun onSubscribe(d: Disposable) {
         if (DisposableHelper.setOnce(this, d)) {
@@ -81,9 +80,7 @@ internal class MvRxLifecycleAwareObserver<T : Any>(
 
     override fun onNext(nextValue: T) {
         if (isUnlocked) {
-            val suppressRepeatedFirstValue = !deliveredFirstValue.getAndSet(true)
-                && deliveryMode is UniqueOnly
-                && lastDeliveredValueFromPriorObserver == nextValue
+            val suppressRepeatedFirstValue = deliveryMode is UniqueOnly && lastDeliveredValueFromPriorObserver == nextValue
             lastDeliveredValueFromPriorObserver = null
             if (!suppressRepeatedFirstValue) {
                 requireSourceObserver().onNext(nextValue)
@@ -121,8 +118,8 @@ internal class MvRxLifecycleAwareObserver<T : Any>(
         if (!isDisposed) {
             val valueToDeliverOnUnlock = when {
                 deliveryMode is UniqueOnly -> lastUndeliveredValue
-                deliveryMode is Standard && lastUndeliveredValue != null -> lastUndeliveredValue
-                deliveryMode is Standard && lastUndeliveredValue == null -> lastValue
+                deliveryMode is RedeliverOnStart && lastUndeliveredValue != null -> lastUndeliveredValue
+                deliveryMode is RedeliverOnStart && lastUndeliveredValue == null -> lastValue
                 else -> throw IllegalStateException("Value to deliver on unlock should be exhaustive.")
             }
             lastUndeliveredValue = null
