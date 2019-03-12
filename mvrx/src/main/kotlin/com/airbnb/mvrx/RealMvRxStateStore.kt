@@ -82,11 +82,11 @@ class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
     /**
      * Job scheduling algorithm
      * We use double-queue design to prioritize `setState` blocks over `getState` blocks.
-     * `setStateQueue` has higher priority and needs to be flushed before taking tasks from `setStateQueue`.
+     * `setStateQueue` has higher priority and needs to be flushed before taking tasks from `getStateQueue`.
      * If a `getState` block enqueues a `setState` block, it should be executed before executing the next `getState` block.
      * This is to prevent a race condition when `getState` itself enqueues a `setState`, for example:
      * ```
-     * withState { state ->
+     * getState { state ->
      *   if (state.isLoading) return
      *   setState { state ->
      *     state.copy(isLoading = true)
@@ -94,7 +94,7 @@ class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
      *   // make a network call
      * }
      * ```
-     * In the above example, we have to run the inner `setState` before the next `withState`.
+     * In the above example, we have to run the inner `setState` before the next `getState`.
      * Otherwise if we call this code twice consecutively, we could end up with making network call twice.
      *
      * Let's simplify the scenario as following:
