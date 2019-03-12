@@ -22,7 +22,7 @@ private val handler = Handler(Looper.getMainLooper(), Handler.Callback { message
  * When you get a ViewModel with fragmentViewModel, activityViewModel, or existingViewModel, it
  * will automatically subscribe to all state changes in the ViewModel and call [invalidate].
  */
-interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner  {
+interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
 
     /**
      * Override this to supply a globally unique id for this MvRxView. If your MvRxView is being recreated due to
