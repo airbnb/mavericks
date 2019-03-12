@@ -16,7 +16,7 @@ android {
     }
     buildToolsVersion "$buildToolsVersion"
     buildTypes {
-        debug {
+        release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.pro'
