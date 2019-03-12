@@ -24,6 +24,10 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
         super.onCreate(savedInstanceState)
     }
 
+    /**
+     * Fragments should override the subscriptionLifecycle owner so that subscriptions made after onCreate
+     * are properly disposed as fragments are moved from/to the backstack.
+     */
     override val subscriptionLifecycleOwner: LifecycleOwner
         get() = this.viewLifecycleOwnerLiveData.value ?: this
 
