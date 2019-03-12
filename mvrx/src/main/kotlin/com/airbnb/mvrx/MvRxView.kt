@@ -12,7 +12,7 @@ private val pendingInvalidates = HashSet<Int>()
 private val handler = Handler(Looper.getMainLooper(), Handler.Callback { message ->
     val view = message.obj as MvRxView
     pendingInvalidates.remove(System.identityHashCode(view))
-    if (view.lifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) view.invalidate()
+    if (view.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) view.invalidate()
     true
 })
 
@@ -22,7 +22,7 @@ private val handler = Handler(Looper.getMainLooper(), Handler.Callback { message
  * When you get a ViewModel with fragmentViewModel, activityViewModel, or existingViewModel, it
  * will automatically subscribe to all state changes in the ViewModel and call [invalidate].
  */
-interface MvRxView : MvRxViewModelStoreOwner {
+interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner  {
 
     /**
      * Override this to supply a globally unique id for this MvRxView. If your MvRxView is being recreated due to
@@ -40,11 +40,6 @@ interface MvRxView : MvRxViewModelStoreOwner {
     fun invalidate()
 
     /**
-     * The [LifecycleOwner] which owns the overall lifecycle of this view.
-     */
-    val lifecycleOwner : LifecycleOwner
-
-    /**
      * The [LifecycleOwner] to use when making new subscriptions. You may want to return different owners depending
      * on what state your [MvRxView] is in. For fragments, subscriptions made in `onCreate` should use
      * the fragment's lifecycle owner so that the subscriptions are cleared in `onDestroy`. Subscriptions made in or after
@@ -53,7 +48,7 @@ interface MvRxView : MvRxViewModelStoreOwner {
      * By default this is the same as [lifecycleOwner].
      */
     val subscriptionLifecycleOwner
-        get() = lifecycleOwner
+        get() = this
 
     fun postInvalidate() {
         if (pendingInvalidates.add(System.identityHashCode(this@MvRxView))) {
