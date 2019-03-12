@@ -45,9 +45,9 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner  {
      * the fragment's lifecycle owner so that the subscriptions are cleared in `onDestroy`. Subscriptions made in or after
      * `onCreateView` should use the fragment's _view's_ lifecycle owner so that they are cleared in `onDestroyView`.
      *
-     * By default this is the same as [lifecycleOwner].
+     * By default this is the same as the view's standard lifecycle owner.
      */
-    val subscriptionLifecycleOwner
+    val subscriptionLifecycleOwner : LifecycleOwner
         get() = this
 
     fun postInvalidate() {

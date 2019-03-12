@@ -24,11 +24,8 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
         super.onCreate(savedInstanceState)
     }
 
-    override val lifecycleOwner: LifecycleOwner
-        get() = this
-
     override val subscriptionLifecycleOwner: LifecycleOwner
-        get() = this.viewLifecycleOwnerLiveData.value ?: lifecycleOwner
+        get() = this.viewLifecycleOwnerLiveData.value ?: this
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
