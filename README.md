@@ -14,7 +14,7 @@ data class HelloWorldState(val title: String = "Hello World") : MvRxState
 /**
  * Refer to the wiki for how to set up your base ViewModel.
  */
-class HelloWorldViewModel(initialState: HelloWorldState) : MyBaseMvRxViewModel<HelloWorldState>(initialState) {
+class HelloWorldViewModel(initialState: HelloWorldState) : MyBaseMvRxViewModel<HelloWorldState>(initialState, debugMode = BuildConfig.DEBUG) {
     fun getMoreExcited() = setState { copy(title = "$title!") }
 }
 
@@ -38,7 +38,7 @@ Gradle is the only supported build configuration, so just add the dependency to 
 
 ```groovy
 dependencies {
-  implementation 'com.airbnb.android:mvrx:0.7.0'
+  implementation 'com.airbnb.android:mvrx:0.7.2'
 }
 ```
 The latest version of mvrx is [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx)

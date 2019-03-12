@@ -156,15 +156,15 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewMod
                 callCount++
                 assertEquals(when (callCount) {
                     1 -> 0
-                    2 -> 2
+                    2 -> 1
+                    3 -> 2
                     else -> throw IllegalArgumentException("Unexpected call count $callCount")
                 }, it)
             }
-            // These will be coalesced into one update
             setState { copy(foo = 1) }
             setState { copy(foo = 2) }
         }
-        assertEquals(2, callCount)
+        assertEquals(3, callCount)
     }
 
     fun testObservableFail() {
@@ -636,7 +636,7 @@ class ViewModelSubscriberTest : BaseTest() {
         owner.lifecycle.markState(Lifecycle.State.STARTED)
 
         var callCount = 0
-        viewModel.subscribe(owner, uniqueOnly = true) {
+        viewModel.subscribe(owner, deliveryMode = UniqueOnly("id")) {
             callCount++
         }
 
@@ -654,7 +654,7 @@ class ViewModelSubscriberTest : BaseTest() {
         owner.lifecycle.markState(Lifecycle.State.STARTED)
 
         var callCount = 0
-        viewModel.subscribe(owner, uniqueOnly = true) {
+        viewModel.subscribe(owner, deliveryMode = UniqueOnly("id")) {
             callCount++
         }
 
