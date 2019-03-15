@@ -1,6 +1,6 @@
 package com.airbnb.mvrx
 
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import org.junit.Test
 
 data class DefaultParamState(val foo: String = "") : MvRxState

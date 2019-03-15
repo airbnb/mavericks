@@ -1,8 +1,8 @@
 package com.airbnb.mvrx
 
 import android.app.Application
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 
 /**
  * Implement this on your ViewModel's companion object for hooks into state creation and ViewModel creation. For example, if you need access

@@ -1,9 +1,9 @@
 package com.airbnb.mvrx
 
-import android.arch.lifecycle.ViewModelProviders
-import android.support.annotation.RestrictTo
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentActivity
+import androidx.lifecycle.ViewModelProviders
+import androidx.annotation.RestrictTo
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import kotlin.reflect.full.primaryConstructor
 
 /**

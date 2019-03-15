@@ -1,6 +1,6 @@
 package com.airbnb.mvrx
 
-import android.arch.lifecycle.Lifecycle
+import androidx.lifecycle.Lifecycle
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
