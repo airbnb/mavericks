@@ -1,8 +1,8 @@
 package com.airbnb.mvrx
 
-import android.arch.lifecycle.LifecycleOwner
 import android.os.Bundle
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
 import java.util.*
 
 /**
