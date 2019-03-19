@@ -1,10 +1,10 @@
 package com.airbnb.mvrx
 
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModel
+import android.util.Log
 import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
-import android.util.Log
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModel
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -68,9 +68,6 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     internal val state: S
         get() = stateStore.state
 
-    /**
-     * Override this to provide the initial state.
-     */
     @CallSuper
     override fun onCleared() {
         super.onCleared()
@@ -520,7 +517,8 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
                 if (activeSubscriptions.contains(deliveryMode.subscriptionId)) {
                     throw IllegalStateException("Subscribing with a duplicate subscription id: ${deliveryMode.subscriptionId}. " +
                         "If you have multiple uniqueOnly subscriptions in a MvRx view that listen to the same properties " +
-                        "you must use a custom subscription id.")
+                        "you must use a custom subscription id. If you are using a custom MvRxView, make sure you are using the proper" +
+                        "lifecycle owner. See BaseMvRxFragment for an example.")
                 }
                 activeSubscriptions.add(deliveryMode.subscriptionId)
                 lastDeliveredStates[deliveryMode.subscriptionId] as? T

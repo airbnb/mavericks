@@ -2,6 +2,7 @@ package com.airbnb.mvrx
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
 import java.util.*
 
 /**
@@ -22,6 +23,13 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
         mvrxPersistedViewId = savedInstanceState?.getString(PERSISTED_VIEW_ID_KEY) ?: this::class.java.simpleName + "_" + UUID.randomUUID().toString()
         super.onCreate(savedInstanceState)
     }
+
+    /**
+     * Fragments should override the subscriptionLifecycle owner so that subscriptions made after onCreate
+     * are properly disposed as fragments are moved from/to the backstack.
+     */
+    override val subscriptionLifecycleOwner: LifecycleOwner
+        get() = this.viewLifecycleOwnerLiveData.value ?: this
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
