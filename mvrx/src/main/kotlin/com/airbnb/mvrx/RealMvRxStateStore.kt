@@ -78,6 +78,67 @@ class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
         flushQueueSubject.onNext(Unit)
     }
 
+
+    /**
+     * Job scheduling algorithm
+     * We use double-queue design to prioritize `setState` blocks over `getState` blocks.
+     * `setStateQueue` has higher priority and needs to be flushed before taking tasks from `getStateQueue`.
+     * If a `getState` block enqueues a `setState` block, it should be executed before executing the next `getState` block.
+     * This is to prevent a race condition when `getState` itself enqueues a `setState`, for example:
+     * ```
+     * getState { state ->
+     *   if (state.isLoading) return
+     *   setState { state ->
+     *     state.copy(isLoading = true)
+     *   }
+     *   // make a network call
+     * }
+     * ```
+     * In the above example, we have to run the inner `setState` before the next `getState`.
+     * Otherwise if we call this code twice consecutively, we could end up with making network call twice.
+     *
+     * Let's simplify the scenario as following:
+     * ```
+     * getStateA {
+     *   setStateA {}
+     * }
+     * getStateB {
+     *   setStateB {}
+     * }
+     * ```
+     * With a single queue design, the execution order is the same as enqueuing order.
+     * i.e. `getStateA -> getStateB -> setStateA -> setStateB`
+     *
+     * With our double queue design, what is happening is:
+     *
+     * 1) after both `getState`s are enqueued
+     *   - setStateQueue: []
+     *   - getStateQueue: [A, B]
+     *
+     * 2) after first `getState` is executed
+     *   - setStateQueue: [A]
+     *   - getStateQueue: [B]
+     * 3) since reducer has higher priority, we execute it
+     *   - setStateQueue: []
+     *   - getStateQueue: [B]
+     * 4) setStateB is executed
+     *  - setStateQueue: []
+     *  - getStateQueue: []
+     *
+     * The execution order is `getStateA->setStateA->getStateB ->setStateB`
+     *
+     * Note that the race condition can also be solved by not introducing the `getState` API, as following:
+     * ```
+     * setState { state -> // `setState` is simply a more "powerful" version of `getState`
+     *   if (state.isLoading) return
+     *   state.copy(isLoading = true)
+     *   // make a network call
+     * }
+     * ```
+     * The above code will run without race condition using single queue design.
+     * However, we think it's valuable to have a separate `getState` API,
+     * as it has a different semantic meaning and improves readability.
+     */
     private class Jobs<S> {
 
         private val getStateQueue = LinkedList<(state: S) -> Unit>()
@@ -99,10 +160,16 @@ class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
         }
 
         @Synchronized
-        fun dequeueSetStateBlock(): (S.() -> S)? {
-            return setStateQueue.poll()
+        fun dequeueAllSetStateBlocks(): List<(S.() -> S)>? {
+            // do not allocate empty queue for no-op flushes
+            if (setStateQueue.isEmpty()) return null
+
+            val queue = setStateQueue
+            setStateQueue = LinkedList()
+            return queue
         }
     }
+
 
     /**
      * Flushes the setState and getState queues.
@@ -120,10 +187,13 @@ class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
     }
 
     private fun flushSetStateQueue() {
-        val block = jobs.dequeueSetStateBlock() ?: return
-        val newState = block(state)
-        if (newState != state) {
-            subject.onNext(newState)
+        val blocks = jobs.dequeueAllSetStateBlocks() ?: return
+        for (block in blocks) {
+            val newState = state.block()
+            // do not coalesce state change. it's more expected to notify for every state change.
+            if (newState != state) {
+                subject.onNext(newState)
+            }
         }
     }
 
