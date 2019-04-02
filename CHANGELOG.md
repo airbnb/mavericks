@@ -1,6 +1,14 @@
 # Change log
 
-## Version 0.8.0 (Current development)
+## Version 1.0.0
+- MvRx now requires androidx.
+- Fix: prevented duplicate subscriptions when subscriptions are made after onCreate. [#210](https://github.com/airbnb/MvRx/pull/210)
+- Respect uniqueOnly across configuration changes. [#207](https://github.com/airbnb/MvRx/pull/207)
+  - This comes with additional code in BaseMvRxFragment. If you are not using BaseMvRxFragment, please refer to [#207](https://github.com/airbnb/MvRx/pull/207) for the additional required code.
+- Remove state coalescing. [#206](https://github.com/airbnb/MvRx/pull/207)
+- Require that all MvRxViewModels actually provide a value for debugMode. [#196](https://github.com/airbnb/MvRx/pull/207)
+
+## Version 0.8.0
 - **BREAKING:** `BaseMvRxViewModel` now requires the debug flag be explicitly set [#196](https://github.com/airbnb/MvRx/pull/196) 
 
 ## Version 0.7.2
