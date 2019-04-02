@@ -13,7 +13,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
-import java.util.*
+import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KProperty1
 import kotlin.reflect.KVisibility
@@ -98,12 +98,16 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
                         .filter { it.isAccessible }
                         .firstOrNull { it.get(firstState) != it.get(secondState) }
                     if (changedProp != null) {
-                        throw IllegalArgumentException("Your reducer must be pure! ${changedProp.name} changed from " +
-                            "${changedProp.get(firstState)} to ${changedProp.get(secondState)}. " +
-                            "Ensure that your state properties properly implement hashCode.")
+                        throw IllegalArgumentException(
+                            "Your reducer must be pure! ${changedProp.name} changed from " +
+                                "${changedProp.get(firstState)} to ${changedProp.get(secondState)}. " +
+                                "Ensure that your state properties properly implement hashCode."
+                        )
                     } else {
-                        throw java.lang.IllegalArgumentException("Your reducer must be pure! A private property was modified. " +
-                            "Ensure that your state properties properly implement hashCode. $firstState -> $secondState")
+                        throw java.lang.IllegalArgumentException(
+                            "Your reducer must be pure! A private property was modified. " +
+                                "Ensure that your state properties properly implement hashCode. $firstState -> $secondState"
+                        )
                     }
                 }
                 mutableStateChecker.onStateChanged(firstState)
@@ -515,10 +519,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             deliveryMode = deliveryMode,
             lastDeliveredValue = if (deliveryMode is UniqueOnly) {
                 if (activeSubscriptions.contains(deliveryMode.subscriptionId)) {
-                    throw IllegalStateException("Subscribing with a duplicate subscription id: ${deliveryMode.subscriptionId}. " +
-                        "If you have multiple uniqueOnly subscriptions in a MvRx view that listen to the same properties " +
-                        "you must use a custom subscription id. If you are using a custom MvRxView, make sure you are using the proper" +
-                        "lifecycle owner. See BaseMvRxFragment for an example.")
+                    throw IllegalStateException(
+                        "Subscribing with a duplicate subscription id: ${deliveryMode.subscriptionId}. " +
+                            "If you have multiple uniqueOnly subscriptions in a MvRx view that listen to the same properties " +
+                            "you must use a custom subscription id. If you are using a custom MvRxView, make sure you are using the proper" +
+                            "lifecycle owner. See BaseMvRxFragment for an example."
+                    )
                 }
                 activeSubscriptions.add(deliveryMode.subscriptionId)
                 lastDeliveredStates[deliveryMode.subscriptionId] as? T
@@ -556,7 +562,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
  */
 sealed class DeliveryMode {
 
-    internal fun appendPropertiesToId(vararg properties: KProperty1<*, *>) : DeliveryMode {
+    internal fun appendPropertiesToId(vararg properties: KProperty1<*, *>): DeliveryMode {
         return when (this) {
             is RedeliverOnStart -> RedeliverOnStart
             is UniqueOnly -> UniqueOnly(subscriptionId + "_" + properties.joinToString(",") { it.name })

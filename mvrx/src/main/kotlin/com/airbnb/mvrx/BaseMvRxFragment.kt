@@ -3,7 +3,7 @@ package com.airbnb.mvrx
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
-import java.util.*
+import java.util.UUID
 
 /**
  * Make your base Fragment class extend this to get MvRx functionality.

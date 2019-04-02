@@ -78,7 +78,6 @@ class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
         flushQueueSubject.onNext(Unit)
     }
 
-
     /**
      * Job scheduling algorithm
      * We use double-queue design to prioritize `setState` blocks over `getState` blocks.
@@ -169,7 +168,6 @@ class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
             return queue
         }
     }
-
 
     /**
      * Flushes the setState and getState queues.

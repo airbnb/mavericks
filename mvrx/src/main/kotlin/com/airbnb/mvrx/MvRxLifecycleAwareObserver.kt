@@ -39,7 +39,7 @@ internal class MvRxLifecycleAwareObserver<T : Any>(
         onSubscribe: Consumer<in Disposable> = Functions.emptyConsumer(),
         onError: Consumer<in Throwable> = Functions.ON_ERROR_MISSING,
         onNext: Consumer<T> = Functions.emptyConsumer(),
-        onDispose: () ->  Unit
+        onDispose: () -> Unit
     ) : this(owner, activeState, deliveryMode, lastDeliveredValue, LambdaObserver<T>(onNext, onError, onComplete, onSubscribe), onDispose)
 
     private var lastUndeliveredValue: T? = null

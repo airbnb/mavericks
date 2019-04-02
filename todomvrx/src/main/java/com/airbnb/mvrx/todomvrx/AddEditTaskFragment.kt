@@ -19,7 +19,6 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.os.Parcelable
-import com.google.android.material.snackbar.Snackbar
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.navigation.fragment.findNavController
@@ -31,11 +30,10 @@ import com.airbnb.mvrx.todomvrx.core.MvRxViewModel
 import com.airbnb.mvrx.todomvrx.data.Task
 import com.airbnb.mvrx.todomvrx.data.findTask
 import com.airbnb.mvrx.todomvrx.todoapp.R
-import com.airbnb.mvrx.todomvrx.util.asSequence
 import com.airbnb.mvrx.todomvrx.util.simpleController
-import com.airbnb.mvrx.todomvrx.views.AddEditView
 import com.airbnb.mvrx.todomvrx.views.addEditView
 import com.airbnb.mvrx.withState
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.android.parcel.Parcelize
 
 @SuppressLint("ParcelCreator")

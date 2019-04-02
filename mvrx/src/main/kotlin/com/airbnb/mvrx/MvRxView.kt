@@ -1,10 +1,10 @@
 package com.airbnb.mvrx
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
 import kotlin.reflect.KProperty1
 
 // Set of MvRxView identity hash codes that have a pending invalidate.
@@ -53,7 +53,7 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      *
      * By default [subscriptionLifecycleOwner] is the same as the MvRxView's standard lifecycle owner.
      */
-    val subscriptionLifecycleOwner : LifecycleOwner
+    val subscriptionLifecycleOwner: LifecycleOwner
         get() = this
 
     fun postInvalidate() {
@@ -74,7 +74,8 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      *
      * Default: [RedeliverOnStart].
      */
-    fun <S : MvRxState> BaseMvRxViewModel<S>.subscribe(deliveryMode: DeliveryMode = RedeliverOnStart, subscriber: (S) -> Unit) = subscribe(this@MvRxView.subscriptionLifecycleOwner, deliveryMode, subscriber)
+    fun <S : MvRxState> BaseMvRxViewModel<S>.subscribe(deliveryMode: DeliveryMode = RedeliverOnStart, subscriber: (S) -> Unit) =
+        subscribe(this@MvRxView.subscriptionLifecycleOwner, deliveryMode, subscriber)
 
     /**
      * Subscribes to state changes for only a specific property and calls the subscribe with
@@ -183,7 +184,7 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      * @param An additional custom id to identify this subscription. Only necessary if there are two subscriptions
      * in this fragment with exact same properties (i.e. two subscribes, or two selectSubscribes with the same properties).
      */
-    fun uniqueOnly(customId: String? = null) : UniqueOnly {
+    fun uniqueOnly(customId: String? = null): UniqueOnly {
         return UniqueOnly(listOfNotNull(mvrxViewId, customId).joinToString("_"))
     }
 }
