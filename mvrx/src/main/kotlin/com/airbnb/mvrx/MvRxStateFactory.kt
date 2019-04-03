@@ -5,8 +5,8 @@ import androidx.annotation.RestrictTo
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 interface MvRxStateFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> {
 
-    fun createInitialState(viewModelClass: Class<VM>,
-                           stateClass: Class<S>,
+    fun createInitialState(viewModelClass: Class<out VM>,
+                           stateClass: Class<out S>,
                            viewModelContext: ViewModelContext,
                            stateRestorer: (S) -> S): S
 }
@@ -14,8 +14,8 @@ interface MvRxStateFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> {
 internal class RealMvRxStateFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> : MvRxStateFactory<VM, S> {
 
     override fun createInitialState(
-        viewModelClass: Class<VM>,
-        stateClass: Class<S>,
+        viewModelClass: Class<out VM>,
+        stateClass: Class<out S>,
         viewModelContext: ViewModelContext,
         stateRestorer: (S) -> S
     ): S {
@@ -29,18 +29,17 @@ internal class RealMvRxStateFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> : 
  * Searches the companion of [viewModelClass] for an initialState function, and uses it to create the initial state.
  * If no such function exists, null is returned.
  */
+@Suppress("UNCHECKED_CAST")
 internal fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createStateFromCompanionFactory(
     viewModelClass: Class<out VM>,
     viewModelContext: ViewModelContext
 ): S? {
     return viewModelClass.factoryCompanion()?.let { factoryClass ->
         try {
-            @Suppress("UNCHECKED_CAST")
             factoryClass.getMethod("initialState", ViewModelContext::class.java)
                 .invoke(factoryClass.instance(), viewModelContext) as S?
         } catch (exception: NoSuchMethodException) {
             // Check for JvmStatic method.
-            @Suppress("UNCHECKED_CAST")
             viewModelClass.getMethod("initialState", ViewModelContext::class.java)
                 .invoke(null, viewModelContext) as S?
         }

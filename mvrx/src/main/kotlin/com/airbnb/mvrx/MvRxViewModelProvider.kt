@@ -24,8 +24,8 @@ object MvRxViewModelProvider {
      *            ViewModel class in the same scope.
      */
     fun <VM : BaseMvRxViewModel<S>, S : MvRxState> get(
-        viewModelClass: Class<VM>,
-        stateClass: Class<S>,
+        viewModelClass: Class<out VM>,
+        stateClass: Class<out S>,
         viewModelContext: ViewModelContext,
         key: String = viewModelClass.name,
         initialStateFactory: MvRxStateFactory<VM, S> = RealMvRxStateFactory()
@@ -40,8 +40,8 @@ object MvRxViewModelProvider {
 
     @Suppress("UNCHECKED_CAST")
     internal fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModel(
-        viewModelClass: Class<VM>,
-        stateClass: Class<S>,
+        viewModelClass: Class<out VM>,
+        stateClass: Class<out S>,
         viewModelContext: ViewModelContext,
         stateRestorer: (S) -> S = { it },
         initialStateFactory: MvRxStateFactory<VM, S> = RealMvRxStateFactory()
