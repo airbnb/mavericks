@@ -16,7 +16,7 @@ class InitialConstructorStateTest : BaseTest() {
     fun testParcelableArgs() {
         val args = ParcelableArgs("hello")
         val frag = Frag(args)
-        val state = createStateFromConstructor(TestState::class.java, frag._fragmentArgsProvider())
+        val state = createStateFromConstructor(TestViewModel::class.java, TestState::class.java, frag._fragmentArgsProvider())
         assertEquals(args.str, state.str)
         assertEquals(null, state.num)
     }
@@ -25,7 +25,7 @@ class InitialConstructorStateTest : BaseTest() {
     fun testSerializableArgs() {
         val args = SerializableArgs(7)
         val frag = Frag(args)
-        val state = createStateFromConstructor(TestState::class.java, frag._fragmentArgsProvider())
+        val state = createStateFromConstructor(TestViewModel::class.java, TestState::class.java, frag._fragmentArgsProvider())
         assertEquals(null, state.str)
         assertEquals(args.num, state.num)
     }
@@ -33,7 +33,7 @@ class InitialConstructorStateTest : BaseTest() {
     @Test
     fun testLongArgs() {
         val frag = Frag(8L)
-        val state = createStateFromConstructor(TestState::class.java, frag._fragmentArgsProvider())
+        val state = createStateFromConstructor(TestViewModel::class.java, TestState::class.java, frag._fragmentArgsProvider())
         assertEquals("id", state.str)
         assertEquals(8, state.num)
     }
@@ -41,7 +41,7 @@ class InitialConstructorStateTest : BaseTest() {
     @Test
     fun testNoArgs() {
         val frag = Frag(null)
-        val state = createStateFromConstructor(TestState::class.java, frag._fragmentArgsProvider())
+        val state = createStateFromConstructor(TestViewModel::class.java, TestState::class.java, frag._fragmentArgsProvider())
         assertEquals("empty", state.str)
         assertEquals(2, state.num)
     }
@@ -49,7 +49,7 @@ class InitialConstructorStateTest : BaseTest() {
     @Test
     fun testNoMatchingArgsFallsbackToEmptyConstructor() {
         val frag = Frag("unknown arg type")
-        val state = createStateFromConstructor(TestState::class.java, frag._fragmentArgsProvider())
+        val state = createStateFromConstructor(TestViewModel::class.java, TestState::class.java, frag._fragmentArgsProvider())
         assertEquals("empty", state.str)
         assertEquals(2, state.num)
     }
@@ -82,6 +82,8 @@ data class TestState(
     constructor(id: Long) : this("id", id.toInt())
     constructor() : this("empty", 2)
 }
+
+private class TestViewModel(state: TestState) : BaseMvRxViewModel<TestState>(initialState = state, debugMode = false)
 
 @Parcelize
 class ParcelableArgs(val str: String) : Parcelable
