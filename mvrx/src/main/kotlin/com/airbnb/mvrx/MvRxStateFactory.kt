@@ -20,7 +20,8 @@ internal class RealMvRxStateFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> : 
         stateRestorer: (S) -> S
     ): S {
         val factoryState = createStateFromCompanionFactory(viewModelClass, viewModelContext)
-        return stateRestorer(factoryState ?: createStateFromConstructor(viewModelClass, stateClass, viewModelContext.args))
+        return stateRestorer(factoryState
+            ?: createStateFromConstructor(viewModelClass, stateClass, viewModelContext.args))
     }
 }
 
@@ -31,7 +32,7 @@ internal class RealMvRxStateFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> : 
 internal fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createStateFromCompanionFactory(
     viewModelClass: Class<out VM>,
     viewModelContext: ViewModelContext
-) : S? {
+): S? {
     return viewModelClass.factoryCompanion()?.let { factoryClass ->
         try {
             @Suppress("UNCHECKED_CAST")
@@ -57,7 +58,6 @@ internal fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createStateFromConstruct
 ): S {
     val argsConstructor = args?.let { arg ->
         val argType = arg::class.java
-
         stateClass.constructors.firstOrNull { constructor ->
             constructor.parameterTypes.size == 1 && isAssignableTo(argType, constructor.parameterTypes[0])
         }
