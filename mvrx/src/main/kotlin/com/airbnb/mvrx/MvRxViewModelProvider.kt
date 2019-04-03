@@ -27,10 +27,11 @@ object MvRxViewModelProvider {
         viewModelClass: Class<VM>,
         stateClass: Class<S>,
         viewModelContext: ViewModelContext,
-        key: String = viewModelClass.name
+        key: String = viewModelClass.name,
+        initialStateFactory: MvRxStateFactory<VM, S> = RealMvRxStateFactory()
     ): VM {
         // This wraps the fact that ViewModelProvider.of has individual methods for Fragment and FragmentActivity.
-        val factory = MvRxFactory { createViewModel(viewModelClass, stateClass, viewModelContext) }
+        val factory = MvRxFactory { createViewModel(viewModelClass, stateClass, viewModelContext, initialStateFactory = initialStateFactory) }
         return when (viewModelContext) {
             is ActivityViewModelContext -> ViewModelProviders.of(viewModelContext.activity, factory)
             is FragmentViewModelContext -> ViewModelProviders.of(viewModelContext.fragment, factory)
@@ -39,12 +40,13 @@ object MvRxViewModelProvider {
 
     @Suppress("UNCHECKED_CAST")
     internal fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModel(
-        viewModelClass: Class<out VM>,
-        stateClass: Class<out S>,
+        viewModelClass: Class<VM>,
+        stateClass: Class<S>,
         viewModelContext: ViewModelContext,
-        stateRestorer: (S) -> S = { it }
+        stateRestorer: (S) -> S = { it },
+        initialStateFactory: MvRxStateFactory<VM, S> = RealMvRxStateFactory()
     ): VM {
-        val initialState = createInitialState(viewModelClass, stateClass, viewModelContext, stateRestorer)
+        val initialState = initialStateFactory.createInitialState(viewModelClass, stateClass, viewModelContext, stateRestorer)
         val factoryViewModel = viewModelClass.factoryCompanion()?.let { factoryClass ->
             try {
                 factoryClass.getMethod("create", ViewModelContext::class.java, MvRxState::class.java)
@@ -70,35 +72,6 @@ object MvRxViewModelProvider {
         }
     }
 
-    /**
-     * Given a companion class, use Java reflection to create an instance. This is used over
-     * Kotlin reflection for performance.
-     */
-    private fun Class<*>.instance(): Any {
-        return declaredConstructors.first { it.parameterTypes.size == 1 }.newInstance(null)
-    }
-
-    private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createInitialState(
-        viewModelClass: Class<out VM>,
-        stateClass: Class<out S>,
-        viewModelContext: ViewModelContext,
-        stateRestorer: (S) -> S
-    ): S {
-        @Suppress("UNCHECKED_CAST")
-        val factoryState = viewModelClass.factoryCompanion()?.let { factoryClass ->
-            try {
-                factoryClass.getMethod("initialState", ViewModelContext::class.java)
-                    .invoke(factoryClass.instance(), viewModelContext) as S?
-            } catch (exception: NoSuchMethodException) {
-                // Check for JvmStatic method.
-                viewModelClass.getMethod("initialState", ViewModelContext::class.java)
-                    .invoke(null, viewModelContext) as S?
-            }
-        }
-        return stateRestorer(factoryState
-            ?: createStateFromConstructor(stateClass, viewModelContext.args))
-    }
-
     @Suppress("UNCHECKED_CAST")
     private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createDefaultViewModel(viewModelClass: Class<VM>, state: S): VM? {
         // If we are checking for a default ViewModel, we expect only a single default constructor. Any other case
@@ -112,53 +85,29 @@ object MvRxViewModelProvider {
         return null
     }
 
-    /**
-     * Return the [Class] of the [MvRxViewModelFactory] for a given ViewModel class, if it exists.
-     */
-    private fun <VM : BaseMvRxViewModel<*>> Class<VM>.factoryCompanion(): Class<out MvRxViewModelFactory<VM, *>>? {
-        val companionClass = try {
-            Class.forName("$name\$Companion")
-        } catch (exception: ClassNotFoundException) {
-            return null
-        }
-        return if (MvRxViewModelFactory::class.java.isAssignableFrom(companionClass)) {
-            @Suppress("UNCHECKED_CAST")
-            companionClass as Class<out MvRxViewModelFactory<VM, *>>
-        } else {
-            null
-        }
+}
+
+/**
+ * Return the [Class] of the [MvRxViewModelFactory] for a given ViewModel class, if it exists.
+ */
+internal fun <VM : BaseMvRxViewModel<*>> Class<VM>.factoryCompanion(): Class<out MvRxViewModelFactory<VM, *>>? {
+    val companionClass = try {
+        Class.forName("$name\$Companion")
+    } catch (exception: ClassNotFoundException) {
+        return null
     }
-
-    /**
-     *
-     * Searches [stateClass] for a single argument constructor matching the type of [args]. If [args] is null, then
-     * no arg constructor is invoked.
-     *
-     */
-    @Suppress("FunctionName") // Public for inline.
-    internal fun <S : MvRxState> createStateFromConstructor(stateClass: Class<S>, args: Any?): S {
-        val argsConstructor = args?.let { arg ->
-            val argType = arg::class.java
-
-            stateClass.constructors.firstOrNull { constructor ->
-                constructor.parameterTypes.size == 1 && isAssignableTo(argType, constructor.parameterTypes[0])
-            }
-        }
-
+    return if (MvRxViewModelFactory::class.java.isAssignableFrom(companionClass)) {
         @Suppress("UNCHECKED_CAST")
-        return argsConstructor?.newInstance(args) as? S
-            ?: try {
-                stateClass.newInstance()
-            } catch (@Suppress("TooGenericExceptionCaught") e: Throwable) {
-                null
-            }
-            ?: throw IllegalStateException(
-                "Attempt to create the MvRx state class ${stateClass.simpleName} has failed. One of the following must be true:" +
-                    "\n 1) The state class has default values for every constructor property." +
-                    "\n 2) The state class has a secondary constructor for ${args?.javaClass?.simpleName
-                        ?: "a fragment argument"}." +
-                    "\n 3) The ViewModel using the state must have a companion object implementing MvRxFactory with an initialState function " +
-                    "that does not return null. "
-            )
+        companionClass as Class<out MvRxViewModelFactory<VM, *>>
+    } else {
+        null
     }
+}
+
+/**
+ * Given a companion class, use Java reflection to create an instance. This is used over
+ * Kotlin reflection for performance.
+ */
+internal fun Class<*>.instance(): Any {
+    return declaredConstructors.first { it.parameterTypes.size == 1 }.newInstance(null)
 }
