@@ -67,7 +67,7 @@ class DogRepository {
         )
     }
 
-    fun adoptDogs(dog: Dog) = Single.fromCallable {
+    fun adoptDog(dog: Dog) = Single.fromCallable {
         Thread.sleep(5000)
         dog
     }
