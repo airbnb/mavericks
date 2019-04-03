@@ -1,4 +1,4 @@
-package com.airbnb.mvrx.dogs
+package com.airbnb.mvrx.dogs.views
 
 import android.content.Context
 import android.util.AttributeSet
@@ -8,10 +8,12 @@ import android.widget.FrameLayout
 import com.airbnb.epoxy.CallbackProp
 import com.airbnb.epoxy.ModelProp
 import com.airbnb.epoxy.ModelView
+import com.airbnb.mvrx.dogs.R
+import com.airbnb.mvrx.dogs.data.Dog
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.dog_row.view.breeds
+import kotlinx.android.synthetic.main.dog_row.view.breedsView
 import kotlinx.android.synthetic.main.dog_row.view.image
-import kotlinx.android.synthetic.main.dog_row.view.name
+import kotlinx.android.synthetic.main.dog_row.view.nameView
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)
 class DogRow @JvmOverloads constructor(
@@ -29,8 +31,8 @@ class DogRow @JvmOverloads constructor(
         Picasso.with(context)
             .load(dog.imageUrl)
             .into(image)
-        name.text = dog.name
-        breeds.text = dog.breeds
+        nameView.text = dog.name
+        breedsView.text = dog.breeds
     }
 
     @CallbackProp

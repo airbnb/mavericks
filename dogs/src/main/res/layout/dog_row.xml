@@ -4,7 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#1D2C69">
+    android:layout_marginBottom="24dp"
+    android:background="#1D2C69"
+    android:foreground="?android:attr/selectableItemBackground"
+    app:cardCornerRadius="8dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -23,7 +26,7 @@
             tools:background="#ff777777" />
 
         <TextView
-            android:id="@+id/name"
+            android:id="@+id/nameView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
@@ -35,14 +38,14 @@
             tools:text="Clover" />
 
         <TextView
-            android:id="@+id/breeds"
+            android:id="@+id/breedsView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:textColor="#ff222222"
             android:textSize="16sp"
-            app:layout_constraintStart_toStartOf="@id/name"
-            app:layout_constraintTop_toBottomOf="@id/name"
+            app:layout_constraintStart_toStartOf="@id/nameView"
+            app:layout_constraintTop_toBottomOf="@id/nameView"
             tools:text="Terrier, Pit Bull Mix" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
