@@ -7,10 +7,17 @@
     <fragment
         android:id="@+id/dogsFragment"
         android:name="com.airbnb.mvrx.dogs.DogsFragment"
-        android:label="Dog Adoption" >
+        android:label="Dog Adoption">
         <action
             android:id="@+id/action_dogs_to_dogDetail"
             app:destination="@id/dogDetailFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_dogs_to_adoption"
+            app:destination="@id/adoptionFragment"
             app:enterAnim="@anim/nav_default_enter_anim"
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
@@ -19,5 +26,9 @@
     <fragment
         android:id="@+id/dogDetailFragment"
         android:name="com.airbnb.mvrx.dogs.DogDetailFragment"
-        android:label="DogDetailFragment" />
+        android:label="" />
+    <fragment
+        android:id="@+id/adoptionFragment"
+        android:name="com.airbnb.mvrx.dogs.AdoptionFragment"
+        android:label="" />
 </navigation>

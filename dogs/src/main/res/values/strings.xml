@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Dogs</string>
+    <string name="meet_your_dog">Time to meet your new dog!</string>
+    <string name="adopt_dog">Adopt %1$s!</string>
+    <string name="adopting_dogs">Adopting Dogs...</string>
+    <string name="love_dog">I love this dog!</string>
 </resources>

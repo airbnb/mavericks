@@ -13,13 +13,6 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments = ["room.schemaLocation": "$projectDir/schemas".toString()]
-            }
-        }
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
     }
@@ -37,9 +30,6 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.0.2'
     implementation 'androidx.core:core-ktx:1.0.1'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.room:room-runtime:2.0.0'
-    implementation 'androidx.room:room-rxjava2:2.0.0'
-    kapt 'androidx.room:room-compiler:2.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation "android.arch.navigation:navigation-fragment-ktx:$navVersion"
     implementation "android.arch.navigation:navigation-ui-ktx:$navVersion"
@@ -48,6 +38,7 @@ dependencies {
     implementation "com.squareup.moshi:moshi-kotlin:$moshiVersion"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
     implementation 'com.squareup.picasso:picasso:2.5.2'
+    implementation 'com.airbnb.android:lottie:3.0.0'
 
     testImplementation 'junit:junit:4.12'
 }
