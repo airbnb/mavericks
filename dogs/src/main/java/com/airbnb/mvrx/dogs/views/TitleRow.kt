@@ -15,7 +15,7 @@ class TitleRow @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : FrameLayout(context, attrs, defStyleAttr) {
-    
+
     init {
         LayoutInflater.from(context).inflate(R.layout.title_row, this, true)
     }

@@ -4,15 +4,26 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.transition.Fade
+import com.airbnb.mvrx.BaseMvRxFragment
+import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.PersistState
+import com.airbnb.mvrx.activityViewModel
+import com.airbnb.mvrx.withState
 import kotlinx.android.synthetic.main.fragment_counter.counterText
 import kotlinx.android.synthetic.main.fragment_counter.nextButton
 
-class CounterFragment : Fragment() {
+data class CounterState(@PersistState val count: Int = 0) : MvRxState
 
-    private var count = 0
+class CounterViewModel(state: CounterState) : MvRxViewModel<CounterState>(state) {
+
+    fun incrementCount() = setState { copy(count = count + 1) }
+}
+
+class CounterFragment : BaseMvRxFragment() {
+
+    private val viewModel: CounterViewModel by activityViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,13 +40,11 @@ class CounterFragment : Fragment() {
         }
 
         counterText.setOnClickListener {
-            count++
-            updateCounter()
+            viewModel.incrementCount()
         }
-        updateCounter()
     }
 
-    private fun updateCounter() {
-        counterText.text = count.toString()
+    override fun invalidate() = withState(viewModel) { state ->
+        counterText.text = state.count.toString()
     }
 }

@@ -1,3 +1,5 @@
+@Suppress("Detekt.MaxLineLength")
+
 package com.airbnb.mvrx.dogs.data
 
 import io.reactivex.Observable
