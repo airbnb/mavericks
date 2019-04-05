@@ -64,7 +64,7 @@
     </ScrollView>
 
     <TextView
-        android:id="@+id/adoptButton"
+        android:id="@+id/loveButton"
         android:layout_width="0dp"
         android:layout_height="48dp"
         android:layout_marginStart="16dp"
