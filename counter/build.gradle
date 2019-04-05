@@ -4,25 +4,19 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 28
 
-
     defaultConfig {
         applicationId "com.airbnb.mvrx.counter"
         minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
     }
 
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
 }
 
 dependencies {
@@ -36,4 +30,5 @@ dependencies {
     implementation "android.arch.navigation:navigation-ui-ktx:$navVersion"
 
     testImplementation 'junit:junit:4.12'
+    testImplementation project(':testing')
 }

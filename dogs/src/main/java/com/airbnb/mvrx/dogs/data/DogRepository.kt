@@ -1,4 +1,4 @@
-@Suppress("Detekt.MaxLineLength")
+@file:Suppress("Detekt.MaxLineLength")
 
 package com.airbnb.mvrx.dogs.data
 

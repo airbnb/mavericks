@@ -6,7 +6,6 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion 28
 
-
     defaultConfig {
         applicationId "com.airbnb.mvrx.dogs"
         minSdkVersion 21
@@ -41,4 +40,5 @@ dependencies {
     implementation 'com.airbnb.android:lottie:3.0.0'
 
     testImplementation 'junit:junit:4.12'
+    testImplementation project(':testing')
 }
