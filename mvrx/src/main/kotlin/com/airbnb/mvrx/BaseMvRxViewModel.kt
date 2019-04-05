@@ -46,7 +46,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         // initialize kotlin reflect and warm the cache so that when persistState() gets
         // called synchronously in onSaveInstanceState() on the main thread, it will be
         // much faster.
-        // This improved performance 10-100x for a state with 100 @PersistStae properties.
+        // This improved performance 10-100x for a state with 100 @PersistState properties.
         Completable.fromCallable {
             initialState::class.primaryConstructor?.parameters?.forEach { it.annotations }
             initialState::class.declaredMemberProperties.asSequence()
@@ -78,8 +78,8 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * Call this to mutate the current state.
      * A few important notes about the state reducer.
      * 1) It will not be called synchronously or on the same thread. This is for performance and accuracy reasons.
-     * 2) Similar to the execute lambda above, the current state is the state receiver  so the `count` in `count + 1` is actually the count
-     *    property of the state at the time that the lambda is called
+     * 2) Similar to the execute lambda above, the current state is the state receiver so the `count` in `count + 1` is actually the count
+     *    property of the state at the time that the lambda is called.
      * 3) In development, MvRx will do checks to make sure that your setState is pure by calling in multiple times. As a result, DO NOT use
      *    mutable variables or properties from outside the lambda or else it may crash.
      */
