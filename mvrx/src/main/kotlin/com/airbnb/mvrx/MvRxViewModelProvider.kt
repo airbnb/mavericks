@@ -1,9 +1,9 @@
 package com.airbnb.mvrx
 
-import androidx.lifecycle.ViewModelProviders
 import androidx.annotation.RestrictTo
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelProviders
 import kotlin.reflect.full.primaryConstructor
 
 /**
@@ -84,7 +84,6 @@ object MvRxViewModelProvider {
         }
         return null
     }
-
 }
 
 /**

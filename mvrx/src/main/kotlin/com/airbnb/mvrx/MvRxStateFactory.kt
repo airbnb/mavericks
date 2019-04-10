@@ -5,10 +5,12 @@ import androidx.annotation.RestrictTo
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 interface MvRxStateFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> {
 
-    fun createInitialState(viewModelClass: Class<out VM>,
-                           stateClass: Class<out S>,
-                           viewModelContext: ViewModelContext,
-                           stateRestorer: (S) -> S): S
+    fun createInitialState(
+        viewModelClass: Class<out VM>,
+        stateClass: Class<out S>,
+        viewModelContext: ViewModelContext,
+        stateRestorer: (S) -> S
+    ): S
 }
 
 internal class RealMvRxStateFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> : MvRxStateFactory<VM, S> {
@@ -20,8 +22,10 @@ internal class RealMvRxStateFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> : 
         stateRestorer: (S) -> S
     ): S {
         val factoryState = createStateFromCompanionFactory(viewModelClass, viewModelContext)
-        return stateRestorer(factoryState
-            ?: createStateFromConstructor(viewModelClass, stateClass, viewModelContext.args))
+        return stateRestorer(
+            factoryState
+                ?: createStateFromConstructor(viewModelClass, stateClass, viewModelContext.args)
+        )
     }
 }
 
