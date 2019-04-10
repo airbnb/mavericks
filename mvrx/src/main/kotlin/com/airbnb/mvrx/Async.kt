@@ -69,7 +69,7 @@ data class Fail<out T>(val error: Throwable) : Async<T>(complete = true, shouldL
         val otherError = other.error
         return error::class == otherError::class &&
             error.message == otherError.message &&
-            (error.stackTrace.size == otherError.stackTrace.size && (error.stackTrace.isEmpty() || error.stackTrace[0] == otherError.stackTrace[0]))
+            error.stackTrace.firstOrNull() == otherError.stackTrace.firstOrNull()
     }
 
     override fun hashCode(): Int = Arrays.hashCode(arrayOf(error::class, error.message, error.stackTrace[0]))
