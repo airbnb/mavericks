@@ -95,18 +95,26 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
                     @Suppress("UNCHECKED_CAST")
                     val changedProp = firstState::class.memberProperties.asSequence()
                         .map { it as KProperty1<S, *> }
-                        .filter { it.isAccessible }
-                        .firstOrNull { it.get(firstState) != it.get(secondState) }
+                        .onEach { it.isAccessible = true }
+                        .firstOrNull { property ->
+                            @Suppress("Detekt.TooGenericExceptionCaught")
+                            try {
+                                property.get(firstState) != property.get(secondState)
+                            } catch (e: Throwable) {
+                                false
+                            }
+                        }
                     if (changedProp != null) {
                         throw IllegalArgumentException(
-                            "Your reducer must be pure! ${changedProp.name} changed from " +
-                                "${changedProp.get(firstState)} to ${changedProp.get(secondState)}. " +
-                                "Ensure that your state properties properly implement hashCode."
+                            "Impure reducer set on ${this@BaseMvRxViewModel::class.simpleName}! " +
+                                    "${changedProp.name} changed from ${changedProp.get(firstState)} " +
+                                    "to ${changedProp.get(secondState)}. " +
+                                    "Ensure that your state properties properly implement hashCode."
                         )
                     } else {
-                        throw java.lang.IllegalArgumentException(
-                            "Your reducer must be pure! A private property was modified. " +
-                                "Ensure that your state properties properly implement hashCode. $firstState -> $secondState"
+                        throw IllegalArgumentException(
+                            "Impure reducer set on ${this@BaseMvRxViewModel::class.simpleName}! Differing states were provided by the same reducer." +
+                                    "Ensure that your state properties properly implement hashCode. First state: $firstState -> Second state: $secondState"
                         )
                     }
                 }
@@ -340,7 +348,13 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ) = stateStore.observable
         .map { MvRxTuple3(prop1.get(it), prop2.get(it), prop3.get(it)) }
         .distinctUntilChanged()
-        .subscribeLifecycle(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3)) { (a, b, c) -> subscriber(a, b, c) }
+        .subscribeLifecycle(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3)) { (a, b, c) ->
+            subscriber(
+                a,
+                b,
+                c
+            )
+        }
 
     /**
      * Subscribe to state changes for four properties.
@@ -375,7 +389,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ) = stateStore.observable
         .map { MvRxTuple4(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it)) }
         .distinctUntilChanged()
-        .subscribeLifecycle(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4)) { (a, b, c, d) -> subscriber(a, b, c, d) }
+        .subscribeLifecycle(
+            owner,
+            deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4)
+        ) { (a, b, c, d) -> subscriber(a, b, c, d) }
 
     /**
      * Subscribe to state changes for five properties.
@@ -413,7 +430,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ) = stateStore.observable
         .map { MvRxTuple5(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it)) }
         .distinctUntilChanged()
-        .subscribeLifecycle(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4, prop5)) { (a, b, c, d, e) -> subscriber(a, b, c, d, e) }
+        .subscribeLifecycle(
+            owner,
+            deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4, prop5)
+        ) { (a, b, c, d, e) -> subscriber(a, b, c, d, e) }
 
     /**
      * Subscribe to state changes for six properties.
@@ -454,7 +474,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ) = stateStore.observable
         .map { MvRxTuple6(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it), prop6.get(it)) }
         .distinctUntilChanged()
-        .subscribeLifecycle(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4, prop5, prop6)) { (a, b, c, d, e, f) -> subscriber(a, b, c, d, e, f) }
+        .subscribeLifecycle(
+            owner,
+            deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4, prop5, prop6)
+        ) { (a, b, c, d, e, f) -> subscriber(a, b, c, d, e, f) }
 
     /**
      * Subscribe to state changes for seven properties.
@@ -496,7 +519,17 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         deliveryMode: DeliveryMode,
         subscriber: (A, B, C, D, E, F, G) -> Unit
     ) = stateStore.observable
-        .map { MvRxTuple7(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it), prop6.get(it), prop7.get(it)) }
+        .map { state ->
+            MvRxTuple7(
+                prop1.get(state),
+                prop2.get(state),
+                prop3.get(state),
+                prop4.get(state),
+                prop5.get(state),
+                prop6.get(state),
+                prop7.get(state)
+            )
+        }
         .distinctUntilChanged()
         .subscribeLifecycle(
             owner,
@@ -521,9 +554,9 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
                 if (activeSubscriptions.contains(deliveryMode.subscriptionId)) {
                     throw IllegalStateException(
                         "Subscribing with a duplicate subscription id: ${deliveryMode.subscriptionId}. " +
-                            "If you have multiple uniqueOnly subscriptions in a MvRx view that listen to the same properties " +
-                            "you must use a custom subscription id. If you are using a custom MvRxView, make sure you are using the proper" +
-                            "lifecycle owner. See BaseMvRxFragment for an example."
+                                "If you have multiple uniqueOnly subscriptions in a MvRx view that listen to the same properties " +
+                                "you must use a custom subscription id. If you are using a custom MvRxView, make sure you are using the proper" +
+                                "lifecycle owner. See BaseMvRxFragment for an example."
                     )
                 }
                 activeSubscriptions.add(deliveryMode.subscriptionId)
