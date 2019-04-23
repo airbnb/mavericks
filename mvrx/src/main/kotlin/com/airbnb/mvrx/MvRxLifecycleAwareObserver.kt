@@ -28,7 +28,7 @@ internal class MvRxLifecycleAwareObserver<T : Any>(
     private var lastDeliveredValueFromPriorObserver: T?,
     private var sourceObserver: Observer<T>?,
     private val onDispose: () -> Unit
-) : AtomicReference<Disposable>(), LifecycleObserver, Observer<T>, Disposable {
+) : AtomicReference<Disposable>(), LifecycleObserver, ObserverDisposable<T> {
 
     constructor(
         owner: LifecycleOwner,

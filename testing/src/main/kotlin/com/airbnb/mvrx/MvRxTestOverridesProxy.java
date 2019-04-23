@@ -13,4 +13,8 @@ public class MvRxTestOverridesProxy {
     public static void forceMvRxDebug(Boolean debug) {
         MvRxTestOverrides.FORCE_DEBUG = debug;
     }
+
+    public static void forceUseTestObserver(Boolean removeLifecycleAwareObserver) {
+        MvRxTestOverrides.FORCE_USE_TEST_OBSERVER = removeLifecycleAwareObserver;
+    }
 }
