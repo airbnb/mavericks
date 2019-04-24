@@ -11,6 +11,7 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
@@ -541,29 +542,50 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         deliveryMode: DeliveryMode,
         subscriber: (T) -> Unit
     ): Disposable {
-        if (lifecycleOwner == null) {
-            return observeOn(AndroidSchedulers.mainThread())
-                .subscribe(subscriber)
-                .disposeOnClear()
-        }
-
-        val subscribeWithStrategy = resolveSubscribeWithStrategy(lifecycleOwner, deliveryMode)
         return observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(subscribeWithStrategy.subscribe(subscriber))
+            .resolveSubscription(subscriber, lifecycleOwner, deliveryMode)
             .disposeOnClear()
     }
 
-    private fun resolveSubscribeWithStrategy(lifecycleOwner: LifecycleOwner, deliveryMode: DeliveryMode) =
-        if (forceUserTestObserver) {
-            SubscribeWithTestStrategy()
-        } else {
-            SubscribeWithLifecycleAwareObservableStrategy(
+    private fun <T : Any> Observable<T>.resolveSubscription(
+        subscriber: (T) -> Unit,
+        lifecycleOwner: LifecycleOwner?,
+        deliveryMode: DeliveryMode
+    ): Disposable = if (lifecycleOwner == null || forceUserTestObserver) {
+        this.subscribe(subscriber)
+    } else {
+        this.subscribeWith(
+            MvRxLifecycleAwareObserver(
                 lifecycleOwner,
-                deliveryMode,
-                lastDeliveredStates,
-                activeSubscriptions
+                deliveryMode = deliveryMode,
+                lastDeliveredValue = if (deliveryMode is UniqueOnly) {
+                    if (activeSubscriptions.contains(deliveryMode.subscriptionId)) {
+                        throw IllegalStateException(
+                            "Subscribing with a duplicate subscription id: ${deliveryMode.subscriptionId}. " +
+                                    "If you have multiple uniqueOnly subscriptions in a MvRx view that listen to the same properties " +
+                                    "you must use a custom subscription id. If you are using a custom MvRxView, make sure you are using the proper" +
+                                    "lifecycle owner. See BaseMvRxFragment for an example."
+                        )
+                    }
+                    activeSubscriptions.add(deliveryMode.subscriptionId)
+                    lastDeliveredStates[deliveryMode.subscriptionId] as? T
+                } else {
+                    null
+                },
+                onNext = Consumer { value ->
+                    if (deliveryMode is UniqueOnly) {
+                        lastDeliveredStates[deliveryMode.subscriptionId] = value
+                    }
+                    subscriber(value)
+                },
+                onDispose = {
+                    if (deliveryMode is UniqueOnly) {
+                        activeSubscriptions.remove(deliveryMode.subscriptionId)
+                    }
+                }
             )
-        }
+        )
+    }
 
     protected fun Disposable.disposeOnClear(): Disposable {
         disposables.add(this)
