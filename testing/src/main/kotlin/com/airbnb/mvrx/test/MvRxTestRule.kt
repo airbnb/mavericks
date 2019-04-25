@@ -22,7 +22,8 @@ class MvRxTestRule(
          * Sets up all Rx schedulers to use an immediate scheduler. This will cause all MvRx
          * operations including setState reducers to run synchronously so you can test them.
          */
-        private val setRxImmediateSchedulers: Boolean = true
+        private val setRxImmediateSchedulers: Boolean = true,
+        private val setForceDisableLifecycleAwareObserver: Boolean = true
 ) : ExternalResource() {
     private var defaultExceptionHandler: Thread.UncaughtExceptionHandler? = null
 
@@ -32,7 +33,7 @@ class MvRxTestRule(
         RxAndroidPlugins.setMainThreadSchedulerHandler { Schedulers.trampoline() }
         if (setRxImmediateSchedulers) setRxImmediateSchedulers()
         MvRxTestOverridesProxy.forceMvRxDebug(debugMode.value)
-        MvRxTestOverridesProxy.forceDisableLifecycleAwareObserver(true)
+        MvRxTestOverridesProxy.forceDisableLifecycleAwareObserver(setForceDisableLifecycleAwareObserver)
     }
 
     override fun after() {
