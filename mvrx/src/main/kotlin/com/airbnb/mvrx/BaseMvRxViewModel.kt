@@ -33,7 +33,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     private val stateStore: MvRxStateStore<S> = RealMvRxStateStore(initialState)
 ) : ViewModel() {
     private val debugMode = if (MvRxTestOverrides.FORCE_DEBUG == null) debugMode else MvRxTestOverrides.FORCE_DEBUG
-    private val forceUserTestObserver = MvRxTestOverrides.FORCE_USE_TEST_OBSERVER
+    private val forceDisableLifecycleAwareObserver = MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER
 
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
@@ -543,15 +543,15 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (T) -> Unit
     ): Disposable {
         return observeOn(AndroidSchedulers.mainThread())
-            .resolveSubscription(subscriber, lifecycleOwner, deliveryMode)
+            .resolveSubscription(lifecycleOwner, deliveryMode, subscriber)
             .disposeOnClear()
     }
 
     private fun <T : Any> Observable<T>.resolveSubscription(
-        subscriber: (T) -> Unit,
-        lifecycleOwner: LifecycleOwner?,
-        deliveryMode: DeliveryMode
-    ): Disposable = if (lifecycleOwner == null || forceUserTestObserver) {
+        lifecycleOwner: LifecycleOwner? = null,
+        deliveryMode: DeliveryMode,
+        subscriber: (T) -> Unit
+    ): Disposable = if (lifecycleOwner == null || forceDisableLifecycleAwareObserver) {
         this.subscribe(subscriber)
     } else {
         this.subscribeWith(

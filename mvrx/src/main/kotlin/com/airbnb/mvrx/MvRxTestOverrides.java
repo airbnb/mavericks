@@ -12,8 +12,8 @@ public class MvRxTestOverrides {
     /**
      * This should only be set by the MvRxTestRule from the mvrx-testing artifact.
      *
-     * This can be used to force MvRxViewModels to use lifecycle aware observer or test observer.
+     * This can be used to force MvRxViewModels to disable lifecycle aware observer for unit testing.
      * This is Java so it can be packgage private.
      */
-    static Boolean FORCE_USE_TEST_OBSERVER = false;
+    static Boolean FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER = false;
 }

@@ -32,7 +32,7 @@ class MvRxTestRule(
         RxAndroidPlugins.setMainThreadSchedulerHandler { Schedulers.trampoline() }
         if (setRxImmediateSchedulers) setRxImmediateSchedulers()
         MvRxTestOverridesProxy.forceMvRxDebug(debugMode.value)
-        MvRxTestOverridesProxy.forceUseTestObserver(true)
+        MvRxTestOverridesProxy.forceDisableLifecycleAwareObserver(true)
     }
 
     override fun after() {
