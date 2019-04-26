@@ -5,6 +5,7 @@ import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
+import com.airbnb.mvrx.MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -33,7 +34,6 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     private val stateStore: MvRxStateStore<S> = RealMvRxStateStore(initialState)
 ) : ViewModel() {
     private val debugMode = if (MvRxTestOverrides.FORCE_DEBUG == null) debugMode else MvRxTestOverrides.FORCE_DEBUG
-    private val forceDisableLifecycleAwareObserver = MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER
 
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
@@ -551,7 +551,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         lifecycleOwner: LifecycleOwner? = null,
         deliveryMode: DeliveryMode,
         subscriber: (T) -> Unit
-    ): Disposable = if (lifecycleOwner == null || forceDisableLifecycleAwareObserver) {
+    ): Disposable = if (lifecycleOwner == null || FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER) {
         this.subscribe(subscriber)
     } else {
         this.subscribeWith(
