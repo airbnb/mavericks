@@ -5,6 +5,7 @@ import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
+import com.airbnb.mvrx.MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -541,44 +542,49 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         deliveryMode: DeliveryMode,
         subscriber: (T) -> Unit
     ): Disposable {
-        if (lifecycleOwner == null) {
-            return observeOn(AndroidSchedulers.mainThread())
-                .subscribe(subscriber)
-                .disposeOnClear()
-        }
-
-        @Suppress("UNCHECKED_CAST") val lifecycleAwareObserver = MvRxLifecycleAwareObserver(
-            lifecycleOwner,
-            deliveryMode = deliveryMode,
-            lastDeliveredValue = if (deliveryMode is UniqueOnly) {
-                if (activeSubscriptions.contains(deliveryMode.subscriptionId)) {
-                    throw IllegalStateException(
-                        "Subscribing with a duplicate subscription id: ${deliveryMode.subscriptionId}. " +
-                                "If you have multiple uniqueOnly subscriptions in a MvRx view that listen to the same properties " +
-                                "you must use a custom subscription id. If you are using a custom MvRxView, make sure you are using the proper" +
-                                "lifecycle owner. See BaseMvRxFragment for an example."
-                    )
-                }
-                activeSubscriptions.add(deliveryMode.subscriptionId)
-                lastDeliveredStates[deliveryMode.subscriptionId] as? T
-            } else {
-                null
-            },
-            onNext = Consumer { value ->
-                if (deliveryMode is UniqueOnly) {
-                    lastDeliveredStates[deliveryMode.subscriptionId] = value
-                }
-                subscriber(value)
-            },
-            onDispose = {
-                if (deliveryMode is UniqueOnly) {
-                    activeSubscriptions.remove(deliveryMode.subscriptionId)
-                }
-            }
-        )
         return observeOn(AndroidSchedulers.mainThread())
-            .subscribeWith(lifecycleAwareObserver)
+            .resolveSubscription(lifecycleOwner, deliveryMode, subscriber)
             .disposeOnClear()
+    }
+
+    private fun <T : Any> Observable<T>.resolveSubscription(
+        lifecycleOwner: LifecycleOwner? = null,
+        deliveryMode: DeliveryMode,
+        subscriber: (T) -> Unit
+    ): Disposable = if (lifecycleOwner == null || FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER) {
+        this.subscribe(subscriber)
+    } else {
+        this.subscribeWith(
+            MvRxLifecycleAwareObserver(
+                lifecycleOwner,
+                deliveryMode = deliveryMode,
+                lastDeliveredValue = if (deliveryMode is UniqueOnly) {
+                    if (activeSubscriptions.contains(deliveryMode.subscriptionId)) {
+                        throw IllegalStateException(
+                            "Subscribing with a duplicate subscription id: ${deliveryMode.subscriptionId}. " +
+                                    "If you have multiple uniqueOnly subscriptions in a MvRx view that listen to the same properties " +
+                                    "you must use a custom subscription id. If you are using a custom MvRxView, make sure you are using the proper" +
+                                    "lifecycle owner. See BaseMvRxFragment for an example."
+                        )
+                    }
+                    activeSubscriptions.add(deliveryMode.subscriptionId)
+                    lastDeliveredStates[deliveryMode.subscriptionId] as? T
+                } else {
+                    null
+                },
+                onNext = Consumer { value ->
+                    if (deliveryMode is UniqueOnly) {
+                        lastDeliveredStates[deliveryMode.subscriptionId] = value
+                    }
+                    subscriber(value)
+                },
+                onDispose = {
+                    if (deliveryMode is UniqueOnly) {
+                        activeSubscriptions.remove(deliveryMode.subscriptionId)
+                    }
+                }
+            )
+        )
     }
 
     protected fun Disposable.disposeOnClear(): Disposable {
