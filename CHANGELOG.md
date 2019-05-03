@@ -1,5 +1,10 @@
 # Change log
 
+## Version 1.0.1
+- MvRxTestRule can now disable lifecycle checking for subscriptions in tests [#235](https://github.com/airbnb/MvRx/pull/235)
+- Improve the error message for impure reducers [#229](https://github.com/airbnb/MvRx/pull/229)
+- Allow Fail to be used with exceptions that have no stack trace [#225](https://github.com/airbnb/MvRx/pull/235)
+
 ## Version 1.0.0
 - MvRx now requires androidx.
 - Fix: prevented duplicate subscriptions when subscriptions are made after onCreate. [#210](https://github.com/airbnb/MvRx/pull/210)
