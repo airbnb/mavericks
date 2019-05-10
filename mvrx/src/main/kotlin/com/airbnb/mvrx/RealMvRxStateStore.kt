@@ -172,7 +172,7 @@ class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
     /**
      * Flushes the setState and getState queues.
      *
-     * This will flush he setState queue then call the first element on the getState queue.
+     * This will flush the setState queue then call the first element on the getState queue.
      *
      * In case the setState queue calls setState, we call flushQueues recursively to flush the setState queue
      * in between every getState block gets processed.
