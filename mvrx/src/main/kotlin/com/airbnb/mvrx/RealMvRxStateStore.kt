@@ -177,7 +177,7 @@ class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
      * In case the setState queue calls setState, we call flushQueues recursively to flush the setState queue
      * in between every getState block gets processed.
      */
-    private fun flushQueues() {
+    private tailrec fun flushQueues() {
         flushSetStateQueue()
         val block = jobs.dequeueGetStateBlock() ?: return
         block(state)
