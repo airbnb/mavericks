@@ -37,7 +37,7 @@ abstract class BaseTest {
                 // this prevents StackOverflowErrors when scheduling with a delay
                 override fun scheduleDirect(@NonNull run: Runnable, delay: Long, @NonNull unit: TimeUnit): Disposable = super.scheduleDirect(run, 0, unit)
 
-                override fun createWorker(): Scheduler.Worker = ExecutorScheduler.ExecutorWorker(Executor { it.run() })
+                override fun createWorker(): Worker = ExecutorScheduler.ExecutorWorker(Executor { it.run() }, true)
             }
             RxJavaPlugins.setNewThreadSchedulerHandler { immediate }
             RxJavaPlugins.setComputationSchedulerHandler { immediate }
