@@ -41,22 +41,11 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     private val lastDeliveredStates = ConcurrentHashMap<String, Any>()
     private val activeSubscriptions = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
+    internal val state: S
+        get() = stateStore.state
+
     init {
-        // Kotlin reflection has a large overhead the first time you run it
-        // but then is pretty fast on subsequent times. Running these methods now will
-        // initialize kotlin reflect and warm the cache so that when persistState() gets
-        // called synchronously in onSaveInstanceState() on the main thread, it will be
-        // much faster.
-        // This improved performance 10-100x for a state with 100 @PersistState properties.
-        Completable.fromCallable {
-            initialState::class.primaryConstructor?.parameters?.forEach { it.annotations }
-            initialState::class.declaredMemberProperties.asSequence()
-                .filter { it.isAccessible }
-                .forEach { prop ->
-                    @Suppress("UNCHECKED_CAST")
-                    (prop as? KProperty1<S, Any?>)?.get(initialState)
-                }
-        }.subscribeOn(Schedulers.computation()).subscribe()
+        Completable.fromCallable { warmReflectionCache(initialState) }.subscribeOn(Schedulers.computation()).subscribe()
 
         if (this.debugMode) {
             mutableStateChecker = MutableStateChecker(initialState)
@@ -66,8 +55,25 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         }
     }
 
-    internal val state: S
-        get() = stateStore.state
+    /**
+     * Kotlin reflection has a large overhead the first time you run it
+     * but then is pretty fast on subsequent times. Running these methods now will
+     * initialize kotlin reflect and warm the cache so that when persistState() gets
+     * called synchronously in onSaveInstanceState() on the main thread, it will be much faster.
+     * This improved performance 10-100x for a state with 100 @PersistState properties.
+     *
+     * This is also @Synchronized to prevent a ConcurrentModificationException in kotlin-reflect: https://gist.github.com/gpeal/27a5747b3c351d4bd592a8d2d58f134a
+     */
+    @Synchronized
+    fun warmReflectionCache(initialState: S) {
+        initialState::class.primaryConstructor?.parameters?.forEach { it.annotations }
+        initialState::class.declaredMemberProperties.asSequence()
+            .filter { it.visibility == KVisibility.PUBLIC }
+            .forEach { prop ->
+                @Suppress("UNCHECKED_CAST")
+                (prop as? KProperty1<S, Any?>)?.get(initialState)
+            }
+    }
 
     @CallSuper
     override fun onCleared() {
@@ -108,14 +114,14 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
                     if (changedProp != null) {
                         throw IllegalArgumentException(
                             "Impure reducer set on ${this@BaseMvRxViewModel::class.simpleName}! " +
-                                    "${changedProp.name} changed from ${changedProp.get(firstState)} " +
-                                    "to ${changedProp.get(secondState)}. " +
-                                    "Ensure that your state properties properly implement hashCode."
+                                "${changedProp.name} changed from ${changedProp.get(firstState)} " +
+                                "to ${changedProp.get(secondState)}. " +
+                                "Ensure that your state properties properly implement hashCode."
                         )
                     } else {
                         throw IllegalArgumentException(
                             "Impure reducer set on ${this@BaseMvRxViewModel::class.simpleName}! Differing states were provided by the same reducer." +
-                                    "Ensure that your state properties properly implement hashCode. First state: $firstState -> Second state: $secondState"
+                                "Ensure that your state properties properly implement hashCode. First state: $firstState -> Second state: $secondState"
                         )
                     }
                 }
@@ -562,9 +568,9 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
                     if (activeSubscriptions.contains(deliveryMode.subscriptionId)) {
                         throw IllegalStateException(
                             "Subscribing with a duplicate subscription id: ${deliveryMode.subscriptionId}. " +
-                                    "If you have multiple uniqueOnly subscriptions in a MvRx view that listen to the same properties " +
-                                    "you must use a custom subscription id. If you are using a custom MvRxView, make sure you are using the proper" +
-                                    "lifecycle owner. See BaseMvRxFragment for an example."
+                                "If you have multiple uniqueOnly subscriptions in a MvRx view that listen to the same properties " +
+                                "you must use a custom subscription id. If you are using a custom MvRxView, make sure you are using the proper" +
+                                "lifecycle owner. See BaseMvRxFragment for an example."
                         )
                     }
                     activeSubscriptions.add(deliveryMode.subscriptionId)
