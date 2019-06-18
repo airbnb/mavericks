@@ -1,5 +1,10 @@
 # Change log
 
+## Version 1.0.2
+- Synchronized and improved Kotlin cache warming [#244](https://github.com/airbnb/MvRx/pull/244)
+- Made flushQueues tailrec to improve performance [#252](https://github.com/airbnb/MvRx/pull/252)
+- Updated RxJava to 2.1.1 and RxAndroid to 2.2.8 [#233](https://github.com/airbnb/MvRx/pull/233)
+
 ## Version 1.0.1
 - MvRxTestRule can now disable lifecycle checking for subscriptions in tests [#235](https://github.com/airbnb/MvRx/pull/235)
 - Improve the error message for impure reducers [#229](https://github.com/airbnb/MvRx/pull/229)
