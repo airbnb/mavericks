@@ -93,7 +93,7 @@ formatting:
   SpacingAroundRangeOperator:
     active: true
   StringTemplate:
-    active: true
+    active: false
 
 comments:
   active: true

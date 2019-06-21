@@ -29,6 +29,13 @@ class MainFragment : BaseFragment() {
         }
 
         basicRow {
+            id("stateful_view")
+            title("Custom Stateful Views")
+            subtitle(demonstrates("StatefulView", "Custom Views"))
+            clickListener { _ -> navigateTo(R.id.action_main_to_statefulViewFragment) }
+        }
+
+        basicRow {
             id("random_dad_joke")
             title("Random Dad Joke")
             subtitle(demonstrates("fragmentViewModel", "Network requests", "Dependency Injection"))

@@ -3,7 +3,7 @@ buildscript {
     ext.appCompatVersion = '1.0.2'
     ext.recyclerViewVersion = '1.0.0'
     ext.lifecycleVersion = '2.0.0'
-    ext.robolectricVersion = '4.0.2'
+    ext.robolectricVersion = '4.3'
     ext.epoxyVersion = '3.2.0'
     ext.moshiVersion = '1.6.0'
     ext.koinVersion = '0.9.3'

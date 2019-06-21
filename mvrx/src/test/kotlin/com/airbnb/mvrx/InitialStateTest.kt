@@ -15,7 +15,7 @@ class InitialStateTest : BaseTest() {
         MvRxViewModelProvider.get(
             DefaultParamViewModel::class.java,
             DefaultParamState::class.java,
-            FragmentViewModelContext(controller.get(), null, fragment), "foo"
+            FragmentViewModelContext(controller.get(), null, fragment, "foo"), "foo"
         )
     }
 
@@ -26,7 +26,7 @@ class InitialStateTest : BaseTest() {
         MvRxViewModelProvider.get(
             NonDefaultParamViewModel::class.java,
             DefaultParamState::class.java,
-            FragmentViewModelContext(controller.get(), null, fragment), "foo"
+            FragmentViewModelContext(controller.get(), null, fragment, "foo"), "foo"
         )
     }
 }

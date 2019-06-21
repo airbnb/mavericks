@@ -1,6 +1,7 @@
 package com.airbnb.mvrx
 
 import androidx.lifecycle.Lifecycle
+import io.reactivex.internal.disposables.EmptyDisposable
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -14,7 +15,7 @@ class LifecycleAwareLazyTest : BaseTest() {
     @Before
     fun setup() {
         owner = TestLifecycleOwner()
-        lazyProp = lifecycleAwareLazy(owner) { "Hello World" }
+        lazyProp = lifecycleAwareLazy(owner, {"" }) { "Hello World" to EmptyDisposable.INSTANCE }
     }
 
     @Test
@@ -33,7 +34,7 @@ class LifecycleAwareLazyTest : BaseTest() {
     @Test
     fun testInitializedIfAlreadyStarted() {
         owner.lifecycle.markState(Lifecycle.State.STARTED)
-        lazyProp = lifecycleAwareLazy(owner) { "Hello World" }
+        lazyProp = lifecycleAwareLazy(owner, { "" }) { "Hello World" to EmptyDisposable.INSTANCE }
         assertTrue(lazyProp.isInitialized())
     }
 }

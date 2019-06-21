@@ -1,6 +1,7 @@
 package com.airbnb.mvrx
 
 import android.app.Application
+import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 
@@ -50,6 +51,11 @@ sealed class ViewModelContext {
     abstract val activity: FragmentActivity
 
     /**
+     * The ViewModel key used to uniquely identify it in the ViewModelStore.
+     */
+    abstract val key: String
+
+    /**
      * Convenience method to type [activity].
      */
     @Suppress("UNCHECKED_CAST")
@@ -80,7 +86,8 @@ sealed class ViewModelContext {
  */
 class ActivityViewModelContext(
     override val activity: FragmentActivity,
-    override val args: Any?
+    override val args: Any?,
+    override val key: String
 ) : ViewModelContext()
 
 /**
@@ -93,7 +100,8 @@ class FragmentViewModelContext(
     /**
      * The fragment owner of the ViewModel.
      */
-    val fragment: Fragment
+    val fragment: Fragment,
+    override val key: String
 ) : ViewModelContext() {
     /**
      * Convenience method to type [fragment].
@@ -101,3 +109,12 @@ class FragmentViewModelContext(
     @Suppress("UNCHECKED_CAST")
     fun <F : Fragment> fragment(): F = fragment as F
 }
+
+class ViewViewModelContext(
+    override val activity: FragmentActivity,
+    val fragment: Fragment?,
+    override val args: Any?,
+    val view: View,
+    internal val owner: MvRxViewModelStoreOwner,
+    override val key: String
+) : ViewModelContext()

@@ -3,6 +3,7 @@ package com.airbnb.mvrx
 import androidx.annotation.RestrictTo
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelProviders
 import kotlin.reflect.full.primaryConstructor
 
@@ -35,6 +36,7 @@ object MvRxViewModelProvider {
         return when (viewModelContext) {
             is ActivityViewModelContext -> ViewModelProviders.of(viewModelContext.activity, factory)
             is FragmentViewModelContext -> ViewModelProviders.of(viewModelContext.fragment, factory)
+            is ViewViewModelContext -> ViewModelProvider(viewModelContext.owner.mvrxViewModelStore.viewViewModels.getStore(viewModelContext.view), factory)
         }.get(key, viewModelClass)
     }
 

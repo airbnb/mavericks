@@ -40,6 +40,13 @@
             app:exitAnim="@anim/anim_exit"
             app:popEnterAnim="@anim/anim_pop_enter"
             app:popExitAnim="@anim/anim_pop_exit" />
+        <action
+            android:id="@+id/action_main_to_statefulViewFragment"
+            app:destination="@id/statefulViewFragment"
+            app:enterAnim="@anim/anim_enter"
+            app:exitAnim="@anim/anim_exit"
+            app:popEnterAnim="@anim/anim_pop_enter"
+            app:popExitAnim="@anim/anim_pop_exit"/>
     </fragment>
 
     <fragment
@@ -79,4 +86,15 @@
     <fragment
         android:id="@+id/helloWorldFragment"
         android:name="com.airbnb.mvrx.sample.features.helloworld.HelloWorldFragment" />
+    <fragment
+        android:id="@+id/statefulViewFragment"
+        android:name="com.airbnb.mvrx.sample.features.statefulview.StatefulViewFragment" >
+        <action
+            android:id="@+id/action_statefulViewFragment_self"
+            app:destination="@id/statefulViewFragment"
+            app:enterAnim="@anim/anim_enter"
+            app:exitAnim="@anim/anim_exit"
+            app:popEnterAnim="@anim/anim_pop_enter"
+            app:popExitAnim="@anim/anim_pop_exit"/>
+    </fragment>
 </navigation>

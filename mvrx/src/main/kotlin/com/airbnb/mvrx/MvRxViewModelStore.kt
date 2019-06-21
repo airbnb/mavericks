@@ -1,10 +1,10 @@
 package com.airbnb.mvrx
 
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelStore
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelStore
 import com.airbnb.mvrx.MvRxViewModelProvider.createViewModel
 import kotlin.collections.set
 
@@ -24,6 +24,8 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
      */
     @Suppress("UNCHECKED_CAST")
     private val map: HashMap<String, ViewModel> by lazy { mMapMethod.get(viewModelStore)!! as HashMap<String, ViewModel> }
+
+    internal val viewViewModels = ViewViewModelStore()
 
     /**
      * In a new process, the _Activity_ will restore Activity ViewModels created by Fragments, not the Fragment which created the ViewModel.
@@ -105,8 +107,8 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
             val holder = viewModelsState.getParcelable<MvRxPersistedViewModelHolder>(key)
                 ?: throw IllegalStateException("ViewModel key: $key expected to be in stored ViewModels but was not found.")
             map[key] = when (host) {
-                is Fragment -> restoreViewModel(host, holder, arguments)
-                is FragmentActivity -> restoreViewModel(host, holder, arguments)
+                is Fragment -> restoreViewModel(host, holder, arguments, key)
+                is FragmentActivity -> restoreViewModel(host, holder, arguments, key)
                 else -> throw IllegalStateException("Host: $host is expected to be either Fragment or FragmentActivity.")
             }
         }
@@ -119,14 +121,15 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
             ?.let { fragmentArgsForActivityViewModelState.putAll(it) }
     }
 
-    private fun restoreViewModel(activity: FragmentActivity, holder: MvRxPersistedViewModelHolder, arguments: Any?): ViewModel {
+    private fun restoreViewModel(activity: FragmentActivity, holder: MvRxPersistedViewModelHolder, arguments: Any?, key: String): ViewModel {
         val (viewModelClass, stateClass, viewModelState) = holder
-        return createViewModel(viewModelClass, stateClass, ActivityViewModelContext(activity, arguments), viewModelState::restorePersistedState)
+        return createViewModel(viewModelClass, stateClass, ActivityViewModelContext(activity, arguments, key), viewModelState::restorePersistedState)
     }
 
-    private fun restoreViewModel(fragment: Fragment, holder: MvRxPersistedViewModelHolder, arguments: Any?): ViewModel {
+    private fun restoreViewModel(fragment: Fragment, holder: MvRxPersistedViewModelHolder, arguments: Any?, key: String): ViewModel {
         val (viewModelClass, stateClass, viewModelState) = holder
-        return createViewModel(viewModelClass, stateClass, FragmentViewModelContext(fragment.requireActivity(), arguments, fragment), viewModelState::restorePersistedState)
+        val viewModelContext = FragmentViewModelContext(fragment.requireActivity(), arguments, fragment, key)
+        return createViewModel(viewModelClass, stateClass, viewModelContext, viewModelState::restorePersistedState)
     }
 
     /**

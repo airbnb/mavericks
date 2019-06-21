@@ -43,7 +43,7 @@ class NoFactoryTest : BaseTest() {
     fun createFromActivityOwner() {
         class MyViewModel(initialState: FactoryState) : TestMvRxViewModel<FactoryState>(initialState)
 
-        val viewModel = MvRxViewModelProvider.get(MyViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello")))
+        val viewModel = MvRxViewModelProvider.get(MyViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello"), "hello"))
         withState(viewModel) { state ->
             assertEquals(FactoryState("hello constructor"), state)
         }
@@ -54,7 +54,7 @@ class NoFactoryTest : BaseTest() {
         val (_, fragment) = createFragment<ViewModelFactoryTestFragment, TestActivity>()
         class MyViewModel(initialState: FactoryState) : TestMvRxViewModel<FactoryState>(initialState)
 
-        val viewModel = MvRxViewModelProvider.get(MyViewModel::class.java, FactoryState::class.java, FragmentViewModelContext(activity, TestArgs("hello"), fragment))
+        val viewModel = MvRxViewModelProvider.get(MyViewModel::class.java, FactoryState::class.java, FragmentViewModelContext(activity, TestArgs("hello"), fragment, "hello"))
         withState(viewModel) { state ->
             assertEquals(FactoryState("hello constructor"), state)
         }
@@ -62,7 +62,7 @@ class NoFactoryTest : BaseTest() {
 
     @Test
     fun createWithNonFactoryCompanion() {
-        val viewModel = MvRxViewModelProvider.get(MyViewModelWithNonFactoryCompanion::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello")))
+        val viewModel = MvRxViewModelProvider.get(MyViewModelWithNonFactoryCompanion::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello"), "hello"))
         withState(viewModel) { state ->
             assertEquals(FactoryState("hello constructor"), state)
         }
@@ -75,31 +75,31 @@ class NoFactoryTest : BaseTest() {
         class MyViewModel(initialState: PrivateState) : TestMvRxViewModel<PrivateState>(initialState)
         // Create a view model to run state validation checks.
         @Suppress("UNUSED_VARIABLE")
-        val viewModel = MvRxViewModelProvider.get(MyViewModel::class.java, PrivateState::class.java, ActivityViewModelContext(activity, null))
+        val viewModel = MvRxViewModelProvider.get(MyViewModel::class.java, PrivateState::class.java, ActivityViewModelContext(activity, null, "hello"))
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun failOnDefaultState() {
         class MyViewModel(initialState: FactoryState = FactoryState()) : TestMvRxViewModel<FactoryState>(initialState)
-        MvRxViewModelProvider.get(MyViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, null))
+        MvRxViewModelProvider.get(MyViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, null, "hello"))
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun failOnWrongSingleParameterType() {
         class ViewModel : BaseMvRxViewModel<FactoryState>(initialState = FactoryState(), debugMode = false)
-        MvRxViewModelProvider.get(ViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, null))
+        MvRxViewModelProvider.get(ViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, null, "hello"))
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun failOnMultipleParametersAndNoCompanion() {
         class OptionalParamViewModel(initialState: FactoryState, debugMode: Boolean = false) : BaseMvRxViewModel<FactoryState>(initialState, debugMode)
-        MvRxViewModelProvider.get(OptionalParamViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, null))
+        MvRxViewModelProvider.get(OptionalParamViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, null, "hello"))
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun failOnNoViewModelParameters() {
         class OptionalParamViewModel : BaseMvRxViewModel<FactoryState>(initialState = FactoryState(), debugMode = false)
-        MvRxViewModelProvider.get(OptionalParamViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, null))
+        MvRxViewModelProvider.get(OptionalParamViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, null, "hello"))
     }
 }
 
@@ -153,7 +153,7 @@ class FactoryViewModelTest : BaseTest() {
 
     @Test
     fun createFromActivityOwner() {
-        val viewModel = MvRxViewModelProvider.get(TestFactoryViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello")))
+        val viewModel = MvRxViewModelProvider.get(TestFactoryViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello"), "hello"))
         withState(viewModel) { state ->
             assertEquals(FactoryState("hello constructor"), state)
         }
@@ -164,7 +164,7 @@ class FactoryViewModelTest : BaseTest() {
     fun createFromFragmentOwner() {
         val (_, fragment) = createFragment<ViewModelFactoryTestFragment, TestActivity>()
         fragment.arguments = Bundle().apply { putLong("otherProp", 6L) }
-        val viewModel = MvRxViewModelProvider.get(TestFactoryViewModel::class.java, FactoryState::class.java, FragmentViewModelContext(activity, TestArgs("hello"), fragment))
+        val viewModel = MvRxViewModelProvider.get(TestFactoryViewModel::class.java, FactoryState::class.java, FragmentViewModelContext(activity, TestArgs("hello"), fragment, "hello"))
         withState(viewModel) { state ->
             assertEquals(FactoryState("hello constructor"), state)
         }
@@ -173,7 +173,7 @@ class FactoryViewModelTest : BaseTest() {
 
     @Test
     fun createWithJvmStatic() {
-        val viewModel = MvRxViewModelProvider.get(TestFactoryJvmStaticViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello")))
+        val viewModel = MvRxViewModelProvider.get(TestFactoryJvmStaticViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello"), "hello"))
         withState(viewModel) { state ->
             assertEquals(FactoryState("hello constructor"), state)
         }
@@ -182,7 +182,7 @@ class FactoryViewModelTest : BaseTest() {
 
     @Test
     fun nullInitialStateDelegatesToConstructor() {
-        val viewModel = MvRxViewModelProvider.get(TestNullFactory::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello")))
+        val viewModel = MvRxViewModelProvider.get(TestNullFactory::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello"), "hello"))
         withState(viewModel) { state ->
             assertEquals(FactoryState("hello constructor"), state)
         }
@@ -190,7 +190,7 @@ class FactoryViewModelTest : BaseTest() {
 
     @Test
     fun testApplicationCanBeAccessed() {
-        MvRxViewModelProvider.get(ViewModelContextApplicationFactory::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello")))
+        MvRxViewModelProvider.get(ViewModelContextApplicationFactory::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello"), "hello"))
     }
 }
 
@@ -232,7 +232,7 @@ class FactoryStateTest : BaseTest() {
 
     @Test
     fun createFromActivityOwner() {
-        val viewModel = MvRxViewModelProvider.get(TestFactoryViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello")))
+        val viewModel = MvRxViewModelProvider.get(TestFactoryViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello"), "hello"))
         withState(viewModel) { state ->
             assertEquals(FactoryState("hello factory"), state)
         }
@@ -242,7 +242,7 @@ class FactoryStateTest : BaseTest() {
     fun createFromFragmentOwner() {
         val (_, fragment) = createFragment<ViewModelFactoryTestFragment, TestActivity>()
         fragment.arguments = Bundle().apply { putString("greeting", "howdy") }
-        val viewModel = MvRxViewModelProvider.get(TestFactoryViewModel::class.java, FactoryState::class.java, FragmentViewModelContext(activity, TestArgs("hello"), fragment))
+        val viewModel = MvRxViewModelProvider.get(TestFactoryViewModel::class.java, FactoryState::class.java, FragmentViewModelContext(activity, TestArgs("hello"), fragment, "hello"))
         withState(viewModel) { state ->
             assertEquals(FactoryState("howdy and hello factory"), state)
         }
@@ -250,7 +250,7 @@ class FactoryStateTest : BaseTest() {
 
     @Test
     fun createWithJvmStatic() {
-        val viewModel = MvRxViewModelProvider.get(TestFactoryJvmStaticViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello")))
+        val viewModel = MvRxViewModelProvider.get(TestFactoryJvmStaticViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello"), "hello"))
         withState(viewModel) { state ->
             assertEquals(FactoryState("hello factory"), state)
         }
@@ -258,7 +258,7 @@ class FactoryStateTest : BaseTest() {
 
     @Test
     fun nullInitialStateDelegatesToConstructor() {
-        val viewModel = MvRxViewModelProvider.get(TestNullFactory::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello")))
+        val viewModel = MvRxViewModelProvider.get(TestNullFactory::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello"), "hello"))
         withState(viewModel) { state ->
             assertEquals(FactoryState("hello constructor"), state)
         }
@@ -292,7 +292,7 @@ class FactoryViewModelAndStateTest : BaseTest() {
 
     @Test
     fun createFromActivityOwner() {
-        val viewModel = MvRxViewModelProvider.get(TestFactoryViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello")))
+        val viewModel = MvRxViewModelProvider.get(TestFactoryViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello"), "hello"))
         withState(viewModel) { state ->
             assertEquals(FactoryState("hello factory"), state)
         }
@@ -303,7 +303,7 @@ class FactoryViewModelAndStateTest : BaseTest() {
     fun createFromFragmentOwner() {
         val (_, fragment) = createFragment<ViewModelFactoryTestFragment, TestActivity>()
 
-        val viewModel = MvRxViewModelProvider.get(TestFactoryViewModel::class.java, FactoryState::class.java, FragmentViewModelContext(activity, TestArgs("hello"), fragment))
+        val viewModel = MvRxViewModelProvider.get(TestFactoryViewModel::class.java, FactoryState::class.java, FragmentViewModelContext(activity, TestArgs("hello"), fragment, "hello"))
         withState(viewModel) { state ->
             assertEquals(FactoryState("hello factory"), state)
         }
@@ -312,7 +312,7 @@ class FactoryViewModelAndStateTest : BaseTest() {
 
     @Test
     fun createWithJvmStatic() {
-        val viewModel = MvRxViewModelProvider.get(TestFactoryJvmStaticViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello")))
+        val viewModel = MvRxViewModelProvider.get(TestFactoryJvmStaticViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello"), "hello"))
         withState(viewModel) { state ->
             assertEquals(FactoryState("hello factory"), state)
         }

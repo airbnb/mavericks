@@ -1,20 +1,7 @@
 package com.airbnb.mvrx
 
-import android.os.Handler
-import android.os.Looper
-import android.os.Message
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import kotlin.reflect.KProperty1
-
-// Set of MvRxView identity hash codes that have a pending invalidate.
-private val pendingInvalidates = HashSet<Int>()
-private val handler = Handler(Looper.getMainLooper(), Handler.Callback { message ->
-    val view = message.obj as MvRxView
-    pendingInvalidates.remove(System.identityHashCode(view))
-    if (view.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) view.invalidate()
-    true
-})
 
 /**
  * Implement this in your MvRx capable Fragment.
@@ -57,9 +44,7 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
         get() = this
 
     fun postInvalidate() {
-        if (pendingInvalidates.add(System.identityHashCode(this@MvRxView))) {
-            handler.sendMessage(Message.obtain(handler, System.identityHashCode(this@MvRxView), this@MvRxView))
-        }
+        MvRxInvalidator.post(this)
     }
 
     /**
