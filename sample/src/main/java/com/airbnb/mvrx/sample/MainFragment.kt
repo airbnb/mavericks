@@ -29,6 +29,13 @@ class MainFragment : BaseFragment() {
         }
 
         basicRow {
+            id("parent_fragments")
+            title("Parent/Child ViewModel")
+            subtitle(demonstrates("parentFragmentViewModel"))
+            clickListener { _ -> navigateTo(R.id.action_main_to_parentFragment) }
+        }
+
+        basicRow {
             id("random_dad_joke")
             title("Random Dad Joke")
             subtitle(demonstrates("fragmentViewModel", "Network requests", "Dependency Injection"))

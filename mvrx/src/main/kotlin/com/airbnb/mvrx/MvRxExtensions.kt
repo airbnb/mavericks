@@ -1,10 +1,10 @@
 package com.airbnb.mvrx
 
-import androidx.lifecycle.ViewModelProviders
 import androidx.annotation.RestrictTo
 import androidx.annotation.RestrictTo.Scope.LIBRARY
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelProviders
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
@@ -27,6 +27,40 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragm
 ) where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
     MvRxViewModelProvider.get(viewModelClass.java, S::class.java, FragmentViewModelContext(this.requireActivity(), _fragmentArgsProvider(), this), keyFactory())
         .apply { subscribe(this@fragmentViewModel, subscriber = { postInvalidate() }) }
+}
+
+/**
+ * Gets or creates a ViewModel scoped to a parent fragment. This delegate will walk up the parentFragment hierarchy
+ * until it finds a Fragment that can provide the correct ViewModel. If no parent fragments can provide the ViewModel,
+ * a new one will be created in the direct parent of the curent Fragment.
+ */
+inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.parentFragmentViewModel(
+    viewModelClass: KClass<VM> = VM::class,
+    crossinline keyFactory: () -> String = { viewModelClass.java.name }
+): Lazy<VM> where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
+    requireNotNull(parentFragment) { "There is no parent fragment!" }
+    val factory = MvRxFactory { error("No ViewModel for this Fragment.") }
+    var fragment: Fragment? = this
+    var viewModel: VM? = null
+    val key = keyFactory()
+    while (fragment != null) {
+        try {
+            viewModel = ViewModelProviders.of(fragment, factory).get(key, viewModelClass.java)
+                .apply { subscribe(this@parentFragmentViewModel, subscriber = { postInvalidate() }) }
+            break
+        } catch (e: IllegalStateException) {
+            fragment = fragment.parentFragment
+        }
+    }
+    if (viewModel == null) {
+        val viewModelContext = FragmentViewModelContext(this.requireActivity(), _fragmentArgsProvider(), parentFragment as Fragment)
+        viewModel = MvRxViewModelProvider.get(viewModelClass.java, S::class.java, viewModelContext, keyFactory())
+    }
+    // There is a mismatch between the compiler inference and Android Studio inference.
+    // This code doesn't compile without the cast.
+    // May be related to: https://blog.jetbrains.com/kotlin/2019/06/kotlin-1-3-40-released/
+    @Suppress("USELESS_CAST")
+    viewModel as VM
 }
 
 /**

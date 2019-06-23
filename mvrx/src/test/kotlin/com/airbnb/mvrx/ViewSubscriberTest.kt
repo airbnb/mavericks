@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -462,5 +463,61 @@ class FragmentSubscriberTest : BaseTest() {
     @Test(expected = IllegalStateException::class)
     fun duplicateUniqueOnlySubscribeThrowIllegalStateException() {
          createFragment<DuplicateUniqueSubscriberFragment, TestActivity>(containerId = CONTAINER_ID)
+    }
+
+    class ParentFragment : BaseMvRxFragment() {
+
+        val viewModel: ViewSubscriberViewModel by fragmentViewModel()
+
+        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = FrameLayout(requireContext())
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            childFragmentManager.beginTransaction()
+                .add(ChildFragment(), "child")
+                .commit()
+        }
+
+        override fun invalidate() {
+        }
+    }
+
+    class ChildFragment : BaseMvRxFragment() {
+
+        val viewModel: ViewSubscriberViewModel by parentFragmentViewModel()
+
+        override fun invalidate() {
+        }
+    }
+
+    @Test
+    fun testParentFragment() {
+        val (_, parentFragment) = createFragment<ParentFragment, TestActivity>(containerId = CONTAINER_ID)
+        val childFragment = parentFragment.childFragmentManager.findFragmentByTag("child") as ChildFragment
+        assertEquals(parentFragment.viewModel, childFragment.viewModel)
+    }
+
+    class ParentFragmentWithoutViewModel : BaseMvRxFragment() {
+
+        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = FrameLayout(requireContext())
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            childFragmentManager.beginTransaction()
+                .add(ChildFragment(), "child1")
+                .commit()
+            childFragmentManager.beginTransaction()
+                .add(ChildFragment(), "child2")
+                .commit()
+        }
+
+        override fun invalidate() {
+        }
+    }
+
+    @Test
+    fun testChildFragmentsCanShareViewModelWithoutParent() {
+        val (_, parentFragment) = createFragment<ParentFragmentWithoutViewModel, TestActivity>(containerId = CONTAINER_ID)
+        val childFragment1 = parentFragment.childFragmentManager.findFragmentByTag("child1") as ChildFragment
+        val childFragment2 = parentFragment.childFragmentManager.findFragmentByTag("child2") as ChildFragment
+        assertEquals(childFragment1.viewModel, childFragment2.viewModel)
     }
 }
