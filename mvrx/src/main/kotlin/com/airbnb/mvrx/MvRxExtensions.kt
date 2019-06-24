@@ -40,7 +40,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.paren
 ): Lazy<VM> where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
     requireNotNull(parentFragment) { "There is no parent fragment!" }
     val factory = MvRxFactory { error("No ViewModel for this Fragment.") }
-    var fragment: Fragment? = this
+    var fragment: Fragment? = parentFragment
     var viewModel: VM? = null
     val key = keyFactory()
     while (fragment != null) {
