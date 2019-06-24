@@ -15,10 +15,11 @@ import kotlin.concurrent.fixedRateTimer
 internal class ViewViewModelStore {
 
     class ViewReference(
-        val view: View,
+        view: View,
         queue: ReferenceQueue<View>,
         private val store: ViewModelStore
     ) : WeakReference<View>(view, queue) {
+        val viewIdentity = System.identityHashCode(view)
 
         fun cleanUp() {
             store.clear()
@@ -77,7 +78,7 @@ internal class ViewViewModelStore {
             while (ref != null) {
                 Log.d("Gabe", "Pruning: $ref")
                 viewMap.remove(ref)
-                viewIdeneityRefMap.remove(System.identityHashCode(ref.view))
+                viewIdeneityRefMap.remove(ref.viewIdentity)
                 ref.cleanUp()
                 ref = referenceQueue.poll() as ViewReference?
             }
