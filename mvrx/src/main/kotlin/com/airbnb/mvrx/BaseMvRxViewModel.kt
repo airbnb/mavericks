@@ -156,14 +156,14 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     }
 
     /**
-     * Helper to map an Single to an Async property on the state object.
+     * Helper to map a Single to an Async property on the state object.
      */
     fun <T> Single<T>.execute(
         stateReducer: S.(Async<T>) -> S
     ) = toObservable().execute({ it }, null, stateReducer)
 
     /**
-     * Helper to map an Single to an Async property on the state object.
+     * Helper to map a Single to an Async property on the state object.
      * @param mapper A map converting the observable type to the desired AsyncData type.
      * @param stateReducer A reducer that is applied to the current state and should return the
      *                     new state. Because the state is the receiver and it likely a data
@@ -175,7 +175,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ) = toObservable().execute(mapper, null, stateReducer)
 
     /**
-     * Helper to map an observable to an Async property on the state object.
+     * Helper to map an Observable to an Async property on the state object.
      */
     fun <T> Observable<T>.execute(
         stateReducer: S.(Async<T>) -> S
@@ -186,7 +186,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      */
     fun Completable.execute(
         stateReducer: S.(Async<Unit>) -> S
-    ) = toSingle { Unit }.execute(stateReducer)
+    ) = toObservable<Unit>().execute(stateReducer)
+
+    /**
+     * Helper to subscribe to a Completable and ignore its output.
+     */
+    fun Completable.execute() = toObservable<Unit>().execute { this }
 
     /**
      * Execute an observable and wrap its progression with AsyncData reduced to the global state.
