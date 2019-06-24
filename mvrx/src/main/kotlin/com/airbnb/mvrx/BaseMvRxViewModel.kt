@@ -207,13 +207,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         successMetaData: ((T) -> Any)? = null,
         stateReducer: S.(Async<V>) -> S
     ): Disposable {
-        setState { stateReducer(Loading()) }
-
-        return map { value ->
-            val success = Success(mapper(value))
-            success.metadata = successMetaData?.invoke(value)
-            success as Async<V>
+        return map<Async<V>> { value ->
+            Success(mapper(value)).also {
+                it.metadata = successMetaData?.invoke(value)
+            }
         }
+            .startWith(Loading())
             .onErrorReturn { Fail(it) }
             .subscribe { asyncData -> setState { stateReducer(asyncData) } }
             .disposeOnClear()
