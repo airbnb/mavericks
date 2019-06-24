@@ -70,6 +70,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.viewV
 
         val context = ViewViewModelContext(activity, fragment, fragment?._fragmentArgsProvider(), this, storeOwner, key)
         val viewModel = MvRxViewModelProvider.get(viewModelClass.java, S::class.java, context, key)
+        // TODO: we can unsubscribe from the main invalidate call but not any manual subscriptions if the key ever changes.
         viewModel to viewModel.subscribe(viewLifecycleOwner, subscriber = { postOnInvalidate() })
     }
 }

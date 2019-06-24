@@ -39,6 +39,8 @@ class ViewLifecycleOwner(private val view: View) : LifecycleOwner {
             }
         })
 
+        // TODO: handle Activity lifecycle to handle screen off and backgrounding
+
         // This causes Views to get invalidated twice when they are attached to the window
         // We call onInvalidate directly immediately to ensure that the correct data is rendered
         // in the first frame. However, invalidate will get posted again as the lifecycle

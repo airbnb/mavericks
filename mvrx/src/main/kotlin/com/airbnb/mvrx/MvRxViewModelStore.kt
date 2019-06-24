@@ -25,6 +25,7 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
     @Suppress("UNCHECKED_CAST")
     private val map: HashMap<String, ViewModel> by lazy { mMapMethod.get(viewModelStore)!! as HashMap<String, ViewModel> }
 
+    /** This is only used for an Activities ViewModelStore. */
     internal val viewViewModels = ViewViewModelStore()
 
     /**
