@@ -1,9 +1,10 @@
 package com.airbnb.mvrx
 
+import android.util.SparseArray
 import androidx.collection.ArrayMap
 import androidx.collection.LongSparseArray
 import androidx.collection.SparseArrayCompat
-import android.util.SparseArray
+import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KProperty1
@@ -27,8 +28,9 @@ private const val IMMUTABLE_MAP_MESSAGE =
 internal fun KClass<*>.assertImmutability() {
     require(this.isData) { "MvRx state must be a data class!" }
 
-    fun KProperty1<*, *>.isSubtype(klass: KClass<*>) =
-        returnType.isSubtypeOf(klass.starProjectedType)
+    fun KProperty1<*, *>.isSubtype(vararg classes: KClass<*>): Boolean {
+        return classes.any { klass -> returnType.isSubtypeOf(klass.starProjectedType) }
+    }
 
     this.declaredMemberProperties.forEach { prop ->
         when {
@@ -37,9 +39,13 @@ internal fun KClass<*>.assertImmutability() {
             prop.isSubtype(SparseArray::class) -> "You cannot use SparseArray for ${prop.name}.\n$IMMUTABLE_LIST_MESSAGE"
             prop.isSubtype(LongSparseArray::class) -> "You cannot use LongSparseArray for ${prop.name}.\n$IMMUTABLE_LIST_MESSAGE"
             prop.isSubtype(SparseArrayCompat::class) -> "You cannot use SparseArrayCompat for ${prop.name}.\n$IMMUTABLE_LIST_MESSAGE"
-            prop.isSubtype(ArrayMap::class) -> "You cannot use ArrayMap for ${prop.name}.\n$IMMUTABLE_MAP_MESSAGE"
-            prop.isSubtype(android.util.ArrayMap::class) -> "You cannot use ArrayMap for ${prop.name}.\n$IMMUTABLE_MAP_MESSAGE"
+            prop.isSubtype(ArrayMap::class, android.util.ArrayMap::class) -> {
+                "You cannot use ArrayMap for ${prop.name}.\n$IMMUTABLE_MAP_MESSAGE"
+            }
             prop.isSubtype(HashMap::class) -> "You cannot use HashMap for ${prop.name}.\n$IMMUTABLE_MAP_MESSAGE"
+            prop.isSubtype(Function::class, KCallable::class) -> {
+                "You cannot use functions inside MvRx state. Only pure data should be represented: ${prop.name}"
+            }
             else -> null
         }?.let { throw IllegalArgumentException(it) }
     }

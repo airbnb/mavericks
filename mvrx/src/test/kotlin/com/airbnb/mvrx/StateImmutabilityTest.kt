@@ -2,9 +2,9 @@
 
 package com.airbnb.mvrx
 
+import android.util.SparseArray
 import androidx.collection.ArrayMap
 import androidx.collection.SparseArrayCompat
-import android.util.SparseArray
 import org.junit.Test
 
 class StateImmutabilityTest : BaseTest() {
@@ -66,6 +66,12 @@ class StateImmutabilityTest : BaseTest() {
     @Test(expected = IllegalArgumentException::class)
     fun sparseArrayCompat() {
         data class State(val map: SparseArrayCompat<Int> = SparseArrayCompat())
+        State::class.assertImmutability()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun lambda() {
+        data class State(val func: () -> Unit = {})
         State::class.assertImmutability()
     }
 }
