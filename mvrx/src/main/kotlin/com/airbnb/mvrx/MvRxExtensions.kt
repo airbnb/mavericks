@@ -41,31 +41,41 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.paren
     requireNotNull(parentFragment) { "There is no parent fragment!" }
     val factory = MvRxFactory { error("No ViewModel for this Fragment.") }
     var fragment: Fragment? = parentFragment
-    var viewModel: VM? = null
     val key = keyFactory()
     while (fragment != null) {
         try {
-            viewModel = ViewModelProviders.of(fragment, factory).get(key, viewModelClass.java)
+            return@lifecycleAwareLazy ViewModelProviders.of(fragment, factory).get(key, viewModelClass.java)
                 .apply { subscribe(this@parentFragmentViewModel, subscriber = { postInvalidate() }) }
-            break
         } catch (e: IllegalStateException) {
             fragment = fragment.parentFragment
         }
     }
-    if (viewModel == null) {
-        // ViewModel was not found. Create a new one in the top-most parent.
-        var topParentFragment = parentFragment
-        while (topParentFragment?.parentFragment != null) {
-            topParentFragment = topParentFragment.parentFragment
-        }
-        val viewModelContext = FragmentViewModelContext(this.requireActivity(), _fragmentArgsProvider(), topParentFragment!!)
-        viewModel = MvRxViewModelProvider.get(viewModelClass.java, S::class.java, viewModelContext, keyFactory())
+
+    // ViewModel was not found. Create a new one in the top-most parent.
+    var topParentFragment = parentFragment
+    while (topParentFragment?.parentFragment != null) {
+        topParentFragment = topParentFragment.parentFragment
     }
-    // There is a mismatch between the compiler inference and Android Studio inference.
-    // This code doesn't compile without the cast.
-    // May be related to: https://blog.jetbrains.com/kotlin/2019/06/kotlin-1-3-40-released/
-    @Suppress("USELESS_CAST")
-    viewModel as VM
+    val viewModelContext = FragmentViewModelContext(this.requireActivity(), _fragmentArgsProvider(), topParentFragment!!)
+    return@lifecycleAwareLazy MvRxViewModelProvider.get(viewModelClass.java, S::class.java, viewModelContext, keyFactory())
+        .apply { subscribe(this@parentFragmentViewModel, subscriber = { postInvalidate() }) }
+}
+
+/**
+ * Gets or creates a ViewModel scoped to a target fragment. Throws [IllegalStateException] if there is no target fragment.
+ */
+inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.targetFragmentViewModel(
+    viewModelClass: KClass<VM> = VM::class,
+    crossinline keyFactory: () -> String = { viewModelClass.java.name }
+): Lazy<VM> where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
+    val targetFragment = requireNotNull(targetFragment) { "There is no target fragment!" }
+    MvRxViewModelProvider.get(
+        viewModelClass.java,
+        S::class.java,
+        FragmentViewModelContext(this.requireActivity(), targetFragment._fragmentArgsProvider(), targetFragment),
+        keyFactory()
+    )
+        .apply { subscribe(this@targetFragmentViewModel, subscriber = { postInvalidate() }) }
 }
 
 /**
