@@ -471,12 +471,6 @@ class FragmentSubscriberTest : BaseTest() {
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = FrameLayout(requireContext())
 
-        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-            childFragmentManager.beginTransaction()
-                .add(ChildFragment(), "child")
-                .commit()
-        }
-
         override fun invalidate() {
         }
     }
@@ -492,7 +486,8 @@ class FragmentSubscriberTest : BaseTest() {
     @Test
     fun testParentFragment() {
         val (_, parentFragment) = createFragment<ParentFragment, TestActivity>(containerId = CONTAINER_ID)
-        val childFragment = parentFragment.childFragmentManager.findFragmentByTag("child") as ChildFragment
+        val childFragment = ChildFragment()
+        parentFragment.childFragmentManager.beginTransaction().add(childFragment, "child").commit()
         assertEquals(parentFragment.viewModel, childFragment.viewModel)
     }
 
@@ -518,6 +513,25 @@ class FragmentSubscriberTest : BaseTest() {
         val (_, parentFragment) = createFragment<ParentFragmentWithoutViewModel, TestActivity>(containerId = CONTAINER_ID)
         val childFragment1 = parentFragment.childFragmentManager.findFragmentByTag("child1") as ChildFragment
         val childFragment2 = parentFragment.childFragmentManager.findFragmentByTag("child2") as ChildFragment
+        assertEquals(childFragment1.viewModel, childFragment2.viewModel)
+    }
+
+    class EmptyMvRxFragment : BaseMvRxFragment() {
+        override fun invalidate() {
+        }
+    }
+
+    @Test
+    fun testCreatesViewModelInTopMostFragment() {
+        val (_, parentFragment) = createFragment<ParentFragmentWithoutViewModel, TestActivity>(containerId = CONTAINER_ID)
+        val middleFragment = Fragment()
+        parentFragment.childFragmentManager.beginTransaction().add(middleFragment, "middle").commitNow()
+        val childFragment1 = ChildFragment()
+        middleFragment.childFragmentManager.beginTransaction().add(childFragment1, "child1").commitNow()
+
+        val childFragment2 = ChildFragment()
+        parentFragment.childFragmentManager.beginTransaction().add(childFragment2, "child2").commitNow()
+
         assertEquals(childFragment1.viewModel, childFragment2.viewModel)
     }
 }

@@ -32,7 +32,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragm
 /**
  * Gets or creates a ViewModel scoped to a parent fragment. This delegate will walk up the parentFragment hierarchy
  * until it finds a Fragment that can provide the correct ViewModel. If no parent fragments can provide the ViewModel,
- * a new one will be created in the direct parent of the curent Fragment.
+ * a new one will be created in top-most parent Fragment.
  */
 inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.parentFragmentViewModel(
     viewModelClass: KClass<VM> = VM::class,
@@ -53,7 +53,12 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.paren
         }
     }
     if (viewModel == null) {
-        val viewModelContext = FragmentViewModelContext(this.requireActivity(), _fragmentArgsProvider(), parentFragment as Fragment)
+        // ViewModel was not found. Create a new one in the top-most parent.
+        var topParentFragment = parentFragment
+        while (topParentFragment?.parentFragment != null) {
+            topParentFragment = topParentFragment.parentFragment
+        }
+        val viewModelContext = FragmentViewModelContext(this.requireActivity(), _fragmentArgsProvider(), topParentFragment!!)
         viewModel = MvRxViewModelProvider.get(viewModelClass.java, S::class.java, viewModelContext, keyFactory())
     }
     // There is a mismatch between the compiler inference and Android Studio inference.
