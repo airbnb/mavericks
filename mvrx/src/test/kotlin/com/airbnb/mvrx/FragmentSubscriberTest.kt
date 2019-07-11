@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -462,5 +463,123 @@ class FragmentSubscriberTest : BaseTest() {
     @Test(expected = IllegalStateException::class)
     fun duplicateUniqueOnlySubscribeThrowIllegalStateException() {
          createFragment<DuplicateUniqueSubscriberFragment, TestActivity>(containerId = CONTAINER_ID)
+    }
+
+    class ParentFragment : BaseMvRxFragment() {
+
+        val viewModel: ViewSubscriberViewModel by fragmentViewModel()
+
+        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = FrameLayout(requireContext())
+
+        override fun invalidate() {
+        }
+    }
+
+    class ChildFragmentWithParentViewModel : BaseMvRxFragment() {
+
+        val viewModel: ViewSubscriberViewModel by parentFragmentViewModel()
+
+        override fun invalidate() {
+        }
+    }
+
+    @Test
+    fun testParentFragment() {
+        val (_, parentFragment) = createFragment<ParentFragment, TestActivity>(containerId = CONTAINER_ID)
+        val childFragment = ChildFragmentWithParentViewModel()
+        parentFragment.childFragmentManager.beginTransaction().add(childFragment, "child").commit()
+        assertEquals(parentFragment.viewModel, childFragment.viewModel)
+    }
+
+    class ParentFragmentWithoutViewModel : BaseMvRxFragment() {
+
+        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = FrameLayout(requireContext())
+
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            childFragmentManager.beginTransaction()
+                .add(ChildFragmentWithParentViewModel(), "child1")
+                .commit()
+            childFragmentManager.beginTransaction()
+                .add(ChildFragmentWithParentViewModel(), "child2")
+                .commit()
+        }
+
+        override fun invalidate() {
+        }
+    }
+
+    @Test
+    fun testChildFragmentsCanShareViewModelWithoutParent() {
+        val (_, parentFragment) = createFragment<ParentFragmentWithoutViewModel, TestActivity>(containerId = CONTAINER_ID)
+        val childFragment1 = parentFragment.childFragmentManager.findFragmentByTag("child1") as ChildFragmentWithParentViewModel
+        val childFragment2 = parentFragment.childFragmentManager.findFragmentByTag("child2") as ChildFragmentWithParentViewModel
+        assertEquals(childFragment1.viewModel, childFragment2.viewModel)
+    }
+
+    class EmptyMvRxFragment : BaseMvRxFragment() {
+        override fun invalidate() {
+        }
+    }
+
+    @Test
+    fun testCreatesViewModelInTopMostFragment() {
+        val (_, parentFragment) = createFragment<ParentFragmentWithoutViewModel, TestActivity>(containerId = CONTAINER_ID)
+        val middleFragment = Fragment()
+        parentFragment.childFragmentManager.beginTransaction().add(middleFragment, "middle").commitNow()
+        val childFragment1 = ChildFragmentWithParentViewModel()
+        middleFragment.childFragmentManager.beginTransaction().add(childFragment1, "child1").commitNow()
+
+        val childFragment2 = ChildFragmentWithParentViewModel()
+        parentFragment.childFragmentManager.beginTransaction().add(childFragment2, "child2").commitNow()
+
+        assertEquals(childFragment1.viewModel, childFragment2.viewModel)
+    }
+
+    class FragmentWithTarget : BaseMvRxFragment() {
+        val viewModel: ViewSubscriberViewModel by targetFragmentViewModel()
+
+        var invalidateCount = 0
+
+        override fun invalidate() {
+            invalidateCount++
+        }
+    }
+
+    @Test
+    fun testTargetFragment() {
+        val (_, parentFragment) = createFragment<EmptyMvRxFragment, TestActivity>(containerId = CONTAINER_ID)
+        val targetFragment = EmptyMvRxFragment()
+        parentFragment.childFragmentManager.beginTransaction().add(targetFragment, "target").commitNow()
+        val fragmentWithTarget = FragmentWithTarget()
+        fragmentWithTarget.setTargetFragment(targetFragment, 123)
+        parentFragment.childFragmentManager.beginTransaction().add(fragmentWithTarget, "fragment-with-target").commitNow()
+        // Make sure subscribe works.
+        assertEquals(1, fragmentWithTarget.invalidateCount)
+        fragmentWithTarget.viewModel.setFoo(1)
+        assertEquals(2, fragmentWithTarget.invalidateCount)
+    }
+
+    @Test
+    fun testTargetFragmentsShareViewModel() {
+        val (_, parentFragment) = createFragment<EmptyMvRxFragment, TestActivity>(containerId = CONTAINER_ID)
+        val targetFragment = EmptyMvRxFragment()
+        parentFragment.childFragmentManager.beginTransaction().add(targetFragment, "target").commitNow()
+        val fragmentWithTarget1 = FragmentWithTarget()
+        fragmentWithTarget1.setTargetFragment(targetFragment, 123)
+        parentFragment.childFragmentManager.beginTransaction().add(fragmentWithTarget1, "fragment-with-target1").commitNow()
+        val fragmentWithTarget2 = FragmentWithTarget()
+        fragmentWithTarget2.setTargetFragment(targetFragment, 123)
+        parentFragment.childFragmentManager.beginTransaction().add(fragmentWithTarget2, "fragment-with-target2").commitNow()
+        assertEquals(fragmentWithTarget1.viewModel, fragmentWithTarget2.viewModel)
+    }
+
+    /**
+     * This would be [IllegalStateException] except it fails during the Fragment transaction so it's a RuntimeException.
+     */
+    @Test(expected = RuntimeException::class)
+    fun testTargetFragmentWithoutTargetCrashes() {
+        val (_, parentFragment) = createFragment<EmptyMvRxFragment, TestActivity>(containerId = CONTAINER_ID)
+        val fragmentWithTarget = FragmentWithTarget()
+        parentFragment.childFragmentManager.beginTransaction().add(fragmentWithTarget, "fragment-with-target").commitNow()
     }
 }

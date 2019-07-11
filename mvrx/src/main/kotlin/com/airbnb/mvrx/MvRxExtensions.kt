@@ -1,10 +1,10 @@
 package com.airbnb.mvrx
 
-import androidx.lifecycle.ViewModelProviders
 import androidx.annotation.RestrictTo
 import androidx.annotation.RestrictTo.Scope.LIBRARY
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelProviders
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
@@ -27,6 +27,60 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragm
 ) where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
     MvRxViewModelProvider.get(viewModelClass.java, S::class.java, FragmentViewModelContext(this.requireActivity(), _fragmentArgsProvider(), this), keyFactory())
         .apply { subscribe(this@fragmentViewModel, subscriber = { postInvalidate() }) }
+}
+
+/**
+ * Gets or creates a ViewModel scoped to a parent fragment. This delegate will walk up the parentFragment hierarchy
+ * until it finds a Fragment that can provide the correct ViewModel. If no parent fragments can provide the ViewModel,
+ * a new one will be created in top-most parent Fragment.
+ */
+inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.parentFragmentViewModel(
+    viewModelClass: KClass<VM> = VM::class,
+    crossinline keyFactory: () -> String = { viewModelClass.java.name }
+): Lazy<VM> where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
+    requireNotNull(parentFragment) { "There is no parent fragment for ${this::class.java.simpleName}!" }
+    val notFoundMessage by lazy { "There is no ViewModel of type ${VM::class.java.simpleName} for this Fragment!" }
+    val factory = MvRxFactory { error(notFoundMessage) }
+    var fragment: Fragment? = parentFragment
+    val key = keyFactory()
+    while (fragment != null) {
+        try {
+            return@lifecycleAwareLazy ViewModelProviders.of(fragment, factory).get(key, viewModelClass.java)
+                .apply { subscribe(this@parentFragmentViewModel, subscriber = { postInvalidate() }) }
+        } catch (e: java.lang.IllegalStateException) {
+            if (e.message == notFoundMessage) {
+                fragment = fragment.parentFragment
+            } else {
+                throw e
+            }
+        }
+    }
+
+    // ViewModel was not found. Create a new one in the top-most parent.
+    var topParentFragment = parentFragment
+    while (topParentFragment?.parentFragment != null) {
+        topParentFragment = topParentFragment.parentFragment
+    }
+    val viewModelContext = FragmentViewModelContext(this.requireActivity(), _fragmentArgsProvider(), topParentFragment!!)
+    return@lifecycleAwareLazy MvRxViewModelProvider.get(viewModelClass.java, S::class.java, viewModelContext, keyFactory())
+        .apply { subscribe(this@parentFragmentViewModel, subscriber = { postInvalidate() }) }
+}
+
+/**
+ * Gets or creates a ViewModel scoped to a target fragment. Throws [IllegalStateException] if there is no target fragment.
+ */
+inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.targetFragmentViewModel(
+    viewModelClass: KClass<VM> = VM::class,
+    crossinline keyFactory: () -> String = { viewModelClass.java.name }
+): Lazy<VM> where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
+    val targetFragment = requireNotNull(targetFragment) { "There is no target fragment for ${this::class.java.simpleName}!" }
+    MvRxViewModelProvider.get(
+        viewModelClass.java,
+        S::class.java,
+        FragmentViewModelContext(this.requireActivity(), targetFragment._fragmentArgsProvider(), targetFragment),
+        keyFactory()
+    )
+        .apply { subscribe(this@targetFragmentViewModel, subscriber = { postInvalidate() }) }
 }
 
 /**

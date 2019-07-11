@@ -40,6 +40,9 @@
             app:exitAnim="@anim/anim_exit"
             app:popEnterAnim="@anim/anim_pop_enter"
             app:popExitAnim="@anim/anim_pop_exit" />
+        <action
+            android:id="@+id/action_main_to_parentFragment"
+            app:destination="@id/parentFragment" />
     </fragment>
 
     <fragment
@@ -79,4 +82,8 @@
     <fragment
         android:id="@+id/helloWorldFragment"
         android:name="com.airbnb.mvrx.sample.features.helloworld.HelloWorldFragment" />
+    <fragment
+        android:id="@+id/parentFragment"
+        android:name="com.airbnb.mvrx.sample.features.parentfragment.ParentFragment"
+        android:label="ParentFragment" />
 </navigation>
