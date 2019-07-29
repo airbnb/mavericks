@@ -105,8 +105,8 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
             val holder = viewModelsState.getParcelable<MvRxPersistedViewModelHolder>(key)
                 ?: throw IllegalStateException("ViewModel key: $key expected to be in stored ViewModels but was not found.")
             map[key] = when (host) {
-                is Fragment -> restoreViewModel(host, holder, arguments)
-                is FragmentActivity -> restoreViewModel(host, holder, arguments)
+                is Fragment -> restoreViewModel(key, host, holder, arguments)
+                is FragmentActivity -> restoreViewModel(key, host, holder, arguments)
                 else -> throw IllegalStateException("Host: $host is expected to be either Fragment or FragmentActivity.")
             }
         }
@@ -119,14 +119,14 @@ class MvRxViewModelStore(private val viewModelStore: ViewModelStore) {
             ?.let { fragmentArgsForActivityViewModelState.putAll(it) }
     }
 
-    private fun restoreViewModel(activity: FragmentActivity, holder: MvRxPersistedViewModelHolder, arguments: Any?): ViewModel {
+    private fun restoreViewModel(key: String, activity: FragmentActivity, holder: MvRxPersistedViewModelHolder, arguments: Any?): ViewModel {
         val (viewModelClass, stateClass, viewModelState) = holder
-        return createViewModel(viewModelClass, stateClass, ActivityViewModelContext(activity, arguments), viewModelState::restorePersistedState)
+        return createViewModel(key, viewModelClass, stateClass, ActivityViewModelContext(activity, arguments), viewModelState::restorePersistedState)
     }
 
-    private fun restoreViewModel(fragment: Fragment, holder: MvRxPersistedViewModelHolder, arguments: Any?): ViewModel {
+    private fun restoreViewModel(key: String, fragment: Fragment, holder: MvRxPersistedViewModelHolder, arguments: Any?): ViewModel {
         val (viewModelClass, stateClass, viewModelState) = holder
-        return createViewModel(viewModelClass, stateClass, FragmentViewModelContext(fragment.requireActivity(), arguments, fragment), viewModelState::restorePersistedState)
+        return createViewModel(key, viewModelClass, stateClass, FragmentViewModelContext(fragment.requireActivity(), arguments, fragment), viewModelState::restorePersistedState)
     }
 
     /**

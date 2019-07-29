@@ -3,6 +3,7 @@ package com.airbnb.mvrx
 import android.app.Application
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.savedstate.SavedStateRegistry
 
 /**
  * Implement this on your ViewModel's companion object for hooks into state creation and ViewModel creation. For example, if you need access
@@ -49,6 +50,8 @@ sealed class ViewModelContext {
      */
     abstract val activity: FragmentActivity
 
+    internal abstract val savedStateRegistry: SavedStateRegistry
+
     /**
      * Convenience method to type [activity].
      */
@@ -81,7 +84,9 @@ sealed class ViewModelContext {
 class ActivityViewModelContext(
     override val activity: FragmentActivity,
     override val args: Any?
-) : ViewModelContext()
+) : ViewModelContext() {
+    override val savedStateRegistry = activity.savedStateRegistry
+}
 
 /**
  * The [ViewModelContext] for a ViewModel created with a
@@ -95,6 +100,8 @@ class FragmentViewModelContext(
      */
     val fragment: Fragment
 ) : ViewModelContext() {
+
+    override val savedStateRegistry = fragment.savedStateRegistry
     /**
      * Convenience method to type [fragment].
      */

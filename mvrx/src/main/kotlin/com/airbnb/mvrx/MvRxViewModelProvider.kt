@@ -1,5 +1,7 @@
 package com.airbnb.mvrx
 
+import android.os.Bundle
+import android.os.Parcelable
 import androidx.annotation.RestrictTo
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -28,10 +30,26 @@ object MvRxViewModelProvider {
         stateClass: Class<out S>,
         viewModelContext: ViewModelContext,
         key: String = viewModelClass.name,
-        initialStateFactory: MvRxStateFactory<VM, S> = RealMvRxStateFactory()
+        initialStateFactory: MvRxStateFactory<VM, S> = RealMvRxStateFactory(),
+        viewModelFactory: MvRxFactory<VM> = MvRxFactory { createViewModel(key, viewModelClass, stateClass, viewModelContext, initialStateFactory = initialStateFactory) }
     ): VM {
+        // check if this needs to be recreated from saved state due to process being restarted
+        val restoreViewModelFactory = viewModelContext.savedStateRegistry.consumeRestoredStateForKey(key)?.let { savedStateBundle ->
+            val restoredArgs = savedStateBundle.get(KEY_MVRX_SAVED_ARGS)
+            val restoredState = savedStateBundle.getBundle(KEY_MVRX_SAVED_INSTANCE_STATE)
+
+            requireNotNull(restoredState) { "State was not saved prior to restoring!"}
+
+            val restoredContext = when (viewModelContext) {
+                is ActivityViewModelContext -> ActivityViewModelContext(viewModelContext.activity, restoredArgs)
+                is FragmentViewModelContext -> FragmentViewModelContext(viewModelContext.activity, restoredArgs, viewModelContext.fragment)
+            }
+            MvRxFactory { createViewModel(key, viewModelClass, stateClass, restoredContext, restoredState::restorePersistedState) }
+        }
+
+        val factory = restoreViewModelFactory ?: viewModelFactory
+
         // This wraps the fact that ViewModelProvider.of has individual methods for Fragment and FragmentActivity.
-        val factory = MvRxFactory { createViewModel(viewModelClass, stateClass, viewModelContext, initialStateFactory = initialStateFactory) }
         return when (viewModelContext) {
             is ActivityViewModelContext -> ViewModelProviders.of(viewModelContext.activity, factory)
             is FragmentViewModelContext -> ViewModelProviders.of(viewModelContext.fragment, factory)
@@ -40,6 +58,7 @@ object MvRxViewModelProvider {
 
     @Suppress("UNCHECKED_CAST")
     internal fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModel(
+        key: String,
         viewModelClass: Class<out VM>,
         stateClass: Class<out S>,
         viewModelContext: ViewModelContext,
@@ -57,8 +76,7 @@ object MvRxViewModelProvider {
                     .invoke(null, viewModelContext, initialState) as VM?
             }
         }
-        val viewModel = factoryViewModel ?: createDefaultViewModel(viewModelClass, initialState)
-        return requireNotNull(viewModel) {
+        val viewModel = requireNotNull(factoryViewModel ?: createDefaultViewModel(viewModelClass, initialState)) {
             // If null, use Kotlin reflect for best error message. We will crash anyway, so performance
             // doesn't matter.
             if (viewModelClass.kotlin.primaryConstructor?.parameters?.size?.let { it > 1 } == true) {
@@ -70,6 +88,17 @@ object MvRxViewModelProvider {
                     "single non-optional parameter that takes initial state of ${stateClass.simpleName}."
             }
         }
+
+        viewModelContext.savedStateRegistry.registerSavedStateProvider(key) {
+            withState(viewModel) { state ->
+                Bundle().apply {
+                    putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, state.persistState())
+                    putParcelable(KEY_MVRX_SAVED_ARGS, viewModelContext.args as Parcelable?)
+                }
+            }
+        }
+
+        return viewModel
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -84,6 +113,9 @@ object MvRxViewModelProvider {
         }
         return null
     }
+
+    private const val KEY_MVRX_SAVED_INSTANCE_STATE = "mvrx:saved_instance_state"
+    private const val KEY_MVRX_SAVED_ARGS = "mvrx:saved_args"
 }
 
 /**

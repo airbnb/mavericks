@@ -17,25 +17,4 @@ import androidx.appcompat.app.AppCompatActivity
  * 2) Replace your BaseActivity super class with this one.
  * 3) Manually integrate this into your base Activity (not recommended).
  */
-abstract class BaseMvRxActivity : AppCompatActivity(), MvRxViewModelStoreOwner {
-
-    /**
-     * MvRx has its own wrapped ViewModelStore that enables improved state restoration if Android
-     * kills your app and restores it in a new process.
-     */
-    override val mvrxViewModelStore by lazy { MvRxViewModelStore(viewModelStore) }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        /**
-         * This MUST be called before super!
-         * In a new process, super.onCreate will trigger Fragment.onCreate, which could access a ViewModel.
-         */
-        mvrxViewModelStore.restoreViewModels(this, savedInstanceState)
-        super.onCreate(savedInstanceState)
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        mvrxViewModelStore.saveViewModels(outState)
-    }
-}
+abstract class BaseMvRxActivity : AppCompatActivity()

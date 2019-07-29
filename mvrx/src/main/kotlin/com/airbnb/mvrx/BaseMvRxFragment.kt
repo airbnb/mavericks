@@ -12,14 +12,11 @@ import java.util.UUID
  */
 abstract class BaseMvRxFragment : Fragment(), MvRxView {
 
-    override val mvrxViewModelStore by lazy { MvRxViewModelStore(viewModelStore) }
-
     final override val mvrxViewId: String by lazy { mvrxPersistedViewId }
 
     private lateinit var mvrxPersistedViewId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        mvrxViewModelStore.restoreViewModels(this, savedInstanceState)
         mvrxPersistedViewId = savedInstanceState?.getString(PERSISTED_VIEW_ID_KEY) ?: this::class.java.simpleName + "_" + UUID.randomUUID().toString()
         super.onCreate(savedInstanceState)
     }
@@ -33,7 +30,6 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        mvrxViewModelStore.saveViewModels(outState)
         outState.putString(PERSISTED_VIEW_ID_KEY, mvrxViewId)
     }
 
