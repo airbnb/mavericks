@@ -11,7 +11,6 @@ buildscript {
     ext.navVersion = '2.0.0'
     ext.roomVersion = '2.0.0'
     ext.buildToolsVersion = '28.0.3'
-    ext.androidXTestVersion = '1.1.0'
     ext.espressoVersion = '3.1.1'
 
     repositories {
