@@ -14,13 +14,13 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
 
     override val mvrxViewModelStore by lazy { MvRxViewModelStore(viewModelStore) }
 
-    final override val mvrxViewId: String by lazy { mvrxPersistedViewId }
+    final override val mvrxViewId: String by lazy { mvrxPersistedViewId ?: generateUniqueId() }
 
-    private lateinit var mvrxPersistedViewId: String
+    private var mvrxPersistedViewId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         mvrxViewModelStore.restoreViewModels(this, savedInstanceState)
-        mvrxPersistedViewId = savedInstanceState?.getString(PERSISTED_VIEW_ID_KEY) ?: this::class.java.simpleName + "_" + UUID.randomUUID().toString()
+        mvrxPersistedViewId = savedInstanceState?.getString(PERSISTED_VIEW_ID_KEY)
         super.onCreate(savedInstanceState)
     }
 
@@ -43,6 +43,8 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
         // subscribe to a ViewModel.
         postInvalidate()
     }
+
+    private fun generateUniqueId() = this::class.java.simpleName + "_" + UUID.randomUUID().toString()
 }
 
 private const val PERSISTED_VIEW_ID_KEY = "mvrx:persisted_view_id"
