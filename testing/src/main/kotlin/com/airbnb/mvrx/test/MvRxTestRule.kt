@@ -39,7 +39,7 @@ class MvRxTestRule(
     override fun after() {
         RxAndroidPlugins.reset()
         MvRxTestOverridesProxy.forceMvRxDebug(DebugMode.Unset.value)
-        if (setRxImmediateSchedulers) clearRxImmediateScheduleres()
+        if (setRxImmediateSchedulers) clearRxImmediateSchedulers()
     }
 
     private fun setRxImmediateSchedulers() {
@@ -57,7 +57,7 @@ class MvRxTestRule(
         }
     }
 
-    private fun clearRxImmediateScheduleres() {
+    private fun clearRxImmediateSchedulers() {
         Thread.setDefaultUncaughtExceptionHandler(defaultExceptionHandler)
         defaultExceptionHandler = null
         RxJavaPlugins.reset()
