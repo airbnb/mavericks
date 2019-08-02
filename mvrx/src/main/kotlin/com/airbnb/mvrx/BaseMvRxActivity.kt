@@ -1,16 +1,14 @@
 package com.airbnb.mvrx
 
-import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 
 /**
  * Extend this class to get MvRx support out of the box.
  *
- * The purpose of this class is to:
- * 1) Be the host of MvRxFragments. MvRxFragments are the screen unit in MvRx. Activities are meant
- *    to just be the shell for your Fragments. There should be no business logic in your
- *    Activities anymore. Use activityViewModel to share state between screens.
- * 2) Properly configure MvRx so it has things like the correct ViewModelStore.
+ * The purpose of this class is to be the host of MvRxFragments.
+ * MvRxFragments are the screen unit in MvRx. Activities are meant
+ * to just be the shell for your Fragments. There should be no business logic in your
+ * Activities anymore. Use activityViewModel to share state between screens.
  *
  * To integrate this into your app. you may:
  * 1) Extend this directly.

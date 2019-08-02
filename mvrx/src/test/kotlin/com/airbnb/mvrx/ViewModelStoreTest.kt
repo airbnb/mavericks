@@ -11,6 +11,7 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Test
 import org.robolectric.Robolectric
 import org.robolectric.annotation.Config
+import java.lang.IllegalStateException
 
 @Parcelize
 data class ViewModelStoreTestArgs(val count: Int = 2) : Parcelable
@@ -21,25 +22,6 @@ data class ViewModelStoreTestState(val notPersistedCount: Int = 1, @PersistState
 
 class ViewModelStoreTestViewModel(initialState: ViewModelStoreTestState) : TestMvRxViewModel<ViewModelStoreTestState>(initialState) {
     fun setCount(count: Int) = setState { copy(persistedCount = count, notPersistedCount = count) }
-}
-
-class NoRestoreActivity : AppCompatActivity(), MvRxViewModelStoreOwner {
-    override val mvrxViewModelStore by lazy { MvRxViewModelStore(viewModelStore) }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setTheme(R.style.Theme_AppCompat_NoActionBar)
-    }
-}
-
-class NoSaveActivity : AppCompatActivity(), MvRxViewModelStoreOwner {
-    override val mvrxViewModelStore by lazy { MvRxViewModelStore(viewModelStore) }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        mvrxViewModelStore.restoreViewModels(this, savedInstanceState)
-        super.onCreate(savedInstanceState)
-        setTheme(R.style.Theme_AppCompat_NoActionBar)
-    }
 }
 
 class ViewModelStoreActivity : TestActivity() {
@@ -223,21 +205,6 @@ class ViewModelStoreTest : BaseTest() {
             assertEquals(3, state.notPersistedCount)
             assertEquals(2, state.persistedCount)
         }
-    }
-
-    @Test(expected = RuntimeException::class)
-    fun testNoRestoreInActivityCrashes() {
-        val (_, fragment) = createFragment<ViewModelStoreTestFragment, NoRestoreActivity>()
-        fragment.viewModelActivity
-    }
-
-    @Test(expected = IllegalStateException::class)
-    fun testNoSaveInActivityCrashes() {
-        val (controller, fragment) = createFragment<ViewModelStoreTestFragment, NoSaveActivity>()
-        fragment.viewModelActivity
-        val bundle = Bundle()
-        controller.saveInstanceState(bundle)
-        createFragment<ViewModelStoreTestFragment, NoSaveActivity>(savedInstanceState = bundle)
     }
 
     @Test

@@ -3,6 +3,7 @@ package com.airbnb.mvrx
 import android.app.Application
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistry
 
 /**
@@ -51,6 +52,7 @@ sealed class ViewModelContext {
     abstract val activity: FragmentActivity
 
     internal abstract val savedStateRegistry: SavedStateRegistry
+    internal abstract val owner: ViewModelStoreOwner
 
     /**
      * Convenience method to type [activity].
@@ -85,6 +87,7 @@ class ActivityViewModelContext(
     override val activity: FragmentActivity,
     override val args: Any?
 ) : ViewModelContext() {
+    override val owner = activity
     override val savedStateRegistry = activity.savedStateRegistry
 }
 
@@ -101,6 +104,7 @@ class FragmentViewModelContext(
     val fragment: Fragment
 ) : ViewModelContext() {
 
+    override val owner = fragment
     override val savedStateRegistry = fragment.savedStateRegistry
     /**
      * Convenience method to type [fragment].
