@@ -83,7 +83,7 @@ sealed class ViewModelContext {
  * reference is available when an activity scoped ViewModel is first created, during process restoration, activity scoped ViewModels will be created
  * _without_ a fragment reference, so it is only safe to reference the activity.
  */
-class ActivityViewModelContext(
+data class ActivityViewModelContext(
     override val activity: FragmentActivity,
     override val args: Any?
 ) : ViewModelContext() {
@@ -95,7 +95,7 @@ class ActivityViewModelContext(
  * The [ViewModelContext] for a ViewModel created with a
  * fragment scope (`val viewModel by fragmentViewModel<MyViewModel>`).
  */
-class FragmentViewModelContext(
+data class FragmentViewModelContext(
     override val activity: FragmentActivity,
     override val args: Any?,
     /**

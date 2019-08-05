@@ -11,6 +11,7 @@ import org.junit.Assert.assertNotEquals
 import org.junit.Test
 import org.robolectric.Robolectric
 import org.robolectric.android.controller.ActivityController
+import java.lang.IllegalStateException
 
 @Parcelize
 data class MvRxFactoryArgs(val initialCount: Int = 1) : Parcelable
@@ -25,6 +26,14 @@ data class MvRxFactoryState(
 class MyViewModel(initialState: MvRxFactoryState) : TestMvRxViewModel<MvRxFactoryState>(initialState) {
     fun setCount(count: Int) = setState { copy(persistedCount = count, notPersistedCount = count) }
 }
+
+data class InvalidArgs(val initialCount: Int = 1)
+
+data class InvalidState(val count: Int = 0) : MvRxState {
+    constructor(args: InvalidArgs) : this(count = args.initialCount)
+}
+
+class InvalidViewModel(initialState: InvalidState) : TestMvRxViewModel<InvalidState>(initialState)
 
 class MvRxFactoryTest : BaseTest() {
 
@@ -86,6 +95,24 @@ class MvRxFactoryTest : BaseTest() {
         }
     }
 
+    @Test(expected = IllegalStateException::class)
+    fun failForUnsupportedArgs() {
+        val key = "invalid_vm"
+        val vmClass = InvalidViewModel::class.java
+        val (controller, activity) = buildActivity()
+
+        ViewModelProviders.of(
+            activity,
+            MvRxFactory(
+                vmClass,
+                InvalidState::class.java,
+                ActivityViewModelContext(activity, InvalidArgs()),
+                key
+            )
+        ).get(key, vmClass)
+        controller.saveInstanceState(Bundle())
+    }
+
     private fun createMvRxFactory(
         activity: FragmentActivity,
         forExistingViewModel: Boolean = false
@@ -94,8 +121,7 @@ class MvRxFactoryTest : BaseTest() {
         MvRxFactoryState::class.java,
         ActivityViewModelContext(activity, MvRxFactoryArgs()),
         VM_KEY,
-        forExistingViewModel,
-        RealMvRxStateFactory()
+        forExistingViewModel
     )
 }
 

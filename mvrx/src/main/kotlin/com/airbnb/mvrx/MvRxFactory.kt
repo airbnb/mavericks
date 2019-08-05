@@ -16,36 +16,33 @@ class MvRxFactory<VM : BaseMvRxViewModel<S>, S : MvRxState>(
     private val stateClass: Class<out S>,
     private val viewModelContext: ViewModelContext,
     private val key: String,
-    private val forExistingViewModel: Boolean,
-    private val initialStateFactory: MvRxStateFactory<VM, S>
+    private val forExistingViewModel: Boolean = false,
+    private val initialStateFactory: MvRxStateFactory<VM, S> = RealMvRxStateFactory()
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        val (viewModelContext, viewModel) = viewModelContext.savedStateRegistry.consumeRestoredStateForKey(key)?.let { savedStateBundle ->
-            val restoredArgs = savedStateBundle.get(KEY_MVRX_SAVED_ARGS)
-            val restoredState = savedStateBundle.getBundle(KEY_MVRX_SAVED_INSTANCE_STATE)
+        val restoredState = viewModelContext.savedStateRegistry.consumeRestoredStateForKey(key)
 
-            requireNotNull(restoredState) { "State was not saved prior to restoring!" }
+        val (viewModelContext, stateRestorer) =
+            restoredState
+                ?.toRestoredState(viewModelContext)
+                ?: viewModelContext to { state: S -> state }
 
-            val restoredContext = when (viewModelContext) {
-                is ActivityViewModelContext -> ActivityViewModelContext(viewModelContext.activity, restoredArgs)
-                is FragmentViewModelContext -> FragmentViewModelContext(viewModelContext.activity, restoredArgs, viewModelContext.fragment)
-            }
-            restoredContext to createViewModel(viewModelClass, stateClass, restoredContext, key, restoredState::restorePersistedState)
-        } ?: viewModelContext to createViewModel(viewModelClass, stateClass, viewModelContext, key, forExistingViewModel = forExistingViewModel, initialStateFactory = initialStateFactory)
+        val viewModel = createViewModel(
+            viewModelClass,
+            stateClass,
+            viewModelContext,
+            key,
+            stateRestorer,
+            forExistingViewModel = restoredState == null && forExistingViewModel,
+            initialStateFactory = initialStateFactory
+        )
 
         viewModelContext.savedStateRegistry.registerSavedStateProvider(key) {
-            withState(viewModel) { state ->
-                Bundle().apply {
-                    putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, state.persistState())
-                    when (val args = viewModelContext.args) {
-                        is Parcelable -> putParcelable(KEY_MVRX_SAVED_ARGS, args)
-                        is Serializable -> putSerializable(KEY_MVRX_SAVED_ARGS, args)
-                    }
-                }
-            }
+            viewModel.getSavedStateBundle(viewModelContext)
         }
+
         return viewModel as T
     }
 }
@@ -56,9 +53,9 @@ private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModel(
     stateClass: Class<out S>,
     viewModelContext: ViewModelContext,
     key: String,
-    stateRestorer: (S) -> S = { it },
-    forExistingViewModel: Boolean = false,
-    initialStateFactory: MvRxStateFactory<VM, S> = RealMvRxStateFactory()
+    stateRestorer: (S) -> S,
+    forExistingViewModel: Boolean,
+    initialStateFactory: MvRxStateFactory<VM, S>
 ): VM {
     if (forExistingViewModel) {
         throw ViewModelDoesNotExistException(viewModelClass, viewModelContext, key)
@@ -102,6 +99,35 @@ private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createDefaultViewModel(vi
     }
     return null
 }
+
+private fun <S : MvRxState> Bundle.toRestoredState(viewModelContext: ViewModelContext): Pair<ViewModelContext, (S) -> S> {
+    val restoredArgs = get(KEY_MVRX_SAVED_ARGS)
+    val restoredState = getBundle(KEY_MVRX_SAVED_INSTANCE_STATE)
+
+    requireNotNull(restoredState) { "State was not saved prior to restoring!" }
+
+    val restoredContext = when (viewModelContext) {
+        is ActivityViewModelContext -> viewModelContext.copy(args = restoredArgs)
+        is FragmentViewModelContext -> viewModelContext.copy(args = restoredArgs)
+    }
+    return restoredContext to restoredState::restorePersistedState
+}
+
+private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> VM.getSavedStateBundle(viewModelContext: ViewModelContext) =
+    withState(this) { state ->
+        Bundle().apply {
+            putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, state.persistState())
+            viewModelContext.args?.let {
+                when (it) {
+                    is Parcelable -> putParcelable(KEY_MVRX_SAVED_ARGS, it)
+                    is Serializable -> putSerializable(KEY_MVRX_SAVED_ARGS, it)
+                    else -> throw IllegalStateException("Args must be parcelable or serializable")
+                }
+            }
+
+        }
+    }
+
 
 private const val KEY_MVRX_SAVED_INSTANCE_STATE = "mvrx:saved_instance_state"
 private const val KEY_MVRX_SAVED_ARGS = "mvrx:saved_args"

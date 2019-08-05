@@ -86,7 +86,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.targe
 }
 
 /**
- * [activityViewModel] except it will throw [ViewModelDoesNotExistException] if the ViewModel doesn't already exist.
+ * [activityViewModel] except it will throw [IllegalStateException] if the ViewModel doesn't already exist.
  * Use this for screens in the middle of a flow that cannot reasonably be an entrypoint to the flow.
  */
 inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.existingViewModel(
