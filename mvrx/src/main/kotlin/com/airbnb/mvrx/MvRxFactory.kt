@@ -24,6 +24,10 @@ class MvRxFactory<VM : BaseMvRxViewModel<S>, S : MvRxState>(
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         val restoredState = viewModelContext.savedStateRegistry.consumeRestoredStateForKey(key)
 
+        if (restoredState == null && forExistingViewModel) {
+            throw ViewModelDoesNotExistException(viewModelClass, viewModelContext, key)
+        }
+
         val (viewModelContext, stateRestorer) =
             restoredState
                 ?.toRestoredState(viewModelContext)
@@ -33,10 +37,8 @@ class MvRxFactory<VM : BaseMvRxViewModel<S>, S : MvRxState>(
             viewModelClass,
             stateClass,
             viewModelContext,
-            key,
             stateRestorer,
-            forExistingViewModel = restoredState == null && forExistingViewModel,
-            initialStateFactory = initialStateFactory
+            initialStateFactory
         )
 
         viewModelContext.savedStateRegistry.registerSavedStateProvider(key) {
@@ -52,15 +54,9 @@ private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModel(
     viewModelClass: Class<out VM>,
     stateClass: Class<out S>,
     viewModelContext: ViewModelContext,
-    key: String,
     stateRestorer: (S) -> S,
-    forExistingViewModel: Boolean,
     initialStateFactory: MvRxStateFactory<VM, S>
 ): VM {
-    if (forExistingViewModel) {
-        throw ViewModelDoesNotExistException(viewModelClass, viewModelContext, key)
-    }
-
     val initialState = initialStateFactory.createInitialState(viewModelClass, stateClass, viewModelContext, stateRestorer)
     val factoryViewModel = viewModelClass.factoryCompanion()?.let { factoryClass ->
         try {
