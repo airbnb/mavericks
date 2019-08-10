@@ -214,7 +214,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             success.metadata = successMetaData?.invoke(value)
             success as Async<V>
         }
-            .onErrorReturn { Fail(it) }
+            .onErrorReturn {
+                if (debugMode) Log.e(tag, "Observable encountered error", it)
+                Fail(it)
+            }
             .subscribe { asyncData -> setState { stateReducer(asyncData) } }
             .disposeOnClear()
     }
