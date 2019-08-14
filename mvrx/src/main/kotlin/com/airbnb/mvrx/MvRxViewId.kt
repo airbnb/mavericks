@@ -10,14 +10,7 @@ class MvRxViewId : ReadOnlyProperty<MvRxView, String> {
     private var value: String? = null
 
     override fun getValue(thisRef: MvRxView, property: KProperty<*>): String {
-        val currentValue = value
-        return if (currentValue == null) {
-            val id = generateUniqueId(thisRef)
-            value = id
-            id
-        } else {
-            currentValue
-        }
+        return value ?: generateUniqueId(thisRef).also { value = it }
     }
 
     private fun generateUniqueId(thisRef: MvRxView) = thisRef::class.java.simpleName + "_" + UUID.randomUUID().toString()
