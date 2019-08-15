@@ -37,3 +37,8 @@
 -keepclassmembers class ** implements com.airbnb.mvrx.MvRxState {
    *;
 }
+
+# The MvRxState object and the names classes that implement the MvRxState interfrace need to be
+# kept as they are accessed via reflection.
+-keepnames class com.airbnb.mvrx.MvRxState
+-keepnames class * implements com.airbnb.mvrx.MvRxState

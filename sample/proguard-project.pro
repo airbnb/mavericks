@@ -41,7 +41,7 @@
 }
 
 # Oddly need to keep that even though Evernote state is not used in the app.
--keepnames class * { @com.evernote.android.state.State *;}
+#-keepnames class * { @com.evernote.android.state.State *;}
 
 #
 # Keep rules that are unique to the sample project because it uses epoxy, okhttp3, moshi and retrofit.
@@ -160,3 +160,17 @@
 -keepclassmembers class kotlin.Metadata {
     public <methods>;
 }
+
+-dontwarn com.airbnb.mvrx.sample.features.parentfragment.ChildFragment$$special$$inlined$parentFragmentViewModel$1
+
+-keep class kotlin.reflect.jvm.internal.impl.builtins.BuiltInsLoaderImpl
+
+-keep class kotlin.reflect.jvm.internal.impl.load.java.FieldOverridabilityCondition
+
+-keep class kotlin.reflect.jvm.internal.impl.load.java.ErasedOverridabilityCondition
+
+-keep class kotlin.reflect.jvm.internal.impl.load.java.JavaIncompatibilityRulesOverridabilityCondition
+
+-keep interface  kotlin.reflect.jvm.internal.impl.builtins.BuiltInsLoader
+
+-keep class kotlin.reflect.jvm.internal.impl.serialization.deserialization.builtins.BuiltInsLoaderImpl
