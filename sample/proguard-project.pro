@@ -161,16 +161,9 @@
     public <methods>;
 }
 
--dontwarn com.airbnb.mvrx.sample.features.parentfragment.ChildFragment$$special$$inlined$parentFragmentViewModel$1
+#
+# For Kotlin reflection
+#
 
--keep class kotlin.reflect.jvm.internal.impl.builtins.BuiltInsLoaderImpl
+-keep interface kotlin.reflect.jvm.internal.impl.builtins.BuiltInsLoader
 
--keep class kotlin.reflect.jvm.internal.impl.load.java.FieldOverridabilityCondition
-
--keep class kotlin.reflect.jvm.internal.impl.load.java.ErasedOverridabilityCondition
-
--keep class kotlin.reflect.jvm.internal.impl.load.java.JavaIncompatibilityRulesOverridabilityCondition
-
--keep interface  kotlin.reflect.jvm.internal.impl.builtins.BuiltInsLoader
-
--keep class kotlin.reflect.jvm.internal.impl.serialization.deserialization.builtins.BuiltInsLoaderImpl
