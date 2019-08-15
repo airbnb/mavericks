@@ -19,6 +19,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KProperty1
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.declaredMemberProperties
+import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.isAccessible
@@ -70,8 +71,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         initialState::class.declaredMemberProperties.asSequence()
             .filter { it.visibility == KVisibility.PUBLIC }
             .forEach { prop ->
-                @Suppress("UNCHECKED_CAST")
-                (prop as? KProperty1<S, Any?>)?.get(initialState)
+                if (prop.findAnnotation<PersistState>() != null) {
+                    @Suppress("UNCHECKED_CAST")
+                    (prop as? KProperty1<S, Any?>)?.get(initialState)
+                }
             }
     }
 
