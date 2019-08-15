@@ -40,9 +40,6 @@
    long consumerIndex;
 }
 
-# Oddly need to keep that even though Evernote state is not used in the app.
-#-keepnames class * { @com.evernote.android.state.State *;}
-
 #
 # Keep rules that are unique to the sample project because it uses epoxy, okhttp3, moshi and retrofit.
 #
