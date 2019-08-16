@@ -207,12 +207,13 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         successMetaData: ((T) -> Any)? = null,
         stateReducer: S.(Async<V>) -> S
     ): Disposable {
+        // Intentionally didn't use RxJava's startWith operator. When withState is called right after execute then the loading reducer won't be enqueued yet if startWith is used.
         setState { stateReducer(Loading()) }
 
-        return map { value ->
+        return map<Async<V>> { value ->
             val success = Success(mapper(value))
             success.metadata = successMetaData?.invoke(value)
-            success as Async<V>
+            success
         }
             .onErrorReturn {
                 if (debugMode) Log.e(tag, "Observable encountered error", it)
