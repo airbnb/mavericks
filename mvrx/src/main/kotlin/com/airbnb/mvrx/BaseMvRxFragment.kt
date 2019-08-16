@@ -3,7 +3,6 @@ package com.airbnb.mvrx
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
-import java.util.UUID
 
 /**
  * Make your base Fragment class extend this to get MvRx functionality.
@@ -14,13 +13,12 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
 
     override val mvrxViewModelStore by lazy { MvRxViewModelStore(viewModelStore) }
 
-    final override val mvrxViewId: String by lazy { mvrxPersistedViewId }
-
-    private lateinit var mvrxPersistedViewId: String
+    private val mvrxViewIdProperty = MvRxViewId()
+    final override val mvrxViewId: String by mvrxViewIdProperty
 
     override fun onCreate(savedInstanceState: Bundle?) {
         mvrxViewModelStore.restoreViewModels(this, savedInstanceState)
-        mvrxPersistedViewId = savedInstanceState?.getString(PERSISTED_VIEW_ID_KEY) ?: this::class.java.simpleName + "_" + UUID.randomUUID().toString()
+        mvrxViewIdProperty.restoreFrom(savedInstanceState)
         super.onCreate(savedInstanceState)
     }
 
@@ -34,7 +32,7 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         mvrxViewModelStore.saveViewModels(outState)
-        outState.putString(PERSISTED_VIEW_ID_KEY, mvrxViewId)
+        mvrxViewIdProperty.saveTo(outState)
     }
 
     override fun onStart() {
@@ -44,5 +42,3 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
         postInvalidate()
     }
 }
-
-private const val PERSISTED_VIEW_ID_KEY = "mvrx:persisted_view_id"
