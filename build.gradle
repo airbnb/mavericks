@@ -6,7 +6,7 @@ buildscript {
     ext.robolectricVersion = '4.0.2'
     ext.epoxyVersion = '3.2.0'
     ext.moshiVersion = '1.6.0'
-    ext.koinVersion = '0.9.3'
+    ext.koinVersion = '2.0.1'
     ext.retrofitVersion = '2.4.0'
     ext.navVersion = '2.0.0'
     ext.roomVersion = '2.0.0'

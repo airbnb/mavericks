@@ -46,10 +46,9 @@ dependencies {
     implementation "com.squareup.moshi:moshi:$moshiVersion"
     implementation "com.squareup.moshi:moshi-kotlin:$moshiVersion"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
-    implementation "org.koin:koin-android-architecture:$koinVersion"
-    implementation "org.koin:koin-android:$koinVersion"
     implementation "androidx.navigation:navigation-fragment-ktx:$navVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navVersion"
+    implementation "org.koin:koin-android:$koinVersion"
 
     testImplementation 'junit:junit:4.12'
 }
