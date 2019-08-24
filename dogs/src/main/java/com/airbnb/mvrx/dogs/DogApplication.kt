@@ -1,4 +1,4 @@
-package com.airbnb.mvrx.dogs.app
+package com.airbnb.mvrx.dogs
 
 import android.app.Application
 import com.airbnb.mvrx.dogs.data.DogRepository

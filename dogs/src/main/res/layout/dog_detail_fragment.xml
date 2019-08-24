@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
+    <data>
+        <variable
+            name="dog"
+            type="com.airbnb.mvrx.dogs.data.Dog" />
+
+        <variable
+            name="handler"
+            type="com.airbnb.mvrx.dogs.views.DogDetailFragmentHandler" />
+    </data>
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimary">
+
+        <com.airbnb.mvrx.dogs.views.DogImageView
+            android:id="@+id/image"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:scaleType="centerCrop"
+            app:layout_constraintDimensionRatio="1.33"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:url="@{dog.imageUrl}"
+            tools:background="#ff777777" />
+
+        <ScrollView
+            android:id="@+id/descriptionScrollView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="8dp"
+            app:layout_constraintBottom_toTopOf="@id/loveButton"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@id/nameView"
+            app:layout_constraintTop_toBottomOf="@id/breedsView">
+
+            <TextView
+                android:id="@+id/descriptionView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                app:layout_constraintStart_toStartOf="@id/nameView"
+                app:layout_constraintTop_toBottomOf="@id/breedsView"
+                app:text="@{dog.description}"
+                tools:text="His name is Jules and he is named after his favorite author Jules Verne. Jules is a happy boy who love nothing more than to hang out indoors with you, and while he may not always want to take a 'Journey to the Center of the Earth', he'll be just as happy if you read it to him or watch the film together! He enjoys good company and sun bathing, weather permitting. You don't have to travel " />
+        </ScrollView>
+
+        <TextView
+            android:id="@+id/breedsView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            app:layout_constraintStart_toStartOf="@id/nameView"
+            app:layout_constraintTop_toBottomOf="@id/nameView"
+            android:text="@{dog.breeds}"
+            tools:text="Terrier, Pit Bull Mix" />
+
+        <TextView
+            android:id="@+id/nameView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:textColor="@android:color/white"
+            android:textSize="32sp"
+            android:text="@{dog.name}"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/image"
+            tools:text="Clover" />
+
+        <TextView
+            android:id="@+id/loveButton"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/adopt_button_background"
+            android:elevation="8dp"
+            android:gravity="center"
+            android:text="@string/love_dog"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:onClick="@{() -> handler.onLoveClicked()}"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

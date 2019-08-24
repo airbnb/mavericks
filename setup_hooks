@@ -5,7 +5,6 @@
 # Run Detekt on pre-push
 echo "
 #!/bin/bash
-cd Android
 ./detekt
 " > .git/hooks/pre-push
 

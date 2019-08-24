@@ -13,6 +13,10 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    dataBinding {
+        enabled = true
+    }
 }
 
 dependencies {
@@ -25,7 +29,6 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:$navVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navVersion"
     implementation("com.airbnb.android:epoxy:$epoxyVersion") { exclude group: 'com.android.support' }
-    kapt "com.airbnb.android:epoxy-processor:$epoxyVersion"
     implementation "com.squareup.moshi:moshi-kotlin:$moshiVersion"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
     implementation 'com.squareup.picasso:picasso:2.5.2'

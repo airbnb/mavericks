@@ -2,8 +2,7 @@ package com.airbnb.mvrx.dogs
 
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.ViewModelContext
-import com.airbnb.mvrx.dogs.app.DogApplication
-import com.airbnb.mvrx.dogs.app.MvRxViewModel
+import com.airbnb.mvrx.dogs.utils.MvRxViewModel
 import com.airbnb.mvrx.dogs.data.DogRepository
 import io.reactivex.schedulers.Schedulers
 

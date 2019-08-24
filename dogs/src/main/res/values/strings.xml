@@ -4,4 +4,6 @@
     <string name="adopt_dog">Adopt %1$s!</string>
     <string name="adopting_dogs">Adopting Dogs...</string>
     <string name="love_dog">I love this dog!</string>
+    <string name="congratulations">Congratulations,</string>
+    <string name="you_adopted">You adopted %1$s!</string>
 </resources>
