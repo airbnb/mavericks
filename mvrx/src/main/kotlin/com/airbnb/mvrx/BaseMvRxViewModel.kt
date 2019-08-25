@@ -3,6 +3,7 @@ package com.airbnb.mvrx
 import android.util.Log
 import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import com.airbnb.mvrx.MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER
@@ -78,6 +79,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     @CallSuper
     override fun onCleared() {
         super.onCleared()
+        stateStore.dispose()
         disposables.dispose()
     }
 
@@ -132,6 +134,19 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         } else {
             stateStore.set(reducer)
         }
+    }
+
+    /**
+     * TODO
+     */
+    @VisibleForTesting
+    internal fun freezeStateForTesting(state: S) {
+        TODO()
+//        if (stateStore is SwitchableMvRxStateStore) {
+//            stateStore.next(state)
+//        } else {
+//            error("SwitchableMvRxStateStore must be enabled to use this")
+//        }
     }
 
     /**
