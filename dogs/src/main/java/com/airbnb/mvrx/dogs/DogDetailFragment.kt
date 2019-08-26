@@ -32,14 +32,12 @@ class DogDetailFragment : BaseMvRxFragment(), DogDetailFragmentHandler {
     }
 
     override fun invalidate() = withState(viewModel) { state ->
-        binding.dog = state.dog(dogId) ?: throw IllegalStateException("Cannot find dog with id $dogId")
+        binding.dog = state.dog(dogId) ?: error("Cannot find dog with id $dogId")
     }
 
     companion object {
-        fun arg(dogId: Long): Bundle {
-            val args = Bundle()
-            args.putLong(MvRx.KEY_ARG, dogId)
-            return args
+        fun arg(dogId: Long) = Bundle().apply {
+            putLong(MvRx.KEY_ARG, dogId)
         }
     }
 }
