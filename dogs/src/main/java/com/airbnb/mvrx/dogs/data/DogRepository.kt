@@ -4,6 +4,8 @@ package com.airbnb.mvrx.dogs.data
 
 import io.reactivex.Observable
 import io.reactivex.Single
+import io.reactivex.schedulers.Schedulers
+import java.util.concurrent.TimeUnit
 
 class DogRepository {
     fun getDogs() = Observable.fromCallable<List<Dog>> {
@@ -67,10 +69,9 @@ class DogRepository {
                 "What's not to love about a Golden Retriever!"
             )
         )
-    }
+    }.subscribeOn(Schedulers.io())
 
-    fun adoptDog(dog: Dog) = Single.fromCallable {
-        Thread.sleep(5000)
-        dog
-    }
+    fun adoptDog(dog: Dog) = Single.just(dog)
+        .delaySubscription(2, TimeUnit.SECONDS)
+        .subscribeOn(Schedulers.io())
 }
