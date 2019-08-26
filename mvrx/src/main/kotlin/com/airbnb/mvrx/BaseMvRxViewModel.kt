@@ -16,6 +16,7 @@ import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 import kotlin.reflect.KProperty1
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.declaredMemberProperties
@@ -45,7 +46,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         get() = stateStore.state
 
     init {
-        Completable.fromCallable { warmReflectionCache(initialState) }.subscribeOn(Schedulers.computation()).subscribe()
+        Completable.fromCallable { warmReflectionCache(initialState) }
+            .delay(500, TimeUnit.MILLISECONDS, Schedulers.computation())
+            .subscribeOn(Schedulers.computation())
+            .subscribe()
 
         if (this.debugMode) {
             mutableStateChecker = MutableStateChecker(initialState)
