@@ -1,7 +1,7 @@
 package com.airbnb.mvrx
 
 import android.os.Bundle
-import java.util.*
+import java.util.UUID
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 

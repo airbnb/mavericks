@@ -39,8 +39,8 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.paren
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ): Lazy<VM> where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
     requireNotNull(parentFragment) { "There is no parent fragment for ${this::class.java.simpleName}!" }
-    val notFoundMessage by lazy { "There is no ViewModel of type ${VM::class.java.simpleName} for this Fragment!" }
-    val factory = MvRxFactory { error(notFoundMessage) }
+    val notFoundMessage = { "There is no ViewModel of type ${VM::class.java.simpleName} for this Fragment!" }
+    val factory = MvRxFactory { error(notFoundMessage()) }
     var fragment: Fragment? = parentFragment
     val key = keyFactory()
     while (fragment != null) {
@@ -48,7 +48,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.paren
             return@lifecycleAwareLazy ViewModelProviders.of(fragment, factory).get(key, viewModelClass.java)
                 .apply { subscribe(this@parentFragmentViewModel, subscriber = { postInvalidate() }) }
         } catch (e: java.lang.IllegalStateException) {
-            if (e.message == notFoundMessage) {
+            if (e.message == notFoundMessage()) {
                 fragment = fragment.parentFragment
             } else {
                 throw e

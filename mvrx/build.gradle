@@ -62,7 +62,6 @@ dependencies {
     testImplementation "org.mockito:mockito-core:2.25.1"
     testImplementation 'junit:junit:4.12'
     testImplementation "org.robolectric:robolectric:$robolectricVersion"
-    testImplementation "org.robolectric:shadows-supportv4:$robolectricVersion"
 }
 
 // Ensure custom source sets are included:

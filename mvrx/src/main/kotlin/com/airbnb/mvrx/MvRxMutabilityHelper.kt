@@ -1,5 +1,6 @@
 package com.airbnb.mvrx
 
+import android.os.Build
 import android.util.SparseArray
 import androidx.collection.ArrayMap
 import androidx.collection.LongSparseArray
@@ -39,9 +40,9 @@ internal fun KClass<*>.assertImmutability() {
             prop.isSubtype(SparseArray::class) -> "You cannot use SparseArray for ${prop.name}.\n$IMMUTABLE_LIST_MESSAGE"
             prop.isSubtype(LongSparseArray::class) -> "You cannot use LongSparseArray for ${prop.name}.\n$IMMUTABLE_LIST_MESSAGE"
             prop.isSubtype(SparseArrayCompat::class) -> "You cannot use SparseArrayCompat for ${prop.name}.\n$IMMUTABLE_LIST_MESSAGE"
-            prop.isSubtype(ArrayMap::class, android.util.ArrayMap::class) -> {
-                "You cannot use ArrayMap for ${prop.name}.\n$IMMUTABLE_MAP_MESSAGE"
-            }
+            prop.isSubtype(ArrayMap::class) -> "You cannot use ArrayMap for ${prop.name}.\n$IMMUTABLE_MAP_MESSAGE"
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT &&
+                prop.isSubtype(android.util.ArrayMap::class) -> "You cannot use ArrayMap for ${prop.name}.\n$IMMUTABLE_MAP_MESSAGE"
             prop.isSubtype(HashMap::class) -> "You cannot use HashMap for ${prop.name}.\n$IMMUTABLE_MAP_MESSAGE"
             prop.isSubtype(Function::class, KCallable::class) -> {
                 "You cannot use functions inside MvRx state. Only pure data should be represented: ${prop.name}"
