@@ -1,4 +1,9 @@
 # Change log
+## Version 1.1.0
+- New `parentFragmentViewModel()` and `targetFragmentViewModel()` ViewModel delegate scopes [#247](https://github.com/airbnb/MvRx/pull/247)
+- Disallow functions in state [#250](https://github.com/airbnb/MvRx/pull/250)
+- Log execute errors in debug mode [#260](https://github.com/airbnb/MvRx/pull/260)
+- Fixed proguard issues with 1.0.2 [#267](https://github.com/airbnb/MvRx/pull/267)
 
 ## Version 1.0.2
 - Synchronized and improved Kotlin cache warming [#244](https://github.com/airbnb/MvRx/pull/244)
