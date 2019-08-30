@@ -22,6 +22,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlinVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'net.sf.proguard:proguard-gradle:6.1.1'
+        classpath 'com.vanniktech:gradle-maven-publish-plugin:0.8.0'
     }
 }
 

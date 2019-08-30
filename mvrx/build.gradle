@@ -3,8 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "jacoco"
-
-apply from: '../gradle-maven-push.gradle'
+apply plugin: "com.vanniktech.maven.publish"
 
 android {
     compileSdkVersion 28

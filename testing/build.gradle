@@ -2,8 +2,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-
-apply from: '../gradle-maven-push.gradle'
+apply plugin: "com.vanniktech.maven.publish"
 
 android {
     compileSdkVersion 28
