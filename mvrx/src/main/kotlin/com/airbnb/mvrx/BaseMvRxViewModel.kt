@@ -7,12 +7,14 @@ import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModel
 import com.airbnb.mvrx.MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER
+import com.airbnb.mvrx.mock.reportExecuteCallToInteractionTest
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.Disposables
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import java.util.Collections
@@ -162,9 +164,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * a fair amount of reflection.
      */
     private fun validateState(initialState: S) {
-        if (state::class.visibility != KVisibility.PUBLIC) {
-            throw IllegalStateException("Your state class ${state::class.qualifiedName} must be public.")
-        }
+        check(state::class.visibility == KVisibility.PUBLIC) { "Your state class ${state::class.qualifiedName} must be public." }
         state::class.assertImmutability()
         val bundle = state.persistState(assertCollectionPersistability = true)
         bundle.restorePersistedState(initialState)
@@ -222,6 +222,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         successMetaData: ((T) -> Any)? = null,
         stateReducer: S.(Async<V>) -> S
     ): Disposable {
+        if (debugMode) {
+            reportExecuteCallToInteractionTest()
+            // TODO Only set loading in certain mode
+            setState { stateReducer(Loading()) }
+            return Disposables.disposed()
+        }
         // Intentionally didn't use RxJava's startWith operator. When withState is called right after execute then the loading reducer won't be enqueued yet if startWith is used.
         setState { stateReducer(Loading()) }
 
@@ -236,6 +242,26 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             }
             .subscribe { asyncData -> setState { stateReducer(asyncData) } }
             .disposeOnClear()
+    }
+
+    /**
+     * Similar to [execute]. This subscribes to an Observable, provides a reducing function to update state when the observable passes a value,
+     * and registers the subscription to be disposed when the ViewModel is cleared.
+     *
+     * This function should be preferred over calling [Observable.subscribe] directly so that disposal is handled for you, and so setting state
+     * is simplified.
+     */
+     fun <T> Observable<T>.executeWithoutAsync(stateReducer: S.(value: T) -> S): Disposable {
+        if (debugMode) {
+            reportExecuteCallToInteractionTest()
+            return Disposables.disposed()
+        }
+
+        return subscribe { value ->
+            setState {
+                stateReducer(value)
+            }
+        }.disposeOnClear()
     }
 
     /**
