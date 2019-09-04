@@ -21,11 +21,11 @@ import kotlin.reflect.full.primaryConstructor
 
 
 interface MockableMvRxView : MvRxView {
-    fun mocks(): FragmentMocker<out MockableMvRxView, out Parcelable> = EmptyMocks
+    fun provideMocks(): FragmentMocker<out MockableMvRxView, out Parcelable> = EmptyMocks
 }
 
 /**
- * Used with [MockableMvRxView.mocks] for mocking a MvRx fragment that has no view models (eg only static content and fragment arguments).
+ * Used with [MockableMvRxView.provideMocks] for mocking a MvRx fragment that has no view models (eg only static content and fragment arguments).
  *
  * See https://airbnb.quip.com/4S6aAV3uzBRP/Testing-MvRx-Screens
  *
@@ -35,11 +35,9 @@ interface MockableMvRxView : MvRxView {
 fun <Frag : MockableMvRxView, Args : Parcelable> Frag.mockNoViewModels(
     defaultArgs: Args?,
     mockBuilder: MockBuilder<Frag, Args>.() -> Unit = {}
-): Lazy<MockBuilder<Frag, Args>> = lazy {
-    MockBuilder<Frag, Args>(defaultArgs).apply {
-        mockBuilder()
-        build(this@mockNoViewModels)
-    }
+): MockBuilder<Frag, Args> = MockBuilder<Frag, Args>(defaultArgs).apply {
+    mockBuilder()
+    build(this@mockNoViewModels)
 }
 
 /**
@@ -51,29 +49,27 @@ fun <Frag : MockableMvRxView, Args : Parcelable> Frag.mockNoViewModels(
  * used to create the pair is prepended to the name of each mock in the group, so you can omit a  reference to the group type in the individual mocks.
  */
 inline fun <reified Frag : MockableMvRxView> Frag.combineMocks(
-    vararg mocks: Pair<String, Lazy<FragmentMocker<Frag, *>>>
-): Lazy<FragmentMocker<Frag, *>> = lazy {
-    object : FragmentMocker<Frag, Parcelable> {
+    vararg mocks: Pair<String, FragmentMocker<Frag, *>>
+): FragmentMocker<Frag, *> = object : FragmentMocker<Frag, Parcelable> {
 
-        init {
-            validate(Frag::class.simpleName!!)
-        }
+    init {
+        validate(Frag::class.simpleName!!)
+    }
 
-        override val mockGroups: List<List<MockableMvRxViewMock<Frag, out Parcelable>>>
-            get() {
-                println("mocking groups for ${Frag::class.simpleName}")
-                return mocks.map { (prefix, lazy) ->
-                    lazy.value.fragmentMocks.map {
-                        it.copy(name = "$prefix : ${it.name}")
-                    }
+    override val mockGroups: List<List<MockableMvRxViewMock<Frag, out Parcelable>>>
+        get() {
+            println("mocking groups for ${Frag::class.simpleName}")
+            return mocks.map { (prefix, mocker) ->
+                mocker.fragmentMocks.map {
+                    it.copy(name = "$prefix : ${it.name}")
                 }
             }
-    }
+        }
 }
 
 /**
  * Define state values for a [MockableMvRxView] that should be used in tests.
- * This is for use with [MockableMvRxView.mocks] when the fragment has a single view model.
+ * This is for use with [MockableMvRxView.provideMocks] when the fragment has a single view model.
  *
  * In the [mockBuilder] lambda you can use [MockBuilder.args] to define mock arguments that should be used to initialize the fragment and create the
  * initial view model state. Use [SingleViewModelMockBuilder.state] to define complete state objects.
@@ -92,16 +88,15 @@ fun <Frag : MockableMvRxView, Args : Parcelable, S : MvRxState> Frag.mockSingleV
     defaultState: S,
     defaultArgs: Args?,
     mockBuilder: SingleViewModelMockBuilder<Frag, Args, S>.() -> Unit
-): Lazy<MockBuilder<Frag, Args>> = lazy {
+): MockBuilder<Frag, Args> =
     SingleViewModelMockBuilder(viewModelReference, defaultState, defaultArgs).apply {
         mockBuilder()
         build(this@mockSingleViewModel)
     }
-}
 
 /**
  * Define state values for a [MockableMvRxView] that should be used in tests.
- * This is for use with [MockableMvRxView.mocks] when the fragment has two view models.
+ * This is for use with [MockableMvRxView.provideMocks] when the fragment has two view models.
  *
  * In the [mockBuilder] lambda you can use [MockBuilder.args] to define mock arguments that should be used to initialize the fragment and create the
  * initial view model state. Use [TwoViewModelMockBuilder.state] to define complete state objects for each view model.
@@ -128,17 +123,15 @@ fun <Frag : MockableMvRxView,
     defaultState2: S2,
     defaultArgs: Args?,
     mockBuilder: TwoViewModelMockBuilder<Frag, VM1, S1, VM2, S2, Args>.() -> Unit
-): Lazy<MockBuilder<Frag, Args>> = lazy {
-    TwoViewModelMockBuilder(
-        viewModel1Reference,
-        defaultState1,
-        viewModel2Reference,
-        defaultState2,
-        defaultArgs
-    ).apply {
-        mockBuilder()
-        build(this@mockTwoViewModels)
-    }
+): MockBuilder<Frag, Args> = TwoViewModelMockBuilder(
+    viewModel1Reference,
+    defaultState1,
+    viewModel2Reference,
+    defaultState2,
+    defaultArgs
+).apply {
+    mockBuilder()
+    build(this@mockTwoViewModels)
 }
 
 /**
@@ -162,19 +155,17 @@ fun <Frag : MockableMvRxView,
     defaultState3: S3,
     defaultArgs: Args?,
     mockBuilder: ThreeViewModelMockBuilder<Frag, VM1, S1, VM2, S2, VM3, S3, Args>.() -> Unit
-): Lazy<MockBuilder<Frag, Args>> = lazy {
-    ThreeViewModelMockBuilder(
-        viewModel1Reference,
-        defaultState1,
-        viewModel2Reference,
-        defaultState2,
-        viewModel3Reference,
-        defaultState3,
-        defaultArgs
-    ).apply {
-        mockBuilder()
-        build(this@mockThreeViewModels)
-    }
+): MockBuilder<Frag, Args> = ThreeViewModelMockBuilder(
+    viewModel1Reference,
+    defaultState1,
+    viewModel2Reference,
+    defaultState2,
+    viewModel3Reference,
+    defaultState3,
+    defaultArgs
+).apply {
+    mockBuilder()
+    build(this@mockThreeViewModels)
 }
 
 @SuppressWarnings("Detekt.LongParameterList")
@@ -199,21 +190,19 @@ fun <Frag : MockableMvRxView,
     defaultState4: S4,
     defaultArgs: Args?,
     mockBuilder: FourViewModelMockBuilder<Frag, VM1, S1, VM2, S2, VM3, S3, VM4, S4, Args>.() -> Unit
-): Lazy<MockBuilder<Frag, Args>> = lazy {
-    FourViewModelMockBuilder(
-        viewModel1Reference,
-        defaultState1,
-        viewModel2Reference,
-        defaultState2,
-        viewModel3Reference,
-        defaultState3,
-        viewModel4Reference,
-        defaultState4,
-        defaultArgs
-    ).apply {
-        mockBuilder()
-        build(this@mockFourViewModels)
-    }
+): MockBuilder<Frag, Args> = FourViewModelMockBuilder(
+    viewModel1Reference,
+    defaultState1,
+    viewModel2Reference,
+    defaultState2,
+    viewModel3Reference,
+    defaultState3,
+    viewModel4Reference,
+    defaultState4,
+    defaultArgs
+).apply {
+    mockBuilder()
+    build(this@mockFourViewModels)
 }
 
 data class MockableMvRxViewMock<Frag : MockableMvRxView, Args : Parcelable> internal constructor(
@@ -316,7 +305,9 @@ class SingleViewModelMockBuilder<Frag : MockableMvRxView, Args : Parcelable, S :
     ) {
         val asyncProperty = state.asyncPropertyBlock()
         // Split "myProperty" to "My property"
-        val asyncName = asyncProperty.name.replace(Regex("[A-Z]")) { " ${it.value.toLowerCase()}" }.trim().capitalize()
+        val asyncName =
+            asyncProperty.name.replace(Regex("[A-Z]")) { " ${it.value.toLowerCase()}" }.trim()
+                .capitalize()
 
         state("$asyncName loading") {
             state.setLoading { asyncProperty }
@@ -348,7 +339,11 @@ internal constructor(
     val vm2: KProperty1<Frag, VM2>,
     val defaultState2: S2,
     defaultArgs: Args?
-) : MockBuilder<Frag, Args>(defaultArgs, vm1.pairDefault(defaultState1), vm2.pairDefault(defaultState2)) {
+) : MockBuilder<Frag, Args>(
+    defaultArgs,
+    vm1.pairDefault(defaultState1),
+    vm2.pairDefault(defaultState2)
+) {
 
     /**
      * Provide state objects for each view model in the fragment.
@@ -386,7 +381,9 @@ internal constructor(
     ) {
         val asyncProperty = state.asyncPropertyBlock()
         // Split "myProperty" to "My property"
-        val asyncName = asyncProperty.name.replace(Regex("[A-Z]")) { " ${it.value.toLowerCase()}" }.trim().capitalize()
+        val asyncName =
+            asyncProperty.name.replace(Regex("[A-Z]")) { " ${it.value.toLowerCase()}" }.trim()
+                .capitalize()
 
         state("$asyncName loading") {
             viewModel1 {
@@ -412,7 +409,9 @@ internal constructor(
     ) {
         val asyncProperty = state.asyncPropertyBlock()
         // Split "myProperty" to "My property"
-        val asyncName = asyncProperty.name.replace(Regex("[A-Z]")) { " ${it.value.toLowerCase()}" }.trim().capitalize()
+        val asyncName =
+            asyncProperty.name.replace(Regex("[A-Z]")) { " ${it.value.toLowerCase()}" }.trim()
+                .capitalize()
 
         state("$asyncName loading") {
             viewModel2 {
@@ -453,7 +452,9 @@ internal constructor(
             )
         }
 
-    protected infix fun <VM : BaseMvRxViewModel<S>, S : MvRxState> KProperty1<Frag, VM>.setStateTo(state: S) {
+    protected infix fun <VM : BaseMvRxViewModel<S>, S : MvRxState> KProperty1<Frag, VM>.setStateTo(
+        state: S
+    ) {
         @Suppress("UNCHECKED_CAST")
         stateMap[this as KProperty1<Frag, BaseMvRxViewModel<MvRxState>>] = state
     }
@@ -643,7 +644,14 @@ internal constructor(
     defaultState3: S3,
     val vm4: KProperty1<Frag, VM4>,
     val defaultState4: S4
-) : ThreeStatesBuilder<Frag, S1, VM1, S2, VM2, S3, VM3>(vm1, defaultState1, vm2, defaultState2, vm3, defaultState3) {
+) : ThreeStatesBuilder<Frag, S1, VM1, S2, VM2, S3, VM3>(
+    vm1,
+    defaultState1,
+    vm2,
+    defaultState2,
+    vm3,
+    defaultState3
+) {
 
     init {
         vm4 setStateTo defaultState4
@@ -660,11 +668,13 @@ internal constructor(
 }
 
 /**
- * This placeholder can be used as a NO-OP implementation of [MockableMvRxView.mocks].
+ * This placeholder can be used as a NO-OP implementation of [MockableMvRxView.provideMocks].
  */
 object EmptyMocks : FragmentMocker<MockableMvRxView, Nothing> {
-    override val fragmentMocks: List<MockableMvRxViewMock<MockableMvRxView, out Nothing>> = emptyList()
-    override val mockGroups: List<List<MockableMvRxViewMock<MockableMvRxView, out Nothing>>> = emptyList()
+    override val fragmentMocks: List<MockableMvRxViewMock<MockableMvRxView, out Nothing>> =
+        emptyList()
+    override val mockGroups: List<List<MockableMvRxViewMock<MockableMvRxView, out Nothing>>> =
+        emptyList()
 }
 
 interface FragmentMocker<Frag : MockableMvRxView, Args : Parcelable> {

@@ -1,25 +1,40 @@
 package com.airbnb.mvrx.mock
 
 
+import android.util.Log
+import com.airbnb.mvrx.BaseMvRxViewModel
+import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxStateStore
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.RealMvRxStateStore
 import java.util.LinkedList
 
+// TODO: Is there a better way to set this?
+var mvrxViewModelConfigProvider = MvRxViewModelConfigProvider()
+
 class MvRxViewModelConfig<S : Any>(
     val debugMode: Boolean,
     val stateStore: MvRxStateStore<S>,
-    mockBehavior: MockBehavior? = null
+    private val initialMockBehavior: MockBehavior? = null
 ) {
-    private val initialMockBehavior: MockBehavior? = mockBehavior
+    val currentMockBehavior: MockBehavior?
+        get() = mockBehaviorOverrides.peek() ?: initialMockBehavior
     private val mockBehaviorOverrides = LinkedList<MockBehavior>()
-    val currentMockBehavior: MockBehavior? get() = mockBehaviorOverrides.peek() ?: initialMockBehavior
 
+    init {
+        if (!debugMode && initialMockBehavior != null) {
+            Log.e("MvRx", "Mock behavior should only be used in debug", IllegalStateException())
+        }
+    }
+
+    // TODO: Should these be public? Would allow easy access to change mock behavior of individual view models
     internal fun pushBehaviorOverride(mockBehavior: MockBehavior) {
+        validateDebug(debugMode) ?: return
         mockBehaviorOverrides.push(mockBehavior)
     }
 
     internal fun popBehaviorOverride() {
+        validateDebug(debugMode) ?: return
         mockBehaviorOverrides.pop()
     }
 }
@@ -65,8 +80,8 @@ data class MockBehavior(
     }
 
     enum class StateStoreBehavior {
-        Scriptable,
         Normal,
+        Scriptable,
         /**
          * When toggled to use the real state store (instead of the scriptable store), this controls whether to use
          * a synchronous version of the state store or the original MvRx state store that operates asynchronously.
@@ -82,18 +97,17 @@ data class MockBehavior(
     }
 }
 
-//internal fun isDebugApp(): Boolean = applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE
-
 /**
  * Switch between using a mock view model store and a normal view model store.
  */
-open class MvRxViewModelConfigProvider {
+open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
 
-    private val onConfigProvidedListeners = mutableListOf<(MvRxViewModelConfig<*>) -> Unit>()
-    private val currentConfigs = mutableListOf<MvRxViewModelConfig<*>>()
+    private val onViewModelCreatedListeners =
+        mutableListOf<(BaseMvRxViewModel<*>, MvRxViewModelConfig<*>) -> Unit>()
+    private val currentConfigs = mutableMapOf<MvRxStateStore<*>, MvRxViewModelConfig<*>>()
 
     /**
-     * Determines what sort of mocked state store is created when [provideStateStore] is called.
+     * Determines what sort of mocked state store is created when [provideConfig] is called.
      * This can be changed via [withMockBehavior] to affect behavior when creating a new Fragment.
      *
      * A value can also be set directly here if you want to change the global default.
@@ -115,7 +129,10 @@ open class MvRxViewModelConfigProvider {
         mockBehavior: MockBehavior? = this.mockBehavior,
         block: () -> R
     ): R {
-        // This is not inlined so that the caller cannot return early, which would skip setting back the original value!
+        // This function is not inlined so that the caller cannot return early,
+        // which would skip setting back the original value!
+
+        validateDebug(debugMode)
 
         // Nesting this call is tricky because an inner call may change the mock behavior that an outer call originally set.
         // To avoid potential bugs because of that we restore the original setting when leaving the block
@@ -128,47 +145,79 @@ open class MvRxViewModelConfigProvider {
         return result
     }
 
-    private fun onMockStoreDisposed(store: MockableMvRxStateStore<*>) {
+    private fun onMockStoreDisposed(store: MockableStateStore<*>) {
         currentConfigs.remove(store)
     }
 
-    fun <S : Any> provideConfig(initialState: S): MvRxViewModelConfig<S> {
+    fun <S : MvRxState> provideConfig(
+        viewModel: BaseMvRxViewModel<S>,
+        initialState: S
+    ): MvRxViewModelConfig<S> {
         val behavior = mockBehavior
 
-        val stateStore = if (behavior != null) {
+        val stateStore = if (behavior != null && validateDebug(debugMode) == true) {
             MockableMvRxStateStore(
                 initialState = initialState,
                 mockBehavior = behavior,
                 onDisposed = ::onMockStoreDisposed
-            ).also { store ->
-                onConfigProvidedListeners.forEach { callback -> callback(store) }
-                currentConfigs.add(it)
-            }
+            )
         } else {
-
             RealMvRxStateStore(initialState)
         }
 
-        return MvRxViewModelConfig<S>(
-            false,
+        return MvRxViewModelConfig(
+            debugMode,
             stateStore,
             behavior
-        )
+        ).also { config ->
+            currentConfigs[stateStore] = config
+            onViewModelCreatedListeners.forEach { callback -> callback(viewModel, config) }
+        }
     }
 
-    fun addOnConfigProvidedListener(callback: (MvRxViewModelConfig<*>) -> Unit) {
-        onConfigProvidedListeners.add(callback)
+    open fun <S : Any> buildStateStore(
+        initialState: S,
+        mockBehavior: MockBehavior?
+    ): MvRxStateStore<S> {
+        return if (mockBehavior != null && debugMode) {
+            MockableMvRxStateStore(
+                initialState = initialState,
+                mockBehavior = mockBehavior,
+                onDisposed = ::onMockStoreDisposed
+            )
+        } else {
+            RealMvRxStateStore(initialState)
+        }
     }
 
-    fun removeOnConfigProvidedListener(callback: (MvRxViewModelConfig<*>) -> Unit) {
-        onConfigProvidedListeners.remove(callback)
+    fun addOnConfigProvidedListener(callback: (BaseMvRxViewModel<*>, MvRxViewModelConfig<*>) -> Unit) {
+        onViewModelCreatedListeners.add(callback)
+    }
+
+    fun removeOnConfigProvidedListener(callback: (BaseMvRxViewModel<*>, MvRxViewModelConfig<*>) -> Unit) {
+        onViewModelCreatedListeners.remove(callback)
     }
 
     fun pushMockBehaviorOverride(mockBehavior: MockBehavior) {
-        currentConfigs.forEach { it.pushBehaviorOverride(mockBehavior) }
+        validateDebug(debugMode) ?: return
+        currentConfigs.values.forEach { it.pushBehaviorOverride(mockBehavior) }
     }
 
     fun popMockBehaviorOverride() {
-        currentConfigs.forEach { it.popBehaviorOverride() }
+        validateDebug(debugMode) ?: return
+        currentConfigs.values.forEach { it.popBehaviorOverride() }
+    }
+}
+
+private fun validateDebug(debug: Boolean): Boolean? {
+    return if (debug) {
+        true
+    } else {
+        Log.e(
+            "MvRx",
+            "Only accessible in debug mode",
+            IllegalStateException("Only accessible in debug mode")
+        )
+        null
     }
 }

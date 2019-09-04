@@ -25,27 +25,12 @@ class MockableMvRxStateStore<S : Any>(
     private val onStateSetListeners = mutableListOf<(previousState: S, newState: S) -> Unit>()
     private val onDisposeListeners = mutableListOf<() -> Unit>()
 
-    init {
-        realStore.observable
-            // Using "trampoline" scheduler so that updates are processed synchronously
-            .observeOn(Schedulers.trampoline())
-            .subscribe { newState ->
-                // Make sure the scriptable store stays up to date with the state on the real store.
-                // This is important when we are switching back and forth between the two (as the test environment can do).
-                // Otherwise the states can get out of sync and cause unexpected issues. Additionally, if a subscriber
-                // subscribes to one store we need to make sure it is updated if the other store ever changes.
-                if (scriptableStore.state != newState) {
-                    scriptableStore.next(newState)
-                }
-            }
-    }
-
-
-    private val currentStore get() = when (mockBehavior.stateStoreBehavior) {
-        MockBehavior.StateStoreBehavior.Scriptable -> scriptableStore
-        MockBehavior.StateStoreBehavior.Normal -> realStore
-        MockBehavior.StateStoreBehavior.Synchronous -> realImmediateStore
-    }
+    private val currentStore
+        get() = when (mockBehavior.stateStoreBehavior) {
+            MockBehavior.StateStoreBehavior.Scriptable -> scriptableStore
+            MockBehavior.StateStoreBehavior.Normal -> realStore
+            MockBehavior.StateStoreBehavior.Synchronous -> realImmediateStore
+        }
 
     // Using "trampoline" scheduler so that updates are processed synchronously.
     // This allows changes to be dispatched in a more controllable way for testing,
@@ -66,7 +51,10 @@ class MockableMvRxStateStore<S : Any>(
     }
 
     fun next(state: S) {
-        require(mockBehavior.stateStoreBehavior == MockBehavior.StateStoreBehavior.Scriptable) { "Scriptable store is not enabled" }
+        require(mockBehavior.stateStoreBehavior == MockBehavior.StateStoreBehavior.Scriptable) {
+            "Scriptable store is not enabled"
+        }
+
         scriptableStore.next(state)
         // Update the real stores too, so if we switch to them they are already up to date.
         realStore.set { state }
@@ -86,7 +74,11 @@ class MockableMvRxStateStore<S : Any>(
             val newState = state.stateReducer()
             onStateSetListeners.forEach { it.invoke(state, newState) }
         }
-        currentStore.set(stateReducer)
+
+        if (mockBehavior.stateStoreBehavior != MockBehavior.StateStoreBehavior.Scriptable) {
+            realImmediateStore.set(stateReducer)
+            realStore.set(stateReducer)
+        }
     }
 
     fun addOnStateSetListener(callback: (previousState: S, newState: S) -> Unit) {

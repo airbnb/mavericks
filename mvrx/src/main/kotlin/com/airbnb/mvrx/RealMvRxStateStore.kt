@@ -15,7 +15,7 @@ import java.util.LinkedList
  * conditions with each other.
  *
  */
-class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
+    class RealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
     /**
      * The subject is where state changes should be pushed to.
      */
