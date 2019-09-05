@@ -52,14 +52,14 @@ object MvRxViewModelProvider {
                 factoryClass.getMethod("create", ViewModelContext::class.java, MvRxState::class.java)
                     .invoke(factoryClass.instance(), viewModelContext, initialState) as VM?
             } catch (ignore: NoSuchMethodException) {
+                null
             }
-        }
-        
-        try {
+        } ?: try {
             // Check for JvmStatic method.
             viewModelClass.getMethod("create", ViewModelContext::class.java, MvRxState::class.java)
                     .invoke(null, viewModelContext, initialState) as VM?
         } catch (ignore: NoSuchMethodException) {
+            null
         }
         
         val viewModel = factoryViewModel ?: createDefaultViewModel(viewModelClass, initialState)
