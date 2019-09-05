@@ -21,7 +21,7 @@ import kotlin.reflect.full.primaryConstructor
 
 
 interface MockableMvRxView : MvRxView {
-    fun provideMocks(): FragmentMocker<out MockableMvRxView, out Parcelable> = EmptyMocks
+    fun provideMocks(): MvRxViewMocks<out MockableMvRxView, out Parcelable> = EmptyMocks
 }
 
 /**
@@ -49,8 +49,8 @@ fun <Frag : MockableMvRxView, Args : Parcelable> Frag.mockNoViewModels(
  * used to create the pair is prepended to the name of each mock in the group, so you can omit a  reference to the group type in the individual mocks.
  */
 inline fun <reified Frag : MockableMvRxView> Frag.combineMocks(
-    vararg mocks: Pair<String, FragmentMocker<Frag, *>>
-): FragmentMocker<Frag, *> = object : FragmentMocker<Frag, Parcelable> {
+    vararg mocks: Pair<String, MvRxViewMocks<Frag, *>>
+): MvRxViewMocks<Frag, *> = object : MvRxViewMocks<Frag, Parcelable> {
 
     init {
         validate(Frag::class.simpleName!!)
@@ -60,7 +60,7 @@ inline fun <reified Frag : MockableMvRxView> Frag.combineMocks(
         get() {
             println("mocking groups for ${Frag::class.simpleName}")
             return mocks.map { (prefix, mocker) ->
-                mocker.fragmentMocks.map {
+                mocker.mocks.map {
                     it.copy(name = "$prefix : ${it.name}")
                 }
             }
@@ -670,26 +670,26 @@ internal constructor(
 /**
  * This placeholder can be used as a NO-OP implementation of [MockableMvRxView.provideMocks].
  */
-object EmptyMocks : FragmentMocker<MockableMvRxView, Nothing> {
-    override val fragmentMocks: List<MvRxMock<MockableMvRxView, out Nothing>> = emptyList()
+object EmptyMocks : MvRxViewMocks<MockableMvRxView, Nothing> {
+    override val mocks: List<MvRxMock<MockableMvRxView, out Nothing>> = emptyList()
     override val mockGroups: List<List<MvRxMock<MockableMvRxView, out Nothing>>> = emptyList()
 }
 
-interface FragmentMocker<Frag : MockableMvRxView, Args : Parcelable> {
-    /** At least one of fragmentMocks or mockGroups must be implemented to avoid a loop. */
-    val fragmentMocks: List<MvRxMock<Frag, out Args>> get() = mockGroups.flatten()
+interface MvRxViewMocks<Frag : MockableMvRxView, Args : Parcelable> {
+    /** At least one of mocks or mockGroups must be implemented to avoid a loop. */
+    val mocks: List<MvRxMock<Frag, out Args>> get() = mockGroups.flatten()
 
     /**
      * Groups allow splitting up a fragment with lots of mocks so they can be run in separate tests (better parallelization),
      * with separate default args and states.
      */
-    val mockGroups: List<List<MvRxMock<Frag, out Args>>> get() = listOf(fragmentMocks)
+    val mockGroups: List<List<MvRxMock<Frag, out Args>>> get() = listOf(mocks)
 
-    fun validate(fragmentName: String) {
+    fun validate(viewName: String) {
         // TODO eli_hart: 2018-11-06 Gather all validation errors in one exception instead of failing early, so that you don't have to do multiple test runs to catch multiple issues
 
-        val errorIntro = "Invalid mocks defined for $fragmentName. "
-        val (fragmentMocksWithArgsOnly, fragmentMocksWithState) = fragmentMocks.partition { it.states.isEmpty() }
+        val errorIntro = "Invalid mocks defined for $viewName. "
+        val (fragmentMocksWithArgsOnly, fragmentMocksWithState) = mocks.partition { it.states.isEmpty() }
 
         fun List<MvRxMock<Frag, *>>.validateUniqueNames() {
             val nameCounts = groupingBy { it.name }.eachCount()
@@ -707,12 +707,12 @@ interface FragmentMocker<Frag : MockableMvRxView, Args : Parcelable> {
 open class MockBuilder<Frag : MockableMvRxView, Args : Parcelable> internal constructor(
     internal val defaultArgs: Args?,
     vararg defaultStatePairs: Pair<KProperty1<Frag, BaseMvRxViewModel<MvRxState>>, MvRxState>
-) : FragmentMocker<Frag, Args>, DataClassSetDsl {
+) : MvRxViewMocks<Frag, Args>, DataClassSetDsl {
 
     internal val defaultStates = defaultStatePairs.map { ViewModelState(it.first, it.second) }
 
     @VisibleForTesting
-    override val fragmentMocks = mutableListOf<MvRxMock<Frag, Args>>()
+    override val mocks = mutableListOf<MvRxMock<Frag, Args>>()
 
     init {
         val viewModelProperties = defaultStates.map { it.viewModelProperty }
@@ -775,7 +775,7 @@ open class MockBuilder<Frag : MockableMvRxView, Args : Parcelable> internal cons
         forInitialization: Boolean = false,
         type: MvRxMock.Type = MvRxMock.Type.Custom
     ) {
-        fragmentMocks.add(
+        mocks.add(
             MvRxMock(
                 name = name,
                 args = args,

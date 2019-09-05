@@ -6,9 +6,9 @@ import android.os.Parcelable
 import com.airbnb.mvrx.MvRx
 import kotlin.system.measureTimeMillis
 
-fun <V : MockableMvRxView, A : Parcelable> mockView(
+fun <V : MockableMvRxView, A : Parcelable> getMockVariants(
     viewProvider: (arguments: A?, argumentsBundle: Bundle?) -> V,
-    emptyMockPlaceholder: Pair<String, FragmentMocker<MockableMvRxView, Nothing>> = Pair(
+    emptyMockPlaceholder: Pair<String, MvRxViewMocks<MockableMvRxView, Nothing>> = Pair(
         EmptyMocks::class.java.simpleName,
         EmptyMocks
     ),
@@ -29,7 +29,7 @@ fun <V : MockableMvRxView, A : Parcelable> mockView(
             mockData.mockGroups.getOrNull(mockGroupIndex)
                 ?: error("Could not get mock group at index $mockGroupIndex for $viewName")
         } else {
-            mockData.fragmentMocks
+            mockData.mocks
         }
     }
 
@@ -46,7 +46,6 @@ fun <V : MockableMvRxView, A : Parcelable> mockView(
         MockedViewProvider(
             viewName = viewName,
             createView = { mockBehavior ->
-                val initialStateProvider by inject(MvRxDagger.AppGraph::initialStateProvider)
                 val configProvider = mvrxViewModelConfigProvider
 
                 // Test argument serialization/deserialization
@@ -57,14 +56,14 @@ fun <V : MockableMvRxView, A : Parcelable> mockView(
                 configProvider.withMockBehavior(mockBehavior) {
                     viewProvider(arguments, bundle)
                 }.let { view ->
-                        // Set the view to be initialized with the mocked state when its viewmodels are created
-                        initialStateProvider.setMock(view, mockInfo)
-                        MockedView(
-                            view,
-                            viewName,
-                            mockInfo
-                        ) { initialStateProvider.clearMock(view) }
-                    }
+                    // Set the view to be initialized with the mocked state when its viewmodels are created
+                    mockStateHolder.setMock(view, mockInfo)
+                    MockedView(
+                        viewInstance = view,
+                        viewName = viewName,
+                        mockData = mockInfo
+                    ) { mockStateHolder.clearMock(view) }
+                }
             },
             mockData = mockInfo
         )

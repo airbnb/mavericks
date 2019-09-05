@@ -157,6 +157,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     /**
      * TODO
      */
+    @PublishedApi
     @VisibleForTesting
     internal fun freezeStateForTesting(state: S) {
         if (stateStore is ScriptableStateStore) {

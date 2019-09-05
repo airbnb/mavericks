@@ -68,12 +68,12 @@ data class MockBehavior(
          */
         ForceMockExistingViewModel,
         /**
-         * Initial view model state is taken from [InitialStateProvider] and used in ViewModel creation,
-         * but that mocked state may be overridden either in the [MvRxViewModelFactory] or constructor or the ViewModel.
+         * Initial view model state is taken from [MockStateHolder] and used in ViewModel creation,
+         * but that mocked state may be overridden either in the [MvRxViewModelFactory] or constructor of the ViewModel.
          */
         Partial,
         /**
-         * Initial view model state is taken from [InitialStateProvider] and used in ViewModel creation.
+         * Initial view model state is taken from [MockStateHolder] and used in ViewModel creation.
          * Additionally, any changes to state during ViewModel initialization are forcibly overridden by the mocked state.
          */
         Full
@@ -113,7 +113,13 @@ open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
      * A value can also be set directly here if you want to change the global default.
      */
     var mockBehavior: MockBehavior? = null
-
+        set(value) {
+            if (validateDebug(debugMode) == true) {
+                field = value
+            } else {
+                field = null
+            }
+        }
 
     /**
      * Any view models created within the [block] will be given a viewmodel store that was created according to the rules of the given mock behavior.
