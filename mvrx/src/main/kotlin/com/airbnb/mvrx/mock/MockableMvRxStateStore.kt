@@ -3,10 +3,11 @@ package com.airbnb.mvrx.mock
 import com.airbnb.mvrx.MvRxStateStore
 import com.airbnb.mvrx.RealMvRxStateStore
 import com.airbnb.mvrx.ScriptableMvRxStateStore
+import com.airbnb.mvrx.ScriptableStateStore
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 
-interface MockableStateStore<S : Any> : MvRxStateStore<S> {
+interface MockableStateStore<S : Any> : ScriptableStateStore<S> {
     var mockBehavior: MockBehavior
 }
 
@@ -16,7 +17,7 @@ interface MockableStateStore<S : Any> : MvRxStateStore<S> {
 class MockableMvRxStateStore<S : Any>(
     initialState: S,
     override var mockBehavior: MockBehavior,
-    val onDisposed: (MockableMvRxStateStore<*>) -> Unit
+    private val onDisposed: (MockableMvRxStateStore<*>) -> Unit
 ) : MockableStateStore<S> {
     private val scriptableStore = ScriptableMvRxStateStore(initialState)
     private val realStore = RealMvRxStateStore(initialState)
@@ -50,7 +51,7 @@ class MockableMvRxStateStore<S : Any>(
         onDisposeListeners.clear()
     }
 
-    fun next(state: S) {
+    override fun next(state: S) {
         require(mockBehavior.stateStoreBehavior == MockBehavior.StateStoreBehavior.Scriptable) {
             "Scriptable store is not enabled"
         }

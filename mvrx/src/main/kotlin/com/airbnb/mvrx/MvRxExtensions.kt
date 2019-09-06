@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProviders
 import com.airbnb.mvrx.mock.MockBehavior
+import com.airbnb.mvrx.mock.MockableStateStore
 import com.airbnb.mvrx.mock.mockStateHolder
 import com.airbnb.mvrx.mock.mvrxViewModelConfigProvider
 import kotlin.properties.ReadOnlyProperty
@@ -34,64 +35,89 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragm
             thisRef: T,
             property: KProperty<*>
         ): lifecycleAwareLazy<VM> {
-            val mockBehavior = mvrxViewModelConfigProvider.mockBehavior
 
-            // Mocked state will be null if it is being created from mock arguments, and this is not an "existing" view model
-            val mockedState: S? =
-                if (mockBehavior != null && mockBehavior.initialState != MockBehavior.InitialState.None) {
-                    mockStateHolder.getMockedState(
-                        view = thisRef,
-                        viewModelProperty = property,
-                        existingViewModel = false,
-                        stateClass = S::class.java,
-                        forceMockExistingViewModel = mockBehavior.initialState == MockBehavior.InitialState.ForceMockExistingViewModel
-                    )
-                } else {
-                    null
-                }
-
-            return lifecycleAwareLazy(thisRef) {
-                mvrxViewModelConfigProvider.withMockBehavior(mockBehavior) {
-                    MvRxViewModelProvider.get(
-                        viewModelClass = viewModelClass.java,
-                        stateClass = S::class.java,
-                        viewModelContext = FragmentViewModelContext(
-                            thisRef.requireActivity(),
-                            _fragmentArgsProvider(),
-                            thisRef
-                        ),
-                        key = keyFactory(),
-                        initialStateFactory = stateFactory(mockedState)
-                    )
-                        .apply { subscribe(thisRef, subscriber = { postInvalidate() }) }
-                        .also { vm ->
-                            if (mockBehavior?.initialState == MockBehavior.InitialState.Full) {
-                                // Custom viewmodel factories can override initial state, so we also force state from the viewmodel
-                                // to be the expected mocked value via the scriptable state store.
-                                @Suppress("UNCHECKED_CAST")
-                                mockedState?.let { vm.freezeStateForTesting(it) }
-                            }
-                        }
-                }
-            }.also { viewModelDelegate ->
-                mockStateHolder.addViewModelDelegate(
-                    fragment = thisRef,
-                    existingViewModel = false,
-                    viewModelProperty = property,
-                    viewModelDelegate = viewModelDelegate
+            return buildViewModel<S>(thisRef, property, false) { mockState ->
+                MvRxViewModelProvider.get(
+                    viewModelClass = viewModelClass.java,
+                    stateClass = S::class.java,
+                    viewModelContext = FragmentViewModelContext(
+                        thisRef.requireActivity(),
+                        _fragmentArgsProvider(),
+                        thisRef
+                    ),
+                    key = keyFactory(),
+                    initialStateFactory = stateFactory(mockState)
                 )
             }
         }
     }
 
-abstract class ViewModelProvider<T, VM : BaseMvRxViewModel<S>, S : MvRxState> {
+abstract class ViewModelProvider<T, VM : BaseMvRxViewModel<S>, S : MvRxState> where T : Fragment, T : MvRxView {
+
+    protected val mockBehavior = mvrxViewModelConfigProvider.mockBehavior
 
     abstract operator fun provideDelegate(
         thisRef: T,
         property: KProperty<*>
     ): lifecycleAwareLazy<VM>
 
-    internal fun stateFactory(mockState: S?): MvRxStateFactory<VM, S> {
+    protected inline fun <reified State : S> buildViewModel(
+        view: T,
+        viewModelProperty: KProperty<*>,
+        existingViewModel: Boolean,
+        crossinline viewModelProvider: (mockState: S?) -> VM
+    ): lifecycleAwareLazy<VM> {
+
+        // Mocked state will be null if it is being created from mock arguments, and this is not an "existing" view model
+        val mockState: S? =
+            if (mockBehavior != null && mockBehavior.initialState != MockBehavior.InitialState.None) {
+                mockStateHolder.getMockedState(
+                    view = view,
+                    viewModelProperty = viewModelProperty,
+                    existingViewModel = existingViewModel,
+                    stateClass = State::class.java,
+                    forceMockExistingViewModel = mockBehavior.initialState == MockBehavior.InitialState.ForceMockExistingViewModel
+                )
+            } else {
+                null
+            }
+
+        return lifecycleAwareLazy(view) {
+            mvrxViewModelConfigProvider.withMockBehavior(mockBehavior) {
+                viewModelProvider(mockState)
+                    .apply { subscribe(view, subscriber = { view.postInvalidate() }) }
+                    .also { vm ->
+                        if (mockState != null && mockBehavior?.initialState == MockBehavior.InitialState.Full) {
+                            // Custom viewmodel factories can override initial state, so we also force state from the viewmodel
+                            // to be the expected mocked value after the ViewModel has been created.
+
+                            val stateStore = vm.config.stateStore as? MockableStateStore
+                                ?: error("Expected a mockable state store for 'Full' mock behavior.")
+
+                            require(stateStore.mockBehavior.stateStoreBehavior == MockBehavior.StateStoreBehavior.Scriptable) {
+                                "Full mock state requires that the state store be set to scriptable to " +
+                                        "guarantee that state is frozen on the mock and not allowed to be changed by the view."
+                            }
+
+                            stateStore.next(mockState)
+                        }
+                    }
+            }
+        }.also { viewModelDelegate ->
+            if (mockBehavior != null) {
+                mockStateHolder.addViewModelDelegate(
+                    fragment = view,
+                    existingViewModel = false,
+                    viewModelProperty = viewModelProperty,
+                    viewModelDelegate = viewModelDelegate
+                )
+            }
+        }
+    }
+
+    internal fun stateFactory(
+        mockState: S?
+    ): MvRxStateFactory<VM, S> {
         return if (mockState == null) {
             RealMvRxStateFactory()
         } else {

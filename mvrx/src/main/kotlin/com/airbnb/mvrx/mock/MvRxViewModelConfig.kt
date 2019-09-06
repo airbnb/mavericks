@@ -31,11 +31,20 @@ class MvRxViewModelConfig<S : Any>(
     internal fun pushBehaviorOverride(mockBehavior: MockBehavior) {
         validateDebug(debugMode) ?: return
         mockBehaviorOverrides.push(mockBehavior)
+        updateStateStore()
+    }
+
+    private fun updateStateStore() {
+        val currentBehavior = currentMockBehavior
+        if (stateStore is MockableStateStore && currentBehavior != null) {
+            stateStore.mockBehavior = currentBehavior
+        }
     }
 
     internal fun popBehaviorOverride() {
         validateDebug(debugMode) ?: return
         mockBehaviorOverrides.pop()
+        updateStateStore()
     }
 }
 
@@ -114,11 +123,7 @@ open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
      */
     var mockBehavior: MockBehavior? = null
         set(value) {
-            if (validateDebug(debugMode) == true) {
-                field = value
-            } else {
-                field = null
-            }
+            field = if (validateDebug(debugMode) == true) value else null
         }
 
     /**
@@ -137,8 +142,6 @@ open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
     ): R {
         // This function is not inlined so that the caller cannot return early,
         // which would skip setting back the original value!
-
-        validateDebug(debugMode)
 
         // Nesting this call is tricky because an inner call may change the mock behavior that an outer call originally set.
         // To avoid potential bugs because of that we restore the original setting when leaving the block

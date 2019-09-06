@@ -99,6 +99,7 @@ internal class MockStateHolder {
             error("An 'existingViewModel' must have its state provided in the mocks")
         }
 
+        // TODO Higher order view model support in MvRx
         // It's possible for this viewmodel to be injected with another view model in its constructor.
         // In that case, the other viewmodel needs to be initialized first, otherwise it will crash.
         // Fragments should use the 'dependencies' property of the viewmodel delegate function to specify viewmodels to initialize first,
@@ -106,11 +107,11 @@ internal class MockStateHolder {
         // However, for mocking it won't exist, so we need to force existing view models to be created first.
         // We only do this from non existing view models to prevent a loop.
         if (!existingViewModel) {
-            val otherViewModelsOnFragment =
+            val otherViewModelsOnView =
                 delegateInfoMap[view]?.filter { it.viewModelProperty != viewModelProperty }
                     ?: error("No delegates registered for ${view.javaClass.simpleName}")
 
-            otherViewModelsOnFragment
+            otherViewModelsOnView
                 .filter { it.existingViewModel }
                 .forEach { it.viewModelDelegate.value }
         }

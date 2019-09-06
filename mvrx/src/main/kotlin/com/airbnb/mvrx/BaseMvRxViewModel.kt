@@ -40,6 +40,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 
     // TODO: Should the config be public?
     @Suppress("LeakingThis")
+    @PublishedApi
     internal val config: MvRxViewModelConfig<S> = mvrxViewModelConfigProvider.provideConfig(
         this,
         initialState
