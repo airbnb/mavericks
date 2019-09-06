@@ -2,20 +2,17 @@ package com.airbnb.mvrx.dogs
 
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.ViewModelContext
-import com.airbnb.mvrx.dogs.app.DogApplication
-import com.airbnb.mvrx.dogs.app.MvRxViewModel
 import com.airbnb.mvrx.dogs.data.DogRepository
+import com.airbnb.mvrx.dogs.utils.MvRxViewModel
 import io.reactivex.schedulers.Schedulers
 
 class DogViewModel(
-    state: DogState,
+    initialState: DogState,
     private val dogRepository: DogRepository
-) : MvRxViewModel<DogState>(state) {
+) : MvRxViewModel<DogState>(initialState) {
 
     init {
-        dogRepository.getDogs()
-            .subscribeOn(Schedulers.io())
-            .execute { copy(dogs = it) }
+        dogRepository.getDogs().execute { copy(dogs = it) }
     }
 
     fun loveDog(dogId: Long) = setState { copy(lovedDogId = dogId) }

@@ -7,7 +7,7 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.airbnb.sample"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 28
         versionCode 1
         versionName "0.0.1"
@@ -32,9 +32,8 @@ dependencies {
     implementation project(':mvrx')
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    // TODO: clean up the support library dependency resolution.
-    implementation("androidx.appcompat:appcompat:$appCompatVersion") { exclude group: 'android.arch.lifecycle' }
-    implementation("androidx.recyclerview:recyclerview:$recyclerViewVersion") { exclude group: 'android.arch.lifecycle' }
+    implementation "androidx.appcompat:appcompat:$appCompatVersion"
+    implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation("com.airbnb.android:epoxy:$epoxyVersion") { exclude group: 'com.android.support' }
@@ -47,10 +46,9 @@ dependencies {
     implementation "com.squareup.moshi:moshi:$moshiVersion"
     implementation "com.squareup.moshi:moshi-kotlin:$moshiVersion"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
-    implementation "org.koin:koin-android-architecture:$koinVersion"
     implementation "androidx.navigation:navigation-fragment-ktx:$navVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navVersion"
+    implementation "org.koin:koin-android:$koinVersion"
+
     testImplementation 'junit:junit:4.12'
-    androidTestImplementation "androidx.test:runner:$androidXTestVersion"
-    androidTestImplementation "androidx.test.espresso:espresso-core:$espressoVersion"
 }

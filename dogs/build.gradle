@@ -12,14 +12,10 @@ android {
         targetSdkVersion 28
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
     }
 
-    buildTypes {
-        release {
-            minifyEnabled false
-        }
+    dataBinding {
+        enabled = true
     }
 }
 
@@ -33,7 +29,6 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:$navVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navVersion"
     implementation("com.airbnb.android:epoxy:$epoxyVersion") { exclude group: 'com.android.support' }
-    kapt "com.airbnb.android:epoxy-processor:$epoxyVersion"
     implementation "com.squareup.moshi:moshi-kotlin:$moshiVersion"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
     implementation 'com.squareup.picasso:picasso:2.5.2'

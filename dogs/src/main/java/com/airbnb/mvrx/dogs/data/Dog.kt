@@ -6,4 +6,6 @@ data class Dog(
     val breeds: String,
     val imageUrl: String,
     val description: String
-)
+) : StableItem {
+    override val stableId = id
+}

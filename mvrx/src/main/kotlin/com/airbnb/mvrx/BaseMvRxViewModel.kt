@@ -136,7 +136,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 
     /**
      * Access the current ViewModel state. Takes a block of code that will be run after all current pending state
-     * updates are processed. The `this` inside of the block is the state.
+     * updates are processed.
      */
     protected fun withState(block: (state: S) -> Unit) {
         stateStore.get(block)
@@ -156,15 +156,15 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     }
 
     /**
-     * Helper to map an Single to an Async property on the state object.
+     * Helper to map a [Single] to an [Async] property on the state object.
      */
     fun <T> Single<T>.execute(
         stateReducer: S.(Async<T>) -> S
     ) = toObservable().execute({ it }, null, stateReducer)
 
     /**
-     * Helper to map an Single to an Async property on the state object.
-     * @param mapper A map converting the observable type to the desired AsyncData type.
+     * Helper to map a [Single] to an [Async] property on the state object.
+     * @param mapper A map converting the Single type to the desired Async type.
      * @param stateReducer A reducer that is applied to the current state and should return the
      *                     new state. Because the state is the receiver and it likely a data
      *                     class, an implementation may look like: `{ copy(response = it) }`.
@@ -175,23 +175,23 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ) = toObservable().execute(mapper, null, stateReducer)
 
     /**
-     * Helper to map an observable to an Async property on the state object.
+     * Helper to map an [Observable] to an [Async] property on the state object.
      */
     fun <T> Observable<T>.execute(
         stateReducer: S.(Async<T>) -> S
     ) = execute({ it }, null, stateReducer)
 
     /**
-     * Helper to map a Completable to an Async property on the state object.
+     * Helper to map a [Completable] to an [Async] property on the state object.
      */
     fun Completable.execute(
         stateReducer: S.(Async<Unit>) -> S
     ) = toSingle { Unit }.execute(stateReducer)
 
     /**
-     * Execute an observable and wrap its progression with AsyncData reduced to the global state.
+     * Execute an [Observable] and wrap its progression with [Async] property reduced to the global state.
      *
-     * @param mapper A map converting the observable type to the desired AsyncData type.
+     * @param mapper A map converting the Observable type to the desired Async type.
      * @param successMetaData A map that provides metadata to set on the Success result.
      *                        It allows data about the original Observable to be kept and accessed later. For example,
      *                        your mapper could map a network request to just the data your UI needs, but your base layers could
@@ -207,14 +207,18 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         successMetaData: ((T) -> Any)? = null,
         stateReducer: S.(Async<V>) -> S
     ): Disposable {
+        // Intentionally didn't use RxJava's startWith operator. When withState is called right after execute then the loading reducer won't be enqueued yet if startWith is used.
         setState { stateReducer(Loading()) }
 
-        return map { value ->
+        return map<Async<V>> { value ->
             val success = Success(mapper(value))
             success.metadata = successMetaData?.invoke(value)
-            success as Async<V>
+            success
         }
-            .onErrorReturn { Fail(it) }
+            .onErrorReturn { e ->
+                if (debugMode) Log.e(tag, "Observable encountered error", e)
+                Fail(e)
+            }
             .subscribe { asyncData -> setState { stateReducer(asyncData) } }
             .disposeOnClear()
     }

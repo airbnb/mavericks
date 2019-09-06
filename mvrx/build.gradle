@@ -3,8 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: "jacoco"
-
-apply from: '../gradle-maven-push.gradle'
+apply plugin: "com.vanniktech.maven.publish"
 
 android {
     compileSdkVersion 28
@@ -63,7 +62,6 @@ dependencies {
     testImplementation "org.mockito:mockito-core:2.25.1"
     testImplementation 'junit:junit:4.12'
     testImplementation "org.robolectric:robolectric:$robolectricVersion"
-    testImplementation "org.robolectric:shadows-supportv4:$robolectricVersion"
 }
 
 // Ensure custom source sets are included:

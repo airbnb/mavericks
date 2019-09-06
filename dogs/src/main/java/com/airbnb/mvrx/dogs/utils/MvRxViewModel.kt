@@ -1,4 +1,4 @@
-package com.airbnb.mvrx.dogs.app
+package com.airbnb.mvrx.dogs.utils
 
 import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.MvRxState
