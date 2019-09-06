@@ -54,7 +54,6 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:1.0.0-alpha03"
     kapt "androidx.lifecycle:lifecycle-compiler:$lifecycleVersion"
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     api "io.reactivex.rxjava2:rxjava:2.2.8"

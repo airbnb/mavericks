@@ -56,11 +56,11 @@ class TaskListFragment : BaseFragment() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
-        inflater?.inflate(R.menu.tasks_fragment_menu, menu)
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.tasks_fragment_menu, menu)
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?) = when (item?.itemId ?: 0) {
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.menu_refresh -> viewModel.refreshTasks().andTrue()
         R.id.menu_filter -> showFilteringPopUpMenu().andTrue()
         R.id.menu_clear -> viewModel.clearCompletedTasks().andTrue()
