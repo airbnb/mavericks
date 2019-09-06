@@ -7,6 +7,7 @@ import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.lifecycleAwareLazy
 import kotlin.reflect.KProperty
 
+// TODO Make this public? nest under a common object with other configurables?
 @PublishedApi
 internal val mockStateHolder = MockStateHolder()
 
