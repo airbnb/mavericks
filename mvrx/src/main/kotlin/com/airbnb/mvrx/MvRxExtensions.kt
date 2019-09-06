@@ -28,113 +28,20 @@ import kotlin.reflect.KProperty
 inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragmentViewModel(
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
-): ViewModelProvider<T, VM, S> where T : Fragment, T : MvRxView =
-    object : ViewModelProvider<T, VM, S>() {
-
-        override operator fun provideDelegate(
-            thisRef: T,
-            property: KProperty<*>
-        ): lifecycleAwareLazy<VM> {
-
-            return buildViewModel<S>(thisRef, property, false) { mockState ->
-                MvRxViewModelProvider.get(
-                    viewModelClass = viewModelClass.java,
-                    stateClass = S::class.java,
-                    viewModelContext = FragmentViewModelContext(
-                        thisRef.requireActivity(),
-                        _fragmentArgsProvider(),
-                        thisRef
-                    ),
-                    key = keyFactory(),
-                    initialStateFactory = stateFactory(mockState)
-                )
-            }
-        }
+): ViewModelDelegate<T, VM, S> where T : Fragment, T : MvRxView =
+    provideViewModel(false) { fragment, stateFactory, _ ->
+        MvRxViewModelProvider.get(
+            viewModelClass = viewModelClass.java,
+            stateClass = S::class.java,
+            viewModelContext = FragmentViewModelContext(
+                fragment.requireActivity(),
+                _fragmentArgsProvider(),
+                fragment
+            ),
+            key = keyFactory(),
+            initialStateFactory = stateFactory
+        )
     }
-
-abstract class ViewModelProvider<T, VM : BaseMvRxViewModel<S>, S : MvRxState> where T : Fragment, T : MvRxView {
-
-    protected val mockBehavior = mvrxViewModelConfigProvider.mockBehavior
-
-    abstract operator fun provideDelegate(
-        thisRef: T,
-        property: KProperty<*>
-    ): lifecycleAwareLazy<VM>
-
-    protected inline fun <reified State : S> buildViewModel(
-        view: T,
-        viewModelProperty: KProperty<*>,
-        existingViewModel: Boolean,
-        crossinline viewModelProvider: (mockState: S?) -> VM
-    ): lifecycleAwareLazy<VM> {
-
-        // Mocked state will be null if it is being created from mock arguments, and this is not an "existing" view model
-        val mockState: S? =
-            if (mockBehavior != null && mockBehavior.initialState != MockBehavior.InitialState.None) {
-                mockStateHolder.getMockedState(
-                    view = view,
-                    viewModelProperty = viewModelProperty,
-                    existingViewModel = existingViewModel,
-                    stateClass = State::class.java,
-                    forceMockExistingViewModel = mockBehavior.initialState == MockBehavior.InitialState.ForceMockExistingViewModel
-                )
-            } else {
-                null
-            }
-
-        return lifecycleAwareLazy(view) {
-            mvrxViewModelConfigProvider.withMockBehavior(mockBehavior) {
-                viewModelProvider(mockState)
-                    .apply { subscribe(view, subscriber = { view.postInvalidate() }) }
-                    .also { vm ->
-                        if (mockState != null && mockBehavior?.initialState == MockBehavior.InitialState.Full) {
-                            // Custom viewmodel factories can override initial state, so we also force state from the viewmodel
-                            // to be the expected mocked value after the ViewModel has been created.
-
-                            val stateStore = vm.config.stateStore as? MockableStateStore
-                                ?: error("Expected a mockable state store for 'Full' mock behavior.")
-
-                            require(stateStore.mockBehavior.stateStoreBehavior == MockBehavior.StateStoreBehavior.Scriptable) {
-                                "Full mock state requires that the state store be set to scriptable to " +
-                                        "guarantee that state is frozen on the mock and not allowed to be changed by the view."
-                            }
-
-                            stateStore.next(mockState)
-                        }
-                    }
-            }
-        }.also { viewModelDelegate ->
-            if (mockBehavior != null) {
-                mockStateHolder.addViewModelDelegate(
-                    fragment = view,
-                    existingViewModel = false,
-                    viewModelProperty = viewModelProperty,
-                    viewModelDelegate = viewModelDelegate
-                )
-            }
-        }
-    }
-
-    internal fun stateFactory(
-        mockState: S?
-    ): MvRxStateFactory<VM, S> {
-        return if (mockState == null) {
-            RealMvRxStateFactory()
-        } else {
-            object : MvRxStateFactory<VM, S> {
-                override fun createInitialState(
-                    viewModelClass: Class<out VM>,
-                    stateClass: Class<out S>,
-                    viewModelContext: ViewModelContext,
-                    stateRestorer: (S) -> S
-                ): S {
-                    return mockState
-                }
-            }
-        }
-    }
-}
-
 
 /**
  * Gets or creates a ViewModel scoped to a parent fragment. This delegate will walk up the parentFragment hierarchy
@@ -144,56 +51,50 @@ abstract class ViewModelProvider<T, VM : BaseMvRxViewModel<S>, S : MvRxState> wh
 inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.parentFragmentViewModel(
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
-): ViewModelProvider<T, VM, S> where T : Fragment, T : MvRxView =
-    object : ViewModelProvider<T, VM, S>() {
+): ViewModelDelegate<T, VM, S> where T : Fragment, T : MvRxView =
+    provideViewModel(true) { fragment, stateFactory, _ ->
+        // 'existingViewModel' is set to true. Although this function works in both cases of
+        // either existing or new viewmodel it would be more difficult to support both cases,
+        // so we just test the common case of "existing". We can't be sure that the fragment
+        // was designed for it to be used in the non-existing case (ie it may require arguments)
 
-        override operator fun provideDelegate(
-            thisRef: T,
-            property: KProperty<*>
-        ): lifecycleAwareLazy<VM> = buildViewModel<S>(thisRef, property, true) { mockState ->
-            // 'existingViewModel' is set to true. Although this function works in both cases of
-            // either existing or new viewmodel it would be more difficult to support both cases,
-            // so we just test the common case of "existing". We can't be sure that the fragment
-            // was designed for it to be used in the non-existing case (ie it may require arguments)
-
-            requireNotNull(parentFragment) { "There is no parent fragment for ${thisRef::class.java.simpleName}!" }
-            val notFoundMessage =
-                { "There is no ViewModel of type ${VM::class.java.simpleName} for this Fragment!" }
-            val factory = MvRxFactory { error(notFoundMessage()) }
-            var fragment: Fragment? = parentFragment
-            val key = keyFactory()
-            while (fragment != null) {
-                try {
-                    return@buildViewModel ViewModelProviders.of(fragment, factory)
-                        .get(key, viewModelClass.java)
-                } catch (e: java.lang.IllegalStateException) {
-                    if (e.message == notFoundMessage()) {
-                        fragment = fragment.parentFragment
-                    } else {
-                        throw e
-                    }
+        requireNotNull(parentFragment) { "There is no parent fragment for ${fragment::class.java.simpleName}!" }
+        val notFoundMessage =
+            { "There is no ViewModel of type ${VM::class.java.simpleName} for this Fragment!" }
+        val factory = MvRxFactory { error(notFoundMessage()) }
+        var parent: Fragment? = parentFragment
+        val key = keyFactory()
+        while (parent != null) {
+            try {
+                return@provideViewModel ViewModelProviders.of(parent, factory)
+                    .get(key, viewModelClass.java)
+            } catch (e: java.lang.IllegalStateException) {
+                if (e.message == notFoundMessage()) {
+                    parent = parent.parentFragment
+                } else {
+                    throw e
                 }
             }
-
-            // ViewModel was not found. Create a new one in the top-most parent.
-            var topParentFragment = parentFragment
-            while (topParentFragment?.parentFragment != null) {
-                topParentFragment = topParentFragment.parentFragment
-            }
-            val viewModelContext = FragmentViewModelContext(
-                thisRef.requireActivity(),
-                _fragmentArgsProvider(),
-                topParentFragment!!
-            )
-
-            MvRxViewModelProvider.get(
-                viewModelClass = viewModelClass.java,
-                stateClass = S::class.java,
-                viewModelContext = viewModelContext,
-                key = keyFactory(),
-                initialStateFactory = stateFactory(mockState)
-            )
         }
+
+        // ViewModel was not found. Create a new one in the top-most parent.
+        var topParentFragment = parentFragment
+        while (topParentFragment?.parentFragment != null) {
+            topParentFragment = topParentFragment.parentFragment
+        }
+        val viewModelContext = FragmentViewModelContext(
+            fragment.requireActivity(),
+            _fragmentArgsProvider(),
+            topParentFragment!!
+        )
+
+        MvRxViewModelProvider.get(
+            viewModelClass = viewModelClass.java,
+            stateClass = S::class.java,
+            viewModelContext = viewModelContext,
+            key = keyFactory(),
+            initialStateFactory = stateFactory
+        )
     }
 
 /**
@@ -202,35 +103,58 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.paren
 inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.targetFragmentViewModel(
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
-): Lazy<VM> where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
-    val targetFragment =
-        requireNotNull(targetFragment) { "There is no target fragment for ${this::class.java.simpleName}!" }
-    MvRxViewModelProvider.get(
-        viewModelClass.java,
-        S::class.java,
-        FragmentViewModelContext(
-            this.requireActivity(),
-            targetFragment._fragmentArgsProvider(),
-            targetFragment
-        ),
-        keyFactory()
-    )
-        .apply { subscribe(this@targetFragmentViewModel, subscriber = { postInvalidate() }) }
-}
+): ViewModelDelegate<T, VM, S> where T : Fragment, T : MvRxView =
+    provideViewModel(true) { fragment, stateFactory, _ ->
+        // 'existingViewModel' is set to true. Although this function works in both cases of
+        // either existing or new viewmodel it would be more difficult to support both cases,
+        // so we just test the common case of "existing". We can't be sure that the fragment
+        // was designed for it to be used in the non-existing case (ie it may require arguments)
+
+        val targetFragment =
+            requireNotNull(fragment.targetFragment) { "There is no target fragment for ${fragment::class.java.simpleName}!" }
+
+        MvRxViewModelProvider.get(
+            viewModelClass = viewModelClass.java,
+            stateClass = S::class.java,
+            viewModelContext = FragmentViewModelContext(
+                fragment.requireActivity(),
+                targetFragment._fragmentArgsProvider(),
+                targetFragment
+            ),
+            key = keyFactory(),
+            initialStateFactory = stateFactory
+        )
+    }
 
 /**
  * [activityViewModel] except it will throw [IllegalStateException] if the ViewModel doesn't already exist.
  * Use this for screens in the middle of a flow that cannot reasonably be an entrypoint to the flow.
  */
-inline fun <T, reified VM : BaseMvRxViewModel<S>, S : MvRxState> T.existingViewModel(
+inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.existingViewModel(
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
-) where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
-    val factory =
-        MvRxFactory { throw IllegalStateException("ViewModel for ${requireActivity()}[${keyFactory()}] does not exist yet!") }
-    ViewModelProviders.of(requireActivity(), factory).get(keyFactory(), viewModelClass.java)
-        .apply { subscribe(this@existingViewModel, subscriber = { postInvalidate() }) }
-}
+): ViewModelDelegate<T, VM, S> where T : Fragment, T : MvRxView =
+    provideViewModel(true) { fragment, stateFactory, isMocked ->
+
+        val activity = fragment.requireActivity()
+        val factory =
+            MvRxFactory { error("ViewModel for ${activity}[${keyFactory()}] does not exist yet!") }
+
+        if (!isMocked) {
+            ViewModelProviders.of(activity, factory).get(keyFactory(), viewModelClass.java)
+        } else {
+            MvRxViewModelProvider.get(
+                viewModelClass = viewModelClass.java,
+                stateClass = S::class.java,
+                viewModelContext = ActivityViewModelContext(
+                    activity,
+                    fragment._activityArgsProvider(keyFactory)
+                ),
+                key = keyFactory(),
+                initialStateFactory = stateFactory
+            )
+        }
+    }
 
 /**
  * [fragmentViewModel] except scoped to the current Activity. Use this to share state between different Fragments.
@@ -238,16 +162,25 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, S : MvRxState> T.existingViewM
 inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activityViewModel(
     viewModelClass: KClass<VM> = VM::class,
     noinline keyFactory: () -> String = { viewModelClass.java.name }
-) where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
-    if (requireActivity() !is MvRxViewModelStoreOwner) throw IllegalArgumentException("Your Activity must be a MvRxViewModelStoreOwner!")
-    MvRxViewModelProvider.get(
-        viewModelClass.java,
-        S::class.java,
-        ActivityViewModelContext(requireActivity(), _activityArgsProvider(keyFactory)),
-        keyFactory()
-    )
-        .apply { subscribe(this@activityViewModel, subscriber = { postInvalidate() }) }
-}
+): ViewModelDelegate<T, VM, S> where T : Fragment, T : MvRxView =
+    provideViewModel(false) { fragment, stateFactory, _ ->
+
+        val activity = fragment.requireActivity()
+        check(activity is MvRxViewModelStoreOwner) {
+            "Your Activity must be a MvRxViewModelStoreOwner!"
+        }
+
+        MvRxViewModelProvider.get(
+            viewModelClass = viewModelClass.java,
+            stateClass = S::class.java,
+            viewModelContext = ActivityViewModelContext(
+                activity,
+                fragment._activityArgsProvider(keyFactory)
+            ),
+            key = keyFactory(),
+            initialStateFactory = stateFactory
+        )
+    }
 
 /**
  * For internal use only. Public for inline.
