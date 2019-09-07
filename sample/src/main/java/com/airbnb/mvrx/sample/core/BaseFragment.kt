@@ -2,12 +2,10 @@ package com.airbnb.mvrx.sample.core
 
 import android.os.Bundle
 import android.os.Parcelable
-import androidx.annotation.IdRes
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import androidx.appcompat.widget.Toolbar
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
+import androidx.annotation.IdRes
+import androidx.appcompat.widget.Toolbar
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.airbnb.epoxy.EpoxyRecyclerView
@@ -15,7 +13,7 @@ import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.sample.R
 
-abstract class BaseFragment : BaseMvRxFragment() {
+abstract class BaseFragment : BaseMvRxFragment(R.layout.fragment_base_mvrx) {
 
     protected lateinit var recyclerView: EpoxyRecyclerView
     protected lateinit var toolbar: Toolbar
@@ -27,20 +25,14 @@ abstract class BaseFragment : BaseMvRxFragment() {
         epoxyController.onRestoreInstanceState(savedInstanceState)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_base_mvrx, container, false).apply {
-            recyclerView = findViewById(R.id.recycler_view)
-            toolbar = findViewById(R.id.toolbar)
-            coordinatorLayout = findViewById(R.id.coordinator_layout)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        recyclerView = view.findViewById(R.id.recycler_view)
+        toolbar = view.findViewById(R.id.toolbar)
+        coordinatorLayout = view.findViewById(R.id.coordinator_layout)
 
-            recyclerView.setController(epoxyController)
+        recyclerView.setController(epoxyController)
 
-            toolbar.setupWithNavController(findNavController())
-        }
+        toolbar.setupWithNavController(findNavController())
     }
 
     override fun invalidate() {
