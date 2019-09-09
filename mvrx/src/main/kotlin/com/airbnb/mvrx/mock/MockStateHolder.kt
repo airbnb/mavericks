@@ -7,42 +7,35 @@ import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.lifecycleAwareLazy
 import kotlin.reflect.KProperty
 
-// TODO Make this public? nest under a common object with other configurables?
-@PublishedApi
-internal val mockStateHolder = MockStateHolder()
-
 /**
  * Used to mock the initial state value of a viewmodel.
- * The factory for creating initial state is normally internal in MvRx - we have created our own delegates to provide our mocked
- * state via [mockableViewModelProvider].
  */
-@PublishedApi
-internal class MockStateHolder {
+class MockStateHolder {
 
     @PublishedApi
     internal val stateMap = mutableMapOf<MvRxView, MvRxMock<*, *>>()
     private val delegateInfoMap = mutableMapOf<MvRxView, MutableList<ViewModelDelegateInfo<*, *>>>()
 
     /**
-     * Set mock data for a fragment reference. The mocks will be used to provide initial state
-     * when the view models are initialized as the fragment is started.
+     * Set mock data for a view reference. The mocks will be used to provide initial state
+     * when the view models are initialized as the view is started.
      */
     fun <V : MockableMvRxView, A : Parcelable> setMock(
-        fragment: MvRxView,
+        view: MvRxView,
         mockInfo: MvRxMock<V, A>
     ) {
-        stateMap[fragment] = mockInfo
+        stateMap[view] = mockInfo
     }
 
     /**
-     * Clear the stored mock info for the given fragment. This should be called after the fragment is done initializing itself with the mock.
-     * This should be done to prevent the mock data from interfering with future fragments of the same type.
+     * Clear the stored mock info for the given view. This should be called after the view is done initializing itself with the mock.
+     * This should be done to prevent the mock data from interfering with future views of the same type.
      */
-    fun clearMock(fragment: MvRxView) {
-        stateMap.remove(fragment)
-            ?: error("No mock was set for fragment ${fragment::class.java.simpleName}")
-        // If the mocked fragment was just mocked with args and doesn't haven't view models then this will be empty
-        delegateInfoMap.remove(fragment)
+    fun clearMock(view: MvRxView) {
+        stateMap.remove(view)
+            ?: error("No mock was set for view ${view::class.java.simpleName}")
+        // If the mocked view was just mocked with args and doesn't haven't view models then this will be empty
+        delegateInfoMap.remove(view)
     }
 
     fun clearAllMocks() {
@@ -51,17 +44,17 @@ internal class MockStateHolder {
     }
 
     /**
-     * Get the mocked state for the viewmodel on the given fragment. Returns null if no mocked state has been set - this is valid if a fragment
-     * under mock contains nested fragments that are not under mock.
+     * Get the mocked state for the viewmodel on the given view. Returns null if no mocked state has been set - this is valid if a view
+     * under mock contains nested views that are not under mock.
      *
-     * The mock state is not cleared after being retrieved because if the fragment has multiple viewmodels they will each need to
+     * The mock state is not cleared after being retrieved because if the view has multiple viewmodels they will each need to
      * access this separately.
      *
-     * If null is returned it means that the fragment should be initialized from its arguments.
+     * If null is returned it means that the view should be initialized from its arguments.
      * This will only happen if this is not an "existing" view model.
      *
      * @param forceMockExistingViewModel If true, and if [existingViewModel] is true, then we expect that no mock state has been set for this viewmodel
-     * and we should instead manually retrieve the default mock state from the Fragment and force that as the mock state to use.
+     * and we should instead manually retrieve the default mock state from the View and force that as the mock state to use.
      */
     fun <S : MvRxState> getMockedState(
         view: MvRxView,
@@ -126,13 +119,13 @@ internal class MockStateHolder {
     }
 
     fun <VM : BaseMvRxViewModel<S>, S : MvRxState> addViewModelDelegate(
-        fragment: MvRxView,
+        view: MvRxView,
         existingViewModel: Boolean,
         viewModelProperty: KProperty<*>,
         viewModelDelegate: lifecycleAwareLazy<VM>
     ) {
         delegateInfoMap
-            .getOrPut(fragment) { mutableListOf() }
+            .getOrPut(view) { mutableListOf() }
             .also { delegateInfoList ->
                 require(delegateInfoList.none { it.viewModelProperty == viewModelProperty }) {
                     "Delegate already registered for ${viewModelProperty.name}"

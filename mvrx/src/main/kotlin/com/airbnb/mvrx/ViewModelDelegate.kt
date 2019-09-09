@@ -3,8 +3,6 @@ package com.airbnb.mvrx
 import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.mock.MockBehavior
 import com.airbnb.mvrx.mock.MockableStateStore
-import com.airbnb.mvrx.mock.mockStateHolder
-import com.airbnb.mvrx.mock.mvrxViewModelConfigProvider
 import kotlin.reflect.KProperty
 
 @PublishedApi
@@ -32,7 +30,7 @@ internal inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState
 
 abstract class ViewModelDelegate<T, VM : BaseMvRxViewModel<S>, S : MvRxState> where T : Fragment, T : MvRxView {
 
-    protected val mockBehavior = mvrxViewModelConfigProvider.mockBehavior
+    protected val mockBehavior = MvRx.viewModelConfigProvider.mockBehavior
 
     abstract operator fun provideDelegate(
         thisRef: T,
@@ -50,7 +48,7 @@ abstract class ViewModelDelegate<T, VM : BaseMvRxViewModel<S>, S : MvRxState> wh
         val mockState: S? =
             // TODO: Is this right for ForceMockExistingViewModel? do we not get mocked state for ForceMockExistingViewModel if it isn't an existing view model?
             if (mockBehavior != null && mockBehavior.initialState != MockBehavior.InitialState.None) {
-                mockStateHolder.getMockedState(
+                MvRx.mockStateHolder.getMockedState(
                     view = view,
                     viewModelProperty = viewModelProperty,
                     existingViewModel = existingViewModel,
@@ -62,7 +60,7 @@ abstract class ViewModelDelegate<T, VM : BaseMvRxViewModel<S>, S : MvRxState> wh
             }
 
         return lifecycleAwareLazy(view) {
-            mvrxViewModelConfigProvider.withMockBehavior(mockBehavior) {
+            MvRx.viewModelConfigProvider.withMockBehavior(mockBehavior) {
                 viewModelProvider(mockState)
                     .apply { subscribe(view, subscriber = { view.postInvalidate() }) }
                     .also { vm ->
@@ -89,7 +87,7 @@ abstract class ViewModelDelegate<T, VM : BaseMvRxViewModel<S>, S : MvRxState> wh
                 // Tracking all view model delegates created for a view allows us to for
                 // initialize existing view models first, since Fragment view models
                 // may depend on existing view models.
-                mockStateHolder.addViewModelDelegate(
+                MvRx.mockStateHolder.addViewModelDelegate(
                     fragment = view,
                     existingViewModel = existingViewModel,
                     viewModelProperty = viewModelProperty,

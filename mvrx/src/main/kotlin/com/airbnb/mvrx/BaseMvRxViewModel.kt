@@ -9,7 +9,6 @@ import androidx.lifecycle.ViewModel
 import com.airbnb.mvrx.MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER
 import com.airbnb.mvrx.mock.MockBehavior
 import com.airbnb.mvrx.mock.MvRxViewModelConfig
-import com.airbnb.mvrx.mock.mvrxViewModelConfigProvider
 import com.airbnb.mvrx.mock.reportExecuteCallToInteractionTest
 import io.reactivex.Completable
 import io.reactivex.Observable
@@ -41,7 +40,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     // TODO: Should the config be public?
     @Suppress("LeakingThis")
     @PublishedApi
-    internal val config: MvRxViewModelConfig<S> = mvrxViewModelConfigProvider.provideConfig(
+    internal val config: MvRxViewModelConfig<S> = MvRx.viewModelConfigProvider.provideConfig(
         this,
         initialState
     )

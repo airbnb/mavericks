@@ -9,9 +9,6 @@ import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.RealMvRxStateStore
 import java.util.LinkedList
 
-// TODO: Is there a better way to set this?
-var mvrxViewModelConfigProvider = MvRxViewModelConfigProvider()
-
 class MvRxViewModelConfig<S : Any>(
     val debugMode: Boolean,
     val stateStore: MvRxStateStore<S>,

@@ -5,10 +5,6 @@ import androidx.annotation.RestrictTo.Scope.LIBRARY
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProviders
-import com.airbnb.mvrx.mock.MockBehavior
-import com.airbnb.mvrx.mock.MockableStateStore
-import com.airbnb.mvrx.mock.mockStateHolder
-import com.airbnb.mvrx.mock.mvrxViewModelConfigProvider
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty

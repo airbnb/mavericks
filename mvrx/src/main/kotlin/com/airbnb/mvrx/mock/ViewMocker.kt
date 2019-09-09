@@ -46,7 +46,7 @@ fun <V : MockableMvRxView, A : Parcelable> getMockVariants(
         MockedViewProvider(
             viewName = viewName,
             createView = { mockBehavior ->
-                val configProvider = mvrxViewModelConfigProvider
+                val configProvider = MvRx.viewModelConfigProvider
 
                 // Test argument serialization/deserialization
 
@@ -57,12 +57,12 @@ fun <V : MockableMvRxView, A : Parcelable> getMockVariants(
                     viewProvider(arguments, bundle)
                 }.let { view ->
                     // Set the view to be initialized with the mocked state when its viewmodels are created
-                    mockStateHolder.setMock(view, mockInfo)
+                    MvRx.mockStateHolder.setMock(view, mockInfo)
                     MockedView(
                         viewInstance = view,
                         viewName = viewName,
                         mockData = mockInfo
-                    ) { mockStateHolder.clearMock(view) }
+                    ) { MvRx.mockStateHolder.clearMock(view) }
                 }
             },
             mockData = mockInfo
