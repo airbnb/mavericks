@@ -11,23 +11,11 @@ import androidx.lifecycle.LifecycleOwner
  */
 abstract class BaseMvRxFragment : Fragment(), MvRxView {
 
-<<<<<<< HEAD
-    final override val mvrxViewId: String by lazy { mvrxPersistedViewId }
-
-    private lateinit var mvrxPersistedViewId: String
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        mvrxPersistedViewId = savedInstanceState?.getString(PERSISTED_VIEW_ID_KEY) ?: this::class.java.simpleName + "_" + UUID.randomUUID().toString()
-=======
-    override val mvrxViewModelStore by lazy { MvRxViewModelStore(viewModelStore) }
-
     private val mvrxViewIdProperty = MvRxViewId()
     final override val mvrxViewId: String by mvrxViewIdProperty
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        mvrxViewModelStore.restoreViewModels(this, savedInstanceState)
         mvrxViewIdProperty.restoreFrom(savedInstanceState)
->>>>>>> upstreamMvrx/master
         super.onCreate(savedInstanceState)
     }
 
@@ -40,12 +28,7 @@ abstract class BaseMvRxFragment : Fragment(), MvRxView {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-<<<<<<< HEAD
-        outState.putString(PERSISTED_VIEW_ID_KEY, mvrxViewId)
-=======
-        mvrxViewModelStore.saveViewModels(outState)
         mvrxViewIdProperty.saveTo(outState)
->>>>>>> upstreamMvrx/master
     }
 
     override fun onStart() {
