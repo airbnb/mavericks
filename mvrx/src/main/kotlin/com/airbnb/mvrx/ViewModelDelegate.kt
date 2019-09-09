@@ -48,6 +48,7 @@ abstract class ViewModelDelegate<T, VM : BaseMvRxViewModel<S>, S : MvRxState> wh
 
         // Mocked state will be null if it is being created from mock arguments, and this is not an "existing" view model
         val mockState: S? =
+            // TODO: Is this right for ForceMockExistingViewModel? do we not get mocked state for ForceMockExistingViewModel if it isn't an existing view model?
             if (mockBehavior != null && mockBehavior.initialState != MockBehavior.InitialState.None) {
                 mockStateHolder.getMockedState(
                     view = view,
@@ -82,10 +83,15 @@ abstract class ViewModelDelegate<T, VM : BaseMvRxViewModel<S>, S : MvRxState> wh
                     }
             }
         }.also { viewModelDelegate ->
-            if (mockBehavior != null) {
+            if (mockState != null) {
+                // If a view is being mocked then one of its view models may depend on another,
+                // in which case the dependent needs to be initialized after the VM it depends on.
+                // Tracking all view model delegates created for a view allows us to for
+                // initialize existing view models first, since Fragment view models
+                // may depend on existing view models.
                 mockStateHolder.addViewModelDelegate(
                     fragment = view,
-                    existingViewModel = false,
+                    existingViewModel = existingViewModel,
                     viewModelProperty = viewModelProperty,
                     viewModelDelegate = viewModelDelegate
                 )

@@ -7,7 +7,7 @@ import io.reactivex.subjects.BehaviorSubject
 
 /**
  * This acts as a functional state store, but all updates happen synchronously.
- * The intention of this is to allow state changes in integration tests to be tracked
+ * The intention of this is to allow state changes in tests to be tracked
  * synchronously.
  */
 internal class ImmediateRealMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {

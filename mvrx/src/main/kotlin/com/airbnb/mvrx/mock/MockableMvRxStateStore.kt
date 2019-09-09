@@ -1,6 +1,5 @@
 package com.airbnb.mvrx.mock
 
-import com.airbnb.mvrx.MvRxStateStore
 import com.airbnb.mvrx.RealMvRxStateStore
 import com.airbnb.mvrx.ScriptableMvRxStateStore
 import com.airbnb.mvrx.ScriptableStateStore
@@ -82,6 +81,10 @@ class MockableMvRxStateStore<S : Any>(
         }
     }
 
+    /**
+     * Add a listener that will be called each time a state is set on this state store via
+     * the [set] function.
+     */
     fun addOnStateSetListener(callback: (previousState: S, newState: S) -> Unit) {
         onStateSetListeners.add(callback)
     }
