@@ -1,5 +1,6 @@
 package com.airbnb.mvrx
 
+import com.airbnb.mvrx.mock.MockPrinterConfiguration
 import com.airbnb.mvrx.mock.MockStateHolder
 import com.airbnb.mvrx.mock.MvRxViewModelConfigProvider
 
@@ -28,4 +29,9 @@ object MvRx {
      * completes.
      */
     val mockStateHolder = MockStateHolder()
+
+    /**
+     * Configuration for how mock state is generated.
+     */
+    var mockPrinterConfiguration: MockPrinterConfiguration = MockPrinterConfiguration()
 }
