@@ -731,6 +731,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
                         )
                     }
                     activeSubscriptions.add(deliveryMode.subscriptionId)
+                    @Suppress("UNCHECKED_CAST")
                     lastDeliveredStates[deliveryMode.subscriptionId] as? T
                 } else {
                     null

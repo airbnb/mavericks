@@ -30,7 +30,7 @@ internal inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState
 
 abstract class ViewModelDelegate<T, VM : BaseMvRxViewModel<S>, S : MvRxState> where T : Fragment, T : MvRxView {
 
-    protected val mockBehavior = MvRx.viewModelConfigProvider.mockBehavior
+    val mockBehavior = MvRx.viewModelConfigProvider.mockBehavior
 
     abstract operator fun provideDelegate(
         thisRef: T,
@@ -88,7 +88,7 @@ abstract class ViewModelDelegate<T, VM : BaseMvRxViewModel<S>, S : MvRxState> wh
                 // initialize existing view models first, since Fragment view models
                 // may depend on existing view models.
                 MvRx.mockStateHolder.addViewModelDelegate(
-                    fragment = view,
+                    view = view,
                     existingViewModel = existingViewModel,
                     viewModelProperty = viewModelProperty,
                     viewModelDelegate = viewModelDelegate

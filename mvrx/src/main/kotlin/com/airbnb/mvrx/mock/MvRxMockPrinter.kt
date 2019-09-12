@@ -238,6 +238,8 @@ private class MvRxPrintStateBroadcastReceiver(val mvrxView: MvRxView) : Broadcas
                     }
             }
 
+            // We need to pass the package name to the script so that it knows where the pull the files from.
+            Log.d(RESULTS_TAG, "package=${context.applicationContext.packageName}")
             // The command line tooling watches for this "done" message to know when all states have been printed,
             // so it is important that this text doesn't change and matches exactly.
             Log.d(RESULTS_TAG, "done")
