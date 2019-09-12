@@ -1,12 +1,10 @@
 package com.airbnb.mvrx.mock
 
-import android.annotation.TargetApi
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.AsyncTask
-import android.os.Build
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -20,7 +18,6 @@ import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.mock.MvRxMockPrinter.Companion.ACTION_COPY_MVRX_STATE
 import com.airbnb.mvrx.withState
 import java.io.File
-import kotlin.reflect.KClass
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.createType
 import kotlin.reflect.full.isSubtypeOf
@@ -86,14 +83,21 @@ interface TypePrinter<T : Any> {
 /**
  * Helper for easily creating a [TypePrinter].
  *
- * @param block See [TypePrinter.generateCode]
+ * @param codeGenerator See [TypePrinter.generateCode]
  */
-inline fun <reified T : Any> typePrinter(crossinline block: (instance: T, generateConstructor: (Any?) -> String) -> String): TypePrinter<T> {
+inline fun <reified T : Any> typePrinter(
+    crossinline transformImports: (List<String>) -> List<String> = { it },
+    crossinline codeGenerator: (instance: T, generateConstructor: (Any?) -> String) -> String
+): TypePrinter<T> {
     return object : TypePrinter<T> {
         override fun acceptsObject(obj: Any): Boolean = obj is T
 
         override fun generateCode(instance: T, generateConstructor: (Any?) -> String): String {
-            return block(instance, generateConstructor)
+            return codeGenerator(instance, generateConstructor)
+        }
+
+        override fun modifyImports(imports: List<String>): List<String> {
+            return transformImports(imports)
         }
 
     }
@@ -101,12 +105,13 @@ inline fun <reified T : Any> typePrinter(crossinline block: (instance: T, genera
 
 
 /**
- * This registers a Broadcast receiver on the fragment (only in debug mode) that
+ * This registers a Broadcast receiver on the MvRxView (only in debug mode) that
  * listens for the intent action [ACTION_COPY_MVRX_STATE] to copy mvrx state to files on device.
  *
  * The resulting file names are printed to logcat so tooling can copy them from device.
  */
-internal class MvRxMockPrinter(val mvrxView: MvRxView) : LifecycleObserver {
+internal class MvRxMockPrinter private constructor(private val mvrxView: MvRxView) :
+    LifecycleObserver {
     private val broadcastReceiver by lazy { MvRxPrintStateBroadcastReceiver(mvrxView) }
     private val context: Context
         get() {
@@ -117,12 +122,19 @@ internal class MvRxMockPrinter(val mvrxView: MvRxView) : LifecycleObserver {
                 is android.app.Fragment -> {
                     mvrxView.activity ?: error("Fragment context is null")
                 }
-                else -> error("Don't know how to get Context from mvrx view. Submit a PR to support your screen type.")
+                else -> error("Don't know how to get Context from mvrx view ${mvrxView.javaClass.simpleName}. Submit a PR to support your screen type.")
             }
         }
 
     init {
-        if (MvRx.viewModelConfigProvider.debugMode) {
+        // We don't want views to be registered multiple times, as that would result in duplicate
+        // outputs. To avoid this, we track which views have been registered, and only allow one
+        // at a time. We expect this to be single threaded (called from postInvalidate on the
+        // main thread), so the collection is not thread safe.
+        // To avoid leaking the view, it is removed when the lifecycle is destroyed.
+        // If the lifecycle is already Destroyed when this is called, the observer will immediately
+        // invoke the destroyed callback so the view is removed immediately as well.
+        if (viewsWithRegisteredReceivers.add(mvrxView)) {
             mvrxView.lifecycle.addObserver(this)
         }
     }
@@ -137,8 +149,29 @@ internal class MvRxMockPrinter(val mvrxView: MvRxView) : LifecycleObserver {
         context.unregisterReceiver(broadcastReceiver)
     }
 
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    fun onDestroyed() {
+        viewsWithRegisteredReceivers.remove(mvrxView)
+    }
+
     companion object {
         const val ACTION_COPY_MVRX_STATE = "ACTION_COPY_MVRX_STATE"
+        /**
+         * Tracks which views already have a receiver registered, to prevent registering the same
+         * view multiple times. To avoid leaks, the view is removed when it is destroyed.
+         */
+        private val viewsWithRegisteredReceivers = mutableSetOf<MvRxView>()
+
+        /**
+         * Register the given view to listen for broadcast receiver intents for mock state
+         * printing. This is safe to call multiple times for the same [MvRxView].
+         */
+        fun startReceiverIfInDebug(mvrxView: MvRxView) {
+            // Avoid an object allocation in the case of production
+            if (MvRx.viewModelConfigProvider.debugMode) {
+                MvRxMockPrinter(mvrxView)
+            }
+        }
     }
 }
 

@@ -30,6 +30,10 @@ import kotlin.reflect.full.primaryConstructor
  */
 interface MockableMvRxView : MvRxView {
     fun provideMocks(): MvRxViewMocks<out MockableMvRxView, out Parcelable> = EmptyMocks
+
+    fun enableMockPrinterReceiver() {
+        MvRxMockPrinter.startReceiverIfInDebug(this)
+    }
 }
 
 /**

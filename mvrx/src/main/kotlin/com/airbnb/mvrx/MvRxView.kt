@@ -5,6 +5,7 @@ import android.os.Looper
 import android.os.Message
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
+import com.airbnb.mvrx.mock.MockableMvRxView
 import kotlin.reflect.KProperty1
 
 // Set of MvRxView identity hash codes that have a pending invalidate.
@@ -12,7 +13,12 @@ private val pendingInvalidates = HashSet<Int>()
 private val handler = Handler(Looper.getMainLooper(), Handler.Callback { message ->
     val view = message.obj as MvRxView
     pendingInvalidates.remove(System.identityHashCode(view))
-    if (view.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) view.invalidate()
+    if (view.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+        if (view is MockableMvRxView) {
+            view.enableMockPrinterReceiver()
+        }
+        view.invalidate()
+    }
     true
 })
 

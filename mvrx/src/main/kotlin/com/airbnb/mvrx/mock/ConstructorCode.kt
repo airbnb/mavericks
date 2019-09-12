@@ -1,8 +1,7 @@
 package com.airbnb.mvrx.mock
 
 /**
- * This utility is used to print the code need to construct an object. It is useful for printing out a MvRxState instance's
- * constructor code when setting up a test for that state.
+
  */
 
 import com.airbnb.mvrx.MvRx
@@ -16,7 +15,10 @@ import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.isAccessible
 
 /**
- * This uses recursion to analyze the given object instance and
+ * This utility is used to print the code need to construct an object. It is useful for printing out a MvRxState instance's
+ * constructor code when setting up a test for that state.
+ *
+ * It uses recursion to analyze the given object instance and
  * generates code needed to construct another instance of the object containing the same data.
  */
 internal class ConstructorCode<T : Any>(
@@ -55,6 +57,7 @@ internal class ConstructorCode<T : Any>(
                 .customTypePrinters
                 .firstOrNull { it.acceptsObject(this) }
                 ?.let {
+                    usedTypePrinters.add(it)
                     @Suppress("UNCHECKED_CAST")
                     it as TypePrinter<Any>
                 }
