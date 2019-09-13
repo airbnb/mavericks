@@ -3,8 +3,6 @@ package com.airbnb.mvrx
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelProviders
 import kotlinx.android.parcel.Parcelize
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -14,16 +12,16 @@ import org.robolectric.android.controller.ActivityController
 import java.lang.IllegalStateException
 
 @Parcelize
-data class MvRxFactoryArgs(val initialCount: Int = 1) : Parcelable
+data class MvRxTestArgs(val initialCount: Int = 1) : Parcelable
 
-data class MvRxFactoryState(
+data class MvRxTestState(
     @PersistState val persistedCount: Int = 0,
     val notPersistedCount: Int = 0
 ) : MvRxState {
-    constructor(args: MvRxFactoryArgs) : this(persistedCount = args.initialCount, notPersistedCount = args.initialCount)
+    constructor(args: MvRxTestArgs) : this(persistedCount = args.initialCount, notPersistedCount = args.initialCount)
 }
 
-class MyViewModel(initialState: MvRxFactoryState) : TestMvRxViewModel<MvRxFactoryState>(initialState) {
+class MyViewModel(initialState: MvRxTestState) : TestMvRxViewModel<MvRxTestState>(initialState) {
     fun setCount(count: Int) = setState { copy(persistedCount = count, notPersistedCount = count) }
 }
 
@@ -35,23 +33,19 @@ data class InvalidState(val count: Int = 0) : MvRxState {
 
 class InvalidViewModel(initialState: InvalidState) : TestMvRxViewModel<InvalidState>(initialState)
 
-class MvRxFactoryTest : BaseTest() {
+class MvRxViewModelProviderTest : BaseTest() {
 
     @Test(expected = ViewModelDoesNotExistException::class)
     fun failForNonExistentViewModel() {
         val activity = Robolectric.setupActivity(FragmentActivity::class.java)
-
-        val factory = createMvRxFactory(activity, forExistingViewModel = true)
-        getViewModel(activity, factory)
+        getViewModel(activity, forExistingViewModel = true)
     }
 
     @Test
     fun createFromRestoredInstanceState() {
         val (controller, activity) = buildActivity()
 
-        val factory = createMvRxFactory(activity)
-
-        val viewModel = getViewModel(activity, factory)
+        val viewModel = getViewModel(activity)
         viewModel.setCount(3)
 
         val bundle = Bundle()
@@ -59,8 +53,7 @@ class MvRxFactoryTest : BaseTest() {
 
         val (_, recreatedActivity) = buildActivity(savedInstanceState = bundle)
 
-        val recreatedFactory = createMvRxFactory(recreatedActivity)
-        val recreatedViewModel = getViewModel(recreatedActivity, recreatedFactory)
+        val recreatedViewModel = getViewModel(recreatedActivity)
 
         assertNotEquals(viewModel, recreatedViewModel)
 
@@ -74,9 +67,7 @@ class MvRxFactoryTest : BaseTest() {
     fun createExistingFromRestoredInstanceState() {
         val (controller, activity) = buildActivity()
 
-        val factory = createMvRxFactory(activity)
-
-        val viewModel = getViewModel(activity, factory)
+        val viewModel = getViewModel(activity)
         viewModel.setCount(3)
 
         val bundle = Bundle()
@@ -84,8 +75,7 @@ class MvRxFactoryTest : BaseTest() {
 
         val (_, recreatedActivity) = buildActivity(savedInstanceState = bundle)
 
-        val recreatedFactory = createMvRxFactory(recreatedActivity, forExistingViewModel = true)
-        val recreatedViewModel = getViewModel(recreatedActivity, recreatedFactory)
+        val recreatedViewModel = getViewModel(recreatedActivity, forExistingViewModel = true)
 
         assertNotEquals(viewModel, recreatedViewModel)
 
@@ -101,34 +91,26 @@ class MvRxFactoryTest : BaseTest() {
         val vmClass = InvalidViewModel::class.java
         val (controller, activity) = buildActivity()
 
-        ViewModelProviders.of(
-            activity,
-            MvRxFactory(
-                vmClass,
-                InvalidState::class.java,
-                ActivityViewModelContext(activity, InvalidArgs()),
-                key
-            )
-        ).get(key, vmClass)
+        MvRxViewModelProvider.get(
+            vmClass,
+            InvalidState::class.java,
+            ActivityViewModelContext(activity, InvalidArgs()),
+            key
+        )
         controller.saveInstanceState(Bundle())
     }
-
-    private fun createMvRxFactory(
-        activity: FragmentActivity,
-        forExistingViewModel: Boolean = false
-    ) = MvRxFactory(
-        VM_CLASS,
-        MvRxFactoryState::class.java,
-        ActivityViewModelContext(activity, MvRxFactoryArgs()),
-        VM_KEY,
-        forExistingViewModel
-    )
 }
 
 private fun getViewModel(
     activity: FragmentActivity,
-    factory: ViewModelProvider.Factory
-) = ViewModelProviders.of(activity, factory).get(VM_KEY, VM_CLASS)
+    forExistingViewModel: Boolean = false
+) = MvRxViewModelProvider.get(
+    VM_CLASS,
+    MvRxTestState::class.java,
+    ActivityViewModelContext(activity, MvRxTestArgs()),
+    VM_KEY,
+    forExistingViewModel
+)
 
 private fun buildActivity(savedInstanceState: Bundle? = null): Pair<ActivityController<FragmentActivity>, FragmentActivity> {
     val controller = Robolectric.buildActivity(FragmentActivity::class.java).apply {

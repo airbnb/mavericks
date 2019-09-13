@@ -1,9 +1,13 @@
 package com.airbnb.mvrx
 
+import android.os.Bundle
+import android.os.Parcelable
 import androidx.annotation.RestrictTo
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
+import java.io.Serializable
+import java.lang.IllegalStateException
 
 /**
  * Helper ViewModelProvider that has a single method for taking either a [Fragment] or [FragmentActivity] instead
@@ -33,10 +37,36 @@ object MvRxViewModelProvider {
         key: String = viewModelClass.name,
         forExistingViewModel: Boolean = false,
         initialStateFactory: MvRxStateFactory<VM, S> = RealMvRxStateFactory()
-    ): VM = ViewModelProvider(
-        viewModelContext.owner,
-        MvRxFactory(viewModelClass, stateClass, viewModelContext, key, forExistingViewModel, initialStateFactory)
-    ).get(key, viewModelClass)
+    ): VM {
+        val viewModel = ViewModelProvider(
+            viewModelContext.owner,
+            MvRxFactory(viewModelClass, stateClass, viewModelContext, key, forExistingViewModel, initialStateFactory)
+        ).get(key, viewModelClass)
+
+        with(viewModelContext.savedStateRegistry) {
+            unregisterSavedStateProvider(key)
+            registerSavedStateProvider(key) {
+                viewModel.getSavedStateBundle(viewModelContext)
+            }
+        }
+
+        return viewModel
+    }
+
+    private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> VM.getSavedStateBundle(viewModelContext: ViewModelContext) =
+        withState(this) { state ->
+            Bundle().apply {
+                putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, state.persistState())
+                viewModelContext.args?.let {
+                    when (it) {
+                        is Parcelable -> putParcelable(KEY_MVRX_SAVED_ARGS, it)
+                        is Serializable -> putSerializable(KEY_MVRX_SAVED_ARGS, it)
+                        else -> throw IllegalStateException("Args must be parcelable or serializable")
+                    }
+                }
+
+            }
+        }
 }
 
 /**

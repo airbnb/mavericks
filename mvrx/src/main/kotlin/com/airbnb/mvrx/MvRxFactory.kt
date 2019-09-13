@@ -40,11 +40,6 @@ class MvRxFactory<VM : BaseMvRxViewModel<S>, S : MvRxState>(
             stateRestorer,
             initialStateFactory
         )
-
-        viewModelContext.savedStateRegistry.registerSavedStateProvider(key) {
-            viewModel.getSavedStateBundle(viewModelContext)
-        }
-
         return viewModel as T
     }
 }
@@ -109,24 +104,8 @@ private fun <S : MvRxState> Bundle.toRestoredState(viewModelContext: ViewModelCo
     return restoredContext to restoredState::restorePersistedState
 }
 
-private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> VM.getSavedStateBundle(viewModelContext: ViewModelContext) =
-    withState(this) { state ->
-        Bundle().apply {
-            putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, state.persistState())
-            viewModelContext.args?.let {
-                when (it) {
-                    is Parcelable -> putParcelable(KEY_MVRX_SAVED_ARGS, it)
-                    is Serializable -> putSerializable(KEY_MVRX_SAVED_ARGS, it)
-                    else -> throw IllegalStateException("Args must be parcelable or serializable")
-                }
-            }
-
-        }
-    }
-
-
-private const val KEY_MVRX_SAVED_INSTANCE_STATE = "mvrx:saved_instance_state"
-private const val KEY_MVRX_SAVED_ARGS = "mvrx:saved_args"
+internal const val KEY_MVRX_SAVED_INSTANCE_STATE = "mvrx:saved_instance_state"
+internal const val KEY_MVRX_SAVED_ARGS = "mvrx:saved_args"
 
 internal class ViewModelDoesNotExistException(
     viewModelClass: Class<*>,
