@@ -1,5 +1,7 @@
 package com.airbnb.android.mvrx.test
 
+import com.airbnb.mvrx.MvRx
+import com.airbnb.mvrx.mock.MvRxViewModelConfigProvider
 import com.airbnb.mvrx.test.DebugMode
 import com.airbnb.mvrx.test.MvRxTestRule
 import io.reactivex.exceptions.OnErrorNotImplementedException
@@ -15,11 +17,12 @@ class MvRxTestRuleTestNotSet {
 
     @Test
     fun testNotDebugNoOverride() {
+        MvRx.viewModelConfigProvider = MvRxViewModelConfigProvider(debugMode = false)
         TestRuleViewModel()
     }
 
     @Test(expected = OnErrorNotImplementedException::class)
     fun testDebugNoOverride() {
-        TestRuleViewModel(true)
+        TestRuleViewModel()
     }
 }

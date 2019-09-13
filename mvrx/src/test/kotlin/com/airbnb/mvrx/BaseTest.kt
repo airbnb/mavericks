@@ -1,11 +1,13 @@
 // This suppression may be due to a bug in Detekt because this is an abstract class.
 @file:Suppress("UtilityClassWithPublicConstructor")
+
 package com.airbnb.mvrx
 
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
+import com.airbnb.mvrx.mock.MvRxViewModelConfigProvider
 import io.reactivex.Scheduler
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.annotations.NonNull
@@ -13,6 +15,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.exceptions.CompositeException
 import io.reactivex.internal.schedulers.ExecutorScheduler
 import io.reactivex.plugins.RxJavaPlugins
+import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Ignore
 import org.junit.runner.RunWith
@@ -35,9 +38,11 @@ abstract class BaseTest {
             RxJavaPlugins.reset()
             val immediate = object : Scheduler() {
                 // this prevents StackOverflowErrors when scheduling with a delay
-                override fun scheduleDirect(@NonNull run: Runnable, delay: Long, @NonNull unit: TimeUnit): Disposable = super.scheduleDirect(run, 0, unit)
+                override fun scheduleDirect(@NonNull run: Runnable, delay: Long, @NonNull unit: TimeUnit): Disposable =
+                    super.scheduleDirect(run, 0, unit)
 
-                override fun createWorker(): Worker = ExecutorScheduler.ExecutorWorker(Executor { it.run() }, true)
+                override fun createWorker(): Worker =
+                    ExecutorScheduler.ExecutorWorker(Executor { it.run() }, true)
             }
             RxJavaPlugins.setNewThreadSchedulerHandler { immediate }
             RxJavaPlugins.setComputationSchedulerHandler { immediate }
@@ -53,10 +58,15 @@ abstract class BaseTest {
         }
     }
 
+    @Before
+    fun resetConfigurationDefaults() {
+        MvRx.viewModelConfigProvider = MvRxViewModelConfigProvider()
+    }
+
     protected inline fun <reified F : Fragment, reified A : AppCompatActivity> createFragment(
-            savedInstanceState: Bundle? = null,
-            args: Parcelable? = null,
-            containerId: Int? = null
+        savedInstanceState: Bundle? = null,
+        args: Parcelable? = null,
+        containerId: Int? = null
     ): Pair<ActivityController<A>, F> {
         val controller = Robolectric.buildActivity(A::class.java)
         if (savedInstanceState == null) {
@@ -69,7 +79,8 @@ abstract class BaseTest {
             F::class.java.newInstance().apply {
                 arguments = Bundle().apply { putParcelable(MvRx.KEY_ARG, args) }
                 if (containerId != null) {
-                    activity.supportFragmentManager.beginTransaction().add(containerId, this, "TAG").commitNow()
+                    activity.supportFragmentManager.beginTransaction().add(containerId, this, "TAG")
+                        .commitNow()
                 } else {
                     activity.supportFragmentManager.beginTransaction().add(this, "TAG").commitNow()
                 }
@@ -80,7 +91,7 @@ abstract class BaseTest {
         return controller to fragment
     }
 
-    protected inline fun <reified F : Fragment> ActivityController<out AppCompatActivity>.mvRxFragment() : F {
+    protected inline fun <reified F : Fragment> ActivityController<out AppCompatActivity>.mvRxFragment(): F {
         return get().supportFragmentManager.findFragmentByTag("TAG") as F
     }
 }

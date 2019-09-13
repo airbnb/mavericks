@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import com.airbnb.mvrx.mock.MvRxViewModelConfigProvider
 import kotlinx.android.parcel.Parcelize
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -92,7 +93,7 @@ class NoFactoryTest : BaseTest() {
 
     @Test(expected = IllegalArgumentException::class)
     fun failOnMultipleParametersAndNoCompanion() {
-        class OptionalParamViewModel(initialState: FactoryState) : BaseMvRxViewModel<FactoryState>(initialState)
+        class OptionalParamViewModel(initialState: FactoryState, val secondParameter: Long) : BaseMvRxViewModel<FactoryState>(initialState)
         MvRxViewModelProvider.get(OptionalParamViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, null))
     }
 

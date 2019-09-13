@@ -4,7 +4,7 @@ import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.MvRxState
 
 data class TestRuleState(val foo: String = "hello") : MvRxState
-class TestRuleViewModel(debugMode: Boolean = false) : BaseMvRxViewModel<TestRuleState>(TestRuleState(), debugMode) {
+class TestRuleViewModel() : BaseMvRxViewModel<TestRuleState>(TestRuleState()) {
 
     var subscribeCallCount = 0
 

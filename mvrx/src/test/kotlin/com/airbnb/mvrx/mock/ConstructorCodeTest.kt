@@ -3,6 +3,7 @@ package com.airbnb.mvrx.mock
 import com.airbnb.mvrx.BaseTest
 import com.airbnb.mvrx.MvRxState
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ConstructorCodeTest : BaseTest() {
@@ -128,14 +129,21 @@ class ConstructorCodeTest : BaseTest() {
             val date: CustomDate = CustomDate.fromString("2000")
         ) : MvRxState
 
-        ConstructorCode(
+        val result = ConstructorCode(
             Test(),
             Integer.MAX_VALUE,
             Integer.MAX_VALUE,
             customTypePrinters = listOf(
-                typePrinter<CustomDate> { date, _ -> "CustomDate.fromString(\"${date.asString()}\")" }
+                typePrinter<CustomDate>(
+                    transformImports = { it.plus("hello world") },
+                    codeGenerator = { date, _ -> "CustomDate.fromString(\"${date.asString()}\")" }
+                )
             )
-        ).expect("Test(date = CustomDate.fromString(\"2000\"))")
+        )
+
+        result.expect("Test(date = CustomDate.fromString(\"2000\"))")
+
+        assertTrue(result.imports.contains("hello world"))
     }
 
     @Test
