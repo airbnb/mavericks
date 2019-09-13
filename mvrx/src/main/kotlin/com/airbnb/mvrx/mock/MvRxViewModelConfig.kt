@@ -3,6 +3,7 @@ package com.airbnb.mvrx.mock
 
 import android.util.Log
 import com.airbnb.mvrx.BaseMvRxViewModel
+import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxStateStore
 import com.airbnb.mvrx.MvRxViewModelFactory
@@ -215,7 +216,7 @@ open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
     }
 }
 
-private fun validateDebug(debug: Boolean): Boolean? {
+internal fun validateDebug(debug: Boolean = MvRx.viewModelConfigProvider.debugMode): Boolean? {
     return if (debug) {
         true
     } else {

@@ -1,5 +1,9 @@
 package com.airbnb.mvrx.mock
 
+import com.airbnb.mvrx.getIfReflectionSupported
+import com.airbnb.mvrx.isEnum
+import com.airbnb.mvrx.isKotlinClass
+import com.airbnb.mvrx.isObjectInstance
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject

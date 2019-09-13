@@ -3,15 +3,20 @@ package com.airbnb.mvrx.mock
 
 import android.annotation.SuppressLint
 import android.os.Parcelable
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.BaseMvRxViewModel
+import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.PersistState
+import com.airbnb.mvrx.call
 import com.airbnb.mvrx.mock.MvRxMock.Companion.DEFAULT_INITIALIZATION_NAME
 import com.airbnb.mvrx.mock.MvRxMock.Companion.DEFAULT_STATE_NAME
 import com.airbnb.mvrx.mock.MvRxMock.Companion.RESTORED_STATE_NAME
+import java.util.Collections
+import java.util.concurrent.atomic.AtomicInteger
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
@@ -30,6 +35,12 @@ import kotlin.reflect.full.primaryConstructor
  */
 // TODO: Should these mocks be default and be put on the base MvRxView instead of needing another interface?
 interface MockableMvRxView : MvRxView {
+    /**
+     * Override this to provide the mock states that should be used for testing this view.
+     *
+     * You should NOT invoke this function directly. You can access the mocks for a view
+     * via [MvRxViewMocks.getFrom] instead.
+     */
     fun provideMocks(): MvRxViewMocks<out MockableMvRxView, out Parcelable> = EmptyMocks
 
     fun enableMockPrinterReceiver() {
@@ -63,7 +74,7 @@ fun <V : MockableMvRxView, Args : Parcelable> V.mockNoViewModels(
  */
 inline fun <reified V : MockableMvRxView> V.combineMocks(
     vararg mocks: Pair<String, MvRxViewMocks<V, *>>
-): MvRxViewMocks<V, *> = object : MvRxViewMocks<V, Parcelable> {
+): MvRxViewMocks<V, *> = object : MvRxViewMocks<V, Parcelable>() {
 
     init {
         validate(V::class.simpleName!!)
@@ -760,18 +771,18 @@ internal constructor(
 /**
  * This placeholder can be used as a NO-OP implementation of [MockableMvRxView.provideMocks].
  */
-object EmptyMocks : MvRxViewMocks<MockableMvRxView, Nothing> {
+object EmptyMocks : MvRxViewMocks<MockableMvRxView, Nothing>() {
     override val mocks: List<MvRxMock<MockableMvRxView, out Nothing>> = emptyList()
     override val mockGroups: List<List<MvRxMock<MockableMvRxView, out Nothing>>> = emptyList()
 }
 
-interface MvRxViewMocks<V : MockableMvRxView, Args : Parcelable> {
+open class MvRxViewMocks<V : MockableMvRxView, Args : Parcelable> {
     /**
      * A list of mocks to use when testing a view. Each mock represents a unique state to be tested.
      *
      * At least one of [mocks] or [mockGroups] must be implemented.
      */
-    val mocks: List<MvRxMock<V, out Args>> get() = mockGroups.flatten()
+    open val mocks: List<MvRxMock<V, out Args>> get() = mockGroups.flatten()
 
     /**
      * An optional breakdown of [mocks] to categorize them into groups.
@@ -780,7 +791,14 @@ interface MvRxViewMocks<V : MockableMvRxView, Args : Parcelable> {
      * with separate default arguments and states. This is useful for complicated views that
      * want to share different default arguments or states with many mocks.
      */
-    val mockGroups: List<List<MvRxMock<V, out Args>>> get() = listOf(mocks)
+    open val mockGroups: List<List<MvRxMock<V, out Args>>> get() = listOf(mocks)
+
+    init {
+        require(numAllowedCreationsOfMocks.get() > 0) {
+            "Mock creation is not allowed! provideMocks() CANNOT be called directly. " +
+                    "Instead, call MvRxViewMocks#getFrom()"
+        }
+    }
 
     fun validate(viewName: String) {
         // TODO eli_hart: 2018-11-06 Gather all validation errors in one exception instead of failing early, so that you don't have to do multiple test runs to catch multiple issues
@@ -799,12 +817,43 @@ interface MvRxViewMocks<V : MockableMvRxView, Args : Parcelable> {
         mocksWithArgsOnly.validateUniqueNames()
         mocksWithState.validateUniqueNames()
     }
+
+    companion object {
+        /**
+         * Tracks how many mock instances are being validly created. This allows our gating
+         * to be done in a thread safe way.
+         */
+        private val numAllowedCreationsOfMocks = AtomicInteger(0)
+
+        /**
+         * Retrieves the mocks from a view provided by [MockableMvRxView.provideMocks].
+         *
+         * All access to mocks is gated behind this function so that it can enforce that
+         * mocks are only used in debug mode, and so that this function can access mocks
+         * reflectively. By only accessing mocks reflectively they are allowed to be stripped
+         * by minification for non debug builds.
+         */
+        fun getFrom(view: MockableMvRxView): MvRxViewMocks<out MockableMvRxView, out Parcelable> {
+            validateDebug() ?: return EmptyMocks
+
+            numAllowedCreationsOfMocks.incrementAndGet()
+
+            val mocks =
+                view.call<MvRxViewMocks<out MockableMvRxView, out Parcelable>>("provideMocks")
+
+            require(numAllowedCreationsOfMocks.decrementAndGet() >= 0) {
+                "numAllowedCreationsOfMocks is negative"
+            }
+
+            return mocks
+        }
+    }
 }
 
 open class MockBuilder<V : MockableMvRxView, Args : Parcelable> internal constructor(
     internal val defaultArgs: Args?,
     vararg defaultStatePairs: Pair<KProperty1<V, BaseMvRxViewModel<MvRxState>>, MvRxState>
-) : MvRxViewMocks<V, Args>, DataClassSetDsl {
+) : MvRxViewMocks<V, Args>(), DataClassSetDsl {
 
     internal val defaultStates = defaultStatePairs.map { MockState(it.first, it.second) }
 
