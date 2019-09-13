@@ -15,7 +15,7 @@ class ScriptableStateStoreTest : BaseTest() {
 
     @Test
     fun testSetStateCallsIgnored() {
-        viewModel.attemptToChageState(2)
+        viewModel.attemptToChangeState(2)
         withState(viewModel) {
             Assert.assertEquals(1, it.foo)
         }
@@ -35,12 +35,10 @@ class ScriptableStateStoreTest : BaseTest() {
         initialState: TestState = TestState(),
         val stateStore: ScriptableMvRxStateStore<TestState> = ScriptableMvRxStateStore(initialState)
     ) : BaseMvRxViewModel<TestState>(
-        initialState,
-        debugMode = true,
-        stateStore = stateStore
+        initialState
     ) {
 
-        fun attemptToChageState(newFoo: Int) {
+        fun attemptToChangeState(newFoo: Int) {
             setState { copy(foo = newFoo) }
         }
     }

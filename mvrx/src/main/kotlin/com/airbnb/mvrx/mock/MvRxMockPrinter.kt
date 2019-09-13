@@ -317,7 +317,8 @@ private fun <T : Any> printMockFile(
     val code = ConstructorCode(
         instanceToMock,
         listTruncationThreshold.maxIfLTEZero(),
-        stringTruncationThreshold.maxIfLTEZero()
+        stringTruncationThreshold.maxIfLTEZero(),
+        MvRx.mockPrinterConfiguration.customTypePrinters
     )
 
     val file = File(context.cacheDir, "${instanceToMock::class.simpleName}Mock.kt")

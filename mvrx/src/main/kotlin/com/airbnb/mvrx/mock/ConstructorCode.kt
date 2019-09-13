@@ -1,10 +1,5 @@
 package com.airbnb.mvrx.mock
 
-/**
-
- */
-
-import com.airbnb.mvrx.MvRx
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -24,7 +19,8 @@ import kotlin.reflect.jvm.isAccessible
 internal class ConstructorCode<T : Any>(
     objectToCopy: T,
     private val listTruncationThreshold: Int,
-    private val stringTruncationThreshold: Int
+    private val stringTruncationThreshold: Int,
+    private val customTypePrinters: List<TypePrinter<*>> = emptyList()
 ) {
     private val usedTypePrinters = mutableListOf<TypePrinter<*>>()
     val dependencies = mutableSetOf<KClass<*>>()
@@ -53,8 +49,7 @@ internal class ConstructorCode<T : Any>(
 
             val simpleName = kClass.simpleName.orEmpty()
 
-            val customResult = MvRx.mockPrinterConfiguration
-                .customTypePrinters
+            val customResult = customTypePrinters
                 .firstOrNull { it.acceptsObject(this) }
                 ?.let {
                     usedTypePrinters.add(it)
