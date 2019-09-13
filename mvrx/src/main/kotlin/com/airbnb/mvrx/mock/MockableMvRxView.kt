@@ -28,6 +28,7 @@ import kotlin.reflect.full.primaryConstructor
  * Fragments extend from. Proguard and/or other compile behavior is used to prevent the mock data
  * from being included in production builds.
  */
+// TODO: Should these mocks be default and be put on the base MvRxView instead of needing another interface?
 interface MockableMvRxView : MvRxView {
     fun provideMocks(): MvRxViewMocks<out MockableMvRxView, out Parcelable> = EmptyMocks
 
