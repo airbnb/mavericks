@@ -3,7 +3,9 @@ package com.airbnb.mvrx
 import android.util.Log
 import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModel
 import com.airbnb.mvrx.MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER
 import io.reactivex.Completable
@@ -41,10 +43,24 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     private val lastDeliveredStates = ConcurrentHashMap<String, Any>()
     private val activeSubscriptions = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
+    /**
+     * Define a [LifecycleOwner] to control subscriptions between [BaseMvRxViewModel]s. This only
+     * provides two states, [Lifecycle.State.RESUMED] and [Lifecycle.State.DESTROYED] as it follows
+     * the [ViewModel] object lifecycle. That is, when instantiated the lifecycle will be
+     * [Lifecycle.State.RESUMED] and when [ViewModel.onCleared] is called the lifecycle will be
+     * [Lifecycle.State.DESTROYED].
+     *
+     * This is not be publicly accessible as it should only be used to control subscriptions
+     * between two view models.
+     */
+    private val lifecycleOwner: LifecycleOwner = LifecycleOwner { lifecycleRegistry }
+    private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(lifecycleOwner)
+
     internal val state: S
         get() = stateStore.state
 
     init {
+        lifecycleRegistry.currentState = Lifecycle.State.RESUMED
         Completable.fromCallable { warmReflectionCache(initialState) }.subscribeOn(Schedulers.computation()).subscribe()
 
         if (this.debugMode) {
@@ -80,6 +96,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         super.onCleared()
         disposables.dispose()
         stateStore.dispose()
+        lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
     }
 
     /**
@@ -238,6 +255,17 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     protected fun subscribe(subscriber: (S) -> Unit) =
         stateStore.observable.subscribeLifecycle(null, RedeliverOnStart, subscriber)
 
+    /**
+     * For ViewModels that want to subscribe to another ViewModel.
+     */
+    protected fun <S : MvRxState> subscribe(
+        viewModel: BaseMvRxViewModel<S>,
+        subscriber: (S) -> Unit
+    ) {
+        assertSubscribeToDifferentViewModel(viewModel)
+        viewModel.subscribe(lifecycleOwner, RedeliverOnStart, subscriber)
+    }
+
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun subscribe(owner: LifecycleOwner, deliveryMode: DeliveryMode = RedeliverOnStart, subscriber: (S) -> Unit) =
         stateStore.observable.subscribeLifecycle(owner, deliveryMode, subscriber)
@@ -249,6 +277,18 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop1: KProperty1<S, A>,
         subscriber: (A) -> Unit
     ) = selectSubscribeInternal(null, prop1, RedeliverOnStart, subscriber)
+
+    /**
+     * Subscribe to state changes for only a single property in a different ViewModel.
+     */
+    protected fun <A, S : MvRxState> selectSubscribe(
+        viewModel: BaseMvRxViewModel<S>,
+        prop1: KProperty1<S, A>,
+        subscriber: (A) -> Unit
+    ) {
+        assertSubscribeToDifferentViewModel(viewModel)
+        viewModel.selectSubscribeInternal(lifecycleOwner, prop1, RedeliverOnStart, subscriber)
+    }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun <A> selectSubscribe(
@@ -277,6 +317,20 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         onFail: ((Throwable) -> Unit)? = null,
         onSuccess: ((T) -> Unit)? = null
     ) = asyncSubscribeInternal(null, asyncProp, RedeliverOnStart, onFail, onSuccess)
+
+    /**
+     * Subscribe to changes in an async property in a different ViewModel. There are optional parameters
+     * for onSuccess and onFail which automatically unwrap the value or error.
+     */
+    protected fun <T, S : MvRxState> asyncSubscribe(
+        viewModel: BaseMvRxViewModel<S>,
+        asyncProp: KProperty1<S, Async<T>>,
+        onFail: ((Throwable) -> Unit)? = null,
+        onSuccess: ((T) -> Unit)? = null
+    ) {
+        assertSubscribeToDifferentViewModel(viewModel)
+        viewModel.asyncSubscribeInternal(lifecycleOwner, asyncProp, RedeliverOnStart, onFail, onSuccess)
+    }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun <T> asyncSubscribe(
@@ -601,6 +655,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     protected fun Disposable.disposeOnClear(): Disposable {
         disposables.add(this)
         return this
+    }
+
+    private fun <S : MvRxState> assertSubscribeToDifferentViewModel(viewModel: BaseMvRxViewModel<S>) {
+        if (this == viewModel) {
+            throw IllegalArgumentException("This method is for subscribing to other view models. Please pass a different instance as the argument.")
+        }
     }
 
     override fun toString(): String = "${this::class.simpleName} $state"
