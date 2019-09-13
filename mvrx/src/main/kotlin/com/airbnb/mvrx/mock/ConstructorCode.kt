@@ -22,8 +22,8 @@ import kotlin.reflect.jvm.isAccessible
  */
 internal class ConstructorCode<T : Any>(
     objectToCopy: T,
-    private val listTruncationThreshold: Int,
-    private val stringTruncationThreshold: Int,
+    private val listTruncationThreshold: Int = 300,
+    private val stringTruncationThreshold: Int = 3,
     private val customTypePrinters: List<TypePrinter<*>> = emptyList()
 ) {
     private val usedTypePrinters = mutableListOf<TypePrinter<*>>()

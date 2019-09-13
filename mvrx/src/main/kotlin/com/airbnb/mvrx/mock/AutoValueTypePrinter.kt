@@ -1,6 +1,5 @@
 package com.airbnb.mvrx.mock
 
-import java.lang.reflect.Modifier
 
 /**
  * This looks for classes generated via AutoValue, indicated by the class prefix [GENERATED_PREFIX].
@@ -17,18 +16,20 @@ class AutoValueTypePrinter : TypePrinter<Any> {
     }
 
     override fun generateCode(instance: Any, generateConstructor: (Any?) -> String): String {
-        val kClass = this::class
+        val kClass = instance::class
         val className = kClass.java.simpleName
         val name = className.substringAfter(GENERATED_PREFIX)
 
         // The builder annotation is not kept at runtime, so to find the builder class we
         // look for the generated "Builder" nested class.
-        val builderClass = kClass.java.classes
-            .filter { !Modifier.isAbstract(it.modifiers) }
-            .firstOrNull { it.simpleName == "Builder" }
+        val builderClass = kClass.nestedClasses
+            .filter { !it.isAbstract }
+            .firstOrNull { it.simpleName?.contains("builder", ignoreCase = true) == true }
+            ?.java
         // Instead of crashing we have the error msg in the generated code. This allows the
         // rest of the code to be generated while still making it clear what went wrong.
             ?: return "Error: Could not find AutoValue Builder for $className"
+
 
         val builderMethods = builderClass.declaredMethods
             // We expect all builder methods that set a property to return
@@ -43,7 +44,7 @@ class AutoValueTypePrinter : TypePrinter<Any> {
                                 "set"
                             ).decapitalize()
                         }
-                        ?.invoke(this)
+                        ?.invoke(instance)
                         ?.let { generateConstructor(it) }
                         ?: return@mapNotNull null
 
