@@ -180,6 +180,9 @@ private class MvRxPrintStateBroadcastReceiver(val mvrxView: MvRxView) : Broadcas
     override fun onReceive(context: Context, intent: Intent) {
         Log.d(INFO_TAG, "Intent received $intent")
         if (intent.action != ACTION_COPY_MVRX_STATE) return
+        // The script looks for "started" and "done messages to know when work is done. If multiple Fragments are started then
+        // it needs to know how many are still working, so it tracks how many are not yet done.
+        Log.d(RESULTS_TAG, "started")
 
         // TODO: Link to script that uses these
         val viewName: String? = intent.getStringExtra("EXTRA_VIEW_NAME")
@@ -242,6 +245,9 @@ private class MvRxPrintStateBroadcastReceiver(val mvrxView: MvRxView) : Broadcas
             Log.d(RESULTS_TAG, "package=${context.applicationContext.packageName}")
             // The command line tooling watches for this "done" message to know when all states have been printed,
             // so it is important that this text doesn't change and matches exactly.
+            // We delay briefly in case there are other fragments that are printing state - we need to make  sure they have all had
+            // time to print their "started" message so that the script knows they are still working.
+            Thread.sleep(1000)
             Log.d(RESULTS_TAG, "done")
         }
     }

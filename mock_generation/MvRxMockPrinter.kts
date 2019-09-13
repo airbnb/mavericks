@@ -16,10 +16,10 @@ import kotlin.system.exitProcess
     name = "MvRx Mock Printer",
     description = [
         "Generate MvRx mocks. " +
-            "Creates a mock file for each active ViewModel and MvRxView in a connected debug app. " +
-            "The device must have debugging enabled. " +
-            "Mocks are both copied to clipboard and written to temp files. " +
-            "This is intended to be run from the root directory of your project. "
+                "Creates a mock file for each active ViewModel and MvRxView in a connected debug app. " +
+                "The device must have debugging enabled. " +
+                "Mocks are both copied to clipboard and written to temp files. " +
+                "This is intended to be run from the root directory of your project. "
     ]
 )
 class MvrxPrinterApi : CommandLineArgs() {
@@ -28,7 +28,7 @@ class MvrxPrinterApi : CommandLineArgs() {
         names = ["--fragmentName", "--viewName"],
         description = [
             "Pass the name of a specific MvRx view whose states should be copied." +
-                " If not specified then all MvRxViews in the Started state will be copied."
+                    " If not specified then all MvRxViews in the Started state will be copied."
         ]
     )
     var fragmentName: String? = null
@@ -43,7 +43,7 @@ class MvrxPrinterApi : CommandLineArgs() {
         names = ["--stateName"],
         description = [
             "Pass the name of a specific MvRx State to copy. Only states with a matching name will be used." +
-                " If not specified then all states will be copied."
+                    " If not specified then all states will be copied."
         ]
     )
     var stateName: String? = null
@@ -52,7 +52,7 @@ class MvrxPrinterApi : CommandLineArgs() {
         names = ["--copyToModule"],
         description = [
             "Pass the module name of the expected MvRxView so that the generated mock files are copied to the same module automatically." +
-                " The mocks will be copied to the same package as the MvRxView, but nested under a 'mocks' sub package."
+                    " The mocks will be copied to the same package as the MvRxView, but nested under a 'mocks' sub package."
         ]
     )
     var copyToModule: String? = null
@@ -61,8 +61,8 @@ class MvrxPrinterApi : CommandLineArgs() {
         names = ["--listTruncationThreshold"],
         description = [
             "Any lists in the state will be truncated to this many items." +
-                " This helps to reduce bloat and overhead from lists with many redundant items." +
-                " Pass 0 to not truncate lists."
+                    " This helps to reduce bloat and overhead from lists with many redundant items." +
+                    " Pass 0 to not truncate lists."
         ],
         defaultValue = "3",
         showDefaultValue = CommandLine.Help.Visibility.ALWAYS
@@ -73,8 +73,8 @@ class MvrxPrinterApi : CommandLineArgs() {
         names = ["--stringTruncationThreshold"],
         description = [
             "Any Strings in the state will be truncated to this many characters." +
-                " This helps to reduce bloat and overhead from very long text." +
-                " Pass 0 to not truncate Strings."
+                    " This helps to reduce bloat and overhead from very long text." +
+                    " Pass 0 to not truncate Strings."
         ],
         defaultValue = "300",
         showDefaultValue = CommandLine.Help.Visibility.ALWAYS
@@ -184,7 +184,7 @@ getLogcatOutputForTag("MVRX_PRINTER_ERROR")
 // /////////////////////////////////////////////////
 
 /**
- * We expect the device to generate the state code and write each one to its own file on the device.
+ * We expect each started view to generate the state code and write each one to its own file on the device.
  * It will then output each filename to Logcat using a specific tag.
  * When all states are written it will output "done".
  *
@@ -193,10 +193,19 @@ getLogcatOutputForTag("MVRX_PRINTER_ERROR")
  */
 fun parseStateFileNamesFromLogcat(): List<String>? = pollWithTimeout(timeoutMs = 20_000) {
     getLogcatOutputForTag("MVRX_PRINTER_RESULTS")
-        .takeIf { lines -> lines.any { it.equals("done", ignoreCase = true) } }
-        ?.filter {
-            it.endsWith(".kt")
-        }
+        .takeIf { lines -> areAllViewsFinished(lines) }
+        ?.filter { it.endsWith(".kt") }
+}
+
+/**
+ * If multiple MvRxViews are started then we need to wait for all of them to finish before proceeding.
+ * Each view prints "started" when it begins processing and "done" when it is finished - this returns
+ * true when every "started" tag has a matching "done"".
+ */
+fun areAllViewsFinished(logLines: List<String>): Boolean {
+    fun count(str: String): Int = logLines.count { it.trim().equals(str, ignoreCase = true) }
+    val started = count("started")
+    return started > 0 && started == count("done")
 }
 
 fun getLogcatOutputForTag(tag: String): List<String> {
