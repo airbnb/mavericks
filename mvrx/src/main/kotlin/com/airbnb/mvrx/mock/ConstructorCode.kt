@@ -14,23 +14,33 @@ import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.isAccessible
 
 /**
- * This utility is used to print the code need to construct an object. It is useful for printing out a MvRxState instance's
+ * This utility is used to generate the code need to construct an object.
+ * It is useful for printing out a MvRxState instance's
  * constructor code when setting up a test for that state.
  *
  * It uses recursion to analyze the given object instance and
  * generates code needed to construct another instance of the object containing the same data.
  */
-internal class ConstructorCode<T : Any>(
+class ConstructorCode<T : Any>(
     objectToCopy: T,
     private val listTruncationThreshold: Int = 300,
     private val stringTruncationThreshold: Int = 3,
     private val customTypePrinters: List<TypePrinter<*>> = emptyList()
 ) {
     private val usedTypePrinters = mutableListOf<TypePrinter<*>>()
-    val dependencies = mutableSetOf<KClass<*>>()
-    val code =
-        "val mock${objectToCopy::class.simpleName} by lazy { ${objectToCopy.getConstructor()} }"
+    private val dependencies = mutableSetOf<KClass<*>>()
 
+    /** The code needed to reconstruct objectToCopy. */
+    val constructorCode: String = objectToCopy.getConstructor()
+
+    /**
+     * Wraps [constructorCode] in a property that is lazily initialized.
+     */
+    val lazyPropertyToCreateObject = "val mock${objectToCopy::class.simpleName} by lazy { $constructorCode }"
+
+    /**
+     * The fully qualified names of all classes and functions that are used in the code.
+     */
     val imports: List<String> = run {
         val defaultImports = dependencies.mapNotNull { it.qualifiedName }
         usedTypePrinters.fold(defaultImports) { imports, typePrinter ->

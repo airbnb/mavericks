@@ -3,6 +3,7 @@ package com.airbnb.mvrx.mock
 import com.airbnb.mvrx.RealMvRxStateStore
 import com.airbnb.mvrx.ScriptableMvRxStateStore
 import com.airbnb.mvrx.ScriptableStateStore
+import com.airbnb.mvrx.mock.MockBehavior.StateStoreBehavior
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 
@@ -12,24 +13,30 @@ interface MockableStateStore<S : Any> : ScriptableStateStore<S> {
 
 /**
  * Allows switching between a mocked state value and a real state store behavior.
+ * This is intended to enable testing.
+ *
+ * When [StateStoreBehavior.Scriptable] behavior is set, [next] can be called to force a state
+ * synchronously. When in this mode, calls to [set] have no effect. In other modes,
+ * it is an error to call [next].
+ *
+ * The mode can be dynamically changed to modify behavior at runtime.
  */
 class MockableMvRxStateStore<S : Any>(
     initialState: S,
-    override var mockBehavior: MockBehavior,
-    private val onDisposed: (MockableMvRxStateStore<*>) -> Unit
+    override var mockBehavior: MockBehavior
 ) : MockableStateStore<S> {
     private val scriptableStore = ScriptableMvRxStateStore(initialState)
     private val realStore = RealMvRxStateStore(initialState)
     private val realImmediateStore = ImmediateRealMvRxStateStore(initialState)
 
     private val onStateSetListeners = mutableListOf<(previousState: S, newState: S) -> Unit>()
-    private val onDisposeListeners = mutableListOf<() -> Unit>()
+    private val onDisposeListeners = mutableListOf<(MockableMvRxStateStore<*>) -> Unit>()
 
     private val currentStore
         get() = when (mockBehavior.stateStoreBehavior) {
-            MockBehavior.StateStoreBehavior.Scriptable -> scriptableStore
-            MockBehavior.StateStoreBehavior.Normal -> realStore
-            MockBehavior.StateStoreBehavior.Synchronous -> realImmediateStore
+            StateStoreBehavior.Scriptable -> scriptableStore
+            StateStoreBehavior.Normal -> realStore
+            StateStoreBehavior.Synchronous -> realImmediateStore
         }
 
     // Using "trampoline" scheduler so that updates are processed synchronously.
@@ -45,13 +52,12 @@ class MockableMvRxStateStore<S : Any>(
         realStore.dispose()
         realImmediateStore.dispose()
         scriptableStore.dispose()
-        onDisposed(this)
-        onDisposeListeners.forEach { it() }
+        onDisposeListeners.forEach { it(this) }
         onDisposeListeners.clear()
     }
 
     override fun next(state: S) {
-        require(mockBehavior.stateStoreBehavior == MockBehavior.StateStoreBehavior.Scriptable) {
+        check(mockBehavior.stateStoreBehavior == StateStoreBehavior.Scriptable) {
             "Scriptable store is not enabled"
         }
 
@@ -70,14 +76,18 @@ class MockableMvRxStateStore<S : Any>(
     }
 
     override fun set(stateReducer: S.() -> S) {
+        val newState = state.stateReducer()
         if (onStateSetListeners.isNotEmpty()) {
-            val newState = state.stateReducer()
             onStateSetListeners.forEach { it.invoke(state, newState) }
         }
 
-        if (mockBehavior.stateStoreBehavior != MockBehavior.StateStoreBehavior.Scriptable) {
+        // Setting state only takes effect is "scriptable" mode is not enabled.
+        if (mockBehavior.stateStoreBehavior != StateStoreBehavior.Scriptable) {
+            // States are updated on all stores, so if we switch to any other in the future
+            // it will be correctly up to date.
             realImmediateStore.set(stateReducer)
             realStore.set(stateReducer)
+            scriptableStore.next(newState)
         }
     }
 
@@ -93,9 +103,9 @@ class MockableMvRxStateStore<S : Any>(
         onStateSetListeners.remove(callback)
     }
 
-    fun addOnDisposeListener(callback: () -> Unit) {
+    fun addOnDisposeListener(callback: (MockableMvRxStateStore<*>) -> Unit) {
         if (isDisposed) {
-            callback()
+            callback(this)
         } else {
             onDisposeListeners.add(callback)
         }

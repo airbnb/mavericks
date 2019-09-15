@@ -40,7 +40,7 @@ class ConstructorCodeTest : BaseTest() {
                     "NestedObject(myEnum = MyEnum.A)\n" +
                     ")\n" +
                     ") }",
-            code.code
+            code.lazyPropertyToCreateObject
         )
     }
 
@@ -60,7 +60,7 @@ class ConstructorCodeTest : BaseTest() {
                     "    }\n" +
                     "  ]\n" +
                     "}\"\"\") }",
-            code.code
+            code.lazyPropertyToCreateObject
         )
     }
 
@@ -80,7 +80,7 @@ class ConstructorCodeTest : BaseTest() {
                     "    }\n" +
                     "  ]\n" +
                     "}\"\"\") }",
-            code.code
+            code.lazyPropertyToCreateObject
         )
     }
 
@@ -97,7 +97,7 @@ class ConstructorCodeTest : BaseTest() {
                     "    \"lowest\": 0\n" +
                     "  }\n" +
                     "]\"\"\") }",
-            code.code
+            code.lazyPropertyToCreateObject
         )
     }
 
@@ -108,7 +108,7 @@ class ConstructorCodeTest : BaseTest() {
 
         assertEquals(
             "val mockStateWithInvalidJsonObject by lazy { StateWithInvalidJsonObject(json = \"not valid{\\\"color\\\":\\\"red\\\",\\\"numbers\\\":[{\\\"favorite\\\":7},{\\\"lowest\\\":0}]}\") }",
-            code.code
+            code.lazyPropertyToCreateObject
         )
     }
 
@@ -118,7 +118,7 @@ class ConstructorCodeTest : BaseTest() {
 
         assertEquals(
             "val mockStateWithLazy by lazy { StateWithLazy(lazyInt = lazy { 1 }) }",
-            code.code
+            code.lazyPropertyToCreateObject
         )
     }
 
@@ -202,7 +202,7 @@ class ConstructorCodeTest : BaseTest() {
     }
 
     private fun <T : MvRxState> ConstructorCode<T>.expect(expectedCode: String) {
-        assertEquals("val mockTest by lazy { $expectedCode }", code)
+        assertEquals("val mockTest by lazy { $expectedCode }", lazyPropertyToCreateObject)
     }
 
     data class StateWithJsonObject(val json: String = """{"color":"red","numbers":[{"favorite":7},{"lowest":0}]}""") :

@@ -71,8 +71,7 @@ class MockStateHolder {
                         "exists (${view.javaClass.simpleName}#${viewModelProperty.name})"
             }
 
-            // TODO Access mocks reflectively to allow proguarding
-            view.provideMocks().mocks
+            MvRxViewMocks.getFrom(view).mocks
                 .firstOrNull { it.isDefaultState }
                 ?.let {
                     @Suppress("UNCHECKED_CAST")

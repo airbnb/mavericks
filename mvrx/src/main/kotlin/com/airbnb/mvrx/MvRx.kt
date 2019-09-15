@@ -1,7 +1,9 @@
 package com.airbnb.mvrx
 
+import com.airbnb.mvrx.mock.ConstructorCode
 import com.airbnb.mvrx.mock.MockPrinterConfiguration
 import com.airbnb.mvrx.mock.MockStateHolder
+import com.airbnb.mvrx.mock.MvRxMockPrinter.Companion.ACTION_COPY_MVRX_STATE
 import com.airbnb.mvrx.mock.MvRxViewModelConfigProvider
 
 object MvRx {
@@ -31,7 +33,17 @@ object MvRx {
     val mockStateHolder = MockStateHolder()
 
     /**
-     * Configuration for how mock state is generated.
+     * Configuration for how mock state is printed.
+     *
+     * The MvRx mocking system allows you to generate a reproduction of a ViewModel's state. For
+     * any [MvRxState] instance that a ViewModel has, MvRx can generate a file containing code
+     * to completely reconstruct that state.
+     *
+     * This generated code can then be used to reconstruct States that can be used during testing.
+     * The scripts in the MvRx/mock_generation folder are used to interact with the device to pull
+     * the resulting mock files.
+     *
+     * TODO - Link to documentation.
      */
     var mockPrinterConfiguration: MockPrinterConfiguration = MockPrinterConfiguration()
 }

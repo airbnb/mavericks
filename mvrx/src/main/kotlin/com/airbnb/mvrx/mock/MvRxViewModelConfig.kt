@@ -111,13 +111,15 @@ open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
 
     private val onViewModelCreatedListeners =
         mutableListOf<(BaseMvRxViewModel<*>, MvRxViewModelConfig<*>) -> Unit>()
-    private val currentConfigs = mutableMapOf<MvRxStateStore<*>, MvRxViewModelConfig<*>>()
+    private val mockConfigs = mutableMapOf<MvRxStateStore<*>, MvRxViewModelConfig<*>>()
 
     /**
      * Determines what sort of mocked state store is created when [provideConfig] is called.
      * This can be changed via [withMockBehavior] to affect behavior when creating a new Fragment.
      *
      * A value can also be set directly here if you want to change the global default.
+     *
+     * It is only valid to call this when in Debug mode.
      */
     var mockBehavior: MockBehavior? = null
         set(value) {
@@ -153,31 +155,26 @@ open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
     }
 
     private fun onMockStoreDisposed(store: MockableStateStore<*>) {
-        currentConfigs.remove(store)
+        mockConfigs.remove(store)
     }
 
     fun <S : MvRxState> provideConfig(
         viewModel: BaseMvRxViewModel<S>,
         initialState: S
     ): MvRxViewModelConfig<S> {
-        val behavior = mockBehavior
+        val mockBehavior = mockBehavior
 
-        val stateStore = if (behavior != null && validateDebug(debugMode) == true) {
-            MockableMvRxStateStore(
-                initialState = initialState,
-                mockBehavior = behavior,
-                onDisposed = ::onMockStoreDisposed
-            )
-        } else {
-            RealMvRxStateStore(initialState)
-        }
+        val stateStore = buildStateStore(initialState, mockBehavior)
 
         return MvRxViewModelConfig(
             debugMode,
             stateStore,
-            behavior
+            mockBehavior
         ).also { config ->
-            currentConfigs[stateStore] = config
+            if (mockBehavior != null && stateStore is MockableMvRxStateStore) {
+                mockConfigs[stateStore] = config
+                stateStore.addOnDisposeListener(::onMockStoreDisposed)
+            }
             onViewModelCreatedListeners.forEach { callback -> callback(viewModel, config) }
         }
     }
@@ -189,8 +186,7 @@ open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
         return if (mockBehavior != null && debugMode) {
             MockableMvRxStateStore(
                 initialState = initialState,
-                mockBehavior = mockBehavior,
-                onDisposed = ::onMockStoreDisposed
+                mockBehavior = mockBehavior
             )
         } else {
             RealMvRxStateStore(initialState)
@@ -207,12 +203,12 @@ open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
 
     fun pushMockBehaviorOverride(mockBehavior: MockBehavior) {
         validateDebug(debugMode) ?: return
-        currentConfigs.values.forEach { it.pushBehaviorOverride(mockBehavior) }
+        mockConfigs.values.forEach { it.pushBehaviorOverride(mockBehavior) }
     }
 
     fun popMockBehaviorOverride() {
         validateDebug(debugMode) ?: return
-        currentConfigs.values.forEach { it.popBehaviorOverride() }
+        mockConfigs.values.forEach { it.popBehaviorOverride() }
     }
 }
 

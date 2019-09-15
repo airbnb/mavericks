@@ -24,7 +24,7 @@ class AutoValueTypePrinterTest : BaseTest() {
             "val mockAutoValue_AutoValueClass by lazy { AutoValueClass.builder()\n" +
                     ".setName(\"foo\")\n" +
                     ".setNumberOfLegs(1)\n" +
-                    ".build() }", constructorCode.code
+                    ".build() }", constructorCode.lazyPropertyToCreateObject
         )
     }
 

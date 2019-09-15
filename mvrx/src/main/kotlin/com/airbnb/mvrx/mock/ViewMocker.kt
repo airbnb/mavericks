@@ -23,7 +23,7 @@ fun <V : MockableMvRxView, A : Parcelable> getMockVariants(
     lateinit var mocks: List<MvRxMock<out MockableMvRxView, out Parcelable>>
     val elapsedMs: Long = measureTimeMillis {
         val mockData =
-            view.provideMocks().takeIf { it !== emptyMockPlaceholder.second } ?: return null
+            MvRxViewMocks.getFrom(view).takeIf { it !== emptyMockPlaceholder.second } ?: return null
 
         mocks = if (mockGroupIndex != null) {
             mockData.mockGroups.getOrNull(mockGroupIndex)

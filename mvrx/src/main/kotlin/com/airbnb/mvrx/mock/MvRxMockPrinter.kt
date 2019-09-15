@@ -24,10 +24,16 @@ import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 
+/**
+ * Set configuration details for how mock state is generated.
+ */
 class MockPrinterConfiguration(
     /**
      * Given a [MvRxView] that we are generating mock states for, returns which package name to use
      * for the generated file.
+     *
+     * By default mock states are place in a "mocks" subpackage within the package of the view
+     * it is mocking.
      */
     val mockPackage: (mockedView: Any) -> String = { mockedView ->
         val packageName = mockedView::class.qualifiedName!!.substringBeforeLast(".")
@@ -175,6 +181,17 @@ internal class MvRxMockPrinter private constructor(private val mvrxView: MvRxVie
     }
 }
 
+/**
+ * When an Intent with the [ACTION_COPY_MVRX_STATE] action is received, this class will:
+ *
+ * 1. Extract configuration arguments from the Intent
+ * 2. Lookup all ViewModel properties defined on the [MvRxView]
+ * 3. Get the current State of each ViewModel
+ * 4. Use [ConstructorCode] to generate the Kotlin code needed to reconstruct the States
+ * 5. Saves the code to files on the device.
+ * 6. Uses logcat to signal where on device the files were saved, and when the process is done
+ * 7. A listener can wait for the output signals, and then pull the resulting files off the device.
+ */
 private class MvRxPrintStateBroadcastReceiver(val mvrxView: MvRxView) : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -184,7 +201,8 @@ private class MvRxPrintStateBroadcastReceiver(val mvrxView: MvRxView) : Broadcas
         // it needs to know how many are still working, so it tracks how many are not yet done.
         Log.d(RESULTS_TAG, "started")
 
-        // TODO: Link to script that uses these
+        // These string extra names are defined in the mock printer kts script, and
+        // they allow for configuration in how the mock state is gathered and printed.
         val viewName: String? = intent.getStringExtra("EXTRA_VIEW_NAME")
         val stateName: String? = intent.getStringExtra("EXTRA_STATE_NAME")
         val stringTruncationThreshold: Int =
@@ -338,7 +356,7 @@ private fun <T : Any> printMockFile(
         }
 
         out.println()
-        out.println(code.code)
+        out.println(code.lazyPropertyToCreateObject)
     }
 
     Log.d(RESULTS_TAG, file.canonicalPath)
