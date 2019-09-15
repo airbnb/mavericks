@@ -41,7 +41,9 @@ class MvRxViewModelConfig<S : Any>(
 
     internal fun popBehaviorOverride() {
         validateDebug(debugMode) ?: return
-        mockBehaviorOverrides.pop()
+        // It is ok if this list is empty, as the config may have been created after others,
+        // so it may not have an override set while other active configs may have one.
+        mockBehaviorOverrides.pollFirst()
         updateStateStore()
     }
 }
@@ -106,10 +108,13 @@ data class MockBehavior(
 
 /**
  * Switch between using a mock view model store and a normal view model store.
+ *
+ * @param debugMode True if this is a debug build of the app, false for production builds.
+ * When true,
  */
 open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
 
-    private val onViewModelCreatedListeners =
+    private val onConfigProvidedListener =
         mutableListOf<(BaseMvRxViewModel<*>, MvRxViewModelConfig<*>) -> Unit>()
     private val mockConfigs = mutableMapOf<MvRxStateStore<*>, MvRxViewModelConfig<*>>()
 
@@ -134,7 +139,7 @@ open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
      * After the block has executed, the previous setting for mockBehavior will be used again.
      *
      * @param mockBehavior Null to have ViewModels created with a [RealMvRxStateStore]. Non null to create ViewModels with a [MockableMvRxStateStore]
-     * If none null, the [MockableMvRxStateStore] will be created with the options declared in the [MockBehavior]
+     * If not null, the [MockableMvRxStateStore] will be created with the options declared in the [MockBehavior]
      */
     fun <R> withMockBehavior(
         mockBehavior: MockBehavior? = this.mockBehavior,
@@ -175,7 +180,7 @@ open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
                 mockConfigs[stateStore] = config
                 stateStore.addOnDisposeListener(::onMockStoreDisposed)
             }
-            onViewModelCreatedListeners.forEach { callback -> callback(viewModel, config) }
+            onConfigProvidedListener.forEach { callback -> callback(viewModel, config) }
         }
     }
 
@@ -193,14 +198,28 @@ open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
         }
     }
 
+    /**
+     * Add a listener that will be called every time a [MvRxViewModelConfig] is created for a new
+     * view model. This will happen each time a new ViewModel is created.
+     *
+     * The callback includes a reference to the ViewModel that the config was created for, as well
+     * as the configuration itself.
+     */
     fun addOnConfigProvidedListener(callback: (BaseMvRxViewModel<*>, MvRxViewModelConfig<*>) -> Unit) {
-        onViewModelCreatedListeners.add(callback)
+        onConfigProvidedListener.add(callback)
     }
 
     fun removeOnConfigProvidedListener(callback: (BaseMvRxViewModel<*>, MvRxViewModelConfig<*>) -> Unit) {
-        onViewModelCreatedListeners.remove(callback)
+        onConfigProvidedListener.remove(callback)
     }
 
+    /**
+     * Changes the current [MockBehavior] of all running ViewModels, if they were created when
+     * [mockBehavior] was non null. This forces the mock behavior of to this new value.
+     *
+     * This should be followed later by a corresponding call to [popMockBehaviorOverride] in order
+     * to revert the mock behavior to its original value.
+     */
     fun pushMockBehaviorOverride(mockBehavior: MockBehavior) {
         validateDebug(debugMode) ?: return
         mockConfigs.values.forEach { it.pushBehaviorOverride(mockBehavior) }

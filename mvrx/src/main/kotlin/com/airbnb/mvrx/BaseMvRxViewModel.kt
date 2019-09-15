@@ -29,15 +29,12 @@ import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.isAccessible
 
 /**
- * To use MvRx, create your own base MvRxViewModel that extends this one and sets debugMode.
- *
- * All subsequent ViewModels in your app should use that one.
+ * To use MvRx, create view models that extend this base view model.
  */
 abstract class BaseMvRxViewModel<S : MvRxState>(
     initialState: S
 ) : ViewModel() {
 
-    // TODO: Should the config be public?
     @Suppress("LeakingThis")
     @PublishedApi
     internal val config: MvRxViewModelConfig<S> = MvRx.viewModelConfigProvider.provideConfig(
@@ -45,11 +42,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         initialState
     )
 
-    private val debugMode = if (MvRxTestOverrides.FORCE_DEBUG == null) {
-        config.debugMode
-    } else {
-        MvRxTestOverrides.FORCE_DEBUG
-    }
+    private val debugMode = config.debugMode
 
     private val stateStore = config.stateStore
     private val tag by lazy { javaClass.simpleName }
@@ -155,7 +148,9 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     }
 
     /**
-     * TODO
+     * If this state store is a [ScriptableStateStore], this function can be called to force
+     * the current state to the given state. It is an error to call this if the store is not
+     * scriptable.
      */
     @PublishedApi
     @VisibleForTesting

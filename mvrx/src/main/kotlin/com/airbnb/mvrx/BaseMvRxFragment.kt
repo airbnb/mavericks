@@ -46,5 +46,5 @@ abstract class BaseMvRxFragment : Fragment(), MockableMvRxView {
         postInvalidate()
     }
 
-    override fun provideMocks() = EmptyMocks
+    override fun provideMocks(): MvRxViewMocks<out MockableMvRxView, out Parcelable> = EmptyMocks
 }

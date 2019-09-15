@@ -66,29 +66,65 @@ abstract class BaseTest {
     protected inline fun <reified F : Fragment, reified A : AppCompatActivity> createFragment(
         savedInstanceState: Bundle? = null,
         args: Parcelable? = null,
-        containerId: Int? = null
+        containerId: Int? = null,
+        existingController: ActivityController<A>? = null
     ): Pair<ActivityController<A>, F> {
-        val controller = Robolectric.buildActivity(A::class.java)
-        if (savedInstanceState == null) {
-            controller.setup()
-        } else {
-            controller.setup(savedInstanceState)
+        val controller = existingController ?: Robolectric.buildActivity(A::class.java)
+
+        if (existingController == null) {
+            if (savedInstanceState == null) {
+                controller.setup()
+            } else {
+                controller.setup(savedInstanceState)
+            }
         }
+
         val activity = controller.get()
         val fragment = if (savedInstanceState == null) {
             F::class.java.newInstance().apply {
                 arguments = Bundle().apply { putParcelable(MvRx.KEY_ARG, args) }
-                if (containerId != null) {
-                    activity.supportFragmentManager.beginTransaction().add(containerId, this, "TAG")
-                        .commitNow()
-                } else {
-                    activity.supportFragmentManager.beginTransaction().add(this, "TAG").commitNow()
-                }
+                activity.supportFragmentManager
+                    .beginTransaction()
+                    .also {
+                        if (containerId != null) {
+                            it.add(containerId, this, "TAG")
+                        } else {
+                            it.add(this, "TAG")
+                        }
+                    }
+                    .commitNow()
             }
         } else {
             activity.supportFragmentManager.findFragmentByTag("TAG") as F
         }
         return controller to fragment
+    }
+
+    protected inline fun <F : Fragment, reified A : AppCompatActivity> F.addToActivity(
+        containerId: Int? = null,
+        existingController: ActivityController<A>? = null
+    ): ActivityController<A> {
+        val controller = existingController ?: Robolectric.buildActivity(A::class.java)
+
+        if (existingController == null) {
+            controller.setup()
+        }
+
+        val activity = controller.get()
+
+        activity.supportFragmentManager
+            .beginTransaction()
+            .also {
+                if (containerId != null) {
+                    it.add(containerId, this, "TAG")
+                } else {
+                    it.add(this, "TAG")
+                }
+            }
+            .commitNow()
+
+
+        return controller
     }
 
     protected inline fun <reified F : Fragment> ActivityController<out AppCompatActivity>.mvRxFragment(): F {

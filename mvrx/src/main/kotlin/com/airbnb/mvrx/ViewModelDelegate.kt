@@ -59,9 +59,9 @@ abstract class ViewModelDelegate<T, VM : BaseMvRxViewModel<S>, S : MvRxState> wh
         crossinline viewModelProvider: (mockState: S?) -> VM
     ): lifecycleAwareLazy<VM> {
 
-        val mockState: S? = getMockedState<State>(view, viewModelProperty, existingViewModel)
-
         return lifecycleAwareLazy(view) {
+            val mockState: S? = getMockedState<State>(view, viewModelProperty, existingViewModel)
+
             MvRx.viewModelConfigProvider.withMockBehavior(mockBehavior) {
                 viewModelProvider(mockState)
                     .apply { subscribe(view, subscriber = { view.postInvalidate() }) }

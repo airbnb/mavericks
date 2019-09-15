@@ -12,8 +12,7 @@ import kotlin.reflect.KProperty
  */
 class MockStateHolder {
 
-    @PublishedApi
-    internal val stateMap = mutableMapOf<MvRxView, MvRxMock<*, *>>()
+    private val stateMap = mutableMapOf<MvRxView, MvRxMock<*, *>>()
     private val delegateInfoMap = mutableMapOf<MvRxView, MutableList<ViewModelDelegateInfo<*, *>>>()
 
     /**

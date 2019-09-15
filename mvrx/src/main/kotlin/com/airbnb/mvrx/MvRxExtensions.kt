@@ -133,10 +133,10 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.exist
     provideViewModel(true) { fragment, stateFactory, isMocked ->
 
         val activity = fragment.requireActivity()
-        val factory =
-            MvRxFactory { error("ViewModel for ${activity}[${keyFactory()}] does not exist yet!") }
 
         if (!isMocked) {
+            val factory =
+                MvRxFactory { error("ViewModel for ${activity}[${keyFactory()}] does not exist yet!") }
             ViewModelProviders.of(activity, factory).get(keyFactory(), viewModelClass.java)
         } else {
             MvRxViewModelProvider.get(

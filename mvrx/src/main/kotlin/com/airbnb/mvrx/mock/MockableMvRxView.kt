@@ -1,13 +1,10 @@
 package com.airbnb.mvrx.mock
 
 
-import android.annotation.SuppressLint
 import android.os.Parcelable
-import android.util.Log
 import androidx.annotation.VisibleForTesting
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.BaseMvRxViewModel
-import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.PersistState
@@ -15,7 +12,6 @@ import com.airbnb.mvrx.call
 import com.airbnb.mvrx.mock.MvRxMock.Companion.DEFAULT_INITIALIZATION_NAME
 import com.airbnb.mvrx.mock.MvRxMock.Companion.DEFAULT_STATE_NAME
 import com.airbnb.mvrx.mock.MvRxMock.Companion.RESTORED_STATE_NAME
-import java.util.Collections
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
@@ -331,18 +327,7 @@ data class MvRxMock<V : MockableMvRxView, Args : Parcelable> internal constructo
 data class MockState<V : MockableMvRxView, S : MvRxState> internal constructor(
     val viewModelProperty: KProperty1<V, BaseMvRxViewModel<S>>,
     val state: S
-) {
-
-    /**
-     * Forcibly apply this state to the ViewModel instance in the given view.
-     * This requires that the view was created with a mock behavior and has a
-     * [MockableStateStore] implementation.
-     */
-    @SuppressLint("VisibleForTests")
-    fun applyState(mvrxView: V) {
-        viewModelProperty.get(mvrxView).freezeStateForTesting(state)
-    }
-}
+)
 
 /**
  * Provides a DSL for defining variations to the default mock state.
@@ -771,12 +756,14 @@ internal constructor(
 /**
  * This placeholder can be used as a NO-OP implementation of [MockableMvRxView.provideMocks].
  */
-object EmptyMocks : MvRxViewMocks<MockableMvRxView, Nothing>() {
+object EmptyMocks : MvRxViewMocks<MockableMvRxView, Nothing>(allowCreationOfThisInstance = true) {
     override val mocks: List<MvRxMock<MockableMvRxView, out Nothing>> = emptyList()
     override val mockGroups: List<List<MvRxMock<MockableMvRxView, out Nothing>>> = emptyList()
 }
 
-open class MvRxViewMocks<V : MockableMvRxView, Args : Parcelable> {
+open class MvRxViewMocks<V : MockableMvRxView, Args : Parcelable> @PublishedApi internal constructor(
+    allowCreationOfThisInstance: Boolean = false
+) {
     /**
      * A list of mocks to use when testing a view. Each mock represents a unique state to be tested.
      *
@@ -794,7 +781,7 @@ open class MvRxViewMocks<V : MockableMvRxView, Args : Parcelable> {
     open val mockGroups: List<List<MvRxMock<V, out Args>>> get() = listOf(mocks)
 
     init {
-        require(numAllowedCreationsOfMocks.get() > 0) {
+        require(allowCreationForTesting || allowCreationOfThisInstance || numAllowedCreationsOfMocks.get() > 0) {
             "Mock creation is not allowed! provideMocks() CANNOT be called directly. " +
                     "Instead, call MvRxViewMocks#getFrom()"
         }
@@ -819,6 +806,19 @@ open class MvRxViewMocks<V : MockableMvRxView, Args : Parcelable> {
     }
 
     companion object {
+        /**
+         * Exposed for internal tests to allow us to workaround the requirement that this class
+         * can only be created via [getFrom]
+         */
+        internal fun <R> allowCreationForTesting(block: () -> R): R {
+            allowCreationForTesting = true
+            val result: R = block()
+            allowCreationForTesting = false
+            return result
+        }
+
+        private var allowCreationForTesting: Boolean = false
+
         /**
          * Tracks how many mock instances are being validly created. This allows our gating
          * to be done in a thread safe way.

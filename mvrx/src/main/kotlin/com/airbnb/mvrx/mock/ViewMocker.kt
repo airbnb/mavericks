@@ -17,9 +17,6 @@ fun <V : MockableMvRxView, A : Parcelable> getMockVariants(
     val view = viewProvider(null, null)
     val viewName = view.javaClass.simpleName
 
-    // TODO
-//    testUninitializedAccess(fragment)
-
     lateinit var mocks: List<MvRxMock<out MockableMvRxView, out Parcelable>>
     val elapsedMs: Long = measureTimeMillis {
         val mockData =
