@@ -235,11 +235,8 @@ internal fun validateDebug(debug: Boolean = MvRx.viewModelConfigProvider.debugMo
     return if (debug) {
         true
     } else {
-        Log.e(
-            "MvRx",
-            "Only accessible in debug mode",
-            IllegalStateException("Only accessible in debug mode")
-        )
+        // Not using Log.e to avoid needing robolectric in tests.
+        System.err.println("MvRxViewModelConfigProvider: This is only accessible in debug mode")
         null
     }
 }
