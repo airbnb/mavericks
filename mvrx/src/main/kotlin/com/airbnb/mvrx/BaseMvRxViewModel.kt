@@ -50,17 +50,17 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * [Lifecycle.State.RESUMED] and when [ViewModel.onCleared] is called the lifecycle will be
      * [Lifecycle.State.DESTROYED].
      *
-     * This is not be publicly accessible as it should only be used to control subscriptions
+     * This is not publicly accessible as it should only be used to control subscriptions
      * between two view models.
      */
     private val lifecycleOwner: LifecycleOwner = LifecycleOwner { lifecycleRegistry }
-    private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(lifecycleOwner)
+    private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(lifecycleOwner).apply { currentState = Lifecycle.State.RESUMED }
+
 
     internal val state: S
         get() = stateStore.state
 
     init {
-        lifecycleRegistry.currentState = Lifecycle.State.RESUMED
         Completable.fromCallable { warmReflectionCache(initialState) }.subscribeOn(Schedulers.computation()).subscribe()
 
         if (this.debugMode) {
@@ -658,8 +658,8 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     }
 
     private fun <S : MvRxState> assertSubscribeToDifferentViewModel(viewModel: BaseMvRxViewModel<S>) {
-        if (this == viewModel) {
-            throw IllegalArgumentException("This method is for subscribing to other view models. Please pass a different instance as the argument.")
+        require(this == viewModel) {
+            "This method is for subscribing to other view models. Please pass a different instance as the argument."
         }
     }
 
