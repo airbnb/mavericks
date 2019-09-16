@@ -37,7 +37,7 @@ class AutoValueTypePrinterTest : BaseTest() {
         )
 
         assertEquals(
-            listOf("com.airbnb.mvrx.mock.AutoValueClass", "kotlin.String", "kotlin.Int"),
+            listOf("com.airbnb.mvrx.mock.AutoValueClass", "kotlin.Int", "kotlin.String"),
             constructorCode.imports
         )
     }

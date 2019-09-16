@@ -30,6 +30,7 @@ class MvRxTestRule(
     private val setForceDisableLifecycleAwareObserver: Boolean = true
 ) : ExternalResource() {
     private var defaultExceptionHandler: Thread.UncaughtExceptionHandler? = null
+    private val defaultConfigProvider = MvRx.viewModelConfigProvider
 
     override fun before() {
         RxAndroidPlugins.reset()
@@ -52,7 +53,7 @@ class MvRxTestRule(
     override fun after() {
         RxAndroidPlugins.reset()
         if (setRxImmediateSchedulers) clearRxImmediateSchedulers()
-        MvRx.viewModelConfigProvider = MvRxViewModelConfigProvider()
+        MvRx.viewModelConfigProvider = defaultConfigProvider
     }
 
     private fun setRxImmediateSchedulers() {

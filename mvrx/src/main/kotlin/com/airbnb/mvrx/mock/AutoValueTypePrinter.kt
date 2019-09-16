@@ -49,7 +49,9 @@ class AutoValueTypePrinter : TypePrinter<Any> {
                         ?: return@mapNotNull null
 
                 "\n.${builderMethod.name}($valueConstructor)"
-            }.joinToString(separator = "")
+            }
+            .sorted() // Sorting gives consistent output, otherwise tests are flaky
+            .joinToString(separator = "")
 
         // This expects the builder/build functions to have these standard names.
         return "$name.builder()$builderMethods\n.build()"

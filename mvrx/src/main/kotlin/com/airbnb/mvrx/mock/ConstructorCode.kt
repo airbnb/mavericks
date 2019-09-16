@@ -36,16 +36,19 @@ class ConstructorCode<T : Any>(
     /**
      * Wraps [constructorCode] in a property that is lazily initialized.
      */
-    val lazyPropertyToCreateObject = "val mock${objectToCopy::class.simpleName} by lazy { $constructorCode }"
+    val lazyPropertyToCreateObject =
+        "val mock${objectToCopy::class.simpleName} by lazy { $constructorCode }"
 
     /**
      * The fully qualified names of all classes and functions that are used in the code.
      */
     val imports: List<String> = run {
         val defaultImports = dependencies.mapNotNull { it.qualifiedName }
-        usedTypePrinters.fold(defaultImports) { imports, typePrinter ->
-            typePrinter.modifyImports(imports)
-        }
+        usedTypePrinters
+            .fold(defaultImports) { imports, typePrinter ->
+                typePrinter.modifyImports(imports)
+            }
+            .sorted() // Sorting gives consistent output, otherwise tests are flaky
     }
 
     private fun Any?.getConstructor(): String {

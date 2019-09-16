@@ -13,7 +13,7 @@ class ConstructorCodeTest : BaseTest() {
         val code = ConstructorCode(State(), Integer.MAX_VALUE, Integer.MAX_VALUE)
 
         assertEquals(
-            "com.airbnb.mvrx.mock.ConstructorCodeTest.State, kotlin.Int, kotlin.Float, kotlin.String, kotlin.Double, com.airbnb.mvrx.mock.ConstructorCodeTest.NestedObject, com.airbnb.mvrx.mock.ConstructorCodeTest.MyEnum, com.airbnb.mvrx.mock.ConstructorCodeTest.MySingleton",
+            "com.airbnb.mvrx.mock.ConstructorCodeTest.MyEnum, com.airbnb.mvrx.mock.ConstructorCodeTest.MySingleton, com.airbnb.mvrx.mock.ConstructorCodeTest.NestedObject, com.airbnb.mvrx.mock.ConstructorCodeTest.State, kotlin.Double, kotlin.Float, kotlin.Int, kotlin.String",
             code.imports.joinToString()
         )
     }
