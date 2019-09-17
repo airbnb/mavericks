@@ -1,11 +1,8 @@
 package com.airbnb.mvrx
 
-import android.os.Bundle
-import android.os.Parcelable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.annotation.RestrictTo
-import java.io.Serializable
 import java.lang.IllegalStateException
 import kotlin.reflect.full.primaryConstructor
 
@@ -16,28 +13,22 @@ class MvRxFactory<VM : BaseMvRxViewModel<S>, S : MvRxState>(
     private val stateClass: Class<out S>,
     private val viewModelContext: ViewModelContext,
     private val key: String,
+    private val stateRestorer: ((S) -> S)?,
     private val forExistingViewModel: Boolean = false,
     private val initialStateFactory: MvRxStateFactory<VM, S> = RealMvRxStateFactory()
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        val restoredState = viewModelContext.savedStateRegistry.consumeRestoredStateForKey(key)
-
-        if (restoredState == null && forExistingViewModel) {
+        if (stateRestorer == null && forExistingViewModel) {
             throw ViewModelDoesNotExistException(viewModelClass, viewModelContext, key)
         }
-
-        val (viewModelContext, stateRestorer) =
-            restoredState
-                ?.toRestoredState(viewModelContext)
-                ?: viewModelContext to { state: S -> state }
 
         val viewModel = createViewModel(
             viewModelClass,
             stateClass,
             viewModelContext,
-            stateRestorer,
+            stateRestorer ?: { it },
             initialStateFactory
         )
         return viewModel as T
@@ -90,22 +81,6 @@ private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createDefaultViewModel(vi
     }
     return null
 }
-
-private fun <S : MvRxState> Bundle.toRestoredState(viewModelContext: ViewModelContext): Pair<ViewModelContext, (S) -> S> {
-    val restoredArgs = get(KEY_MVRX_SAVED_ARGS)
-    val restoredState = getBundle(KEY_MVRX_SAVED_INSTANCE_STATE)
-
-    requireNotNull(restoredState) { "State was not saved prior to restoring!" }
-
-    val restoredContext = when (viewModelContext) {
-        is ActivityViewModelContext -> viewModelContext.copy(args = restoredArgs)
-        is FragmentViewModelContext -> viewModelContext.copy(args = restoredArgs)
-    }
-    return restoredContext to restoredState::restorePersistedState
-}
-
-internal const val KEY_MVRX_SAVED_INSTANCE_STATE = "mvrx:saved_instance_state"
-internal const val KEY_MVRX_SAVED_ARGS = "mvrx:saved_args"
 
 internal class ViewModelDoesNotExistException(
     viewModelClass: Class<*>,

@@ -87,8 +87,8 @@ data class ActivityViewModelContext(
     override val activity: FragmentActivity,
     override val args: Any?
 ) : ViewModelContext() {
-    override val owner = activity
-    override val savedStateRegistry = activity.savedStateRegistry
+    override val owner get() = activity
+    override val savedStateRegistry get() = activity.savedStateRegistry
 }
 
 /**
@@ -104,8 +104,8 @@ data class FragmentViewModelContext(
     val fragment: Fragment
 ) : ViewModelContext() {
 
-    override val owner = fragment
-    override val savedStateRegistry = fragment.savedStateRegistry
+    override val owner get() = fragment
+    override val savedStateRegistry get() = fragment.savedStateRegistry
     /**
      * Convenience method to type [fragment].
      */

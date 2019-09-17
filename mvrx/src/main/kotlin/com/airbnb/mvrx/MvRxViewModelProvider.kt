@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import java.io.Serializable
+import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 
 /**
@@ -38,35 +39,68 @@ object MvRxViewModelProvider {
         forExistingViewModel: Boolean = false,
         initialStateFactory: MvRxStateFactory<VM, S> = RealMvRxStateFactory()
     ): VM {
+        val stateRestorer = viewModelContext
+            .savedStateRegistry
+            .consumeRestoredStateForKey(key)
+            ?.toStateRestorer<S>(viewModelContext)
+
+        val restoredContext = stateRestorer?.viewModelContext ?: viewModelContext
+
         val viewModel = ViewModelProvider(
             viewModelContext.owner,
-            MvRxFactory(viewModelClass, stateClass, viewModelContext, key, forExistingViewModel, initialStateFactory)
+            MvRxFactory(
+                viewModelClass,
+                stateClass,
+                restoredContext,
+                key,
+                stateRestorer?.toRestoredState,
+                forExistingViewModel,
+                initialStateFactory
+            )
         ).get(key, viewModelClass)
 
-        with(viewModelContext.savedStateRegistry) {
-            unregisterSavedStateProvider(key)
-            registerSavedStateProvider(key) {
-                viewModel.getSavedStateBundle(viewModelContext)
+        try {
+            // Save the view model's state to the bundle so that it can be used to recreate
+            // state across system initiated process death.
+            viewModelContext.savedStateRegistry.registerSavedStateProvider(key) {
+                viewModel.getSavedStateBundle(restoredContext.args)
             }
+        } catch (e: IllegalArgumentException) {
+            // The view model was already registered with the context.
         }
-
         return viewModel
     }
 
-    private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> VM.getSavedStateBundle(viewModelContext: ViewModelContext) =
-        withState(this) { state ->
-            Bundle().apply {
-                putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, state.persistState())
-                viewModelContext.args?.let {
-                    when (it) {
-                        is Parcelable -> putParcelable(KEY_MVRX_SAVED_ARGS, it)
-                        is Serializable -> putSerializable(KEY_MVRX_SAVED_ARGS, it)
-                        else -> throw IllegalStateException("Args must be parcelable or serializable")
-                    }
+    private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> VM.getSavedStateBundle(
+        initialArgs: Any?
+    ) = withState(this) { state ->
+        Bundle().apply {
+            putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, state.persistState())
+            initialArgs?.let {
+                when (it) {
+                    is Parcelable -> putParcelable(KEY_MVRX_SAVED_ARGS, it)
+                    is Serializable -> putSerializable(KEY_MVRX_SAVED_ARGS, it)
+                    else -> error("Args must be parcelable or serializable")
                 }
-
             }
         }
+    }
+
+    private fun <S : MvRxState> Bundle.toStateRestorer(viewModelContext: ViewModelContext): StateRestorer<S> {
+        val restoredArgs = get(KEY_MVRX_SAVED_ARGS)
+        val restoredState = getBundle(KEY_MVRX_SAVED_INSTANCE_STATE)
+
+        requireNotNull(restoredState) { "State was not saved prior to restoring!" }
+
+        val restoredContext = when (viewModelContext) {
+            is ActivityViewModelContext -> viewModelContext.copy(args = restoredArgs)
+            is FragmentViewModelContext -> viewModelContext.copy(args = restoredArgs)
+        }
+        return StateRestorer(restoredContext, restoredState::restorePersistedState)
+    }
+
+    private const val KEY_MVRX_SAVED_INSTANCE_STATE = "mvrx:saved_instance_state"
+    private const val KEY_MVRX_SAVED_ARGS = "mvrx:saved_args"
 }
 
 /**
@@ -93,3 +127,8 @@ internal fun <VM : BaseMvRxViewModel<*>> Class<VM>.factoryCompanion(): Class<out
 internal fun Class<*>.instance(): Any {
     return declaredConstructors.first { it.parameterTypes.size == 1 }.newInstance(null)
 }
+
+private data class StateRestorer<S : MvRxState>(
+    val viewModelContext: ViewModelContext,
+    val toRestoredState: (S) -> S
+)
