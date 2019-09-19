@@ -4,6 +4,7 @@ import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.full.extensionReceiverParameter
+import kotlin.reflect.full.functions
 import kotlin.reflect.full.instanceParameter
 import kotlin.reflect.full.isSubclassOf
 import kotlin.reflect.full.memberFunctions
@@ -118,5 +119,8 @@ internal fun <R> KFunction<R>.callNamed(
 
 /** Helper to call a function reflectively. */
 internal inline fun <reified T> Any.call(functionName: String, vararg args: Any?): T {
-    return this::class.declaredFunctions.find { it.name == functionName }!!.call(this, *args) as T
+    val function = this::class.functions.find { it.name == functionName }
+        ?: error("No function found with name $functionName in class ${this.javaClass.name}")
+
+    return function.call(this, *args) as T
 }

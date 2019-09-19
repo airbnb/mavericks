@@ -32,7 +32,6 @@ class MockStateHolder {
      */
     fun clearMock(view: MvRxView) {
         stateMap.remove(view)
-            ?: error("No mock was set for view ${view::class.java.simpleName}")
         // If the mocked view was just mocked with args and doesn't haven't view models then this will be empty
         delegateInfoMap.remove(view)
     }

@@ -1,14 +1,19 @@
 package com.airbnb.mvrx.sample.features.dadjoke
 
+import android.os.Parcelable
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.Uninitialized
 import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.fragmentViewModel
+import com.airbnb.mvrx.mock.MvRxViewMocks
+import com.airbnb.mvrx.mock.mockSingleViewModel
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.core.MvRxViewModel
 import com.airbnb.mvrx.sample.core.simpleController
+import com.airbnb.mvrx.sample.features.dadjoke.mocks.mockRandomDadJokeState
 import com.airbnb.mvrx.sample.models.Joke
 import com.airbnb.mvrx.sample.network.DadJokeService
 import com.airbnb.mvrx.sample.views.basicRow
@@ -34,7 +39,10 @@ class RandomDadJokeViewModel(
 
     companion object : MvRxViewModelFactory<RandomDadJokeViewModel, RandomDadJokeState> {
 
-        override fun create(viewModelContext: ViewModelContext, state: RandomDadJokeState): RandomDadJokeViewModel {
+        override fun create(
+            viewModelContext: ViewModelContext,
+            state: RandomDadJokeState
+        ): RandomDadJokeViewModel {
             val service: DadJokeService by viewModelContext.activity.inject()
             return RandomDadJokeViewModel(state, service)
         }
@@ -68,4 +76,9 @@ class RandomDadJokeFragment : BaseFragment() {
             clickListener { _ -> viewModel.fetchRandomJoke() }
         }
     }
+
+    override fun provideMocks() =
+        mockSingleViewModel(RandomDadJokeFragment::viewModel, mockRandomDadJokeState, null) {
+        
+        }
 }

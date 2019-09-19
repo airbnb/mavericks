@@ -7,6 +7,40 @@ import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxView
 import kotlin.system.measureTimeMillis
 
+fun getMockVariants(
+    viewClassName: String,
+    emptyMockPlaceholder: Pair<String, MvRxViewMocks<MvRxView, Nothing>> = Pair(
+        EmptyMocks::class.java.simpleName,
+        EmptyMocks
+    ),
+    mockGroupIndex: Int? = null
+): List<MockedViewProvider<MvRxView>>? {
+    @Suppress("UNCHECKED_CAST")
+    return getMockVariants(
+        viewClass = Class.forName(viewClassName) as Class<MvRxView>,
+        emptyMockPlaceholder = emptyMockPlaceholder,
+        mockGroupIndex = mockGroupIndex
+    )
+}
+
+fun getMockVariants(
+    viewClass: Class<MvRxView>,
+    emptyMockPlaceholder: Pair<String, MvRxViewMocks<MvRxView, Nothing>> = Pair(
+        EmptyMocks::class.java.simpleName,
+        EmptyMocks
+    ),
+    mockGroupIndex: Int? = null
+): List<MockedViewProvider<MvRxView>>? {
+    return getMockVariants<MvRxView, Nothing>(
+        viewProvider = { _, _ ->
+            @Suppress("UNCHECKED_CAST")
+            viewClass.newInstance() as MvRxView
+        },
+        emptyMockPlaceholder = emptyMockPlaceholder,
+        mockGroupIndex = mockGroupIndex
+    )
+}
+
 fun <V : MvRxView, A : Parcelable> getMockVariants(
     viewProvider: (arguments: A?, argumentsBundle: Bundle?) -> V,
     emptyMockPlaceholder: Pair<String, MvRxViewMocks<MvRxView, Nothing>> = Pair(
@@ -59,8 +93,9 @@ fun <V : MvRxView, A : Parcelable> getMockVariants(
                     MockedView(
                         viewInstance = view,
                         viewName = viewName,
-                        mockData = mockInfo
-                    ) { MvRx.mockStateHolder.clearMock(view) }
+                        mockData = mockInfo,
+                        cleanupMockState = { MvRx.mockStateHolder.clearMock(view) }
+                    )
                 }
             },
             mockData = mockInfo

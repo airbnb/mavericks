@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 28
@@ -30,8 +31,11 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    implementation "androidx.core:core-ktx:$androidKtxVersion"
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutineVersion"
+    implementation("com.airbnb.android:epoxy:$epoxyVersion") { exclude group: 'com.android.support' }
+    kapt "com.airbnb.android:epoxy-processor:$epoxyVersion"
     implementation project(':mvrx')
     testImplementation 'junit:junit:4.12'
 }

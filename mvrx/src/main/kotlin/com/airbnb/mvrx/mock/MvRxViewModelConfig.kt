@@ -12,7 +12,7 @@ import java.util.LinkedList
 
 class MvRxViewModelConfig<S : Any>(
     val debugMode: Boolean,
-    val stateStore: MvRxStateStore<S>,
+    @PublishedApi internal val stateStore: MvRxStateStore<S>,
     private val initialMockBehavior: MockBehavior? = null
 ) {
     val currentMockBehavior: MockBehavior?
@@ -25,8 +25,7 @@ class MvRxViewModelConfig<S : Any>(
         }
     }
 
-    // TODO: Should these be public? Would allow easy access to change mock behavior of individual view models
-    internal fun pushBehaviorOverride(mockBehavior: MockBehavior) {
+    fun pushBehaviorOverride(mockBehavior: MockBehavior) {
         validateDebug(debugMode) ?: return
         mockBehaviorOverrides.push(mockBehavior)
         updateStateStore()
@@ -39,12 +38,23 @@ class MvRxViewModelConfig<S : Any>(
         }
     }
 
-    internal fun popBehaviorOverride() {
+    fun popBehaviorOverride() {
         validateDebug(debugMode) ?: return
         // It is ok if this list is empty, as the config may have been created after others,
         // so it may not have an override set while other active configs may have one.
         mockBehaviorOverrides.pollFirst()
         updateStateStore()
+    }
+
+    companion object {
+        /**
+         * Allows access to the configuration of a ViewModel.
+         * The config is not directly exposed to discourage use. It should only be carefully
+         * used in testing frameworks.
+         */
+        fun <S : MvRxState> access(viewModel: BaseMvRxViewModel<S>): MvRxViewModelConfig<S> {
+            return viewModel.config
+        }
     }
 }
 
@@ -59,9 +69,9 @@ class MvRxViewModelConfig<S : Any>(
  * created viewmodels first.
  */
 data class MockBehavior(
-    val initialState: InitialState,
-    val blockExecutions: BlockExecutions,
-    val stateStoreBehavior: StateStoreBehavior
+    val initialState: InitialState = InitialState.None,
+    val blockExecutions: BlockExecutions = BlockExecutions.No,
+    val stateStoreBehavior: StateStoreBehavior = StateStoreBehavior.Normal
 ) {
     /** Describes how a custom mocked state is applied to initialize a new ViewModel. */
     enum class InitialState {

@@ -1,2 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-        package="com.airbnb.mvrx.launcher" />
+        package="com.airbnb.mvrx.launcher">
+
+    <application>
+        <activity android:name=".MvRxLauncherActivity" />
+    </application>
+</manifest>

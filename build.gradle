@@ -13,6 +13,7 @@ buildscript {
     ext.roomVersion = '2.0.0'
     ext.buildToolsVersion = '28.0.3'
     ext.espressoVersion = '3.1.1'
+    ext.androidKtxVersion = '1.0.2'
 
     repositories {
         google()
