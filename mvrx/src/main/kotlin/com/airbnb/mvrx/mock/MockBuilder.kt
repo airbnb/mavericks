@@ -22,36 +22,13 @@ import kotlin.reflect.full.primaryConstructor
 
 
 /**
- * A version of [MvRxView] that provides mock State values for the viewmodels used by the view.
- * These mocks enable easier development as well as automated testing.
- *
- * This interface is intended to be used by production classes, such as a base Fragment that other
- * Fragments extend from. Proguard and/or other compile behavior is used to prevent the mock data
- * from being included in production builds.
- */
-// TODO: Should these mocks be default and be put on the base MvRxView instead of needing another interface?
-interface MockableMvRxView : MvRxView {
-    /**
-     * Override this to provide the mock states that should be used for testing this view.
-     *
-     * You should NOT invoke this function directly. You can access the mocks for a view
-     * via [MvRxViewMocks.getFrom] instead.
-     */
-    fun provideMocks(): MvRxViewMocks<out MockableMvRxView, out Parcelable> = EmptyMocks
-
-    fun enableMockPrinterReceiver() {
-        MvRxMockPrinter.startReceiverIfInDebug(this)
-    }
-}
-
-/**
- * Used with [MockableMvRxView.provideMocks] for mocking a MvRx view that has no view models (eg only static content and arguments).
+ * Used with [MvRxView.provideMocks] for mocking a MvRx view that has no view models (eg only static content and arguments).
  *
  * @param defaultArgs If your view takes arguments you must provide an instance of those arguments here to be used as the default value for your mocks.
  *                      If your view has no arguments, pass null (and use Nothing as the type).
  * @param mockBuilder Optionally provide other argument variations via the [MockBuilder] DSL
  */
-fun <V : MockableMvRxView, Args : Parcelable> V.mockNoViewModels(
+fun <V : MvRxView, Args : Parcelable> V.mockNoViewModels(
     defaultArgs: Args?,
     mockBuilder: MockBuilder<V, Args>.() -> Unit = {}
 ): MockBuilder<V, Args> = MockBuilder<V, Args>(defaultArgs).apply {
@@ -68,7 +45,7 @@ fun <V : MockableMvRxView, Args : Parcelable> V.mockNoViewModels(
  * @param mocks Each pair is a String description of the mock group, paired to the mock builder - ie ["Dog" to dogMocks()]. The string description
  * used to create the pair is prepended to the name of each mock in the group, so you can omit a reference to the group type in the individual mocks.
  */
-inline fun <reified V : MockableMvRxView> V.combineMocks(
+inline fun <reified V : MvRxView> V.combineMocks(
     vararg mocks: Pair<String, MvRxViewMocks<V, *>>
 ): MvRxViewMocks<V, *> = object : MvRxViewMocks<V, Parcelable>() {
 
@@ -87,8 +64,8 @@ inline fun <reified V : MockableMvRxView> V.combineMocks(
 }
 
 /**
- * Define state values for a [MockableMvRxView] that should be used in tests.
- * This is for use with [MockableMvRxView.provideMocks] when the view has a single view model.
+ * Define state values for a [MvRxView] that should be used in tests.
+ * This is for use with [MvRxView.provideMocks] when the view has a single view model.
  *
  * In the [mockBuilder] lambda you can use [MockBuilder.args] to define mock arguments that should be used to initialize the view and create the
  * initial view model state. Use [SingleViewModelMockBuilder.state] to define complete state objects.
@@ -113,7 +90,7 @@ inline fun <reified V : MockableMvRxView> V.combineMocks(
  * @param mockBuilder A lambda where the [SingleViewModelMockBuilder] DSL can be used to specify additional mock variants.
  * @see mockTwoViewModels
  */
-fun <V : MockableMvRxView, Args : Parcelable, S : MvRxState> V.mockSingleViewModel(
+fun <V : MvRxView, Args : Parcelable, S : MvRxState> V.mockSingleViewModel(
     viewModelReference: KProperty1<V, BaseMvRxViewModel<S>>,
     defaultState: S,
     defaultArgs: Args?,
@@ -127,7 +104,7 @@ fun <V : MockableMvRxView, Args : Parcelable, S : MvRxState> V.mockSingleViewMod
 /**
  * Similar to [mockSingleViewModel], but for the two view model case.
  */
-fun <V : MockableMvRxView,
+fun <V : MvRxView,
         S1 : MvRxState,
         VM1 : BaseMvRxViewModel<S1>,
         S2 : MvRxState,
@@ -155,7 +132,7 @@ fun <V : MockableMvRxView,
  * Similar to [mockTwoViewModels], but for the three view model case.
  */
 @SuppressWarnings("Detekt.LongParameterList")
-fun <V : MockableMvRxView,
+fun <V : MvRxView,
         S1 : MvRxState,
         VM1 : BaseMvRxViewModel<S1>,
         S2 : MvRxState,
@@ -189,7 +166,7 @@ fun <V : MockableMvRxView,
  * Similar to [mockTwoViewModels], but for the four view model case.
  */
 @SuppressWarnings("Detekt.LongParameterList")
-fun <V : MockableMvRxView,
+fun <V : MvRxView,
         S1 : MvRxState,
         VM1 : BaseMvRxViewModel<S1>,
         S2 : MvRxState,
@@ -253,7 +230,7 @@ fun <V : MockableMvRxView,
  * 2. Each mock variant is only one line of code, and is easily maintained
  * 3. Each variant tests a single edge case
  */
-data class MvRxMock<V : MockableMvRxView, Args : Parcelable> internal constructor(
+data class MvRxMock<V : MvRxView, Args : Parcelable> internal constructor(
     val name: String,
     /**
      * Returns the arguments that should be used to initialize the MvRx view. If null, the view models will be
@@ -324,7 +301,7 @@ data class MvRxMock<V : MockableMvRxView, Args : Parcelable> internal constructo
 /**
  * A mocked State value and a reference to the ViewModel that the State is intended for.
  */
-data class MockState<V : MockableMvRxView, S : MvRxState> internal constructor(
+data class MockState<V : MvRxView, S : MvRxState> internal constructor(
     val viewModelProperty: KProperty1<V, BaseMvRxViewModel<S>>,
     val state: S
 )
@@ -332,7 +309,7 @@ data class MockState<V : MockableMvRxView, S : MvRxState> internal constructor(
 /**
  * Provides a DSL for defining variations to the default mock state.
  */
-class SingleViewModelMockBuilder<V : MockableMvRxView, Args : Parcelable, S : MvRxState> internal constructor(
+class SingleViewModelMockBuilder<V : MvRxView, Args : Parcelable, S : MvRxState> internal constructor(
     private val viewModelReference: KProperty1<V, BaseMvRxViewModel<S>>,
     private val defaultState: S,
     defaultArgs: Args?
@@ -389,7 +366,7 @@ class SingleViewModelMockBuilder<V : MockableMvRxView, Args : Parcelable, S : Mv
     }
 }
 
-private fun <V : MockableMvRxView, S : MvRxState, VM : BaseMvRxViewModel<S>> KProperty1<V, VM>.pairDefault(
+private fun <V : MvRxView, S : MvRxState, VM : BaseMvRxViewModel<S>> KProperty1<V, VM>.pairDefault(
     state: MvRxState
 ): Pair<KProperty1<V, BaseMvRxViewModel<MvRxState>>, MvRxState> {
     @Suppress("UNCHECKED_CAST")
@@ -397,7 +374,7 @@ private fun <V : MockableMvRxView, S : MvRxState, VM : BaseMvRxViewModel<S>> KPr
 }
 
 class TwoViewModelMockBuilder<
-        V : MockableMvRxView,
+        V : MvRxView,
         VM1 : BaseMvRxViewModel<S1>,
         S1 : MvRxState,
         VM2 : BaseMvRxViewModel<S2>,
@@ -517,7 +494,7 @@ internal constructor(
  * }
  */
 open class TwoStatesBuilder<
-        V : MockableMvRxView,
+        V : MvRxView,
         S1 : MvRxState,
         VM1 : BaseMvRxViewModel<S1>,
         S2 : MvRxState,
@@ -570,7 +547,7 @@ internal constructor(
 }
 
 class ThreeViewModelMockBuilder<
-        V : MockableMvRxView,
+        V : MvRxView,
         VM1 : BaseMvRxViewModel<S1>,
         S1 : MvRxState,
         VM2 : BaseMvRxViewModel<S2>,
@@ -621,7 +598,7 @@ internal constructor(
 }
 
 open class ThreeStatesBuilder<
-        V : MockableMvRxView,
+        V : MvRxView,
         S1 : MvRxState,
         VM1 : BaseMvRxViewModel<S1>,
         S2 : MvRxState,
@@ -652,7 +629,7 @@ internal constructor(
 }
 
 class FourViewModelMockBuilder<
-        V : MockableMvRxView,
+        V : MvRxView,
         VM1 : BaseMvRxViewModel<S1>,
         S1 : MvRxState,
         VM2 : BaseMvRxViewModel<S2>,
@@ -712,7 +689,7 @@ internal constructor(
 }
 
 class FourStatesBuilder<
-        V : MockableMvRxView,
+        V : MvRxView,
         S1 : MvRxState,
         VM1 : BaseMvRxViewModel<S1>,
         S2 : MvRxState,
@@ -754,14 +731,14 @@ internal constructor(
 }
 
 /**
- * This placeholder can be used as a NO-OP implementation of [MockableMvRxView.provideMocks].
+ * This placeholder can be used as a NO-OP implementation of [MvRxView.provideMocks].
  */
-object EmptyMocks : MvRxViewMocks<MockableMvRxView, Nothing>(allowCreationOfThisInstance = true) {
-    override val mocks: List<MvRxMock<MockableMvRxView, out Nothing>> = emptyList()
-    override val mockGroups: List<List<MvRxMock<MockableMvRxView, out Nothing>>> = emptyList()
+object EmptyMocks : MvRxViewMocks<MvRxView, Nothing>(allowCreationOfThisInstance = true) {
+    override val mocks: List<MvRxMock<MvRxView, out Nothing>> = emptyList()
+    override val mockGroups: List<List<MvRxMock<MvRxView, out Nothing>>> = emptyList()
 }
 
-open class MvRxViewMocks<V : MockableMvRxView, Args : Parcelable> @PublishedApi internal constructor(
+open class MvRxViewMocks<V : MvRxView, Args : Parcelable> @PublishedApi internal constructor(
     allowCreationOfThisInstance: Boolean = false
 ) {
     /**
@@ -826,20 +803,20 @@ open class MvRxViewMocks<V : MockableMvRxView, Args : Parcelable> @PublishedApi 
         private val numAllowedCreationsOfMocks = AtomicInteger(0)
 
         /**
-         * Retrieves the mocks from a view provided by [MockableMvRxView.provideMocks].
+         * Retrieves the mocks from a view provided by [MvRxView.provideMocks].
          *
          * All access to mocks is gated behind this function so that it can enforce that
          * mocks are only used in debug mode, and so that this function can access mocks
          * reflectively. By only accessing mocks reflectively they are allowed to be stripped
          * by minification for non debug builds.
          */
-        fun getFrom(view: MockableMvRxView): MvRxViewMocks<out MockableMvRxView, out Parcelable> {
+        fun getFrom(view: MvRxView): MvRxViewMocks<out MvRxView, out Parcelable> {
             validateDebug() ?: return EmptyMocks
 
             numAllowedCreationsOfMocks.incrementAndGet()
 
             val mocks =
-                view.call<MvRxViewMocks<out MockableMvRxView, out Parcelable>>("provideMocks")
+                view.call<MvRxViewMocks<out MvRxView, out Parcelable>>("provideMocks")
 
             require(numAllowedCreationsOfMocks.decrementAndGet() >= 0) {
                 "numAllowedCreationsOfMocks is negative"
@@ -850,7 +827,7 @@ open class MvRxViewMocks<V : MockableMvRxView, Args : Parcelable> @PublishedApi 
     }
 }
 
-open class MockBuilder<V : MockableMvRxView, Args : Parcelable> internal constructor(
+open class MockBuilder<V : MvRxView, Args : Parcelable> internal constructor(
     internal val defaultArgs: Args?,
     vararg defaultStatePairs: Pair<KProperty1<V, BaseMvRxViewModel<MvRxState>>, MvRxState>
 ) : MvRxViewMocks<V, Args>(), DataClassSetDsl {

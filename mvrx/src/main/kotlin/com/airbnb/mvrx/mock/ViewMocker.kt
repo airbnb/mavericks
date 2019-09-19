@@ -4,11 +4,12 @@ import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
 import com.airbnb.mvrx.MvRx
+import com.airbnb.mvrx.MvRxView
 import kotlin.system.measureTimeMillis
 
-fun <V : MockableMvRxView, A : Parcelable> getMockVariants(
+fun <V : MvRxView, A : Parcelable> getMockVariants(
     viewProvider: (arguments: A?, argumentsBundle: Bundle?) -> V,
-    emptyMockPlaceholder: Pair<String, MvRxViewMocks<MockableMvRxView, Nothing>> = Pair(
+    emptyMockPlaceholder: Pair<String, MvRxViewMocks<MvRxView, Nothing>> = Pair(
         EmptyMocks::class.java.simpleName,
         EmptyMocks
     ),
@@ -17,7 +18,7 @@ fun <V : MockableMvRxView, A : Parcelable> getMockVariants(
     val view = viewProvider(null, null)
     val viewName = view.javaClass.simpleName
 
-    lateinit var mocks: List<MvRxMock<out MockableMvRxView, out Parcelable>>
+    lateinit var mocks: List<MvRxMock<out MvRxView, out Parcelable>>
     val elapsedMs: Long = measureTimeMillis {
         val mockData =
             MvRxViewMocks.getFrom(view).takeIf { it !== emptyMockPlaceholder.second } ?: return null
@@ -94,7 +95,7 @@ private fun <T : Parcelable> T.makeClone(): T {
     return clone
 }
 
-class MockedViewProvider<V : MockableMvRxView>(
+class MockedViewProvider<V : MvRxView>(
     val viewName: String,
     val createView: (MockBehavior) -> MockedView<V>,
     val mockData: MvRxMock<V, *>
@@ -103,7 +104,7 @@ class MockedViewProvider<V : MockableMvRxView>(
 /**
  * @property cleanupMockState Call this when the view is done initializing its viewmodels, so that the global mock state can be cleared.
  */
-class MockedView<V : MockableMvRxView>(
+class MockedView<V : MvRxView>(
     val viewInstance: V,
     val viewName: String,
     val mockData: MvRxMock<V, *>,

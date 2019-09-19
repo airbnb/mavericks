@@ -95,7 +95,7 @@ class ViewModelDelegateTest : BaseTest() {
         assertEquals(TestState(2), frag.existingVm.state)
     }
 
-    class Frag : BaseMvRxFragment(), MockableMvRxView {
+    class Frag : BaseMvRxFragment() {
         val fragmentVm: FragmentVM by fragmentViewModel()
         val activityVm: ActivityVM by activityViewModel()
 
@@ -114,7 +114,7 @@ class ViewModelDelegateTest : BaseTest() {
         }
     }
 
-    class Frag2 : BaseMvRxFragment(), MockableMvRxView {
+    class Frag2 : BaseMvRxFragment() {
         val existingVm: ActivityVM by existingViewModel()
 
         override fun invalidate() {

@@ -3,13 +3,12 @@ package com.airbnb.mvrx.mock
 import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.BaseTest
-import com.airbnb.mvrx.CONTAINER_ID
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.TestActivity
 import com.airbnb.mvrx.fragmentViewModel
 import org.junit.After
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 
@@ -159,7 +158,7 @@ class MockStateHolderTest : BaseTest() {
     }
 
 
-    class Frag : BaseMvRxFragment(), MockableMvRxView {
+    class Frag : BaseMvRxFragment() {
         val fragmentVm: FragmentVM by fragmentViewModel()
 
         override fun invalidate() {
@@ -175,7 +174,7 @@ class MockStateHolderTest : BaseTest() {
         }
     }
 
-    class FragWithNoMocks : BaseMvRxFragment(), MockableMvRxView {
+    class FragWithNoMocks : BaseMvRxFragment() {
         val fragmentVm: FragmentVM by fragmentViewModel()
 
         override fun invalidate() {

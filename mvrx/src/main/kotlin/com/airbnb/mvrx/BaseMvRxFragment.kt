@@ -5,7 +5,6 @@ import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import com.airbnb.mvrx.mock.EmptyMocks
-import com.airbnb.mvrx.mock.MockableMvRxView
 import com.airbnb.mvrx.mock.MvRxViewMocks
 
 /**
@@ -13,7 +12,7 @@ import com.airbnb.mvrx.mock.MvRxViewMocks
  *
  * This is necessary for the view model delegates and persistence to work correctly.
  */
-abstract class BaseMvRxFragment : Fragment(), MockableMvRxView {
+abstract class BaseMvRxFragment : Fragment(), MvRxView {
 
     override val mvrxViewModelStore by lazy { MvRxViewModelStore(viewModelStore) }
 
@@ -46,5 +45,5 @@ abstract class BaseMvRxFragment : Fragment(), MockableMvRxView {
         postInvalidate()
     }
 
-    override fun provideMocks(): MvRxViewMocks<out MockableMvRxView, out Parcelable> = EmptyMocks
+    override fun provideMocks(): MvRxViewMocks<out MvRxView, out Parcelable> = EmptyMocks
 }

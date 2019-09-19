@@ -19,7 +19,7 @@ class MockStateHolder {
      * Set mock data for a view reference. The mocks will be used to provide initial state
      * when the view models are initialized as the view is started.
      */
-    fun <V : MockableMvRxView, A : Parcelable> setMock(
+    fun <V : MvRxView, A : Parcelable> setMock(
         view: MvRxView,
         mockInfo: MvRxMock<V, A>
     ) {
@@ -62,7 +62,6 @@ class MockStateHolder {
         stateClass: Class<S>,
         forceMockExistingViewModel: Boolean
     ): S? {
-        if (view !is MockableMvRxView) return null
 
         val mockInfo = if (existingViewModel && forceMockExistingViewModel) {
             check(!stateMap.containsKey(view)) {
@@ -74,7 +73,7 @@ class MockStateHolder {
                 .firstOrNull { it.isDefaultState }
                 ?.let {
                     @Suppress("UNCHECKED_CAST")
-                    it as MvRxMock<MockableMvRxView, *>
+                    it as MvRxMock<MvRxView, *>
                 }
                 ?: error(
                     "No mock state found in ${view.javaClass.simpleName} for ViewModel ${viewModelProperty.name}. " +
