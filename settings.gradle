@@ -1,1 +1,1 @@
-include ':mvrx', ':sample', ':todomvrx', ':testing', ':dogs', ':counter'
+include ':mvrx', ':sample', ':todomvrx', ':testing', ':dogs', ':counter', ':launcher'
