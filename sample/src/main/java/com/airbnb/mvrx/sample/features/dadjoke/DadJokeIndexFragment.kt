@@ -5,9 +5,12 @@ import com.google.android.material.snackbar.Snackbar
 import android.util.Log
 import android.view.View
 import com.airbnb.mvrx.fragmentViewModel
+import com.airbnb.mvrx.mock.mockSingleViewModel
 import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.core.simpleController
+import com.airbnb.mvrx.sample.features.dadjoke.mocks.mockDadJokeIndexState
+import com.airbnb.mvrx.sample.features.dadjoke.mocks.mockRandomDadJokeState
 import com.airbnb.mvrx.sample.views.basicRow
 import com.airbnb.mvrx.sample.views.loadingRow
 import com.airbnb.mvrx.sample.views.marquee
@@ -61,5 +64,13 @@ class DadJokeIndexFragment : BaseFragment() {
             id("loading${state.jokes.size}")
             onBind { _, _, _ -> viewModel.fetchNextPage() }
         }
+    }
+
+    override fun provideMocks() = mockSingleViewModel(
+        viewModelReference = DadJokeIndexFragment::viewModel,
+        defaultState = mockDadJokeIndexState,
+        defaultArgs = null
+    ) {
+        stateForLoadingAndFailure { ::request }
     }
 }

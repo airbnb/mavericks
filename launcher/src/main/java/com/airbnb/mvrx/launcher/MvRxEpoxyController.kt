@@ -7,7 +7,7 @@ import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.withState
 
 /**
- * For use with [LauncherBaseFragment.epoxyController].
+ * For use with [MvRxLauncherBaseFragment.epoxyController].
  *
  * This builds Epoxy models in a background thread.
  */
@@ -23,7 +23,7 @@ internal open class MvRxEpoxyController(
 /**
  * Create a [MvRxEpoxyController] that builds models with the given callback.
  */
-fun LauncherBaseFragment.simpleController(
+fun MvRxLauncherBaseFragment.simpleController(
     buildModels: EpoxyController.() -> Unit
 ): EpoxyController = MvRxEpoxyController {
     // Models are built asynchronously, so it is possible that this is called after the fragment
@@ -36,7 +36,7 @@ fun LauncherBaseFragment.simpleController(
  * Create a [MvRxEpoxyController] that builds models with the given callback.
  * When models are built the current state of the viewmodel will be provided.
  */
-fun <S : MvRxState, A : BaseMvRxViewModel<S>> LauncherBaseFragment.simpleController(
+fun <S : MvRxState, A : BaseMvRxViewModel<S>> MvRxLauncherBaseFragment.simpleController(
     viewModel: A,
     buildModels: EpoxyController.(state: S) -> Unit
 ): EpoxyController = MvRxEpoxyController {
@@ -50,7 +50,7 @@ fun <S : MvRxState, A : BaseMvRxViewModel<S>> LauncherBaseFragment.simpleControl
  * Create a [MvRxEpoxyController] that builds models with the given callback.
  * When models are built the current state of the viewmodels will be provided.
  */
-fun <A : BaseMvRxViewModel<B>, B : MvRxState, C : BaseMvRxViewModel<D>, D : MvRxState> LauncherBaseFragment.simpleController(
+fun <A : BaseMvRxViewModel<B>, B : MvRxState, C : BaseMvRxViewModel<D>, D : MvRxState> MvRxLauncherBaseFragment.simpleController(
     viewModel1: A,
     viewModel2: C,
     buildModels: EpoxyController.(state1: B, state2: D) -> Unit
@@ -65,7 +65,7 @@ fun <A : BaseMvRxViewModel<B>, B : MvRxState, C : BaseMvRxViewModel<D>, D : MvRx
  * Create a [MvRxEpoxyController] that builds models with the given callback.
  * When models are built the current state of the viewmodels will be provided.
  */
-fun <A : BaseMvRxViewModel<B>, B : MvRxState, C : BaseMvRxViewModel<D>, D : MvRxState, E : BaseMvRxViewModel<F>, F : MvRxState> LauncherBaseFragment.simpleController(
+fun <A : BaseMvRxViewModel<B>, B : MvRxState, C : BaseMvRxViewModel<D>, D : MvRxState, E : BaseMvRxViewModel<F>, F : MvRxState> MvRxLauncherBaseFragment.simpleController(
     viewModel1: A,
     viewModel2: C,
     viewModel3: E,

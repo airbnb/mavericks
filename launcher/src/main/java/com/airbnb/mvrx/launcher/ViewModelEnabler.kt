@@ -16,6 +16,8 @@ import kotlin.reflect.KProperty1
  * state to be settable.
  *
  * This swaps the mocked state store to a real one to enable normal usage once the View becomes Resumed for the first time.
+ *
+ * Finally, it cleans up the mocked state that was stored in the MockStateHolder.
  */
 class ViewModelEnabler(
     private val mockedView: MockedView<*>,
@@ -28,7 +30,7 @@ class ViewModelEnabler(
         val view = mockedView.viewInstance
         view.lifecycle.removeObserver(this)
 
-        mock.mockData
+        mock.mock
             .states
             .map {
                 @Suppress("UNCHECKED_CAST")

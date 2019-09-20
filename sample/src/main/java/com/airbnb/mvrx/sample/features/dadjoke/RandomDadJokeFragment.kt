@@ -77,8 +77,11 @@ class RandomDadJokeFragment : BaseFragment() {
         }
     }
 
-    override fun provideMocks() =
-        mockSingleViewModel(RandomDadJokeFragment::viewModel, mockRandomDadJokeState, null) {
-        
-        }
+    override fun provideMocks() = mockSingleViewModel(
+        viewModelReference = RandomDadJokeFragment::viewModel,
+        defaultState = mockRandomDadJokeState,
+        defaultArgs = null
+    ) {
+        stateForLoadingAndFailure { ::joke }
+    }
 }

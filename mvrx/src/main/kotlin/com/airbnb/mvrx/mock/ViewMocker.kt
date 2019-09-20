@@ -3,12 +3,29 @@ package com.airbnb.mvrx.mock
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxView
 import kotlin.system.measureTimeMillis
 
+/**
+ * See [getMockVariants]
+ *
+ * Provides mocks for the view specified by the fully qualified name of its class..
+ *
+ * @param viewClassName The fully qualified name of the view's class.
+ * @param viewProvider Creates an instance of the view from the view class. The view should be created
+ * with the given arguments bundle if it exists. The bundle contains parcelable arguments under the
+ * [MvRx.KEY_ARG] key.
+ */
 fun getMockVariants(
     viewClassName: String,
+    viewProvider: (viewClass: Class<MvRxView>, argumentsBundle: Bundle?) -> MvRxView = { viewClass, argumentsBundle ->
+        @Suppress("UNCHECKED_CAST")
+        val view = viewClass.newInstance() as MvRxView
+        if (view is Fragment) view.arguments = argumentsBundle
+        view
+    },
     emptyMockPlaceholder: Pair<String, MvRxViewMocks<MvRxView, Nothing>> = Pair(
         EmptyMocks::class.java.simpleName,
         EmptyMocks
@@ -18,13 +35,30 @@ fun getMockVariants(
     @Suppress("UNCHECKED_CAST")
     return getMockVariants(
         viewClass = Class.forName(viewClassName) as Class<MvRxView>,
+        viewProvider = viewProvider,
         emptyMockPlaceholder = emptyMockPlaceholder,
         mockGroupIndex = mockGroupIndex
     )
 }
 
+/**
+ * See [getMockVariants]
+ *
+ * Provides mocks for the view specified by the given class.
+ *
+ * @param viewClass The Java class representing the [MvRxView]
+ * @param viewProvider Creates an instance of the view from the view class. The view should be created
+ * with the given arguments bundle if it exists. The bundle contains parcelable arguments under the
+ * [MvRx.KEY_ARG] key.
+ */
 fun getMockVariants(
     viewClass: Class<MvRxView>,
+    viewProvider: (viewClass: Class<MvRxView>, argumentsBundle: Bundle?) -> MvRxView = { viewClass, argumentsBundle ->
+        @Suppress("UNCHECKED_CAST")
+        val view = viewClass.newInstance() as MvRxView
+        if (view is Fragment) view.arguments = argumentsBundle
+        view
+    },
     emptyMockPlaceholder: Pair<String, MvRxViewMocks<MvRxView, Nothing>> = Pair(
         EmptyMocks::class.java.simpleName,
         EmptyMocks
@@ -32,15 +66,32 @@ fun getMockVariants(
     mockGroupIndex: Int? = null
 ): List<MockedViewProvider<MvRxView>>? {
     return getMockVariants<MvRxView, Nothing>(
-        viewProvider = { _, _ ->
-            @Suppress("UNCHECKED_CAST")
-            viewClass.newInstance() as MvRxView
+        viewProvider = { _, argumentsBundle ->
+            viewProvider(viewClass, argumentsBundle)
         },
         emptyMockPlaceholder = emptyMockPlaceholder,
         mockGroupIndex = mockGroupIndex
     )
 }
 
+/**
+ * Get all of the mocks declared for a [MvRxView]. The returned list of [MockedViewProvider]
+ * has one entry representing each mock in the view, which can be used to create a view mocked
+ * with that state and arguments.
+ *
+ * @param viewProvider Return an instance of the [MvRxView] that is being mocked. It should be
+ * created with the provided arguments if they exist. Both the arguments and argumentsBundle
+ * parameters in the lambda represent the same arguments, they are just provided in multiple
+ * forms so you can use the most convenient. The Bundle just contains the Parcelable arguments
+ * under the [MvRx.KEY_ARG] key.
+ *
+ * @param emptyMockPlaceholder If you use a custom object to represent that a [MvRxView] legitimately
+ * has no mocks then specify it here. Otherwise any view with empty mocks will throw an error.
+ *
+ * @param mockGroupIndex If the mocks are declared with [combineMocks] then if an index is passed
+ * only the mocks in that group index will be returned. Will throw an error if this is not a valid
+ * group index for this view's mocks.
+ */
 fun <V : MvRxView, A : Parcelable> getMockVariants(
     viewProvider: (arguments: A?, argumentsBundle: Bundle?) -> V,
     emptyMockPlaceholder: Pair<String, MvRxViewMocks<MvRxView, Nothing>> = Pair(
@@ -98,7 +149,7 @@ fun <V : MvRxView, A : Parcelable> getMockVariants(
                     )
                 }
             },
-            mockData = mockInfo
+            mock = mockInfo
         )
     }
 
@@ -133,7 +184,7 @@ private fun <T : Parcelable> T.makeClone(): T {
 class MockedViewProvider<V : MvRxView>(
     val viewName: String,
     val createView: (MockBehavior) -> MockedView<V>,
-    val mockData: MvRxMock<V, *>
+    val mock: MvRxMock<V, *>
 )
 
 /**

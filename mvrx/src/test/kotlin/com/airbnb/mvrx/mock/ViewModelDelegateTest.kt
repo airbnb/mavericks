@@ -64,7 +64,7 @@ class ViewModelDelegateTest : BaseTest() {
             stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
         )
 
-        val mockedView = mockVariants.first { it.mockData.isDefaultState }.createView(mockBehavior)
+        val mockedView = mockVariants.first { it.mock.isDefaultState }.createView(mockBehavior)
 
         val frag = mockedView.viewInstance
         frag.addToActivity<Frag, TestActivity>()
@@ -87,7 +87,7 @@ class ViewModelDelegateTest : BaseTest() {
             stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
         )
 
-        val mockedView = mockVariants.first { it.mockData.isDefaultState }.createView(mockBehavior)
+        val mockedView = mockVariants.first { it.mock.isDefaultState }.createView(mockBehavior)
 
         val frag = mockedView.viewInstance
         frag.addToActivity<Frag2, TestActivity>()

@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import com.airbnb.mvrx.BaseMvRxActivity
 import com.airbnb.mvrx.launcher.MvRxLauncherActivity
+import com.airbnb.mvrx.launcher.MvRxLauncherMockActivity
 
 /**
  * Extend this class to get MvRx support out of the box.
@@ -23,7 +24,15 @@ class MainActivity : BaseMvRxActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        // TODO Move to list
         startActivity(Intent(this, MvRxLauncherActivity::class.java))
         finish()
+    }
+
+    companion object {
+        init {
+            // Override the default activity for showing mocks from the launcher
+            MvRxLauncherMockActivity.activityToShowMock = LauncherActivity::class
+        }
     }
 }

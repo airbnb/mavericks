@@ -1,24 +1,31 @@
 package com.airbnb.mvrx.launcher
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.mvrx.fragmentViewModel
+import com.airbnb.mvrx.launcher.utils.buildIntent
+import com.airbnb.mvrx.launcher.utils.buildText
+import com.airbnb.mvrx.launcher.utils.dismissSoftKeyboard
+import com.airbnb.mvrx.launcher.utils.toastLong
+import com.airbnb.mvrx.launcher.utils.toastShort
+import com.airbnb.mvrx.launcher.views.loadingRow
 import com.airbnb.mvrx.launcher.views.marquee
+import com.airbnb.mvrx.launcher.views.textRow
 import com.airbnb.mvrx.mock.MockedViewProvider
 import com.airbnb.mvrx.withState
 
 /**
- * Displays all MvRx screens and mocks.
+ * Displays all MvRx screens and mocks that are detected in the app.
+ *
  * This is split into two "pages". The first shows the list of view names. Clicking a view
  * updates the screen to show the list of arguments and mocks for that view. Clicking back returns to the list of views.
  *
- * Clicking a mock loads the view in that state.
+ * Clicking a mock loads the view in that state in a new activity.
+ * TODO Details about customizing activity
  */
-class MvRxLauncherFragment : LauncherBaseFragment() {
+class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
 
     private val viewModel: LauncherViewModel by fragmentViewModel()
 
@@ -45,71 +52,36 @@ class MvRxLauncherFragment : LauncherBaseFragment() {
             }
         }
 
-        // For handling deeplink cases, we wait until all mocks are loaded and then look at deeplink params for processing
-        viewModel.asyncFirstSuccess(LauncherState::allMocks) { allMocks ->
-            withState(viewModel) { state ->
-                val (query, mocks) = when {
-                    state.viewNameToOpen != null -> {
-                        // Look for the first Fragment who's simple name contains the deeplink query
-                        // We will just use it's default initial args and state
-                        val fragmentMatch = allMocks
-                            .firstOrNull {
-                                it.viewName.simpleName.contains(
-                                    state.viewNameToOpen,
-                                    ignoreCase = true
-                                ) && it.mockData.isDefaultInitialization
-                            }
-
-                        // Or if no fragment name matches we can look for a specific mock by name
-                        val mock = fragmentMatch ?: allMocks.firstOrNull {
-                            it.mockData.name.contains(
-                                state.viewNameToOpen,
-                                ignoreCase = true
-                            )
-                        }
-                        val mocks = mock?.let { listOf(it) } ?: emptyList()
-
-                        state.viewNameToOpen to mocks
-                    }
-                    state.viewNamePatternToTest != null -> {
-                        fun String.match() =
-                            contains(state.viewNamePatternToTest, ignoreCase = true)
-
-                        val mocks =
-                            allMocks.filter { it.viewName.match() || it.mockData.name.match() }
-                        state.viewNamePatternToTest to mocks
-                    }
-                    else -> return@withState
-                }
-
-                when {
-                    mocks.isEmpty() -> toastLong("No fragments found matching query '$query'")
-                    state.viewNameToOpen != null -> showSelectedMock(mocks.single())
-                    else -> testMocks(mocks)
-                }
-
-                // We finish the activity because multiple deeplink activities don't stack well on each other.
-                // The intent is processed when the viewmodel is first created, and subsequent deeplinks are delivered to the same
-                // activity, and they don't do anything since the viewmodel already exists.
-                // This also prevents a big backstack of activities from being created.
-                activity?.finish()
+        viewModel.selectSubscribe(LauncherState::deeplinkResult) { query ->
+            when (query) {
+                null -> return@selectSubscribe
+                is DeeplinkResult.NoMatch -> toastLong("No views found matching query '${query.queryText}'")
+                is DeeplinkResult.SingleView -> showSelectedMock(query.mock)
+                is DeeplinkResult.TestViews -> testMocks(query.mocks)
             }
+
+            // Once we start a new activity to show the matching mocks
+            // we finish this one, because multiple deeplink activities don't stack well on each other.
+            // The intent is processed when the viewmodel is first created, and subsequent deeplinks are delivered to the same
+            // activity, and they don't do anything since the viewmodel already exists.
+            // This also prevents a big backstack of activities from being created.
+            activity?.finish()
         }
     }
 
     private fun showSelectedMock(mock: MockedViewProvider<*>) {
-        ActivityToShowMock.nextMockToShow = mock
-        // The activity is started for a result so we can know when it returns (so we can clear the selected mock property)
+        // The activity is started for a result so we can know when
+        // it returns (so we can clear the selected mock property)
         startActivityForResult(
-            requireContext().buildIntent<ActivityToShowMock>(),
-            SHOW_FRAGMENT_REQUEST_CODE
+            MvRxLauncherMockActivity.intent(requireContext(), mock),
+            SHOW_VIEW_REQUEST_CODE
         )
     }
 
     private val LauncherState.mocksLoadedSoFar: List<MockedViewProvider<*>>?
         get() = allMocks() ?: cachedMocks()
 
-    private val LauncherState.mocksForSelectedFragment: List<MockedViewProvider<*>>?
+    private val LauncherState.mocksForSelectedView: List<MockedViewProvider<*>>?
         get() {
             val loadedMocks = mocksLoadedSoFar ?: return null
             return if (selectedView != null) loadedMocks.filter { it.viewName == selectedView } else null
@@ -131,23 +103,23 @@ class MvRxLauncherFragment : LauncherBaseFragment() {
         val loadedMocks = state.mocksLoadedSoFar
 
         val deeplinkQuery = state.viewNamePatternToTest ?: state.viewNameToOpen
-//        if (deeplinkQuery != null) {
-//            documentMarquee {
-//                id("header")
-//                title("Loading \"$deeplinkQuery\"...")
-//            }
-//
-//            loaderRow("initial loader")
-//
-//            // Waiting for mocks to load, when they do the matching fragments will be opened and this will be finished.
-//            return@simpleController
-//        }
+        if (deeplinkQuery != null) {
+            marquee {
+                id("header")
+                title("Loading \"$deeplinkQuery\"...")
+            }
+
+            loadingRow { id("initial loader") }
+
+            // Waiting for mocks to load, when they do the matching views will be opened and this will be finished.
+            return@simpleController
+        }
 
         val viewNameToMocks = loadedMocks
             ?.groupBy { it.viewName }
             ?.toSortedMap(viewUiOrderComparator(state))
 
-        val mocksToShow = state.mocksForSelectedFragment
+        val mocksToShow = state.mocksForSelectedView
 
         marquee {
             id("header")
@@ -170,7 +142,7 @@ class MvRxLauncherFragment : LauncherBaseFragment() {
             if (mocksToShow != null) {
                 subtitle("${mocksToShow.size} mocks")
             } else if (viewNameToMocks != null) {
-                subtitle("${viewNameToMocks.size} fragments")
+                subtitle("${viewNameToMocks.size} screens")
             }
         }
 
@@ -179,64 +151,64 @@ class MvRxLauncherFragment : LauncherBaseFragment() {
             (activity as MvRxLauncherActivity)?.addCustomModels(this)
         }
 
-//        if (loadedMocks == null || (state.selectedView != null && mocksToShow == null)) {
-//            loaderRow("initial loader")
-//            return@simpleController
-//        }
-//
-//        mocksToShow
-//            ?.sortedBy {
-//                val recentIndex = state.recentUsage.mockIdentifiers.indexOf(MockIdentifier(it))
-//                if (recentIndex == -1) {
-//                    Integer.MAX_VALUE
-//                } else {
-//                    recentIndex
-//                }
-//            }
-//            ?.forEach {
-//                basicRow {
-//                    id("fragment", it.viewName, it.mockData.name)
-//                    title(it.mockData.name)
-//
-//                    subtitleText(buildText(context) {
-//                        if (MockIdentifier(it) in state.recentUsage.mockIdentifiers) {
-//                            appendWithColor("Recent ", R.color.n2_babu)
-//                        }
-//
-//                        if (it.mockData.forInitialization) append("[With Arguments]")
-//                    })
-//
-//                    onClickListener { _ ->
-//                        viewModel.setSelectedMock(it)
-//                    }
-//                }
-//            } ?: run {
-//            viewNameToMocks?.forEach { (viewName, mocks) ->
-//                basicRow {
-//                    id("fragment", viewName)
-//                    title(viewName.split(".").last())
-//
-//                    subtitleText(buildText(context) {
-//                        if (viewName in state.recentUsage.viewNames) {
-//                            appendWithColor("Recent", R.color.n2_babu)
-//                            append(" · ")
-//                        }
-//                        append("${mocks.size} mocks")
-//                    })
-//
-//                    onClickListener { _ ->
-//                        viewModel.setSelectedView(viewName)
-//                        // If there are any custom rows on the screen that have edit texts the keyboard may be up,
-//                        // and it won't make sense to keep showing it.
-//                        activity?.let { dismissSoftKeyboard(it) }
-//                    }
-//                }
-//            }
-//        }
-//
-//        if (state.allMocks() == null) {
-//            loaderRow("loading additional mocks")
-//        }
+        if (loadedMocks == null || (state.selectedView != null && mocksToShow == null)) {
+            loadingRow { id("initial loader") }
+            return@simpleController
+        }
+
+        mocksToShow
+            ?.sortedBy {
+                val recentIndex = state.recentUsage.mockIdentifiers.indexOf(MockIdentifier(it))
+                if (recentIndex == -1) {
+                    Integer.MAX_VALUE
+                } else {
+                    recentIndex
+                }
+            }
+            ?.forEach {
+                textRow {
+                    id("view", it.viewName, it.mock.name)
+                    title(it.mock.name)
+
+                    subtitle(buildText(context) {
+                        if (MockIdentifier(it) in state.recentUsage.mockIdentifiers) {
+                            appendWithColor("Recent ", R.color.mvrx_colorPrimary)
+                        }
+
+                        if (it.mock.forInitialization) append("[With Arguments]")
+                    })
+
+                    onClickListener { _ ->
+                        viewModel.setSelectedMock(it)
+                    }
+                }
+            } ?: run {
+            viewNameToMocks?.forEach { (viewName, mocks) ->
+                textRow {
+                    id("view entry", viewName)
+                    title(viewName.split(".").last())
+
+                    subtitle(buildText(context) {
+                        if (viewName in state.recentUsage.viewNames) {
+                            appendWithColor("Recent", R.color.mvrx_colorPrimary)
+                            append(" · ")
+                        }
+                        append("${mocks.size} mocks")
+                    })
+
+                    onClickListener { _ ->
+                        viewModel.setSelectedView(viewName)
+                        // If there are any custom rows on the screen that have edit texts the keyboard may be up,
+                        // and it won't make sense to keep showing it.
+                        view?.dismissSoftKeyboard()
+                    }
+                }
+            }
+        }
+
+        if (state.allMocks() == null) {
+            loadingRow { id("loading additional mocks") }
+        }
     }
 
 //    override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -246,7 +218,7 @@ class MvRxLauncherFragment : LauncherBaseFragment() {
 //            R.id.menu_mvrx_launcher_auto_run -> {
 //                withState(viewModel) { state ->
 //                    val mocks =
-//                        state.mocksForSelectedFragment ?: state.mocksLoadedSoFar ?: return@withState
+//                        state.mocksForSelectedView ?: state.mocksLoadedSoFar ?: return@withState
 //                    testMocks(mocks)
 //                }
 //
@@ -258,40 +230,31 @@ class MvRxLauncherFragment : LauncherBaseFragment() {
 
     private fun testMocks(mocks: List<MockedViewProvider<*>>) {
         toastShort("Testing ${mocks.size} mocks...")
-        ActivityToTestMocks.mocksToShow.addAll(mocks)
-        startActivity(requireContext().buildIntent<ActivityToTestMocks>())
+        MvRxLauncherTestMocksActivity.mocksToShow.addAll(mocks)
+        startActivity(requireContext().buildIntent<MvRxLauncherTestMocksActivity>())
     }
 
-//    override fun onBackPressed(): Boolean = withState(viewModel) { state ->
-//        return@withState if (state.selectedView != null) {
-//            viewModel.setSelectedView(null)
-//            true
-//        } else {
-//            super.onBackPressed()
-//        }
-//    }
-//
-//    override fun onHomeActionPressed(): Boolean = withState(viewModel) { state ->
-//        return@withState if (state.selectedView != null) {
-//            viewModel.setSelectedView(null)
-//            true
-//        } else {
-//            super.onHomeActionPressed()
-//        }
-//    }
+    override fun onBackPressed() = withState(viewModel) { state ->
+        return@withState if (state.selectedView != null) {
+            viewModel.setSelectedView(null)
+            true
+        } else {
+            false
+        }
+    }
 
     /**
      * When a mock screen is closed we clear it's entry as the current selection.
      */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
-            SHOW_FRAGMENT_REQUEST_CODE -> viewModel.setSelectedMock(null)
+            SHOW_VIEW_REQUEST_CODE -> viewModel.setSelectedMock(null)
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
     companion object {
-        private const val SHOW_FRAGMENT_REQUEST_CODE = 1
+        private const val SHOW_VIEW_REQUEST_CODE = 1
     }
 }
 
@@ -310,16 +273,16 @@ private fun String.splitCamelCase(): CharSequence {
 }
 
 /** Assumes a FQN - returns the simple name. */
-private val String.simpleName: String get() = substringAfterLast(".")
+internal val String.simpleName: String get() = substringAfterLast(".")
 
 internal fun viewUiOrderComparator(state: LauncherState): Comparator<String> {
     return compareBy { viewName ->
-        // Show recently used fragments first, otherwise compare alphabetically by fragment name
-        val recentFragmentIndex = state.recentUsage.viewNames.indexOf(viewName)
-        if (recentFragmentIndex == -1) {
+        // Show recently used views first, otherwise compare alphabetically by view name
+        val recentViewIndex = state.recentUsage.viewNames.indexOf(viewName)
+        if (recentViewIndex == -1) {
             viewName.simpleName
         } else {
-            recentFragmentIndex.toString()
+            recentViewIndex.toString()
         }
     }
 }

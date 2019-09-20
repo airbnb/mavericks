@@ -6,11 +6,11 @@ import com.airbnb.mvrx.mock.MockedViewProvider
 import java.util.LinkedList
 
 /**
- * This is given a list of fragments and automatically opens them all one at a time.
+ * This is given a list of view mocks and automatically opens them all one at a time.
  * Each fragment waits until it successfully loads, then returns so the next one can be loaded.
  * This tests that each mock can be loaded without crashing.
  */
-class ActivityToTestMocks : BaseMvRxActivity() {
+class MvRxLauncherTestMocksActivity : BaseMvRxActivity() {
 
     private val mockCount = mocksToShow.size
 
@@ -28,15 +28,8 @@ class ActivityToTestMocks : BaseMvRxActivity() {
                 .show()
             return
         }
-//
-//        startActivity(
-//            IntegrationTestActivity.intent<InteractionTestActivity>(
-//                this,
-//                forLocalTesting = true,
-//                viewName = nextMock.viewName,
-//                mockName = nextMock.mockData.name
-//            )
-//        )
+
+        // TODO Support clicking on views to catch crashes on click
     }
 
     companion object {

@@ -1,4 +1,4 @@
-package com.airbnb.mvrx.launcher
+package com.airbnb.mvrx.launcher.utils
 
 import android.content.Context
 import android.content.Intent
@@ -12,7 +12,11 @@ internal fun Fragment.toastShort(str: String) {
 }
 
 internal fun Fragment.toastLong(str: String) {
-    Toast.makeText(requireContext(), str, Toast.LENGTH_LONG).show()
+    requireContext().toastLong(str)
+}
+
+internal fun Context.toastLong(str: String) {
+    Toast.makeText(this, str, Toast.LENGTH_LONG).show()
 }
 
 /**
@@ -30,7 +34,7 @@ internal inline fun <reified T> Context.buildIntent(initializer: Intent.() -> Un
     return Intent(this, T::class.java).apply(initializer)
 }
 
-fun View.dismissSoftKeyboard() {
+internal fun View.dismissSoftKeyboard() {
     val windowToken = windowToken ?: return
     (context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager?)
         ?.hideSoftInputFromWindow(windowToken, 0)

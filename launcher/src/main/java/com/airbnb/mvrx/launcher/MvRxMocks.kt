@@ -1,5 +1,6 @@
 package com.airbnb.mvrx.launcher
 
+import androidx.annotation.WorkerThread
 import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.mock.MockedViewProvider
 import com.airbnb.mvrx.mock.getMockVariants
@@ -10,14 +11,31 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.runBlocking
 import java.lang.reflect.Modifier
 
-internal object MockedViews {
+/**
+ * Provides all of the mocks declared on MvRxViews in the app.
+ */
+object MvRxMocks {
+
     /**
-     * Load all MvRxViews in the app. This uses a lot of reflection and will take a few seconds to initialize the first time it is accessed.
+     * Returns all of the mocks declared on MvRxViews in the app.
+     *
+     * This should be accessed in a background thread since this data may be loaded synchronously when accessed!
+     *
+     * TODO Access mocks from annotation generated code before falling back to dex approach.
+     */
+    @WorkerThread
+    fun getMocks() = viewsFromDex
+
+    /**
+     * Uses dex analysis to detect all MvRxViews in the app.
+     *
+     * This uses a lot of reflection and will take a few seconds to initialize the first time it is accessed.
      * Intended for testing only, and should only be accessed in a background thread!
      */
-    val MOCKED_VIEW_PROVIDERS: List<MockedViewProvider<*>> by lazy {
+    @get:WorkerThread
+    private val viewsFromDex: List<MockedViewProvider<*>> by lazy {
         runBlocking {
-            val classLoader = MockedViews::class.java.classLoader as BaseDexClassLoader
+            val classLoader = MvRxMocks::class.java.classLoader as BaseDexClassLoader
             loadMocks(classLoader)
         }
     }

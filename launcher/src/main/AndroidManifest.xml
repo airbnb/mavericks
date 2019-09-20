@@ -3,5 +3,7 @@
 
     <application>
         <activity android:name=".MvRxLauncherActivity" />
+        <activity android:name=".MvRxLauncherMockActivity" />
+        <activity android:name=".MvRxLauncherTestMocksActivity" />
     </application>
 </manifest>

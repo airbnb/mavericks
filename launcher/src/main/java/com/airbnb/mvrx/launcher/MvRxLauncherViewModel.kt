@@ -7,6 +7,7 @@ import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.BaseMvRxViewModel
+import com.airbnb.mvrx.Incomplete
 import com.airbnb.mvrx.Loading
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxViewModelFactory
@@ -19,7 +20,15 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 data class LauncherState(
+    /**
+     * Mocks that were loaded in previous app sessions will be restored from cache in this property.
+     * It will update incrementally as each cache entry is loaded.
+     */
     val cachedMocks: Async<List<MockedViewProvider<*>>> = Loading(),
+    /**
+     * All mocks that were detected in the app. This can be slow to load, so until it is [Success]
+     * the [cachedMocks] can be used.
+     */
     val allMocks: Async<List<MockedViewProvider<*>>> = Loading(),
     /** The FQN name of the MvRxView that is currently selected for display. */
     val selectedView: String? = null,
@@ -30,10 +39,96 @@ data class LauncherState(
     val selectedMock: MockedViewProvider<*>? = null,
     /** Details about the most recently used MvRxViews and mocks. The UI can use this to order information for relevance. */
     val recentUsage: RecentUsage = RecentUsage(),
+    /** A pattern to match views, provided by a deeplink, that should be tested once all mocks load. */
     val viewNamePatternToTest: String? = null,
+    /** The name of a specific view or mock, provided by a deeplink, that should be opened directly once all mocks load. */
     val viewNameToOpen: String? = null
-) : MvRxState
+) : MvRxState {
 
+    /**
+     * If [viewNameToOpen] or [viewNamePatternToTest] are set, this returns the result of which
+     * mocks match the deeplink query text. This will only be non null once enough mocks
+     * have loaded to provide a comprehensive result.
+     */
+    val deeplinkResult: DeeplinkResult?
+        get() {
+            val mocksToCheck = allMocks() ?: cachedMocks() ?: return null
+
+            // We only return "NoMatch" once we are sure all mocks have loaded and we have checked
+            // all of them. Until then we can look for matches in mocks as they load incrementally.
+            fun fallback(queryText: String) = if (allMocks is Incomplete) {
+                null
+            } else {
+                DeeplinkResult.NoMatch(queryText)
+            }
+
+            return when {
+                viewNameToOpen != null -> {
+                    // Look for the first View who's simple name contains the deeplink query
+                    // We will just use it's default initial args and state
+                    val viewMatch = mocksToCheck.firstOrNull {
+                        it.viewName.simpleName.contains(
+                            viewNameToOpen,
+                            ignoreCase = true
+                        ) && it.mock.isDefaultInitialization
+                    }
+
+                    // Or if no view name matches we can look for a specific mock by name
+                    val mockMatch = mocksToCheck.firstOrNull {
+                        it.mock.name.contains(
+                            viewNameToOpen,
+                            ignoreCase = true
+                        )
+                    }
+
+                    (viewMatch ?: mockMatch)
+                        ?.let { mock ->
+                            DeeplinkResult.SingleView(viewNameToOpen, mock)
+                        }
+                        ?: fallback(viewNameToOpen)
+                }
+                viewNamePatternToTest != null -> {
+                    // Since we need to find all views that match the query we need to make
+                    // sure they are all loaded first, and can't just look at incrementally
+                    // loaded mocks from the cache.
+                    if (allMocks !is Success) return null
+
+                    fun String.match() =
+                        contains(viewNamePatternToTest, ignoreCase = true)
+
+                    mocksToCheck
+                        .filter { it.viewName.match() || it.mock.name.match() }
+                        .takeIf { it.isNotEmpty() }
+                        ?.let { mocks ->
+                            DeeplinkResult.TestViews(viewNamePatternToTest, mocks)
+                        }
+                        ?: fallback(viewNamePatternToTest)
+                }
+                else -> null
+            }
+        }
+}
+
+/**
+ * If the launcher was opened from a deeplink, with arguments for a specific screen, this
+ * contains the argument query as well as the resulting screens that match it.
+ *
+ * @param queryText The text that was specified in the deeplink.
+ */
+sealed class DeeplinkResult(val queryText: String) {
+    /** The query was for a single screen, and the given mock was the best match. */
+    class SingleView(query: String, val mock: MockedViewProvider<*>) : DeeplinkResult(query)
+
+    /** The query was to test multiple screens, and all of the mocks matched the naming pattern. */
+    class TestViews(query: String, val mocks: List<MockedViewProvider<*>>) : DeeplinkResult(query)
+
+    /** No screens matched the given query. */
+    class NoMatch(query: String) : DeeplinkResult(query)
+}
+
+/**
+ * Specifies which views and mocks have been recently opened.
+ */
 data class RecentUsage(
     /** Ordered list of most recently used MvRxViews, by FQN. */
     val viewNames: List<String> = emptyList(),
@@ -53,10 +148,10 @@ data class RecentUsage(
     }
 }
 
-data class MockIdentifier(val ViewName: String, val mockName: String) {
+data class MockIdentifier(val viewName: String, val mockName: String) {
     constructor(mockedViewProvider: MockedViewProvider<*>) : this(
         mockedViewProvider.viewName,
-        mockedViewProvider.mockData.name
+        mockedViewProvider.mock.name
     )
 }
 
@@ -69,7 +164,7 @@ class LauncherViewModel(
         loadViewsFromCache(initialState)
 
         GlobalScope.launch {
-            val mocks = MockedViews.MOCKED_VIEW_PROVIDERS
+            val mocks = MvRxMocks.getMocks()
             setState {
                 // The previously selected view (last time the app ran) may have been deleted or renamed.
                 val selectedViewExists = mocks.any { it.viewName == selectedView }
@@ -92,7 +187,7 @@ class LauncherViewModel(
         ) ?: listOf(null, null)
 
         fun List<MockedViewProvider<*>>.findSelectedMock(): MockedViewProvider<*>? {
-            return find { it.viewName == selectedMocksViewName && it.mockData.name == selectedMockName }
+            return find { it.viewName == selectedMocksViewName && it.mock.name == selectedMockName }
         }
 
         // The goal with saving and restoring the selected mock is to launch the last used mock automatically, ASAP, with the expectation
@@ -157,7 +252,7 @@ class LauncherViewModel(
 
         sharedPrefs.edit {
             val savedMockValue =
-                if (mock == null) null else mock.viewName + PROPERTY_SEPARATOR + mock.mockData.name
+                if (mock == null) null else mock.viewName + PROPERTY_SEPARATOR + mock.mock.name
             putString(KEY_SELECTED_MOCK, savedMockValue)
 
             if (savedMockValue != null) {

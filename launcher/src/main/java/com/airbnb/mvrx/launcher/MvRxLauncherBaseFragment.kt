@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.airbnb.epoxy.EpoxyController
@@ -16,7 +18,7 @@ import com.airbnb.mvrx.MvRxState
 import io.reactivex.disposables.Disposable
 import kotlin.reflect.KProperty1
 
-abstract class LauncherBaseFragment : BaseMvRxFragment() {
+abstract class MvRxLauncherBaseFragment : BaseMvRxFragment() {
 
     protected lateinit var recyclerView: EpoxyRecyclerView
     protected lateinit var toolbar: Toolbar
@@ -26,6 +28,19 @@ abstract class LauncherBaseFragment : BaseMvRxFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         epoxyController.onRestoreInstanceState(savedInstanceState)
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (!onBackPressed()) {
+                        // Pass on back press to other listeners, or the activity's default handling
+                        isEnabled = false
+                        requireActivity().onBackPressed()
+                        isEnabled = true
+                    }
+                }
+            })
     }
 
     override fun onCreateView(
@@ -33,16 +48,25 @@ abstract class LauncherBaseFragment : BaseMvRxFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.mvrx_fragment_base_launcher, container, false).apply {
+        val view = inflater.inflate(R.layout.mvrx_fragment_base_launcher, container, false).apply {
             recyclerView = findViewById(R.id.recycler_view)
             toolbar = findViewById(R.id.toolbar)
             coordinatorLayout = findViewById(R.id.coordinator_layout)
-
-            recyclerView.setController(epoxyController)
-
-//            toolbar.setupWithNavController(findNavController())
         }
+
+
+        recyclerView.setController(epoxyController)
+
+        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+
+        toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
+        // We don't want a title shown. By default it adds "MvRx"
+        activity?.title = ""
+
+        return view
     }
+
+    protected open fun onBackPressed(): Boolean = false
 
     override fun invalidate() {
         recyclerView.requestModelBuild()
@@ -65,7 +89,7 @@ abstract class LauncherBaseFragment : BaseMvRxFragment() {
         onSuccess: (T) -> Unit
     ) {
         var disposable: Disposable? = null
-        disposable = asyncSubscribe(this@LauncherBaseFragment, asyncProp) {
+        disposable = asyncSubscribe(this@MvRxLauncherBaseFragment, asyncProp) {
             disposable?.dispose()
             onSuccess(it)
         }

@@ -2,23 +2,19 @@ package com.airbnb.mvrx.launcher
 
 import android.os.Bundle
 import com.airbnb.epoxy.EpoxyController
-import com.airbnb.mvrx.BaseMvRxActivity
 
 /**
  * Entry point for showing all MvRx Views in the application.
+ *
+ * You can extend this activity to modify the UI that is displayed, via [buildCustomModels].
  */
-open class MvRxLauncherActivity : BaseMvRxActivity() {
+open class MvRxLauncherActivity : MvRxBaseLauncherActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.mvrx_launcher_activity)
 
         if (savedInstanceState == null) {
-            val fragment = MvRxLauncherFragment()
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.container, fragment)
-                .setPrimaryNavigationFragment(fragment)
-                .commit()
+            setFragment(MvRxLauncherFragment())
         }
     }
 
