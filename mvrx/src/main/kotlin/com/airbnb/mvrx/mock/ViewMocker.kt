@@ -101,7 +101,8 @@ fun <V : MvRxView, A : Parcelable> getMockVariants(
     mockGroupIndex: Int? = null
 ): List<MockedViewProvider<V>>? {
     val view = viewProvider(null, null)
-    val viewName = view.javaClass.simpleName
+    // This needs to be the FQN to completely define the view and make it creatable from reflection
+    val viewName = view.javaClass.canonicalName
 
     lateinit var mocks: List<MvRxMock<out MvRxView, out Parcelable>>
     val elapsedMs: Long = measureTimeMillis {

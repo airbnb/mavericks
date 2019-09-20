@@ -4,6 +4,7 @@ import com.airbnb.mvrx.mock.MockedViewProvider
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.core.content.edit
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.BaseMvRxViewModel
@@ -19,7 +20,7 @@ import com.airbnb.mvrx.mock.getMockVariants
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-data class LauncherState(
+data class MvRxLauncherState(
     /**
      * Mocks that were loaded in previous app sessions will be restored from cache in this property.
      * It will update incrementally as each cache entry is loaded.
@@ -38,7 +39,7 @@ data class LauncherState(
      */
     val selectedMock: MockedViewProvider<*>? = null,
     /** Details about the most recently used MvRxViews and mocks. The UI can use this to order information for relevance. */
-    val recentUsage: RecentUsage = RecentUsage(),
+    val recentUsage: LauncherRecentUsage = LauncherRecentUsage(),
     /** A pattern to match views, provided by a deeplink, that should be tested once all mocks load. */
     val viewNamePatternToTest: String? = null,
     /** The name of a specific view or mock, provided by a deeplink, that should be opened directly once all mocks load. */
@@ -129,17 +130,17 @@ sealed class DeeplinkResult(val queryText: String) {
 /**
  * Specifies which views and mocks have been recently opened.
  */
-data class RecentUsage(
+data class LauncherRecentUsage(
     /** Ordered list of most recently used MvRxViews, by FQN. */
     val viewNames: List<String> = emptyList(),
     /** Ordered list of most recently used mocks. */
-    val mockIdentifiers: List<MockIdentifier> = emptyList()
+    val mockIdentifiers: List<LauncherMockIdentifier> = emptyList()
 ) {
     /**
      * Move the given view name to the top of the recents list.
      * Returns a new instance with the list modified.
      */
-    fun withViewAtTop(viewName: String?): RecentUsage {
+    fun withViewAtTop(viewName: String?): LauncherRecentUsage {
         if (viewName == null) return this
 
         return copy(
@@ -148,23 +149,24 @@ data class RecentUsage(
     }
 }
 
-data class MockIdentifier(val viewName: String, val mockName: String) {
+data class LauncherMockIdentifier(val viewName: String, val mockName: String) {
     constructor(mockedViewProvider: MockedViewProvider<*>) : this(
         mockedViewProvider.viewName,
         mockedViewProvider.mock.name
     )
 }
 
-class LauncherViewModel(
-    private val initialState: LauncherState,
+class MvRxLauncherViewModel(
+    private val initialState: MvRxLauncherState,
     private val sharedPrefs: SharedPreferences
-) : BaseMvRxViewModel<LauncherState>(initialState) {
+) : BaseMvRxViewModel<MvRxLauncherState>(initialState) {
 
     init {
         loadViewsFromCache(initialState)
 
         GlobalScope.launch {
             val mocks = MvRxMocks.getMocks()
+            log("loaded mocks from state")
             setState {
                 // The previously selected view (last time the app ran) may have been deleted or renamed.
                 val selectedViewExists = mocks.any { it.viewName == selectedView }
@@ -180,8 +182,10 @@ class LauncherViewModel(
     }
 
     /** Since parsing views from dex files is slow we can remember the last list of view names and load them directly. */
-    private fun loadViewsFromCache(initialState: LauncherState) = GlobalScope.launch {
+    private fun loadViewsFromCache(initialState: MvRxLauncherState) = GlobalScope.launch {
         val selectedMockData: String? = sharedPrefs.getString(KEY_SELECTED_MOCK, null)
+        log("Selected mock from cache: $selectedMockData")
+
         val (selectedMocksViewName, selectedMockName) = selectedMockData?.split(
             PROPERTY_SEPARATOR
         ) ?: listOf(null, null)
@@ -207,17 +211,20 @@ class LauncherViewModel(
 
                     // Only set the selected mock if a deeplink wasn't used to open view,
                     // because otherwise they interfere with each other.
-                    if (this@LauncherViewModel.initialState.viewNameToOpen == null && this@LauncherViewModel.initialState.viewNamePatternToTest == null) {
+                    if (this@MvRxLauncherViewModel.initialState.viewNameToOpen == null && this@MvRxLauncherViewModel.initialState.viewNamePatternToTest == null) {
                         mocks?.findSelectedMock()?.let { selectedMock ->
+                            log("Setting selected mock from cache: ${selectedMock.viewName}")
                             setState { copy(selectedMock = selectedMock) }
                         }
                     }
 
+                    log("loaded mocks from cache: $viewName")
                     setState {
                         copy(cachedMocks = Success(cachedMocks().orEmpty() + mocks.orEmpty()))
                     }
                 } catch (e: ClassNotFoundException) {
                     // The stored view name might not exist anymore if a different flavor was built or a view was deleted
+                    log("Cache class not found: $viewName")
                 }
             }
     }
@@ -236,6 +243,7 @@ class LauncherViewModel(
 
         sharedPrefs.edit {
             putString(KEY_SELECTED_VIEW, viewName)
+            log("Saving selected view to cache:  $viewName")
 
             if (viewName != null) {
                 val recentViews = sharedPrefs.getList(KEY_RECENTLY_USED_VIEWS)
@@ -263,17 +271,18 @@ class LauncherViewModel(
         }
     }
 
-    companion object : MvRxViewModelFactory<LauncherViewModel, LauncherState> {
+    companion object : MvRxViewModelFactory<MvRxLauncherViewModel, MvRxLauncherState> {
 
         override fun create(
             viewModelContext: ViewModelContext,
-            state: LauncherState
-        ): LauncherViewModel {
+            state: MvRxLauncherState
+        ): MvRxLauncherViewModel {
+            log("Created viewmodel")
             val sharedPrefs = viewModelContext.sharedPrefs()
-            return LauncherViewModel(state, sharedPrefs)
+            return MvRxLauncherViewModel(state, sharedPrefs)
         }
 
-        override fun initialState(viewModelContext: ViewModelContext): LauncherState? {
+        override fun initialState(viewModelContext: ViewModelContext): MvRxLauncherState? {
             val sharedPrefs = viewModelContext.sharedPrefs()
             val selectedView: String? = sharedPrefs.getString(KEY_SELECTED_VIEW, null)
             val recentViews = sharedPrefs.getList(KEY_RECENTLY_USED_VIEWS)
@@ -281,16 +290,16 @@ class LauncherViewModel(
             val recentMocks = sharedPrefs.getList(KEY_RECENTLY_USED_MOCKS)
                 .map { it.split(PROPERTY_SEPARATOR) }
                 .map { (viewName, mockName) ->
-                    MockIdentifier(viewName, mockName)
+                    LauncherMockIdentifier(viewName, mockName)
                 }
 
             val params = viewModelContext.activity.intent?.extras
             // If people want to use multiple words they have to separate them with underscores because its part of the link path
             fun parseParam(name: String) = params?.getString(name)?.replace("_", " ")
 
-            return LauncherState(
+            return MvRxLauncherState(
                 selectedView = selectedView,
-                recentUsage = RecentUsage(
+                recentUsage = LauncherRecentUsage(
                     viewNames = recentViews,
                     mockIdentifiers = recentMocks
                 ),
@@ -321,8 +330,13 @@ private fun SharedPreferences.Editor.putList(
     list: List<String>
 ): SharedPreferences.Editor? {
     require(list.none { it.contains(LIST_SEPARATOR) }) { "String contained the separator key: $list" }
+    log("Putting list at key $key in cache: $list")
     return putString(key, list.joinToString(separator = LIST_SEPARATOR))
 }
 
 private fun SharedPreferences.getList(key: String) =
     getString(key, null)?.split(LIST_SEPARATOR) ?: emptyList()
+
+private fun log(msg: String) {
+    Log.d(MvRxLauncherViewModel::class.simpleName, msg)
+}

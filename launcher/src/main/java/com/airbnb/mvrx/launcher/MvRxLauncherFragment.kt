@@ -27,7 +27,7 @@ import com.airbnb.mvrx.withState
  */
 class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
 
-    private val viewModel: LauncherViewModel by fragmentViewModel()
+    private val viewModel: MvRxLauncherViewModel by fragmentViewModel()
 
     override fun enableMockPrinterReceiver() {
         // Disabling this because we don't want it spitting it out its mocks because it clutters
@@ -39,7 +39,7 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
 
         var isFirstValue = true
         viewModel.selectSubscribe(
-            LauncherState::selectedMock,
+            MvRxLauncherState::selectedMock,
             deliveryMode = uniqueOnly()
         ) { mock ->
             // If this fragment is recreated (eg rotation) then the old value will be redelivered. But we don't
@@ -52,7 +52,7 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
             }
         }
 
-        viewModel.selectSubscribe(LauncherState::deeplinkResult) { query ->
+        viewModel.selectSubscribe(MvRxLauncherState::deeplinkResult) { query ->
             when (query) {
                 null -> return@selectSubscribe
                 is DeeplinkResult.NoMatch -> toastLong("No views found matching query '${query.queryText}'")
@@ -78,10 +78,10 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
         )
     }
 
-    private val LauncherState.mocksLoadedSoFar: List<MockedViewProvider<*>>?
+    private val MvRxLauncherState.mocksLoadedSoFar: List<MockedViewProvider<*>>?
         get() = allMocks() ?: cachedMocks()
 
-    private val LauncherState.mocksForSelectedView: List<MockedViewProvider<*>>?
+    private val MvRxLauncherState.mocksForSelectedView: List<MockedViewProvider<*>>?
         get() {
             val loadedMocks = mocksLoadedSoFar ?: return null
             return if (selectedView != null) loadedMocks.filter { it.viewName == selectedView } else null
@@ -158,7 +158,7 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
 
         mocksToShow
             ?.sortedBy {
-                val recentIndex = state.recentUsage.mockIdentifiers.indexOf(MockIdentifier(it))
+                val recentIndex = state.recentUsage.mockIdentifiers.indexOf(LauncherMockIdentifier(it))
                 if (recentIndex == -1) {
                     Integer.MAX_VALUE
                 } else {
@@ -171,7 +171,7 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
                     title(it.mock.name)
 
                     subtitle(buildText(context) {
-                        if (MockIdentifier(it) in state.recentUsage.mockIdentifiers) {
+                        if (LauncherMockIdentifier(it) in state.recentUsage.mockIdentifiers) {
                             appendWithColor("Recent ", R.color.mvrx_colorPrimary)
                         }
 
@@ -275,7 +275,7 @@ private fun String.splitCamelCase(): CharSequence {
 /** Assumes a FQN - returns the simple name. */
 internal val String.simpleName: String get() = substringAfterLast(".")
 
-internal fun viewUiOrderComparator(state: LauncherState): Comparator<String> {
+internal fun viewUiOrderComparator(state: MvRxLauncherState): Comparator<String> {
     return compareBy { viewName ->
         // Show recently used views first, otherwise compare alphabetically by view name
         val recentViewIndex = state.recentUsage.viewNames.indexOf(viewName)
