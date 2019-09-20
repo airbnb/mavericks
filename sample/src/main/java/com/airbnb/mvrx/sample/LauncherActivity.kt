@@ -5,14 +5,15 @@ import android.os.Handler
 import android.widget.Toast
 import androidx.collection.SparseArrayCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.NavAction
+import androidx.navigation.NavController
 import androidx.navigation.NavDestination
-import androidx.navigation.fragment.FragmentNavigator
+import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.BaseMvRxActivity
+import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.launcher.MvRxLauncherMockActivity.Companion.showNextMock
-import com.airbnb.mvrx.sample.features.dadjoke.DadJokeDetailFragment
-
 
 /**
  * This class provides a custom implementation for handling launched mocks, by overriding
@@ -35,58 +36,7 @@ class LauncherActivity : BaseMvRxActivity() {
             // it will override the one we set.
             Handler().post {
                 showNextMock(
-                    showView = { view ->
-                        // The nav host specified in the activity layout
-                        val navHostFragment =
-                            supportFragmentManager.findFragmentById(R.id.my_nav_host_fragment)
-                                ?: error("Could not find nav host fragment")
-
-                        // The nav host simply uses its fragment id as the container id
-                        // when adding fragments internally, so we can use the same approach
-                        // to force a custom fragment.
-                        navHostFragment.childFragmentManager
-                            .beginTransaction()
-                            .replace(navHostFragment.id, view as Fragment)
-                            .commitNow()
-
-                        val navController = navHostFragment.findNavController()
-
-                        val navigator =
-                            navController.navigatorProvider.getNavigator<FragmentNavigator>(
-                                FragmentNavigator::class.java
-                            )
-
-                        // This takes destinations that are not normally available at the top level
-                        // graph, and forcibly adds them so that our mock fragment is able to
-                        // access them.
-                        // TODO  A general way to automatically include all nested destinations
-                        // in the graph.
-//                        destinationOverrides.map { (destId, kClass) ->
-//                            navigator.createDestination().apply {
-//                                id = destId
-//                                className = kClass.qualifiedName ?: error("No name for $kClass")
-//                            }
-//                        }.let {
-//                            navController.graph.addDestinations(it)
-//                        }
-
-                        val actionsField =
-                            NavDestination::class.java.getDeclaredField("mActions").apply {
-                                isAccessible = true
-                            }
-
-                        navController.graph.forEach { dest ->
-                            @Suppress("UNCHECKED_CAST") val actions =
-                                (actionsField.get(dest) as SparseArrayCompat<NavAction>?) ?: return@forEach
-
-                            for (i in 0 until actions.size()) {
-                                val key = actions.keyAt(i)
-                                actions.get(key)?.let { action ->
-                                    navController.currentDestination?.putAction(key, action)
-                                }
-                            }
-                        }
-                    },
+                    showView = { showFragmentWithNavigation(it) },
                     onFailure = {
                         Toast.makeText(
                             this,
@@ -103,8 +53,51 @@ class LauncherActivity : BaseMvRxActivity() {
             }
         }
     }
+
 }
 
-private val destinationOverrides = listOf(
-    R.id.action_dadJokeIndex_to_dadJokeDetailFragment to DadJokeDetailFragment::class
-)
+private fun FragmentActivity.showFragmentWithNavigation(view: MvRxView) {
+    // The nav host specified in the activity layout
+    val navHostFragment = supportFragmentManager.fragments
+        .firstOrNull { it is NavHostFragment }
+        ?: error("Could not find nav host fragment")
+
+    // The nav host simply uses its fragment id as the container id
+    // when adding fragments internally, so we can use the same approach
+    // to force a custom fragment.
+    navHostFragment.childFragmentManager
+        .beginTransaction()
+        .replace(navHostFragment.id, view as Fragment)
+        .commitNow()
+
+    // Normally the app would crash if the fragment tried to invoke an action,
+    // since it isn't properly registered in the graph. To work around that,
+    // we make all actions available via a hack.
+    navHostFragment
+        .findNavController()
+        .makeAllActionsAccessibleToCurrentDestination()
+}
+
+/**
+ * This finds all of the navigation actions across all fragments in the graph, and adds them
+ * all to the current destination so that it is possible to open any navigation link from here.
+ */
+private fun NavController.makeAllActionsAccessibleToCurrentDestination() {
+    val currentDestination = currentDestination ?: return
+
+    val actionsField = NavDestination::class.java.getDeclaredField("mActions")
+    actionsField.isAccessible = true
+
+    graph.forEach { dest ->
+        @Suppress("UNCHECKED_CAST")
+        val actions = (actionsField.get(dest) as SparseArrayCompat<NavAction>?) ?: return@forEach
+
+        for (i in 0 until actions.size()) {
+            val actionId = actions.keyAt(i)
+
+            actions.get(actionId)?.let { action ->
+                currentDestination.putAction(actionId, action)
+            }
+        }
+    }
+}
