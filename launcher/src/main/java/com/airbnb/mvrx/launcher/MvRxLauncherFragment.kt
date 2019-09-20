@@ -2,6 +2,9 @@ package com.airbnb.mvrx.launcher
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.mvrx.fragmentViewModel
@@ -15,6 +18,7 @@ import com.airbnb.mvrx.launcher.views.marquee
 import com.airbnb.mvrx.launcher.views.textRow
 import com.airbnb.mvrx.mock.MockedViewProvider
 import com.airbnb.mvrx.withState
+
 
 /**
  * Displays all MvRx screens and mocks that are detected in the app.
@@ -36,6 +40,7 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setHasOptionsMenu(true)
 
         var isFirstValue = true
         viewModel.selectSubscribe(
@@ -211,25 +216,31 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
         }
     }
 
-//    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-//        return when (item.itemId) {
-//            // This option automatically launches all mocks shown on the screen.
-//            // They are shown in order just long enough to verify they render and don't crash.
-//            R.id.menu_mvrx_launcher_auto_run -> {
-//                withState(viewModel) { state ->
-//                    val mocks =
-//                        state.mocksForSelectedView ?: state.mocksLoadedSoFar ?: return@withState
-//                    testMocks(mocks)
-//                }
-//
-//                true
-//            }
-//            else -> super.onOptionsItemSelected(item)
-//        }
-//    }
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.mvrx_launcher_fragment, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            // This option automatically launches all mocks shown on the screen.
+            // They are shown in order just long enough to verify they render and don't crash.
+            R.id.menu_mvrx_launcher_auto_run -> {
+                withState(viewModel) { state ->
+                    val mocks =
+                        state.mocksForSelectedView ?: state.mocksLoadedSoFar ?: return@withState
+                    testMocks(mocks)
+                }
+
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
 
     private fun testMocks(mocks: List<MockedViewProvider<*>>) {
         toastShort("Testing ${mocks.size} mocks...")
+        MvRxLauncherTestMocksActivity.mocksToShow.clear()
         MvRxLauncherTestMocksActivity.mocksToShow.addAll(mocks)
         startActivity(requireContext().buildIntent<MvRxLauncherTestMocksActivity>())
     }

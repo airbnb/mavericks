@@ -2,7 +2,6 @@ package com.airbnb.mvrx.sample
 
 import android.os.Bundle
 import android.os.Handler
-import android.widget.Toast
 import androidx.collection.SparseArrayCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -13,7 +12,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.BaseMvRxActivity
 import com.airbnb.mvrx.MvRxView
-import com.airbnb.mvrx.launcher.MvRxLauncherMockActivity.Companion.showNextMock
+import com.airbnb.mvrx.launcher.MvRxLauncherMockActivity.Companion.showNextMockFromActivity
 
 /**
  * This class provides a custom implementation for handling launched mocks, by overriding
@@ -35,20 +34,9 @@ class LauncherActivity : BaseMvRxActivity() {
             // This is posted so that the nav graph can set its initial fragment first, otherwise
             // it will override the one we set.
             Handler().post {
-                showNextMock(
-                    showView = { showFragmentWithNavigation(it) },
-                    onFailure = {
-                        Toast.makeText(
-                            this,
-                            "Fragment crashed - see logcat for stacktrace.",
-                            Toast.LENGTH_LONG
-                        ).show()
-
-                        // We finish the Activity in order to clear this Fragment as the "current"
-                        // fragment, so on relaunch it doesn't keep trying to
-                        // open the same Fragment, which would get stuck in a crash loop.
-                        finish()
-                    }
+                showNextMockFromActivity(
+                    activity = this,
+                    showView = { showFragmentWithNavigation(it) }
                 )
             }
         }

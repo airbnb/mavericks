@@ -1,5 +1,8 @@
 package com.airbnb.mvrx.launcher
 
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import com.airbnb.mvrx.BaseMvRxActivity
 import com.airbnb.mvrx.mock.MockedViewProvider
@@ -9,14 +12,30 @@ import java.util.LinkedList
  * This is given a list of view mocks and automatically opens them all one at a time.
  * Each fragment waits until it successfully loads, then returns so the next one can be loaded.
  * This tests that each mock can be loaded without crashing.
+ *
+ * Override [provideIntentToTestMock] in order to customize what activity is used to test eachh
+ * mock.
  */
 class MvRxLauncherTestMocksActivity : BaseMvRxActivity() {
 
     private val mockCount = mocksToShow.size
 
-    override fun onResume() {
-        super.onResume()
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (savedInstanceState == null) {
+            testNexMock()
+        }
+    }
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == REQUEST_CODE_TEST_FINISHED) {
+            testNexMock()
+        } else {
+            super.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+    private fun testNexMock() {
         // This assumes that it isn't rotated or otherwise restarted, and that it will resume when the previously launched screen returns
         val nextMock = mocksToShow.poll() ?: run {
             AlertDialog.Builder(this)
@@ -29,11 +48,23 @@ class MvRxLauncherTestMocksActivity : BaseMvRxActivity() {
             return
         }
 
+        val intent = provideIntentToTestMock(this, nextMock)
+        startActivityForResult(intent, REQUEST_CODE_TEST_FINISHED)
+
         // TODO Support clicking on views to catch crashes on click
     }
 
     companion object {
-        internal val mocksToShow =
-            LinkedList<MockedViewProvider<*>>()
+        internal val mocksToShow = LinkedList<MockedViewProvider<*>>()
+
+        private const val REQUEST_CODE_TEST_FINISHED = 2
+
+        /**
+         * Override this in order to customize what activity is used to test eachh
+         * mock.
+         */
+        var provideIntentToTestMock: (Context, MockedViewProvider<*>) -> Intent = { context, mock ->
+            MvRxLauncherMockActivity.intent(context, mock, finishAfterLaunch = true)
+        }
     }
 }
