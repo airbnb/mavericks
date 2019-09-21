@@ -299,6 +299,7 @@ class MvRxLauncherViewModel(
 
             val params = viewModelContext.activity.intent?.extras
             // If people want to use multiple words they have to separate them with underscores because its part of the link path
+            // TODO verify this
             fun parseParam(name: String) = params?.getString(name)?.replace("_", " ")
 
             return MvRxLauncherState(

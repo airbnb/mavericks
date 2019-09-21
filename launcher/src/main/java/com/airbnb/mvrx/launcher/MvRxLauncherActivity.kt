@@ -1,7 +1,9 @@
 package com.airbnb.mvrx.launcher
 
+import android.content.Context
 import android.os.Bundle
 import com.airbnb.epoxy.EpoxyController
+import com.airbnb.mvrx.launcher.utils.buildIntent
 
 /**
  * Entry point for showing all MvRx Views in the application.
@@ -32,5 +34,12 @@ open class MvRxLauncherActivity : MvRxBaseLauncherActivity() {
     companion object {
         internal const val PARAM_VIEW_TO_OPEN = "viewNameToOpen"
         internal const val PARAM_VIEW_PATTERN_TO_TEST = "viewNamePatternToTest"
+
+        /**
+         * Shortcut to create an intent for this activity and start the intent in one step.
+         */
+        fun show(context: Context) {
+            context.startActivity(context.buildIntent<MvRxLauncherActivity>())
+        }
     }
 }

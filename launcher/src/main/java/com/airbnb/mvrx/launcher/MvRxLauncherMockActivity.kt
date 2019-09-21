@@ -159,7 +159,7 @@ class MvRxLauncherMockActivity : MvRxBaseLauncherActivity() {
                     "MvRx Launcher",
                     "${view.javaClass.simpleName} crashed while opening.",
                     e
-                )   
+                )
                 // We finish the Activity in order to clear this Fragment as the "current"
                 // fragment, so on relaunch it doesn't keep trying to
                 // open the same Fragment, which would get stuck in a crash loop.
