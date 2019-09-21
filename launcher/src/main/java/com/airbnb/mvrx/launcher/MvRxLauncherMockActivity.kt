@@ -137,7 +137,7 @@ class MvRxLauncherMockActivity : MvRxBaseLauncherActivity() {
 
             val mockedView: MockedView<*> = mock.createView(mockBehavior(mock.mock))
 
-            val view = mockedView.viewInstance  
+            val view = mockedView.viewInstance
             view.lifecycle.addObserver(ViewModelEnabler(mockedView, mock))
 
             @Suppress("Detekt.TooGenericExceptionCaught")

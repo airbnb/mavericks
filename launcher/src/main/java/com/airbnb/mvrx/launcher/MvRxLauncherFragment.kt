@@ -57,12 +57,18 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
             }
         }
 
-        viewModel.selectSubscribe(MvRxLauncherState::deeplinkResult) { query ->
-            when (query) {
+        viewModel.selectSubscribe(MvRxLauncherState::deeplinkResult) { result ->
+            // If we're already finishing because we started a different deeplink result, don't
+            // start one again. This can happen because the objects don't have strict equals
+            // implementations.
+            if (activity?.isFinishing != false) return@selectSubscribe
+
+            log("Deeplink result: $result")
+            when (result) {
                 null -> return@selectSubscribe
-                is DeeplinkResult.NoMatch -> toastLong("No views found matching query '${query.queryText}'")
-                is DeeplinkResult.SingleView -> showSelectedMock(query.mock)
-                is DeeplinkResult.TestViews -> testMocks(query.mocks)
+                is DeeplinkResult.NoMatch -> toastLong("No views found matching query '${result.queryText}'")
+                is DeeplinkResult.SingleView -> showSelectedMock(result.mock)
+                is DeeplinkResult.TestViews -> testMocks(result.mocks)
             }
 
             // Once we start a new activity to show the matching mocks
@@ -163,7 +169,8 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
 
         mocksToShow
             ?.sortedBy {
-                val recentIndex = state.recentUsage.mockIdentifiers.indexOf(LauncherMockIdentifier(it))
+                val recentIndex =
+                    state.recentUsage.mockIdentifiers.indexOf(LauncherMockIdentifier(it))
                 if (recentIndex == -1) {
                     Integer.MAX_VALUE
                 } else {

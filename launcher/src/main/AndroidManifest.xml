@@ -2,7 +2,8 @@
         package="com.airbnb.mvrx.launcher">
 
     <application>
-        <activity android:name=".MvRxLauncherActivity" />
+        <!-- This is exported so users can launch it from the command line. It should only be included in debug builds. -->
+        <activity android:name=".MvRxLauncherActivity" android:exported="true"/>
         <activity android:name=".MvRxLauncherMockActivity" />
         <activity android:name=".MvRxLauncherTestMocksActivity" />
     </application>

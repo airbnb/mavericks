@@ -116,15 +116,19 @@ data class MvRxLauncherState(
  *
  * @param queryText The text that was specified in the deeplink.
  */
-sealed class DeeplinkResult(val queryText: String) {
+sealed class DeeplinkResult {
+    abstract val queryText: String
+
     /** The query was for a single screen, and the given mock was the best match. */
-    class SingleView(query: String, val mock: MockedViewProvider<*>) : DeeplinkResult(query)
+    data class SingleView(override val queryText: String, val mock: MockedViewProvider<*>) :
+        DeeplinkResult()
 
-    /** The query was to test multiple screens, and all of the mocks matched the naming pattern. */
-    class TestViews(query: String, val mocks: List<MockedViewProvider<*>>) : DeeplinkResult(query)
+    /** The queryText was to test multiple screens, and all of the mocks matched the naming pattern. */
+    data class TestViews(override val queryText: String, val mocks: List<MockedViewProvider<*>>) :
+        DeeplinkResult()
 
-    /** No screens matched the given query. */
-    class NoMatch(query: String) : DeeplinkResult(query)
+    /** No screens matched the given queryText. */
+    data class NoMatch(override val queryText: String) : DeeplinkResult()
 }
 
 /**
@@ -337,6 +341,6 @@ private fun SharedPreferences.Editor.putList(
 private fun SharedPreferences.getList(key: String) =
     getString(key, null)?.split(LIST_SEPARATOR) ?: emptyList()
 
-private fun log(msg: String) {
+internal fun log(msg: String) {
     Log.d(MvRxLauncherViewModel::class.simpleName, msg)
 }

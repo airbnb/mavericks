@@ -182,7 +182,7 @@ private fun <T : Parcelable> T.makeClone(): T {
     return clone
 }
 
-class MockedViewProvider<V : MvRxView>(
+data class MockedViewProvider<V : MvRxView>(
     val viewName: String,
     val createView: (MockBehavior) -> MockedView<V>,
     val mock: MvRxMock<V, *>

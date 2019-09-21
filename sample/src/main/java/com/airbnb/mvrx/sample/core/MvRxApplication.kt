@@ -1,6 +1,8 @@
 package com.airbnb.mvrx.sample.core
 
 import android.app.Application
+import com.airbnb.mvrx.launcher.MvRxLauncherMockActivity
+import com.airbnb.mvrx.sample.LauncherActivity
 import com.airbnb.mvrx.sample.network.DadJokeService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -15,6 +17,9 @@ class MvRxApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        // Override the default activity for showing mocks from the launcher
+        MvRxLauncherMockActivity.activityToShowMock = LauncherActivity::class
+
         startKoin {
             androidContext(this@MvRxApplication)
             modules(dadJokeServiceModule)
