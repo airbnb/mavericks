@@ -145,14 +145,21 @@ class MvRxLauncherMockActivity : MvRxBaseLauncherActivity() {
                 activity.showView(view)
 
                 if (activity.intent.getBooleanExtra(FINISH_AFTER_LAUNCH, false)) {
-                    Handler().postDelayed({ activity.finish() }, 500)
+                    // If we are initializing from arguments then network requests will be
+                    // made, and we want to give enough time for them to complete to make
+                    // sure the parsing and display it tested as well.
+                    val isInitializing =
+                        mock.mock.isDefaultInitialization || mock.mock.isForProcessRecreation
+                    val finishAfterMs: Long = if (isInitializing) 3000 else 500
+
+                    Handler().postDelayed({ activity.finish() }, finishAfterMs)
                 }
             } catch (e: Throwable) {
                 Log.e(
                     "MvRx Launcher",
                     "${view.javaClass.simpleName} crashed while opening.",
                     e
-                )
+                )   
                 // We finish the Activity in order to clear this Fragment as the "current"
                 // fragment, so on relaunch it doesn't keep trying to
                 // open the same Fragment, which would get stuck in a crash loop.

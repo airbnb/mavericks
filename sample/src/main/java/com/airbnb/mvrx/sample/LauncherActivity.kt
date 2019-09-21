@@ -18,12 +18,13 @@ import com.airbnb.mvrx.launcher.MvRxLauncherMockActivity.Companion.showNextMockF
  * This class provides a custom implementation for handling launched mocks, by overriding
  * the default behavior in MvRxLauncherMockActivity.
  *
+ * The Application class was overriddent to set this behavior change:
+ * `MvRxLauncherMockActivity.activityToShowMock = LauncherActivity::class`
+ *
  * This is needed so we can support the navigation architecture that is used.
  *
- * Note: This works to show the fragment, but is not extensively tested or intended to be a complete
- * solution for working with the navigation component. Notably lacking is support for nested
- * graphs - if a fragment is started that is not in the top level navigation graph then it will crash
- * if any navigation is attempted from it as the proper graph for it is not set.
+ * Note: The work around to support navigation architecture here works for the sample use case,
+ * but is not extensively tested or intended to be a complete solution.
  */
 class LauncherActivity : BaseMvRxActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

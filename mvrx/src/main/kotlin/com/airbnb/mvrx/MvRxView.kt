@@ -243,7 +243,7 @@ interface MvRxView : MvRxViewModelStoreOwner, LifecycleOwner {
      * make two identical subscriptions with the same (or all) properties in this fragment, provide a customId
      * to avoid collisions.
      *
-     * @param An additional custom id to identify this subscription. Only necessary if there are two subscriptions
+     * @param customId An additional custom id to identify this subscription. Only necessary if there are two subscriptions
      * in this fragment with exact same properties (i.e. two subscribes, or two selectSubscribes with the same properties).
      */
     fun uniqueOnly(customId: String? = null): UniqueOnly {

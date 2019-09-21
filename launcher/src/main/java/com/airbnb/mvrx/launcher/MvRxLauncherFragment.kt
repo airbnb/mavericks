@@ -42,17 +42,12 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
 
-        var isFirstValue = true
+        // This is the main callback for showing the selected mock once it is set.
         viewModel.selectSubscribe(
             MvRxLauncherState::selectedMock,
             deliveryMode = uniqueOnly()
         ) { mock ->
-            // If this fragment is recreated (eg rotation) then the old value will be redelivered. But we don't
-            // want to show the fragment in that case, we only want to show it if the activity is starting for the first time.
-            val skipFragmentShowing = isFirstValue && savedInstanceState != null
-            isFirstValue = false
-
-            if (mock != null && !skipFragmentShowing) {
+            if (mock != null) {
                 showSelectedMock(mock)
             }
         }

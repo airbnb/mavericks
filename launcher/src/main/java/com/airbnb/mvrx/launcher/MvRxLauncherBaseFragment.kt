@@ -73,29 +73,6 @@ abstract class MvRxLauncherBaseFragment : BaseMvRxFragment() {
     }
 
     /**
-     * Similar to [asyncSubscribe], but the success callback is only called once,
-     * even if there are multiple success results (such as a request double response),
-     * for the life of the fragment.
-     *
-     * If the fragment is recreated (eg, from activity recreation), and this callback is registered again,
-     * it can be called with an existing Success value, even if a previous fragment instance also received the callback.
-     * This is because it is impossible to know if a previous fragment instance already received a Success callback.
-     *
-     * This can be used for initialization that needs to happen only once after another request finishes (such as logging, or making other requests).
-     */
-    @SuppressLint("RestrictedApi")
-    protected fun <V : BaseMvRxViewModel<S>, S : MvRxState, T> V.asyncFirstSuccess(
-        asyncProp: KProperty1<S, Async<T>>,
-        onSuccess: (T) -> Unit
-    ) {
-        var disposable: Disposable? = null
-        disposable = asyncSubscribe(this@MvRxLauncherBaseFragment, asyncProp) {
-            disposable?.dispose()
-            onSuccess(it)
-        }
-    }
-
-    /**
      * Provide the EpoxyController to use when building models for this Fragment.
      * Basic usages can simply use [simpleController]
      */

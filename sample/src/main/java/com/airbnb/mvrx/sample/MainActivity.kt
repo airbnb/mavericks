@@ -23,8 +23,5 @@ class MainActivity : BaseMvRxActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        // TODO Move to list
-        startActivity(Intent(this, MvRxLauncherActivity::class.java))
-        finish()
     }
 }

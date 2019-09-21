@@ -4,6 +4,10 @@ import android.os.Bundle
 import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.BaseMvRxActivity
 
+/**
+ * Intended to be overridden by other activities in the launcher module.
+ * Provides an easy way to set a single fragment.
+ */
 open class MvRxBaseLauncherActivity : BaseMvRxActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

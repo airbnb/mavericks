@@ -1,5 +1,6 @@
 package com.airbnb.mvrx.launcher
 
+import android.os.Handler
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
@@ -30,22 +31,38 @@ class ViewModelEnabler(
         val view = mockedView.viewInstance
         view.lifecycle.removeObserver(this)
 
-        mock.mock
-            .states
-            .map {
-                @Suppress("UNCHECKED_CAST")
-                (it.viewModelProperty as KProperty1<MvRxView, BaseMvRxViewModel<*>>)
-                    .get(view)
-            }
-            .forEach { viewModel ->
-                MvRxViewModelConfig.access(viewModel).pushBehaviorOverride(
-                    MockBehavior(
-                        blockExecutions = MockBehavior.BlockExecutions.No,
-                        stateStoreBehavior = MockBehavior.StateStoreBehavior.Normal
+        // This is briefly delayed in case any UI initialization causes network events to be
+        // triggered, which we don't want overriding the mock state.
+        Handler().postDelayed({
+            mock.mock
+                .states
+                .map {
+                    @Suppress("UNCHECKED_CAST")
+                    (it.viewModelProperty as KProperty1<MvRxView, BaseMvRxViewModel<*>>)
+                        .get(view)
+                }
+                .forEach { viewModel ->
+                    MvRxViewModelConfig.access(viewModel).pushBehaviorOverride(
+                        MockBehavior(
+                            blockExecutions = MockBehavior.BlockExecutions.No,
+                            stateStoreBehavior = MockBehavior.StateStoreBehavior.Normal
+                        )
                     )
-                )
-            }
+                }
 
-        mockedView.cleanupMockState()
+            mockedView.cleanupMockState()
+        }, delayTime)
+    }
+
+    companion object {
+        /**
+         * Amount of time delay between when the fragment is resumed and when view models
+         * have "execution" enabled so that real loads can occur.
+         *
+         * This is left mutable so users can customize the default. Too short and it may not result
+         * in an accurate mock (as requests can override the mock state). Too long and it may
+         * block the user's actions if they start using the screen.
+         */
+        var delayTime: Long = 500
     }
 }
