@@ -134,6 +134,16 @@ class FactoryViewModelTest : BaseTest() {
         }
     }
 
+    private class NamedFactoryViewModel(initialState: FactoryState) : TestMvRxViewModel<FactoryState>(initialState) {
+
+        // Ensures we don't accidently consider this to be the factory.
+        class NestedClass
+
+        companion object NamedFactory : MvRxViewModelFactory<NamedFactoryViewModel, FactoryState> {
+            override fun create(viewModelContext: ViewModelContext, state: FactoryState) = NamedFactoryViewModel(state)
+        }
+    }
+
     private class ViewModelContextApplicationFactory(initialState: FactoryState) : TestMvRxViewModel<FactoryState>(initialState) {
         companion object : MvRxViewModelFactory<TestFactoryJvmStaticViewModel, FactoryState> {
             override fun create(viewModelContext: ViewModelContext, state: FactoryState): TestFactoryJvmStaticViewModel? {
@@ -178,6 +188,14 @@ class FactoryViewModelTest : BaseTest() {
             assertEquals(FactoryState("hello constructor"), state)
         }
         assertEquals(5, viewModel.otherProp)
+    }
+
+    @Test
+    fun createWithNamedFactory() {
+        val viewModel = MvRxViewModelProvider.get(NamedFactoryViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, TestArgs("hello")))
+        withState(viewModel) { state ->
+            assertEquals(FactoryState("hello constructor"), state)
+        }
     }
 
     @Test
