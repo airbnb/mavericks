@@ -1,7 +1,5 @@
 package com.airbnb.mvrx.launcher
 
-import com.airbnb.mvrx.mock.MockedViewProvider
-
 import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
@@ -16,6 +14,7 @@ import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.launcher.MvRxLauncherActivity.Companion.PARAM_VIEW_PATTERN_TO_TEST
 import com.airbnb.mvrx.launcher.MvRxLauncherActivity.Companion.PARAM_VIEW_TO_OPEN
+import com.airbnb.mvrx.mock.MockedViewProvider
 import com.airbnb.mvrx.mock.getMockVariants
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -297,9 +296,7 @@ class MvRxLauncherViewModel(
                 }
 
             val params = viewModelContext.activity.intent?.extras
-            // If people want to use multiple words they have to separate them with underscores because its part of the link path
-            // TODO verify this
-            fun parseParam(name: String) = params?.getString(name)?.replace("_", " ")
+            fun parseParam(name: String) = params?.getString(name)
 
             return MvRxLauncherState(
                 selectedView = selectedView,
