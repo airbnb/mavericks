@@ -23,7 +23,7 @@ dependencies {
     implementation project(':mvrx')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
-    implementation "androidx.core:core-ktx:$coreVersion"
+    implementation "androidx.core:core-ktx:$androidXCoreKtxVersion"
     implementation 'androidx.cardview:cardview:1.0.0'
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
     implementation "androidx.navigation:navigation-fragment-ktx:$navVersion"

@@ -39,8 +39,13 @@ object MvRxViewModelProvider {
         forExistingViewModel: Boolean = false,
         initialStateFactory: MvRxStateFactory<VM, S> = RealMvRxStateFactory()
     ): VM {
-        val stateRestorer = viewModelContext
-            .savedStateRegistry
+        val savedStateRegistry = viewModelContext.savedStateRegistry
+
+        if (!savedStateRegistry.isRestored) {
+            error("You can only access a view model after onCreate of your component has been called.")
+        }
+
+        val stateRestorer = savedStateRegistry
             .consumeRestoredStateForKey(key)
             ?.toStateRestorer<S>(viewModelContext)
 
@@ -66,7 +71,9 @@ object MvRxViewModelProvider {
                 viewModel.getSavedStateBundle(restoredContext.args)
             }
         } catch (e: IllegalArgumentException) {
-            // The view model was already registered with the context.
+            // The view model was already registered with the context. We only want the initial
+            // fragment that creates the view model to register with the saved state registry so
+            // that it saves the correct arguments.
         }
         return viewModel
     }

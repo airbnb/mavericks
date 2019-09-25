@@ -86,6 +86,12 @@ class MvRxViewModelProviderTest : BaseTest() {
     }
 
     @Test(expected = IllegalStateException::class)
+    fun failForAccessingViewModelBeforeOnCreate() {
+        val activityWithoutSetup = Robolectric.buildActivity(FragmentActivity::class.java).get()
+        getViewModel(activityWithoutSetup)
+    }
+
+    @Test(expected = IllegalStateException::class)
     fun failForUnsupportedArgs() {
         val key = "invalid_vm"
         val vmClass = InvalidViewModel::class.java
