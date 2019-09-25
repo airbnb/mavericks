@@ -51,7 +51,7 @@ data class MvRxLauncherState(
      * mocks match the deeplink query text. This will only be non null once enough mocks
      * have loaded to provide a comprehensive result.
      */
-    val deeplinkResult: DeeplinkResult?
+    val queryResult: QueryResult?
         get() {
             val mocksToCheck = allMocks() ?: cachedMocks() ?: return null
 
@@ -60,7 +60,7 @@ data class MvRxLauncherState(
             fun fallback(queryText: String) = if (allMocks is Incomplete) {
                 null
             } else {
-                DeeplinkResult.NoMatch(queryText)
+                QueryResult.NoMatch(queryText)
             }
 
             return when {
@@ -84,7 +84,7 @@ data class MvRxLauncherState(
 
                     (viewMatch ?: mockMatch)
                         ?.let { mock ->
-                            DeeplinkResult.SingleView(viewNameToOpen, mock)
+                            QueryResult.SingleView(viewNameToOpen, mock)
                         }
                         ?: fallback(viewNameToOpen)
                 }
@@ -101,7 +101,7 @@ data class MvRxLauncherState(
                         .filter { it.viewName.match() || it.mock.name.match() }
                         .takeIf { it.isNotEmpty() }
                         ?.let { mocks ->
-                            DeeplinkResult.TestViews(viewNamePatternToTest, mocks)
+                            QueryResult.TestViews(viewNamePatternToTest, mocks)
                         }
                         ?: fallback(viewNamePatternToTest)
                 }
@@ -111,24 +111,23 @@ data class MvRxLauncherState(
 }
 
 /**
- * If the launcher was opened from a deeplink, with arguments for a specific screen, this
+ * If the launcher was opened with with arguments for a specific screen, this
  * contains the argument query as well as the resulting screens that match it.
- *
- * @param queryText The text that was specified in the deeplink.
  */
-sealed class DeeplinkResult {
+sealed class QueryResult {
+    /** The text that was specified in the query. */
     abstract val queryText: String
 
     /** The query was for a single screen, and the given mock was the best match. */
     data class SingleView(override val queryText: String, val mock: MockedViewProvider<*>) :
-        DeeplinkResult()
+        QueryResult()
 
     /** The queryText was to test multiple screens, and all of the mocks matched the naming pattern. */
     data class TestViews(override val queryText: String, val mocks: List<MockedViewProvider<*>>) :
-        DeeplinkResult()
+        QueryResult()
 
     /** No screens matched the given queryText. */
-    data class NoMatch(override val queryText: String) : DeeplinkResult()
+    data class NoMatch(override val queryText: String) : QueryResult()
 }
 
 /**

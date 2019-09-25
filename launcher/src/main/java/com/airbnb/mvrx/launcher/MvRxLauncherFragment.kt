@@ -27,7 +27,9 @@ import com.airbnb.mvrx.withState
  * updates the screen to show the list of arguments and mocks for that view. Clicking back returns to the list of views.
  *
  * Clicking a mock loads the view in that state in a new activity.
- * TODO Details about customizing activity
+ *
+ * [MvRxLauncherTestMocksActivity] is used by default to open each mock. See the documentation on
+ * that class for how to customize it, or use a different activity to launch the mock with.
  */
 class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
 
@@ -52,7 +54,7 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
             }
         }
 
-        viewModel.selectSubscribe(MvRxLauncherState::deeplinkResult) { result ->
+        viewModel.selectSubscribe(MvRxLauncherState::queryResult) { result ->
             // If we're already finishing because we started a different deeplink result, don't
             // start one again. This can happen because the objects don't have strict equals
             // implementations.
@@ -61,9 +63,9 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
             log("Deeplink result: $result")
             when (result) {
                 null -> return@selectSubscribe
-                is DeeplinkResult.NoMatch -> toastLong("No views found matching query '${result.queryText}'")
-                is DeeplinkResult.SingleView -> showSelectedMock(result.mock)
-                is DeeplinkResult.TestViews -> testMocks(result.mocks)
+                is QueryResult.NoMatch -> toastLong("No views found matching query '${result.queryText}'")
+                is QueryResult.SingleView -> showSelectedMock(result.mock)
+                is QueryResult.TestViews -> testMocks(result.mocks)
             }
 
             // Once we start a new activity to show the matching mocks
@@ -271,10 +273,12 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
     }
 }
 
+private val camelCaseBoundary = "[^A-Z][A-Z]".toRegex()
+
 /** Takes a string in camel case and splits the words so they are instead separated by spaces. */
-private fun String.splitCamelCase(): CharSequence {
+internal fun String.splitCamelCase(): CharSequence {
     // Finds word boundaries by looking for a lower case letter followed by an uppercase letter
-    return replace("[^A-Z][A-Z]".toRegex()) { match ->
+    return replace(camelCaseBoundary) { match ->
         val twoLetters = match.value
         if (twoLetters == "vR") {
             // If this matches "MvRx" we don't want to split that

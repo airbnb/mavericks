@@ -1,6 +1,5 @@
 package com.airbnb.mvrx.launcher
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,13 +10,11 @@ import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.epoxy.EpoxyRecyclerView
-import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.BaseMvRxFragment
-import com.airbnb.mvrx.BaseMvRxViewModel
-import com.airbnb.mvrx.MvRxState
-import io.reactivex.disposables.Disposable
-import kotlin.reflect.KProperty1
 
+/**
+ * Provides base UI (epoxy, toolbar, back handling) for fragments to extend.
+ */
 abstract class MvRxLauncherBaseFragment : BaseMvRxFragment() {
 
     protected lateinit var recyclerView: EpoxyRecyclerView

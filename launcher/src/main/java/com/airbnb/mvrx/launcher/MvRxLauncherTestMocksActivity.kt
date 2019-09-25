@@ -13,7 +13,7 @@ import java.util.LinkedList
  * Each fragment waits until it successfully loads, then returns so the next one can be loaded.
  * This tests that each mock can be loaded without crashing.
  *
- * Override [provideIntentToTestMock] in order to customize what activity is used to test eachh
+ * Override [provideIntentToTestMock] in order to customize what activity is used to test each
  * mock.
  */
 class MvRxLauncherTestMocksActivity : BaseMvRxActivity() {
@@ -23,19 +23,19 @@ class MvRxLauncherTestMocksActivity : BaseMvRxActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) {
-            testNexMock()
+            testNextMock()
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == REQUEST_CODE_TEST_FINISHED) {
-            testNexMock()
+            testNextMock()
         } else {
             super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
-    private fun testNexMock() {
+    private fun testNextMock() {
         // This assumes that it isn't rotated or otherwise restarted, and that it will resume when the previously launched screen returns
         val nextMock = mocksToShow.poll() ?: run {
             AlertDialog.Builder(this)

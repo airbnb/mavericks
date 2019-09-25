@@ -43,6 +43,7 @@ object MvRxMocks {
 
 private suspend fun loadMocks(classLoader: BaseDexClassLoader): List<MockedViewProvider<*>> {
     return getDexFiles(classLoader)
+        .asSequence()
         .flatMap { it.entries().asSequence() }
         .filterNot {
             // These are optimizations to avoid having to check every class in the dex files.

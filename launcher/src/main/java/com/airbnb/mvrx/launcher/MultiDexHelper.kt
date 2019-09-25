@@ -12,7 +12,7 @@ import java.lang.reflect.Field
 /**
  * Get all DexFiles loaded in the app.
  */
-internal fun getDexFiles(classLoader: BaseDexClassLoader): Sequence<DexFile> {
+internal fun getDexFiles(classLoader: BaseDexClassLoader): List<DexFile> {
     // Here we do some reflection to access the dex files from the class loader. These implementation details vary by platform version,
     // so we have to be a little careful, but not a huge deal since this is just for testing. It should work on 21+.
     // The source for reference is at:
@@ -29,7 +29,7 @@ internal fun getDexFiles(classLoader: BaseDexClassLoader): Sequence<DexFile> {
     val dexFileField = field("dalvik.system.DexPathList\$Element", "dexFile")
     return dexElements.map {
         dexFileField.get(it) as DexFile
-    }.asSequence()
+    }
 }
 
 private fun field(className: String, fieldName: String): Field {
