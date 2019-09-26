@@ -6,7 +6,9 @@ import androidx.fragment.app.FragmentActivity
 import kotlinx.android.parcel.Parcelize
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.ExpectedException
 import org.robolectric.Robolectric
 import org.robolectric.android.controller.ActivityController
 import java.lang.IllegalStateException
@@ -34,6 +36,7 @@ data class InvalidState(val count: Int = 0) : MvRxState {
 class InvalidViewModel(initialState: InvalidState) : TestMvRxViewModel<InvalidState>(initialState)
 
 class MvRxViewModelProviderTest : BaseTest() {
+    @get:Rule val thrown: ExpectedException = ExpectedException.none()
 
     @Test(expected = ViewModelDoesNotExistException::class)
     fun failForNonExistentViewModel() {
@@ -85,8 +88,13 @@ class MvRxViewModelProviderTest : BaseTest() {
         }
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test
     fun failForAccessingViewModelBeforeOnCreate() {
+        thrown.apply {
+            expect(IllegalStateException::class.java)
+            expectMessage(ACCESSED_BEFORE_ON_CREATE_ERR_MSG)
+        }
+
         val activityWithoutSetup = Robolectric.buildActivity(FragmentActivity::class.java).get()
         getViewModel(activityWithoutSetup)
     }

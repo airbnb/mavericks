@@ -42,7 +42,7 @@ object MvRxViewModelProvider {
         val savedStateRegistry = viewModelContext.savedStateRegistry
 
         if (!savedStateRegistry.isRestored) {
-            error("You can only access a view model after onCreate of your component has been called.")
+            error(ACCESSED_BEFORE_ON_CREATE_ERR_MSG)
         }
 
         val stateRestorer = savedStateRegistry
@@ -134,6 +134,9 @@ internal fun <VM : BaseMvRxViewModel<*>> Class<VM>.factoryCompanion(): Class<out
 internal fun Class<*>.instance(): Any {
     return declaredConstructors.first { it.parameterTypes.size == 1 }.newInstance(null)
 }
+
+internal const val ACCESSED_BEFORE_ON_CREATE_ERR_MSG =
+    "You can only access a view model after super.onCreate of your activity/fragment has been called."
 
 private data class StateRestorer<S : MvRxState>(
     val viewModelContext: ViewModelContext,
