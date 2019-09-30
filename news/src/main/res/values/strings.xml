@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">News</string>
+    <string name="contentDescriptionArticleImage">Image related to article</string>
+    <string name="noMoreArticlesMessage">No more articles to show.</string>
+    <string name="errorMessage">Error while fetching items</string>
+    <string name="noContentText">No content found for this article</string>
+    <string name="loadingText">Loading...</string>
+    <string name="noArticlesToShowText">No Articles to show!</string>
+</resources>

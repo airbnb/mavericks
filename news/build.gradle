@@ -1,0 +1,88 @@
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-android-extensions"
+apply plugin: "kotlin-kapt"
+
+android {
+
+    compileSdkVersion 29
+    buildToolsVersion "$buildToolsVersion"
+
+    defaultConfig {
+        applicationId "com.airbnb.mvrx.news"
+        minSdkVersion 21
+        targetSdkVersion 29
+        versionCode 1
+        versionName "0.0.1"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        debug {
+            buildConfigField("String", "ApiKey", NEWS_API_KEY)
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
+        release {
+            buildConfigField("String", "ApiKey", NEWS_API_KEY)
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+androidExtensions {
+    experimental = true
+}
+
+dependencies {
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+
+    implementation project(path: ":mvrx")
+    implementation project(path: ":testing")
+
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    implementation "androidx.appcompat:appcompat:1.1.0"
+    implementation "androidx.core:core-ktx:1.1.0"
+
+    implementation "androidx.navigation:navigation-fragment-ktx:2.1.0"
+    implementation "androidx.navigation:navigation-ui-ktx:2.1.0"
+
+    implementation "com.airbnb.android:epoxy:3.8.0"
+    kapt "com.airbnb.android:epoxy-processor:3.8.0"
+
+    implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
+    implementation "io.reactivex.rxjava2:rxjava:2.2.12"
+    implementation "com.squareup.retrofit2:retrofit:2.6.1"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:2.6.1"
+    implementation "com.squareup.retrofit2:converter-moshi:2.6.1"
+    implementation "com.squareup.okhttp3:okhttp:4.2.0"
+    implementation "com.squareup.okhttp3:logging-interceptor:4.2.0"
+    implementation "com.squareup.moshi:moshi:1.8.0"
+    implementation "com.squareup.moshi:moshi-kotlin:1.8.0"
+    implementation "com.squareup.moshi:moshi-adapters:1.8.0"
+    kapt "com.squareup.moshi:moshi-kotlin-codegen:1.8.0"
+
+    implementation "androidx.browser:browser:1.0.0"
+
+    implementation "io.coil-kt:coil:0.7.0"
+
+    implementation "com.google.dagger:dagger:2.24"
+    implementation "com.squareup.inject:assisted-inject-annotations-dagger2:0.5.0"
+    kapt "com.google.dagger:dagger-compiler:2.24"
+    kapt "com.squareup.inject:assisted-inject-processor-dagger2:0.5.0"
+
+    testImplementation "junit:junit:4.12"
+    testImplementation "io.mockk:mockk:1.9.3"
+    androidTestImplementation "androidx.test:runner:1.2.0"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.2.0"
+}
