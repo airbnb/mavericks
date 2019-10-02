@@ -43,3 +43,6 @@
 # kept as they are accessed via reflection.
 -keepnames class com.airbnb.mvrx.MvRxState
 -keepnames class * implements com.airbnb.mvrx.MvRxState
+
+# Retains the metadata necessary for Kotlin Reflection to identify the primaryConstructor of KClass
+-keep class kotlin.Metadata { *; }
