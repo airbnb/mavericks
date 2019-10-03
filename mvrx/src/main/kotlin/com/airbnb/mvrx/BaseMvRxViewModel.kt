@@ -79,6 +79,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     override fun onCleared() {
         super.onCleared()
         disposables.dispose()
+        stateStore.dispose()
     }
 
     /**
