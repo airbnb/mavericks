@@ -366,7 +366,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     /**
      * Subscribe to state changes for two properties in a different ViewModel.
      */
-    protected fun <A, B> selectSubscribe(
+    protected fun <A, B, S : MvRxState> selectSubscribe(
         viewModel: BaseMvRxViewModel<S>,
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
@@ -409,7 +409,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     /**
      * Subscribe to state changes for three properties in a different ViewModel.
      */
-    protected fun <A, B, C> selectSubscribe(
+    protected fun <A, B, C, S : MvRxState> selectSubscribe(
         viewModel: BaseMvRxViewModel<S>,
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
@@ -462,7 +462,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     /**
      * Subscribe to state changes for four properties in a different ViewModel.
      */
-    protected fun <A, B, C, D> selectSubscribe(
+    protected fun <A, B, C, D, S : MvRxState> selectSubscribe(
         viewModel: BaseMvRxViewModel<S>,
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
@@ -516,7 +516,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     /**
      * Subscribe to state changes for five properties in a different ViewModel.
      */
-    protected fun <A, B, C, D, E> selectSubscribe(
+    protected fun <A, B, C, D, E, S : MvRxState> selectSubscribe(
         viewModel: BaseMvRxViewModel<S>,
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
@@ -574,7 +574,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     /**
      * Subscribe to state changes for six properties in a different ViewModel.
      */
-    protected fun <A, B, C, D, E, F> selectSubscribe(
+    protected fun <A, B, C, D, E, F, S : MvRxState> selectSubscribe(
         viewModel: BaseMvRxViewModel<S>,
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
@@ -636,7 +636,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     /**
      * Subscribe to state changes for seven properties in a different ViewModel.
      */
-    protected fun <A, B, C, D, E, F, G, H> selectSubscribe(
+    protected fun <A, B, C, D, E, F, G, S : MvRxState> selectSubscribe(
         viewModel: BaseMvRxViewModel<S>,
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
@@ -644,8 +644,8 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop4: KProperty1<S, D>,
         prop5: KProperty1<S, E>,
         prop6: KProperty1<S, F>,
-        prop7: KProperty1<S, H>,
-        subscriber: (A, B, C, D, E, F, H) -> Unit
+        prop7: KProperty1<S, G>,
+        subscriber: (A, B, C, D, E, F, G) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
         viewModel.selectSubscribeInternal(lifecycleOwner, prop1, prop2, prop3, prop4, prop5, prop6, prop7, RedeliverOnStart, subscriber)
@@ -750,7 +750,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     }
 
     private fun <S : MvRxState> assertSubscribeToDifferentViewModel(viewModel: BaseMvRxViewModel<S>) {
-        require(this == viewModel) {
+        require(this != viewModel) {
             "This method is for subscribing to other view models. Please pass a different instance as the argument."
         }
     }
