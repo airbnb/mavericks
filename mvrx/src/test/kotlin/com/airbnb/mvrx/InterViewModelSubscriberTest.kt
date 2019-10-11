@@ -38,6 +38,77 @@ class OuterViewModelTestViewModel(initialState: OuterViewModelTestState) : TestM
     fun triggerCleared() {
         onCleared()
     }
+
+    fun subscribeSameViewModel() {
+        subscribe(this) { }
+    }
+
+    fun asyncSubscribeSameViewModel() {
+        asyncSubscribe(this, OuterViewModelTestState::async) { }
+    }
+
+    fun selectSubscribeSameViewModel() {
+        selectSubscribe(this, OuterViewModelTestState::foo) { }
+    }
+
+    fun subscribeToTwoPropsSameViewModel() {
+        selectSubscribe(this, OuterViewModelTestState::foo, OuterViewModelTestState::prop2) { _, _ -> }
+    }
+
+    fun subscribeToThreePropsSameViewModel() {
+        selectSubscribe(
+            this,
+            OuterViewModelTestState::foo,
+            OuterViewModelTestState::prop2,
+            OuterViewModelTestState::prop3
+        ) { _, _, _ -> }
+    }
+
+    fun subscribeToFourPropsSameViewModel() {
+        selectSubscribe(
+            this,
+            OuterViewModelTestState::foo,
+            OuterViewModelTestState::prop2,
+            OuterViewModelTestState::prop3,
+            OuterViewModelTestState::prop4
+        ) { _, _, _, _ -> }
+    }
+
+    fun subscribeToFivePropsSameViewModel() {
+        selectSubscribe(
+            this,
+            OuterViewModelTestState::foo,
+            OuterViewModelTestState::prop2,
+            OuterViewModelTestState::prop3,
+            OuterViewModelTestState::prop4,
+            OuterViewModelTestState::prop5
+        ) { _, _, _, _, _ -> }
+    }
+
+    fun subscribeToSixPropsSameViewModel() {
+        selectSubscribe(
+            this,
+            OuterViewModelTestState::foo,
+            OuterViewModelTestState::prop2,
+            OuterViewModelTestState::prop3,
+            OuterViewModelTestState::prop4,
+            OuterViewModelTestState::prop5,
+            OuterViewModelTestState::prop6
+        ) { _, _, _, _, _, _ -> }
+    }
+
+    fun subscribeToSevenPropsSameViewModel() {
+        selectSubscribe(
+            this,
+            OuterViewModelTestState::foo,
+            OuterViewModelTestState::prop2,
+            OuterViewModelTestState::prop3,
+            OuterViewModelTestState::prop4,
+            OuterViewModelTestState::prop5,
+            OuterViewModelTestState::prop6,
+            OuterViewModelTestState::prop7
+        ) { _, _, _, _, _, _, _ -> }
+    }
 }
 
 data class InnerViewModelTestState(
@@ -290,5 +361,50 @@ class InnerViewModelSubscriberTest : BaseTest() {
         assertEquals(7, callCount)
         outerViewModel.setProp7(7)
         assertEquals(8, callCount)
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun testSameViewModelSubscribe() {
+        outerViewModel.subscribeSameViewModel()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun testSameViewModelAsyncSubscribe() {
+        outerViewModel.asyncSubscribeSameViewModel()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun testSameViewModelSelectSubscribe() {
+        outerViewModel.selectSubscribeSameViewModel()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun testSameViewModelSelectSubscribe2() {
+        outerViewModel.subscribeToTwoPropsSameViewModel()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun testSameViewModelSelectSubscribe3() {
+        outerViewModel.subscribeToThreePropsSameViewModel()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun testSameViewModelSelectSubscribe4() {
+        outerViewModel.subscribeToFourPropsSameViewModel()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun testSameViewModelSelectSubscribe5() {
+        outerViewModel.subscribeToFivePropsSameViewModel()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun testSameViewModelSelectSubscribe6() {
+        outerViewModel.subscribeToSixPropsSameViewModel()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun testSameViewModelSelectSubscribe7() {
+        outerViewModel.subscribeToSevenPropsSameViewModel()
     }
 }
