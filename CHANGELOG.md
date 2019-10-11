@@ -1,4 +1,10 @@
 # Change log
+
+## Version 1.2.0
+- Make searching for the companion object factory more robust #283
+- Fix infinite thread leaks while flushing queues in state store #302
+- Adding inter view model subscription support #287
+
 ## Version 1.1.0
 - New `parentFragmentViewModel()` and `targetFragmentViewModel()` ViewModel delegate scopes [#247](https://github.com/airbnb/MvRx/pull/247)
 - Disallow functions in state [#250](https://github.com/airbnb/MvRx/pull/250)

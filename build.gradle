@@ -42,8 +42,4 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
     }
-    tasks.withType(Javadoc) {
-        options.addStringOption('Xdoclint:none', '-quiet')
-        options.addStringOption('encoding', 'UTF-8')
-    }
 }
