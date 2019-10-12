@@ -23,6 +23,15 @@ android {
         }
     }
 
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
     signingConfigs {
         debug {
             storeFile file('debug.keystore')
@@ -41,7 +50,7 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(":mvrx")
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
 
     implementation "androidx.appcompat:appcompat:1.1.0"
     implementation "androidx.core:core-ktx:1.1.0"
@@ -56,6 +65,9 @@ dependencies {
     kapt "com.squareup.inject:assisted-inject-processor-dagger2:0.5.0"
 
     testImplementation "junit:junit:4.12"
+    testImplementation "io.mockk:mockk:1.9.3"
+    debugImplementation "androidx.fragment:fragment-testing:1.2.0-beta02"
+    androidTestImplementation "androidx.test:core:1.2.0"
     androidTestImplementation "androidx.test.ext:junit:1.1.1"
     androidTestImplementation "androidx.test.espresso:espresso-core:3.2.0"
 }
