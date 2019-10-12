@@ -1,3 +1,6 @@
 <resources>
-    <string name="app_name">helloDagger</string>
+    <string name="app_name">Hello Dagger</string>
+    <string name="helloButtonText">Say Hello</string>
+    <string name="helloFragmentLoadingText">Loading…</string>
+    <string name="helloFragmentFailureText">Loading failed</string>
 </resources>

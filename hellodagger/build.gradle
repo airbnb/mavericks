@@ -19,6 +19,16 @@ android {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file('debug.keystore')
+            storePassword 'testing'
+            keyAlias 'helloDagger'
+            keyPassword 'testing'
         }
     }
 }
