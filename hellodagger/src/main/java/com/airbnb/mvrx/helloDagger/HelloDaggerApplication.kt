@@ -1,7 +1,9 @@
 package com.airbnb.mvrx.helloDagger
 
 import android.app.Application
-import com.airbnb.mvrx.ViewModelContext
+import androidx.fragment.app.FragmentActivity
+import com.airbnb.mvrx.helloDagger.di.AppComponent
+import com.airbnb.mvrx.helloDagger.di.DaggerAppComponent
 
 class HelloDaggerApplication: Application() {
 
@@ -14,6 +16,6 @@ class HelloDaggerApplication: Application() {
 
 }
 
-fun ViewModelContext.appComponent(): AppComponent {
-    return this.app<HelloDaggerApplication>().appComponent
+fun FragmentActivity.appComponent(): AppComponent {
+    return (application as HelloDaggerApplication).appComponent
 }

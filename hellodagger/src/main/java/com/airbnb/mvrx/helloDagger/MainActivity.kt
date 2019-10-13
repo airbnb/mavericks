@@ -1,9 +1,9 @@
 package com.airbnb.mvrx.helloDagger
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.airbnb.mvrx.helloDagger.base.MvRxActivity
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : MvRxActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

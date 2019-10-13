@@ -1,15 +1,17 @@
 package com.airbnb.mvrx.helloDagger
 
 import com.airbnb.mvrx.*
+import com.airbnb.mvrx.helloDagger.di.AssistedViewModelFactory
+import com.airbnb.mvrx.helloDagger.base.MvRxViewModel
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 
 data class HelloState(val message: Async<String> = Uninitialized) : MvRxState
 
 class HelloViewModel @AssistedInject constructor(
-        @Assisted initialState: HelloState,
+        @Assisted state: HelloState,
         private val repo: HelloRepository
-) : BaseMvRxViewModel<HelloState>(initialState, BuildConfig.DEBUG) {
+) : MvRxViewModel<HelloState>(state) {
 
     init {
         sayHello()
@@ -20,13 +22,13 @@ class HelloViewModel @AssistedInject constructor(
     }
 
     @AssistedInject.Factory
-    interface Factory {
-        fun create(initialState: HelloState): HelloViewModel
+    interface Factory : AssistedViewModelFactory<HelloViewModel, HelloState> {
+        override fun create(state: HelloState): HelloViewModel
     }
 
-    companion object: MvRxViewModelFactory<HelloViewModel, HelloState> {
+    companion object : MvRxViewModelFactory<HelloViewModel, HelloState> {
         override fun create(viewModelContext: ViewModelContext, state: HelloState): HelloViewModel? {
-            return viewModelContext.appComponent().helloViewModelFactory().create(state)
+            return createViewModel(viewModelContext.activity, state)
         }
     }
 }
