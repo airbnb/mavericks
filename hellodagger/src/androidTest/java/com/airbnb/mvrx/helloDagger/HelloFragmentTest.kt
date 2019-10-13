@@ -12,7 +12,7 @@ class HelloFragmentTest {
     @Test
     fun showsLoadingMessageWhenCreated() {
         val scenario = launchFragmentInContainer<HelloFragment>()
-        onView(withId(R.id.messageTextView)).check(matches(withText(R.string.helloFragmentLoadingText)))
+        onView(withId(R.id.messageTextView)).check(matches(withText(R.string.hello_fragment_loading_text)))
         onView(withId(R.id.helloButton)).check(matches(not(isEnabled())))
     }
 

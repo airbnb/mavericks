@@ -24,7 +24,7 @@ class HelloFragment: BaseMvRxFragment() {
         withState(viewModel) { state: HelloState ->
             when (state.message) {
                 is Uninitialized, is Loading -> {
-                    messageTextView.text = getString(R.string.helloFragmentLoadingText)
+                    messageTextView.text = getString(R.string.hello_fragment_loading_text)
                     helloButton.isEnabled = false
                 }
                 is Success -> {
@@ -32,7 +32,7 @@ class HelloFragment: BaseMvRxFragment() {
                     helloButton.isEnabled = true
                 }
                 is Fail -> {
-                    messageTextView.text = getString(R.string.helloFragmentFailureText)
+                    messageTextView.text = getString(R.string.hello_fragment_failure_text)
                     helloButton.isEnabled = true
                 }
             }
