@@ -1,5 +1,8 @@
 # Change log
 
+## Version 1.2.1
+- Fix sources not included in 1.2.0 release
+
 ## Version 1.2.0
 - Make searching for the companion object factory more robust #283
 - Fix infinite thread leaks while flushing queues in state store #302
