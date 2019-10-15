@@ -24,6 +24,7 @@ class DadJokeIndexFragment : BaseFragment() {
     private val viewModel: DadJokeIndexViewModel by fragmentViewModel()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         /**
          * Use viewModel.subscribe to listen for changes. The parameter is a shouldUpdate
          * function that is given the old state and new state and returns whether or not to

@@ -26,6 +26,13 @@ buildscript {
         classpath 'net.sf.proguard:proguard-gradle:6.1.1'
         classpath 'com.vanniktech:gradle-maven-publish-plugin:0.8.0'
     }
+
+    configurations.all {
+        resolutionStrategy {
+            // Use Proguard 6.2.0
+            force 'net.sf.proguard:proguard-gradle:6.2.0'
+        }
+    }
 }
 
 allprojects {
@@ -36,9 +43,5 @@ allprojects {
         google()
         jcenter()
         maven { url "https://jitpack.io" }
-    }
-    tasks.withType(Javadoc) {
-        options.addStringOption('Xdoclint:none', '-quiet')
-        options.addStringOption('encoding', 'UTF-8')
     }
 }
