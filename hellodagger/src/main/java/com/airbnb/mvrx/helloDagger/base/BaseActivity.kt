@@ -13,10 +13,10 @@ import javax.inject.Inject
  * This class contains an injected map of [AssistedViewModelFactory]s to make it easier to create
  * and instantiate requested ViewModels.
  */
-abstract class MvRxActivity(@LayoutRes layoutResId: Int = 0) : AppCompatActivity(layoutResId) {
+abstract class BaseActivity(@LayoutRes layoutResId: Int = 0) : AppCompatActivity(layoutResId) {
 
     @Inject
-    lateinit var viewModelFactoryMap: @JvmSuppressWildcards Map<Class<out MvRxViewModel<*>>, AssistedViewModelFactory<*, *>>
+    lateinit var viewModelFactoryMap: @JvmSuppressWildcards Map<Class<out BaseViewModel<*>>, AssistedViewModelFactory<*, *>>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         appComponent().inject(this)

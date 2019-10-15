@@ -1,6 +1,6 @@
 package com.airbnb.mvrx.helloDagger.di
 
-import com.airbnb.mvrx.helloDagger.base.MvRxViewModel
+import com.airbnb.mvrx.helloDagger.base.BaseViewModel
 import dagger.MapKey
 import kotlin.reflect.KClass
 
@@ -10,4 +10,4 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)
 @MapKey
-annotation class ViewModelKey(val value: KClass<out MvRxViewModel<*>>)
+annotation class ViewModelKey(val value: KClass<out BaseViewModel<*>>)

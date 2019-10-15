@@ -2,7 +2,7 @@ package com.airbnb.mvrx.helloDagger
 
 import com.airbnb.mvrx.*
 import com.airbnb.mvrx.helloDagger.di.AssistedViewModelFactory
-import com.airbnb.mvrx.helloDagger.base.MvRxViewModel
+import com.airbnb.mvrx.helloDagger.base.BaseViewModel
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 
@@ -11,7 +11,7 @@ data class HelloState(val message: Async<String> = Uninitialized) : MvRxState
 class HelloViewModel @AssistedInject constructor(
         @Assisted state: HelloState,
         private val repo: HelloRepository
-) : MvRxViewModel<HelloState>(state) {
+) : BaseViewModel<HelloState>(state) {
 
     init {
         sayHello()

@@ -14,14 +14,14 @@ import com.airbnb.mvrx.helloDagger.di.AssistedViewModelFactory
  * using their AssistedInject Factories. **Each AssistedInject Factory should implement the
  * [AssistedViewModelFactory] interface.**
  */
-abstract class MvRxViewModel<S : MvRxState>(initialState: S) : BaseMvRxViewModel<S>(initialState, BuildConfig.DEBUG) {
+abstract class BaseViewModel<S : MvRxState>(initialState: S) : BaseMvRxViewModel<S>(initialState, BuildConfig.DEBUG) {
 
     companion object {
-        inline fun <reified VM : MvRxViewModel<S>, reified S : MvRxState> createViewModel(
+        inline fun <reified VM : BaseViewModel<S>, reified S : MvRxState> createViewModel(
                 fragmentActivity: FragmentActivity,
                 state: S
         ): VM {
-            val activity = fragmentActivity as MvRxActivity
+            val activity = fragmentActivity as BaseActivity
             val viewModelFactory = activity.viewModelFactoryMap[VM::class.java]
             @Suppress("UNCHECKED_CAST")
             val castedViewModelFactory = viewModelFactory as? AssistedViewModelFactory<VM, S>

@@ -1,5 +1,5 @@
 package com.airbnb.mvrx.helloDagger
 
-import com.airbnb.mvrx.helloDagger.base.MvRxActivity
+import com.airbnb.mvrx.helloDagger.base.BaseActivity
 
-class MainActivity : MvRxActivity(R.layout.activity_main)
+class MainActivity : BaseActivity(R.layout.activity_main)
