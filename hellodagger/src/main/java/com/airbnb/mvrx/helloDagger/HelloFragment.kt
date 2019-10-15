@@ -7,7 +7,7 @@ import kotlinx.android.synthetic.main.fragment_hello.*
 
 class HelloFragment: BaseMvRxFragment(R.layout.fragment_hello) {
 
-    private val viewModel: HelloViewModel by fragmentViewModel()
+    val viewModel: HelloViewModel by fragmentViewModel()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         helloButton.setOnClickListener { viewModel.sayHello() }
