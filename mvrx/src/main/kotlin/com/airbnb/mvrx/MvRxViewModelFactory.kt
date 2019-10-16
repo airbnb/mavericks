@@ -3,6 +3,8 @@ package com.airbnb.mvrx
 import android.app.Application
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.savedstate.SavedStateRegistry
 
 /**
  * Implement this on your ViewModel's companion object for hooks into state creation and ViewModel creation. For example, if you need access
@@ -49,6 +51,9 @@ sealed class ViewModelContext {
      */
     abstract val activity: FragmentActivity
 
+    internal abstract val savedStateRegistry: SavedStateRegistry
+    internal abstract val owner: ViewModelStoreOwner
+
     /**
      * Convenience method to type [activity].
      */
@@ -78,16 +83,19 @@ sealed class ViewModelContext {
  * reference is available when an activity scoped ViewModel is first created, during process restoration, activity scoped ViewModels will be created
  * _without_ a fragment reference, so it is only safe to reference the activity.
  */
-class ActivityViewModelContext(
+data class ActivityViewModelContext(
     override val activity: FragmentActivity,
     override val args: Any?
-) : ViewModelContext()
+) : ViewModelContext() {
+    override val owner get() = activity
+    override val savedStateRegistry get() = activity.savedStateRegistry
+}
 
 /**
  * The [ViewModelContext] for a ViewModel created with a
  * fragment scope (`val viewModel by fragmentViewModel<MyViewModel>`).
  */
-class FragmentViewModelContext(
+data class FragmentViewModelContext(
     override val activity: FragmentActivity,
     override val args: Any?,
     /**
@@ -95,6 +103,9 @@ class FragmentViewModelContext(
      */
     val fragment: Fragment
 ) : ViewModelContext() {
+
+    override val owner get() = fragment
+    override val savedStateRegistry get() = fragment.savedStateRegistry
     /**
      * Convenience method to type [fragment].
      */

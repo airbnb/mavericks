@@ -6,15 +6,15 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.appcompat.widget.Toolbar
 import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.airbnb.mvrx.BaseMvRxActivity
 import com.airbnb.mvrx.todomvrx.todoapp.R
 
-class MainActivity : BaseMvRxActivity() {
+class MainActivity : AppCompatActivity() {
 
     private val drawerLayout by lazy { findViewById<DrawerLayout>(R.id.drawer_layout) }
 

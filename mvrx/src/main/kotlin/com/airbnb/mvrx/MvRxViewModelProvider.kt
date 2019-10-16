@@ -1,10 +1,14 @@
 package com.airbnb.mvrx
 
+import android.os.Bundle
+import android.os.Parcelable
 import androidx.annotation.RestrictTo
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModelProviders
-import kotlin.reflect.full.primaryConstructor
+import androidx.lifecycle.ViewModelProvider
+import java.io.Serializable
+import java.lang.IllegalArgumentException
+import java.lang.IllegalStateException
 
 /**
  * Helper ViewModelProvider that has a single method for taking either a [Fragment] or [FragmentActivity] instead
@@ -22,68 +26,88 @@ object MvRxViewModelProvider {
      *                         Either [ActivityViewModelContext] or [FragmentViewModelContext].
      * @param key An optional key for the ViewModel in the store. This is optional but should be used if you have multiple of the same
      *            ViewModel class in the same scope.
+     * @param forExistingViewModel If true the viewModel should already have been created. If it has not been created already,
+     *                             a [ViewModelDoesNotExistException] will be thrown
+     * @param initialStateFactory A way to specify how to create the initial state, can be mocked out for testing.
+     *
      */
     fun <VM : BaseMvRxViewModel<S>, S : MvRxState> get(
         viewModelClass: Class<out VM>,
         stateClass: Class<out S>,
         viewModelContext: ViewModelContext,
         key: String = viewModelClass.name,
+        forExistingViewModel: Boolean = false,
         initialStateFactory: MvRxStateFactory<VM, S> = RealMvRxStateFactory()
     ): VM {
-        // This wraps the fact that ViewModelProvider.of has individual methods for Fragment and FragmentActivity.
-        val factory = MvRxFactory { createViewModel(viewModelClass, stateClass, viewModelContext, initialStateFactory = initialStateFactory) }
-        return when (viewModelContext) {
-            is ActivityViewModelContext -> ViewModelProviders.of(viewModelContext.activity, factory)
-            is FragmentViewModelContext -> ViewModelProviders.of(viewModelContext.fragment, factory)
-        }.get(key, viewModelClass)
+        val savedStateRegistry = viewModelContext.savedStateRegistry
+
+        if (!savedStateRegistry.isRestored) {
+            error(ACCESSED_BEFORE_ON_CREATE_ERR_MSG)
+        }
+
+        val stateRestorer = savedStateRegistry
+            .consumeRestoredStateForKey(key)
+            ?.toStateRestorer<S>(viewModelContext)
+
+        val restoredContext = stateRestorer?.viewModelContext ?: viewModelContext
+
+        val viewModel = ViewModelProvider(
+            viewModelContext.owner,
+            MvRxFactory(
+                viewModelClass,
+                stateClass,
+                restoredContext,
+                key,
+                stateRestorer?.toRestoredState,
+                forExistingViewModel,
+                initialStateFactory
+            )
+        ).get(key, viewModelClass)
+
+        try {
+            // Save the view model's state to the bundle so that it can be used to recreate
+            // state across system initiated process death.
+            viewModelContext.savedStateRegistry.registerSavedStateProvider(key) {
+                viewModel.getSavedStateBundle(restoredContext.args)
+            }
+        } catch (e: IllegalArgumentException) {
+            // The view model was already registered with the context. We only want the initial
+            // fragment that creates the view model to register with the saved state registry so
+            // that it saves the correct arguments.
+        }
+        return viewModel
     }
 
-    @Suppress("UNCHECKED_CAST")
-    internal fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModel(
-        viewModelClass: Class<out VM>,
-        stateClass: Class<out S>,
-        viewModelContext: ViewModelContext,
-        stateRestorer: (S) -> S = { it },
-        initialStateFactory: MvRxStateFactory<VM, S> = RealMvRxStateFactory()
-    ): VM {
-        val initialState = initialStateFactory.createInitialState(viewModelClass, stateClass, viewModelContext, stateRestorer)
-        val factoryViewModel = viewModelClass.factoryCompanion()?.let { factoryClass ->
-            try {
-                factoryClass.getMethod("create", ViewModelContext::class.java, MvRxState::class.java)
-                    .invoke(factoryClass.instance(), viewModelContext, initialState) as VM?
-            } catch (exception: NoSuchMethodException) {
-                // Check for JvmStatic method.
-                viewModelClass.getMethod("create", ViewModelContext::class.java, MvRxState::class.java)
-                    .invoke(null, viewModelContext, initialState) as VM?
-            }
-        }
-        val viewModel = factoryViewModel ?: createDefaultViewModel(viewModelClass, initialState)
-        return requireNotNull(viewModel) {
-            // If null, use Kotlin reflect for best error message. We will crash anyway, so performance
-            // doesn't matter.
-            if (viewModelClass.kotlin.primaryConstructor?.parameters?.size?.let { it > 1 } == true) {
-                "${viewModelClass.simpleName} takes dependencies other than initialState. " +
-                    "It must have companion object implementing ${MvRxViewModelFactory::class.java.simpleName} " +
-                    "with a create method returning a non-null ViewModel."
-            } else {
-                "${viewModelClass::class.java.simpleName} must have primary constructor with a " +
-                    "single non-optional parameter that takes initial state of ${stateClass.simpleName}."
+    private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> VM.getSavedStateBundle(
+        initialArgs: Any?
+    ) = withState(this) { state ->
+        Bundle().apply {
+            putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, state.persistState())
+            initialArgs?.let {
+                when (it) {
+                    is Parcelable -> putParcelable(KEY_MVRX_SAVED_ARGS, it)
+                    is Serializable -> putSerializable(KEY_MVRX_SAVED_ARGS, it)
+                    else -> error("Args must be parcelable or serializable")
+                }
             }
         }
     }
 
-    @Suppress("UNCHECKED_CAST")
-    private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createDefaultViewModel(viewModelClass: Class<VM>, state: S): VM? {
-        // If we are checking for a default ViewModel, we expect only a single default constructor. Any other case
-        // is a misconfiguration and we will throw an appropriate error under further inspection.
-        if (viewModelClass.constructors.size == 1) {
-            val primaryConstructor = viewModelClass.constructors[0]
-            if (primaryConstructor.parameterTypes.size == 1 && primaryConstructor.parameterTypes[0].isAssignableFrom(state::class.java)) {
-                return primaryConstructor?.newInstance(state) as? VM
-            }
+    private fun <S : MvRxState> Bundle.toStateRestorer(viewModelContext: ViewModelContext): StateRestorer<S> {
+        val restoredArgs = get(KEY_MVRX_SAVED_ARGS)
+        val restoredState = getBundle(KEY_MVRX_SAVED_INSTANCE_STATE)
+
+        requireNotNull(restoredState) { "State was not saved prior to restoring!" }
+
+        val restoredContext = when (viewModelContext) {
+            is ActivityViewModelContext -> viewModelContext.copy(args = restoredArgs)
+            is FragmentViewModelContext -> viewModelContext.copy(args = restoredArgs)
         }
-        return null
+        return StateRestorer(restoredContext, restoredState::restorePersistedState)
     }
+
+    private const val KEY_MVRX_SAVED_INSTANCE_STATE = "mvrx:saved_instance_state"
+    private const val KEY_MVRX_SAVED_ARGS = "mvrx:saved_args"
 }
 
 /**
@@ -105,3 +129,11 @@ internal fun <VM : BaseMvRxViewModel<*>> Class<VM>.factoryCompanion(): Class<out
 internal fun Class<*>.instance(): Any {
     return declaredConstructors.first { it.parameterTypes.size == 1 }.newInstance(null)
 }
+
+internal const val ACCESSED_BEFORE_ON_CREATE_ERR_MSG =
+    "You can only access a view model after super.onCreate of your activity/fragment has been called."
+
+private data class StateRestorer<S : MvRxState>(
+    val viewModelContext: ViewModelContext,
+    val toRestoredState: (S) -> S
+)

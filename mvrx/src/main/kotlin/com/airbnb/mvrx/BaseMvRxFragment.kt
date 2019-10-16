@@ -12,13 +12,10 @@ import androidx.lifecycle.LifecycleOwner
  */
 abstract class BaseMvRxFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(contentLayoutId), MvRxView {
 
-    override val mvrxViewModelStore by lazy { MvRxViewModelStore(viewModelStore) }
-
     private val mvrxViewIdProperty = MvRxViewId()
     final override val mvrxViewId: String by mvrxViewIdProperty
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        mvrxViewModelStore.restoreViewModels(this, savedInstanceState)
         mvrxViewIdProperty.restoreFrom(savedInstanceState)
         super.onCreate(savedInstanceState)
     }
@@ -32,7 +29,6 @@ abstract class BaseMvRxFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        mvrxViewModelStore.saveViewModels(outState)
         mvrxViewIdProperty.saveTo(outState)
     }
 

@@ -1,9 +1,9 @@
 package com.airbnb.mvrx.dogs
 
 import android.os.Bundle
-import com.airbnb.mvrx.BaseMvRxActivity
+import androidx.appcompat.app.AppCompatActivity
 
-class DogsActivity : BaseMvRxActivity() {
+class DogsActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

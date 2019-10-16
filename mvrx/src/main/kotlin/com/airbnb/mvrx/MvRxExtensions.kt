@@ -4,7 +4,6 @@ import androidx.annotation.RestrictTo
 import androidx.annotation.RestrictTo.Scope.LIBRARY
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModelProviders
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
@@ -25,8 +24,12 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragm
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
-    MvRxViewModelProvider.get(viewModelClass.java, S::class.java, FragmentViewModelContext(this.requireActivity(), _fragmentArgsProvider(), this), keyFactory())
-        .apply { subscribe(this@fragmentViewModel, subscriber = { postInvalidate() }) }
+    MvRxViewModelProvider.get(
+        viewModelClass.java,
+        S::class.java,
+        FragmentViewModelContext(this.requireActivity(), _fragmentArgsProvider(), this),
+        keyFactory()
+    ).apply { subscribe(this@fragmentViewModel, subscriber = { postInvalidate() }) }
 }
 
 /**
@@ -39,20 +42,19 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.paren
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ): Lazy<VM> where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
     requireNotNull(parentFragment) { "There is no parent fragment for ${this::class.java.simpleName}!" }
-    val notFoundMessage = { "There is no ViewModel of type ${VM::class.java.simpleName} for this Fragment!" }
-    val factory = MvRxFactory { error(notFoundMessage()) }
     var fragment: Fragment? = parentFragment
     val key = keyFactory()
     while (fragment != null) {
         try {
-            return@lifecycleAwareLazy ViewModelProviders.of(fragment, factory).get(key, viewModelClass.java)
-                .apply { subscribe(this@parentFragmentViewModel, subscriber = { postInvalidate() }) }
-        } catch (e: java.lang.IllegalStateException) {
-            if (e.message == notFoundMessage()) {
-                fragment = fragment.parentFragment
-            } else {
-                throw e
-            }
+            return@lifecycleAwareLazy MvRxViewModelProvider.get(
+                viewModelClass.java,
+                S::class.java,
+                FragmentViewModelContext(this.requireActivity(), _fragmentArgsProvider(), fragment),
+                key,
+                forExistingViewModel = true
+            ).apply { subscribe(this@parentFragmentViewModel, subscriber = { postInvalidate() }) }
+        } catch (e: ViewModelDoesNotExistException) {
+            fragment = fragment.parentFragment
         }
     }
 
@@ -87,13 +89,17 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.targe
  * [activityViewModel] except it will throw [IllegalStateException] if the ViewModel doesn't already exist.
  * Use this for screens in the middle of a flow that cannot reasonably be an entrypoint to the flow.
  */
-inline fun <T, reified VM : BaseMvRxViewModel<S>, S : MvRxState> T.existingViewModel(
+inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.existingViewModel(
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
-    val factory = MvRxFactory { throw IllegalStateException("ViewModel for ${requireActivity()}[${keyFactory()}] does not exist yet!") }
-    ViewModelProviders.of(requireActivity(), factory).get(keyFactory(), viewModelClass.java)
-        .apply { subscribe(this@existingViewModel, subscriber = { postInvalidate() }) }
+    MvRxViewModelProvider.get(
+        viewModelClass.java,
+        S::class.java,
+        ActivityViewModelContext(requireActivity(), _fragmentArgsProvider()),
+        keyFactory(),
+        forExistingViewModel = true
+    ).apply { subscribe(this@existingViewModel, subscriber = { postInvalidate() }) }
 }
 
 /**
@@ -103,9 +109,12 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activ
     viewModelClass: KClass<VM> = VM::class,
     noinline keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
-    if (requireActivity() !is MvRxViewModelStoreOwner) throw IllegalArgumentException("Your Activity must be a MvRxViewModelStoreOwner!")
-    MvRxViewModelProvider.get(viewModelClass.java, S::class.java, ActivityViewModelContext(requireActivity(), _activityArgsProvider(keyFactory)), keyFactory())
-        .apply { subscribe(this@activityViewModel, subscriber = { postInvalidate() }) }
+    MvRxViewModelProvider.get(
+        viewModelClass.java,
+        S::class.java,
+        ActivityViewModelContext(requireActivity(), _fragmentArgsProvider()),
+        keyFactory()
+    ).apply { subscribe(this@activityViewModel, subscriber = { postInvalidate() })  }
 }
 
 /**
@@ -118,35 +127,18 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activ
 fun <T : Fragment> T._fragmentArgsProvider(): Any? = arguments?.get(MvRx.KEY_ARG)
 
 /**
- * For internal use only. Public for inline.
- *
- * Looks for [MvRx.KEY_ARG] on the arguments of the fragment receiver.
- *
- * Also adds the fragment's MvRx args to the host Activity's [MvRxViewModelStore] so that they can be used to recreate initial state
- * in a new process.
- */
-@Suppress("FunctionName")
-@RestrictTo(LIBRARY)
-inline fun <T : Fragment> T._activityArgsProvider(keyFactory: () -> String): Any? {
-    val args: Any? = _fragmentArgsProvider()
-    val activity = requireActivity()
-    if (activity is MvRxViewModelStoreOwner) {
-        activity.mvrxViewModelStore._saveActivityViewModelArgs(keyFactory(), args)
-    } else {
-        throw IllegalArgumentException("Your Activity must be a MvRxViewModelStoreOwner!")
-    }
-    return args
-}
-
-/**
  * [fragmentViewModel] except scoped to the current Activity. Use this to share state between different Fragments.
  */
 inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.viewModel(
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
-) where T : FragmentActivity,
-        T : MvRxViewModelStoreOwner = lifecycleAwareLazy(this) {
-    MvRxViewModelProvider.get(viewModelClass.java, S::class.java, ActivityViewModelContext(this, intent.extras?.get(MvRx.KEY_ARG)), keyFactory())
+) where T : FragmentActivity = lifecycleAwareLazy(this) {
+    MvRxViewModelProvider.get(
+        viewModelClass.java,
+        S::class.java,
+        ActivityViewModelContext(this, intent.extras?.get(MvRx.KEY_ARG)),
+        keyFactory()
+    )
 }
 
 /**
