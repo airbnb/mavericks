@@ -1,5 +1,16 @@
 # Change log
 
+## Version 1.3.0
+- Revamp state saving to use Android Jetpack `SavedStateRegistry` (#254)
+
+Breaking - This removes the need for `MvRxViewModelStoreOwner` and `BaseMvRxActivity` and thus those classes
+are now deleted.
+
+If you were using `BaseMvRxActivity` you can instead now extend from `AppCompatActivity`.
+
+All usages of `mvrxViewModelStore` can simply be deleted - state saving now happens completley
+automatically.
+
 ## Version 1.2.1
 - Fix sources not included in 1.2.0 release
 
