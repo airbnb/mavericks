@@ -1,0 +1,67 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+
+android {
+    compileSdkVersion 28
+    resourcePrefix 'mvrx_'
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 28
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+    buildToolsVersion "$buildToolsVersion"
+    lintOptions {
+        abortOnError true
+        textReport true
+        textOutput 'stdout'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+    }
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    implementation "androidx.core:core-ktx:$androidKtxVersion"
+    implementation "androidx.appcompat:appcompat:$appCompatVersion"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutineVersion"
+    implementation("com.airbnb.android:epoxy:$epoxyVersion") { exclude group: 'com.android.support' }
+    kapt "com.airbnb.android:epoxy-processor:$epoxyVersion"
+    implementation project(':mvrx')
+    testImplementation 'junit:junit:4.12'
+}
+
+// Ensure custom source sets are included:
+// https://www.virag.si/2015/01/publishing-gradle-android-library-to-jcenter/
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+tasks.withType(Javadoc).all {
+    enabled = false
+}

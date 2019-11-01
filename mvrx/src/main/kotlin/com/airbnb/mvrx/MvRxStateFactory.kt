@@ -13,6 +13,7 @@ interface MvRxStateFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> {
     ): S
 }
 
+@PublishedApi
 internal class RealMvRxStateFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> : MvRxStateFactory<VM, S> {
 
     override fun createInitialState(

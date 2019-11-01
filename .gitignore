@@ -1,6 +1,7 @@
 *.iml
 .gradle
 /local.properties
+/mvrx_temp_mocks/*
 .idea
 .DS_Store
 **/build

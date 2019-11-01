@@ -4,16 +4,21 @@ import android.util.Log
 import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
 import androidx.lifecycle.Lifecycle
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModel
 import com.airbnb.mvrx.MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER
+import com.airbnb.mvrx.mock.MockBehavior
+import com.airbnb.mvrx.mock.MvRxViewModelConfig
+import com.airbnb.mvrx.mock.reportExecuteCallToInteractionTest
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.Disposables
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
 import java.util.Collections
@@ -26,22 +31,28 @@ import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.isAccessible
 
 /**
- * To use MvRx, create your own base MvRxViewModel that extends this one and sets debugMode.
- *
- * All subsequent ViewModels in your app should use that one.
+ * To use MvRx, create view models that extend this base view model.
  */
 abstract class BaseMvRxViewModel<S : MvRxState>(
-    initialState: S,
-    debugMode: Boolean,
-    private val stateStore: MvRxStateStore<S> = RealMvRxStateStore(initialState)
+    initialState: S
 ) : ViewModel() {
-    private val debugMode = if (MvRxTestOverrides.FORCE_DEBUG == null) debugMode else MvRxTestOverrides.FORCE_DEBUG
 
+    @Suppress("LeakingThis")
+    @PublishedApi
+    internal val config: MvRxViewModelConfig<S> = MvRx.viewModelConfigProvider.provideConfig(
+        this,
+        initialState
+    )
+
+    private val debugMode = config.debugMode
+
+    private val stateStore = config.stateStore
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
     private lateinit var mutableStateChecker: MutableStateChecker<S>
     private val lastDeliveredStates = ConcurrentHashMap<String, Any>()
-    private val activeSubscriptions = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
+    private val activeSubscriptions =
+        Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
     /**
      * Define a [LifecycleOwner] to control subscriptions between [BaseMvRxViewModel]s. This only
@@ -54,13 +65,15 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * between two view models.
      */
     private val lifecycleOwner: LifecycleOwner = LifecycleOwner { lifecycleRegistry }
-    private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(lifecycleOwner).apply { currentState = Lifecycle.State.RESUMED }
+    private val lifecycleRegistry: LifecycleRegistry =
+        LifecycleRegistry(lifecycleOwner).apply { currentState = Lifecycle.State.RESUMED }
 
     internal val state: S
         get() = stateStore.state
 
     init {
-        Completable.fromCallable { warmReflectionCache(initialState) }.subscribeOn(Schedulers.computation()).subscribe()
+        Completable.fromCallable { warmReflectionCache(initialState) }
+            .subscribeOn(Schedulers.computation()).subscribe()
 
         if (this.debugMode) {
             mutableStateChecker = MutableStateChecker(initialState)
@@ -93,6 +106,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     @CallSuper
     override fun onCleared() {
         super.onCleared()
+        stateStore.dispose()
         disposables.dispose()
         stateStore.dispose()
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
@@ -131,14 +145,14 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
                     if (changedProp != null) {
                         throw IllegalArgumentException(
                             "Impure reducer set on ${this@BaseMvRxViewModel::class.simpleName}! " +
-                                "${changedProp.name} changed from ${changedProp.get(firstState)} " +
-                                "to ${changedProp.get(secondState)}. " +
-                                "Ensure that your state properties properly implement hashCode."
+                                    "${changedProp.name} changed from ${changedProp.get(firstState)} " +
+                                    "to ${changedProp.get(secondState)}. " +
+                                    "Ensure that your state properties properly implement hashCode."
                         )
                     } else {
                         throw IllegalArgumentException(
                             "Impure reducer set on ${this@BaseMvRxViewModel::class.simpleName}! Differing states were provided by the same reducer." +
-                                "Ensure that your state properties properly implement hashCode. First state: $firstState -> Second state: $secondState"
+                                    "Ensure that your state properties properly implement hashCode. First state: $firstState -> Second state: $secondState"
                         )
                     }
                 }
@@ -148,6 +162,25 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             }
         } else {
             stateStore.set(reducer)
+        }
+    }
+
+    /**
+     * If this state store is a [ScriptableStateStore], this function can be called to force
+     * the current state to the given state. It is an error to call this if the store is not
+     * scriptable.
+     */
+    @PublishedApi
+    @VisibleForTesting
+    internal fun freezeStateForTesting(state: S) {
+        if (stateStore is ScriptableStateStore) {
+            stateStore.next(state)
+        } else {
+            if (debugMode) {
+                error("ScriptableStateStore must be enabled to use this")
+            } else {
+                Log.e(tag, "ScriptableStateStore must be set to freeze state")
+            }
         }
     }
 
@@ -164,9 +197,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * a fair amount of reflection.
      */
     private fun validateState(initialState: S) {
-        if (state::class.visibility != KVisibility.PUBLIC) {
-            throw IllegalStateException("Your state class ${state::class.qualifiedName} must be public.")
-        }
+        check(state::class.visibility == KVisibility.PUBLIC) { "Your state class ${state::class.qualifiedName} must be public." }
         state::class.assertImmutability()
         val bundle = state.persistState(assertCollectionPersistability = true)
         bundle.restorePersistedState(initialState)
@@ -224,6 +255,16 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         successMetaData: ((T) -> Any)? = null,
         stateReducer: S.(Async<V>) -> S
     ): Disposable {
+        val blockExecutions =
+            config.currentMockBehavior?.blockExecutions ?: MockBehavior.BlockExecutions.No
+
+        if (blockExecutions != MockBehavior.BlockExecutions.No) {
+            reportExecuteCallToInteractionTest()
+            if (blockExecutions == MockBehavior.BlockExecutions.WithLoading) {
+                setState { stateReducer(Loading()) }
+            }
+            return Disposables.disposed()
+        }
         // Intentionally didn't use RxJava's startWith operator. When withState is called right after execute then the loading reducer won't be enqueued yet if startWith is used.
         setState { stateReducer(Loading()) }
 
@@ -238,6 +279,29 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             }
             .subscribe { asyncData -> setState { stateReducer(asyncData) } }
             .disposeOnClear()
+    }
+
+    /**
+     * Similar to [execute]. This subscribes to an Observable, provides a reducing function to update state when the observable passes a value,
+     * and registers the subscription to be disposed when the ViewModel is cleared.
+     *
+     * This function should be preferred over calling [Observable.subscribe] directly so that disposal is handled for you, and so setting state
+     * is simplified.
+     */
+    fun <T> Observable<T>.executeWithoutAsync(stateReducer: S.(value: T) -> S): Disposable {
+        val blockExecutions =
+            config.currentMockBehavior?.blockExecutions ?: MockBehavior.BlockExecutions.No
+
+        if (blockExecutions != MockBehavior.BlockExecutions.No) {
+            reportExecuteCallToInteractionTest()
+            return Disposables.disposed()
+        }
+
+        return subscribe { value ->
+            setState {
+                stateReducer(value)
+            }
+        }.disposeOnClear()
     }
 
     /**
@@ -266,7 +330,11 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
-    fun subscribe(owner: LifecycleOwner, deliveryMode: DeliveryMode = RedeliverOnStart, subscriber: (S) -> Unit) =
+    fun subscribe(
+        owner: LifecycleOwner,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
+        subscriber: (S) -> Unit
+    ) =
         stateStore.observable.subscribeLifecycle(owner, deliveryMode, subscriber)
 
     /**
@@ -305,7 +373,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ) = stateStore.observable
         .map { MvRxTuple1(prop1.get(it)) }
         .distinctUntilChanged()
-        .subscribeLifecycle(owner, deliveryMode.appendPropertiesToId(prop1)) { (a) -> subscriber(a) }
+        .subscribeLifecycle(
+            owner,
+            deliveryMode.appendPropertiesToId(prop1)
+        ) { (a) -> subscriber(a) }
 
     /**
      * Subscribe to changes in an async property. There are optional parameters for onSuccess
@@ -328,7 +399,13 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         onSuccess: ((T) -> Unit)? = null
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.asyncSubscribeInternal(lifecycleOwner, asyncProp, RedeliverOnStart, onFail, onSuccess)
+        viewModel.asyncSubscribeInternal(
+            lifecycleOwner,
+            asyncProp,
+            RedeliverOnStart,
+            onFail,
+            onSuccess
+        )
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -346,7 +423,11 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         deliveryMode: DeliveryMode,
         onFail: ((Throwable) -> Unit)? = null,
         onSuccess: ((T) -> Unit)? = null
-    ) = selectSubscribeInternal(owner, asyncProp, deliveryMode.appendPropertiesToId(asyncProp)) { asyncValue ->
+    ) = selectSubscribeInternal(
+        owner,
+        asyncProp,
+        deliveryMode.appendPropertiesToId(asyncProp)
+    ) { asyncValue ->
         if (onSuccess != null && asyncValue is Success) {
             onSuccess(asyncValue())
         } else if (onFail != null && asyncValue is Fail) {
@@ -373,7 +454,13 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (A, B) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.selectSubscribeInternal(lifecycleOwner, prop1, prop2, RedeliverOnStart, subscriber)
+        viewModel.selectSubscribeInternal(
+            lifecycleOwner,
+            prop1,
+            prop2,
+            RedeliverOnStart,
+            subscriber
+        )
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -394,7 +481,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ) = stateStore.observable
         .map { MvRxTuple2(prop1.get(it), prop2.get(it)) }
         .distinctUntilChanged()
-        .subscribeLifecycle(owner, deliveryMode.appendPropertiesToId(prop1, prop2)) { (a, b) -> subscriber(a, b) }
+        .subscribeLifecycle(
+            owner,
+            deliveryMode.appendPropertiesToId(prop1, prop2)
+        ) { (a, b) -> subscriber(a, b) }
 
     /**
      * Subscribe to state changes for three properties.
@@ -417,7 +507,14 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (A, B, C) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.selectSubscribeInternal(lifecycleOwner, prop1, prop2, prop3, RedeliverOnStart, subscriber)
+        viewModel.selectSubscribeInternal(
+            lifecycleOwner,
+            prop1,
+            prop2,
+            prop3,
+            RedeliverOnStart,
+            subscriber
+        )
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -440,7 +537,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     ) = stateStore.observable
         .map { MvRxTuple3(prop1.get(it), prop2.get(it), prop3.get(it)) }
         .distinctUntilChanged()
-        .subscribeLifecycle(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3)) { (a, b, c) ->
+        .subscribeLifecycle(
+            owner,
+            deliveryMode.appendPropertiesToId(prop1, prop2, prop3)
+        ) { (a, b, c) ->
             subscriber(
                 a,
                 b,
@@ -471,7 +571,15 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (A, B, C, D) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.selectSubscribeInternal(lifecycleOwner, prop1, prop2, prop3, prop4, RedeliverOnStart, subscriber)
+        viewModel.selectSubscribeInternal(
+            lifecycleOwner,
+            prop1,
+            prop2,
+            prop3,
+            prop4,
+            RedeliverOnStart,
+            subscriber
+        )
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -511,7 +619,16 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop4: KProperty1<S, D>,
         prop5: KProperty1<S, E>,
         subscriber: (A, B, C, D, E) -> Unit
-    ) = selectSubscribeInternal(null, prop1, prop2, prop3, prop4, prop5, RedeliverOnStart, subscriber)
+    ) = selectSubscribeInternal(
+        null,
+        prop1,
+        prop2,
+        prop3,
+        prop4,
+        prop5,
+        RedeliverOnStart,
+        subscriber
+    )
 
     /**
      * Subscribe to state changes for five properties in a different ViewModel.
@@ -526,7 +643,16 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (A, B, C, D, E) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.selectSubscribeInternal(lifecycleOwner, prop1, prop2, prop3, prop4, prop5, RedeliverOnStart, subscriber)
+        viewModel.selectSubscribeInternal(
+            lifecycleOwner,
+            prop1,
+            prop2,
+            prop3,
+            prop4,
+            prop5,
+            RedeliverOnStart,
+            subscriber
+        )
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -551,7 +677,15 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         deliveryMode: DeliveryMode,
         subscriber: (A, B, C, D, E) -> Unit
     ) = stateStore.observable
-        .map { MvRxTuple5(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it)) }
+        .map {
+            MvRxTuple5(
+                prop1.get(it),
+                prop2.get(it),
+                prop3.get(it),
+                prop4.get(it),
+                prop5.get(it)
+            )
+        }
         .distinctUntilChanged()
         .subscribeLifecycle(
             owner,
@@ -569,7 +703,17 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop5: KProperty1<S, E>,
         prop6: KProperty1<S, F>,
         subscriber: (A, B, C, D, E, F) -> Unit
-    ) = selectSubscribeInternal(null, prop1, prop2, prop3, prop4, prop5, prop6, RedeliverOnStart, subscriber)
+    ) = selectSubscribeInternal(
+        null,
+        prop1,
+        prop2,
+        prop3,
+        prop4,
+        prop5,
+        prop6,
+        RedeliverOnStart,
+        subscriber
+    )
 
     /**
      * Subscribe to state changes for six properties in a different ViewModel.
@@ -585,7 +729,17 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (A, B, C, D, E, F) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.selectSubscribeInternal(lifecycleOwner, prop1, prop2, prop3, prop4, prop5, prop6, RedeliverOnStart, subscriber)
+        viewModel.selectSubscribeInternal(
+            lifecycleOwner,
+            prop1,
+            prop2,
+            prop3,
+            prop4,
+            prop5,
+            prop6,
+            RedeliverOnStart,
+            subscriber
+        )
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -599,7 +753,17 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop6: KProperty1<S, F>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A, B, C, D, E, F) -> Unit
-    ) = selectSubscribeInternal(owner, prop1, prop2, prop3, prop4, prop5, prop6, deliveryMode, subscriber)
+    ) = selectSubscribeInternal(
+        owner,
+        prop1,
+        prop2,
+        prop3,
+        prop4,
+        prop5,
+        prop6,
+        deliveryMode,
+        subscriber
+    )
 
     private fun <A, B, C, D, E, F> selectSubscribeInternal(
         owner: LifecycleOwner?,
@@ -612,7 +776,16 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         deliveryMode: DeliveryMode,
         subscriber: (A, B, C, D, E, F) -> Unit
     ) = stateStore.observable
-        .map { MvRxTuple6(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it), prop6.get(it)) }
+        .map {
+            MvRxTuple6(
+                prop1.get(it),
+                prop2.get(it),
+                prop3.get(it),
+                prop4.get(it),
+                prop5.get(it),
+                prop6.get(it)
+            )
+        }
         .distinctUntilChanged()
         .subscribeLifecycle(
             owner,
@@ -631,7 +804,18 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop6: KProperty1<S, F>,
         prop7: KProperty1<S, G>,
         subscriber: (A, B, C, D, E, F, G) -> Unit
-    ) = selectSubscribeInternal(null, prop1, prop2, prop3, prop4, prop5, prop6, prop7, RedeliverOnStart, subscriber)
+    ) = selectSubscribeInternal(
+        null,
+        prop1,
+        prop2,
+        prop3,
+        prop4,
+        prop5,
+        prop6,
+        prop7,
+        RedeliverOnStart,
+        subscriber
+    )
 
     /**
      * Subscribe to state changes for seven properties in a different ViewModel.
@@ -648,7 +832,18 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (A, B, C, D, E, F, G) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.selectSubscribeInternal(lifecycleOwner, prop1, prop2, prop3, prop4, prop5, prop6, prop7, RedeliverOnStart, subscriber)
+        viewModel.selectSubscribeInternal(
+            lifecycleOwner,
+            prop1,
+            prop2,
+            prop3,
+            prop4,
+            prop5,
+            prop6,
+            prop7,
+            RedeliverOnStart,
+            subscriber
+        )
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
@@ -663,7 +858,18 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop7: KProperty1<S, G>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A, B, C, D, E, F, G) -> Unit
-    ) = selectSubscribeInternal(owner, prop1, prop2, prop3, prop4, prop5, prop6, prop7, deliveryMode, subscriber)
+    ) = selectSubscribeInternal(
+        owner,
+        prop1,
+        prop2,
+        prop3,
+        prop4,
+        prop5,
+        prop6,
+        prop7,
+        deliveryMode,
+        subscriber
+    )
 
     private fun <A, B, C, D, E, F, G> selectSubscribeInternal(
         owner: LifecycleOwner?,
@@ -719,12 +925,13 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
                     if (activeSubscriptions.contains(deliveryMode.subscriptionId)) {
                         throw IllegalStateException(
                             "Subscribing with a duplicate subscription id: ${deliveryMode.subscriptionId}. " +
-                                "If you have multiple uniqueOnly subscriptions in a MvRx view that listen to the same properties " +
-                                "you must use a custom subscription id. If you are using a custom MvRxView, make sure you are using the proper" +
-                                "lifecycle owner. See BaseMvRxFragment for an example."
+                                    "If you have multiple uniqueOnly subscriptions in a MvRx view that listen to the same properties " +
+                                    "you must use a custom subscription id. If you are using a custom MvRxView, make sure you are using the proper" +
+                                    "lifecycle owner. See BaseMvRxFragment for an example."
                         )
                     }
                     activeSubscriptions.add(deliveryMode.subscriptionId)
+                    @Suppress("UNCHECKED_CAST")
                     lastDeliveredStates[deliveryMode.subscriptionId] as? T
                 } else {
                     null

@@ -1,6 +1,9 @@
 package com.airbnb.mvrx.test
 
+import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxTestOverridesProxy
+import com.airbnb.mvrx.mock.MockBehavior
+import com.airbnb.mvrx.mock.MvRxViewModelConfigProvider
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.exceptions.CompositeException
 import io.reactivex.plugins.RxJavaPlugins
@@ -14,32 +17,43 @@ enum class DebugMode(internal val value: Boolean?) {
 }
 
 class MvRxTestRule(
-        /**
-         * Forces MvRx to be in debug mode or not.
-         */
-        private val debugMode: DebugMode = DebugMode.NotDebug,
-        /**
-         * Sets up all Rx schedulers to use an immediate scheduler. This will cause all MvRx
-         * operations including setState reducers to run synchronously so you can test them.
-         */
-        private val setRxImmediateSchedulers: Boolean = true,
-        private val setForceDisableLifecycleAwareObserver: Boolean = true
+    /**
+     * Forces MvRx to be in debug mode or not.
+     */
+    private val debugMode: DebugMode = DebugMode.NotDebug,
+    private val mockBehavior: MockBehavior? = null,
+    /**
+     * Sets up all Rx schedulers to use an immediate scheduler. This will cause all MvRx
+     * operations including setState reducers to run synchronously so you can test them.
+     */
+    private val setRxImmediateSchedulers: Boolean = true,
+    private val setForceDisableLifecycleAwareObserver: Boolean = true
 ) : ExternalResource() {
     private var defaultExceptionHandler: Thread.UncaughtExceptionHandler? = null
+    private val defaultConfigProvider = MvRx.viewModelConfigProvider
 
     override fun before() {
         RxAndroidPlugins.reset()
         RxAndroidPlugins.setInitMainThreadSchedulerHandler { Schedulers.trampoline() }
         RxAndroidPlugins.setMainThreadSchedulerHandler { Schedulers.trampoline() }
         if (setRxImmediateSchedulers) setRxImmediateSchedulers()
-        MvRxTestOverridesProxy.forceMvRxDebug(debugMode.value)
-        MvRxTestOverridesProxy.forceDisableLifecycleAwareObserver(setForceDisableLifecycleAwareObserver)
+
+        if (debugMode != DebugMode.Unset) {
+            MvRx.viewModelConfigProvider =
+                MvRxViewModelConfigProvider(debugMode = debugMode.value == true)
+        }
+
+        MvRx.viewModelConfigProvider.mockBehavior = mockBehavior
+
+        MvRxTestOverridesProxy.forceDisableLifecycleAwareObserver(
+            setForceDisableLifecycleAwareObserver
+        )
     }
 
     override fun after() {
         RxAndroidPlugins.reset()
-        MvRxTestOverridesProxy.forceMvRxDebug(DebugMode.Unset.value)
         if (setRxImmediateSchedulers) clearRxImmediateSchedulers()
+        MvRx.viewModelConfigProvider = defaultConfigProvider
     }
 
     private fun setRxImmediateSchedulers() {

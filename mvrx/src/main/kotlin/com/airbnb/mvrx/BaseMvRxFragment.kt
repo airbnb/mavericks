@@ -2,15 +2,19 @@ package com.airbnb.mvrx
 
 import android.os.Bundle
 import androidx.annotation.LayoutRes
+import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
+import com.airbnb.mvrx.mock.EmptyMocks
+import com.airbnb.mvrx.mock.MvRxViewMocks
 
 /**
  * Make your base Fragment class extend this to get MvRx functionality.
  *
  * This is necessary for the view model delegates and persistence to work correctly.
  */
-abstract class BaseMvRxFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(contentLayoutId), MvRxView {
+abstract class BaseMvRxFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(contentLayoutId),
+    MvRxView {
 
     private val mvrxViewIdProperty = MvRxViewId()
     final override val mvrxViewId: String by mvrxViewIdProperty
@@ -38,4 +42,6 @@ abstract class BaseMvRxFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(
         // subscribe to a ViewModel.
         postInvalidate()
     }
+
+    override fun provideMocks(): MvRxViewMocks<out MvRxView, out Parcelable> = EmptyMocks
 }

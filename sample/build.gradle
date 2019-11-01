@@ -30,6 +30,10 @@ androidExtensions {
 
 dependencies {
     implementation project(':mvrx')
+
+    // In real apps this should be debugImplementation so that the launcher isn't included in production!
+    implementation project(':launcher')
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     implementation "androidx.appcompat:appcompat:$appCompatVersion"

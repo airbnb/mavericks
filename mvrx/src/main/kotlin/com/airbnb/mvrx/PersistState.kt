@@ -113,7 +113,7 @@ internal fun <T : Any> Bundle.restorePersistedState(initialState: T): T {
             map
         }
     // Add the instance to call copy on
-    copyArgs[copyMethod.instanceParameter ?: throw IllegalStateException("Copy method not a member of a class. This should never happen.")] =
+    copyArgs[copyMethod.instanceParameter ?: error("Copy method not a member of a class. This should never happen.")] =
         initialState
     return copyMethod.callBy(copyArgs)
 }

@@ -3,8 +3,12 @@ package com.airbnb.mvrx
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import android.os.Parcelable
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
+import com.airbnb.mvrx.mock.EmptyMocks
+import com.airbnb.mvrx.mock.MvRxMockPrinter
+import com.airbnb.mvrx.mock.MvRxViewMocks
 import kotlin.reflect.KProperty1
 
 // Set of MvRxView identity hash codes that have a pending invalidate.
@@ -12,7 +16,10 @@ private val pendingInvalidates = HashSet<Int>()
 private val handler = Handler(Looper.getMainLooper(), Handler.Callback { message ->
     val view = message.obj as MvRxView
     pendingInvalidates.remove(System.identityHashCode(view))
-    if (view.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) view.invalidate()
+    if (view.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+        view.enableMockPrinterReceiver()
+        view.invalidate()
+    }
     true
 })
 
@@ -58,8 +65,33 @@ interface MvRxView : LifecycleOwner {
 
     fun postInvalidate() {
         if (pendingInvalidates.add(System.identityHashCode(this@MvRxView))) {
-            handler.sendMessage(Message.obtain(handler, System.identityHashCode(this@MvRxView), this@MvRxView))
+            handler.sendMessage(
+                Message.obtain(
+                    handler,
+                    System.identityHashCode(this@MvRxView),
+                    this@MvRxView
+                )
+            )
         }
+    }
+
+    /**
+     * Override this to provide the mock states that should be used for testing this view.
+     *
+     * You should NOT invoke this function directly. You can access the mocks for a view
+     * via [MvRxViewMocks.getFrom] instead.
+     */
+    fun provideMocks(): MvRxViewMocks<out MvRxView, out Parcelable> = EmptyMocks
+
+    /**
+     * When called, this view registers a callback with a broadcast receiver to enable printing
+     * out the state of the ViewModels.
+     *
+     * This is not intended to be overridden. By default it is called when the view is invalidated,
+     * and it is safe to call this multiple times - only one receiver will ever be registered.
+     */
+    fun enableMockPrinterReceiver() {
+        MvRxMockPrinter.startReceiverIfInDebug(this)
     }
 
     /**
@@ -74,7 +106,10 @@ interface MvRxView : LifecycleOwner {
      *
      * Default: [RedeliverOnStart].
      */
-    fun <S : MvRxState> BaseMvRxViewModel<S>.subscribe(deliveryMode: DeliveryMode = RedeliverOnStart, subscriber: (S) -> Unit) =
+    fun <S : MvRxState> BaseMvRxViewModel<S>.subscribe(
+        deliveryMode: DeliveryMode = RedeliverOnStart,
+        subscriber: (S) -> Unit
+    ) =
         subscribe(this@MvRxView.subscriptionLifecycleOwner, deliveryMode, subscriber)
 
     /**
@@ -114,7 +149,13 @@ interface MvRxView : LifecycleOwner {
         deliveryMode: DeliveryMode = RedeliverOnStart,
         onFail: ((Throwable) -> Unit)? = null,
         onSuccess: ((T) -> Unit)? = null
-    ) = asyncSubscribe(this@MvRxView.subscriptionLifecycleOwner, asyncProp, deliveryMode, onFail, onSuccess)
+    ) = asyncSubscribe(
+        this@MvRxView.subscriptionLifecycleOwner,
+        asyncProp,
+        deliveryMode,
+        onFail,
+        onSuccess
+    )
 
     /**
      * Subscribes to state changes for two properties.
@@ -133,7 +174,13 @@ interface MvRxView : LifecycleOwner {
         prop2: KProperty1<S, B>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A, B) -> Unit
-    ) = selectSubscribe(this@MvRxView.subscriptionLifecycleOwner, prop1, prop2, deliveryMode, subscriber)
+    ) = selectSubscribe(
+        this@MvRxView.subscriptionLifecycleOwner,
+        prop1,
+        prop2,
+        deliveryMode,
+        subscriber
+    )
 
     /**
      * Subscribes to state changes for three properties.
@@ -153,7 +200,14 @@ interface MvRxView : LifecycleOwner {
         prop3: KProperty1<S, C>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A, B, C) -> Unit
-    ) = selectSubscribe(this@MvRxView.subscriptionLifecycleOwner, prop1, prop2, prop3, deliveryMode, subscriber)
+    ) = selectSubscribe(
+        this@MvRxView.subscriptionLifecycleOwner,
+        prop1,
+        prop2,
+        prop3,
+        deliveryMode,
+        subscriber
+    )
 
     /**
      * Subscribes to state changes for four properties.
@@ -174,14 +228,22 @@ interface MvRxView : LifecycleOwner {
         prop4: KProperty1<S, D>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A, B, C, D) -> Unit
-    ) = selectSubscribe(this@MvRxView.subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, deliveryMode, subscriber)
+    ) = selectSubscribe(
+        this@MvRxView.subscriptionLifecycleOwner,
+        prop1,
+        prop2,
+        prop3,
+        prop4,
+        deliveryMode,
+        subscriber
+    )
 
     /**
      * Return a [UniqueOnly] delivery mode with a unique id for this fragment. In rare circumstances, if you
      * make two identical subscriptions with the same (or all) properties in this fragment, provide a customId
      * to avoid collisions.
      *
-     * @param An additional custom id to identify this subscription. Only necessary if there are two subscriptions
+     * @param customId An additional custom id to identify this subscription. Only necessary if there are two subscriptions
      * in this fragment with exact same properties (i.e. two subscribes, or two selectSubscribes with the same properties).
      */
     fun uniqueOnly(customId: String? = null): UniqueOnly {
