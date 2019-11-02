@@ -8,7 +8,7 @@ import kotlin.reflect.KProperty
 @PublishedApi
 internal inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> provideViewModel(
     existingViewModel: Boolean,
-    crossinline viewModelProvider: (fragment: T, stateFactory: MvRxStateFactory<VM, S>, isMocked: Boolean) -> VM
+    crossinline viewModelProvider: (fragment: T, stateFactory: MvRxStateFactory<VM, S>) -> VM
 ): ViewModelDelegate<T, VM, S> where T : Fragment, T : MvRxView {
     return object : ViewModelDelegate<T, VM, S>() {
 
@@ -17,11 +17,10 @@ internal inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState
             property: KProperty<*>
         ): lifecycleAwareLazy<VM> {
 
-            return setupViewModel<S>(thisRef, property, existingViewModel) { mockState ->
+                return setupViewModel<S>(thisRef, property, existingViewModel) { mockState ->
                 viewModelProvider(
                     thisRef,
-                    stateFactory(mockState),
-                    mockState != null
+                    stateFactory(mockState)
                 )
             }
         }

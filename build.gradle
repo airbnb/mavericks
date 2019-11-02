@@ -23,7 +23,7 @@ buildscript {
         maven { url "https://oss.sonatype.org/service/local/repositories/snapshots/content/" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.0'
+        classpath 'com.android.tools.build:gradle:3.5.1'
         classpath "org.jetbrains.kotlin:kotlin-android-extensions:$kotlinVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
         classpath 'net.sf.proguard:proguard-gradle:6.1.1'
