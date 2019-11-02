@@ -4,7 +4,6 @@ import androidx.annotation.RestrictTo
 import androidx.annotation.RestrictTo.Scope.LIBRARY
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.ViewModelProviders
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
@@ -26,14 +25,14 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragm
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 
 ): ViewModelDelegate<T, VM, S> where T : Fragment, T : MvRxView =
-    provideViewModel(false) { fragment, stateFactory ->
+    provideViewModel(false) { stateFactory ->
         MvRxViewModelProvider.get(
             viewModelClass = viewModelClass.java,
             stateClass = S::class.java,
             viewModelContext = FragmentViewModelContext(
-                activity = fragment.requireActivity(),
+                activity = requireActivity(),
                 args = _fragmentArgsProvider(),
-                fragment = fragment
+                fragment = this
             ),
             key = keyFactory(),
             initialStateFactory = stateFactory
@@ -49,13 +48,13 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.paren
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ): ViewModelDelegate<T, VM, S> where T : Fragment, T : MvRxView =
-    provideViewModel(true) { fragment, stateFactory ->
+    provideViewModel(true) { stateFactory ->
         // 'existingViewModel' is set to true. Although this function works in both cases of
         // either existing or new viewmodel it would be more difficult to support both cases,
         // so we just test the common case of "existing". We can't be sure that the fragment
         // was designed for it to be used in the non-existing case (ie it may require arguments)
 
-        requireNotNull(parentFragment) { "There is no parent fragment for ${fragment::class.java.simpleName}!" }
+        requireNotNull(parentFragment) { "There is no parent fragment for ${this::class.java.simpleName}!" }
         var parent: Fragment? = parentFragment
         val key = keyFactory()
         while (parent != null) {
@@ -66,7 +65,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.paren
                     viewModelContext = FragmentViewModelContext(
                         activity = this.requireActivity(),
                         args = _fragmentArgsProvider(),
-                        fragment = fragment
+                        fragment = this
                     ),
                     key = key,
                     forExistingViewModel = true
@@ -82,7 +81,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.paren
             topParentFragment = topParentFragment.parentFragment
         }
         val viewModelContext = FragmentViewModelContext(
-            fragment.requireActivity(),
+            requireActivity(),
             _fragmentArgsProvider(),
             topParentFragment!!
         )
@@ -103,20 +102,20 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.targe
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ): ViewModelDelegate<T, VM, S> where T : Fragment, T : MvRxView =
-    provideViewModel(true) { fragment, stateFactory ->
+    provideViewModel(true) { stateFactory ->
         // 'existingViewModel' is set to true. Although this function works in both cases of
         // either existing or new viewmodel it would be more difficult to support both cases,
         // so we just test the common case of "existing". We can't be sure that the fragment
         // was designed for it to be used in the non-existing case (ie it may require arguments)
 
         val targetFragment =
-            requireNotNull(fragment.targetFragment) { "There is no target fragment for ${fragment::class.java.simpleName}!" }
+            requireNotNull(targetFragment) { "There is no target fragment for ${this::class.java.simpleName}!" }
 
         MvRxViewModelProvider.get(
             viewModelClass = viewModelClass.java,
             stateClass = S::class.java,
             viewModelContext = FragmentViewModelContext(
-                activity = fragment.requireActivity(),
+                activity = requireActivity(),
                 args = targetFragment._fragmentArgsProvider(),
                 fragment = targetFragment
             ),
@@ -134,13 +133,13 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.exist
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 
 ): ViewModelDelegate<T, VM, S> where T : Fragment, T : MvRxView =
-    provideViewModel(true) { fragment, stateFactory ->
+    provideViewModel(true) { stateFactory ->
 
         MvRxViewModelProvider.get(
             viewModelClass = viewModelClass.java,
             stateClass = S::class.java,
             viewModelContext = ActivityViewModelContext(
-                fragment.requireActivity(),
+                requireActivity(),
                 _fragmentArgsProvider()
             ),
             key = keyFactory(),
@@ -156,16 +155,14 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activ
     viewModelClass: KClass<VM> = VM::class,
     noinline keyFactory: () -> String = { viewModelClass.java.name }
 ): ViewModelDelegate<T, VM, S> where T : Fragment, T : MvRxView =
-    provideViewModel(false) { fragment, stateFactory ->
-
-        val activity = fragment.requireActivity()
+    provideViewModel(false) { stateFactory ->
 
         MvRxViewModelProvider.get(
             viewModelClass = viewModelClass.java,
             stateClass = S::class.java,
             viewModelContext = ActivityViewModelContext(
-                activity,
-                _fragmentArgsProvider()
+                activity = requireActivity(),
+                args = _fragmentArgsProvider()
             ),
             key = keyFactory(),
             initialStateFactory = stateFactory

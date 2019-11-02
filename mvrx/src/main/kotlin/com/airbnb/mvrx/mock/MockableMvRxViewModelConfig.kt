@@ -3,18 +3,23 @@ package com.airbnb.mvrx.mock
 
 import android.util.Log
 import com.airbnb.mvrx.BaseMvRxViewModel
+import com.airbnb.mvrx.Loading
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxStateStore
+import com.airbnb.mvrx.MvRxViewModelConfig
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.RealMvRxStateStore
+import io.reactivex.disposables.Disposables
 import java.util.LinkedList
 
-class MvRxViewModelConfig<S : Any>(
-    val debugMode: Boolean,
-    @PublishedApi internal val stateStore: MvRxStateStore<S>,
+class MockableMvRxViewModelConfig<S : Any>(
+    debugMode: Boolean,
+    stateStore: MvRxStateStore<S>,
     private val initialMockBehavior: MockBehavior? = null
-) {
+) : MvRxViewModelConfig<S>(debugMode, stateStore) {
+
+
     val currentMockBehavior: MockBehavior?
         get() = mockBehaviorOverrides.peek() ?: initialMockBehavior
     private val mockBehaviorOverrides = LinkedList<MockBehavior>()
@@ -56,6 +61,18 @@ class MvRxViewModelConfig<S : Any>(
             return viewModel.config
         }
     }
+
+    override fun <S : MvRxState> onExecute(
+        viewModel: BaseMvRxViewModel<S>
+    ): BlockExecutions {
+        val blockExecutions = currentMockBehavior?.blockExecutions ?: BlockExecutions.No
+
+        if (blockExecutions != BlockExecutions.No) {
+            viewModel.reportExecuteCallToInteractionTest()
+        }
+
+        return blockExecutions
+    }
 }
 
 /**
@@ -70,7 +87,7 @@ class MvRxViewModelConfig<S : Any>(
  */
 data class MockBehavior(
     val initialState: InitialState = InitialState.None,
-    val blockExecutions: BlockExecutions = BlockExecutions.No,
+    val blockExecutions: MvRxViewModelConfig.BlockExecutions = MvRxViewModelConfig.BlockExecutions.No,
     val stateStoreBehavior: StateStoreBehavior = StateStoreBehavior.Normal
 ) {
     /** Describes how a custom mocked state is applied to initialize a new ViewModel. */
@@ -108,12 +125,6 @@ data class MockBehavior(
          */
         Synchronous
     }
-
-    enum class BlockExecutions {
-        No,
-        Completely,
-        WithLoading
-    }
 }
 
 /**
@@ -126,7 +137,7 @@ open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
 
     private val onConfigProvidedListener =
         mutableListOf<(BaseMvRxViewModel<*>, MvRxViewModelConfig<*>) -> Unit>()
-    private val mockConfigs = mutableMapOf<MvRxStateStore<*>, MvRxViewModelConfig<*>>()
+    private val mockConfigs = mutableMapOf<MvRxStateStore<*>, MockableMvRxViewModelConfig<*>>()
 
     /**
      * Determines what sort of mocked state store is created when [provideConfig] is called.
@@ -181,7 +192,7 @@ open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
 
         val stateStore = buildStateStore(initialState, mockBehavior)
 
-        return MvRxViewModelConfig(
+        return MockableMvRxViewModelConfig(
             debugMode,
             stateStore,
             mockBehavior

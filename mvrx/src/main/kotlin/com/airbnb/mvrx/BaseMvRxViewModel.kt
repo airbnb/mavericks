@@ -9,9 +9,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModel
 import com.airbnb.mvrx.MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER
-import com.airbnb.mvrx.mock.MockBehavior
-import com.airbnb.mvrx.mock.MvRxViewModelConfig
-import com.airbnb.mvrx.mock.reportExecuteCallToInteractionTest
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -255,12 +252,9 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         successMetaData: ((T) -> Any)? = null,
         stateReducer: S.(Async<V>) -> S
     ): Disposable {
-        val blockExecutions =
-            config.currentMockBehavior?.blockExecutions ?: MockBehavior.BlockExecutions.No
-
-        if (blockExecutions != MockBehavior.BlockExecutions.No) {
-            reportExecuteCallToInteractionTest()
-            if (blockExecutions == MockBehavior.BlockExecutions.WithLoading) {
+        val blockExecutions = config.onExecute(this@BaseMvRxViewModel)
+        if (blockExecutions != MvRxViewModelConfig.BlockExecutions.No) {
+            if (blockExecutions == MvRxViewModelConfig.BlockExecutions.WithLoading) {
                 setState { stateReducer(Loading()) }
             }
             return Disposables.disposed()
@@ -289,11 +283,8 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * is simplified.
      */
     fun <T> Observable<T>.executeWithoutAsync(stateReducer: S.(value: T) -> S): Disposable {
-        val blockExecutions =
-            config.currentMockBehavior?.blockExecutions ?: MockBehavior.BlockExecutions.No
-
-        if (blockExecutions != MockBehavior.BlockExecutions.No) {
-            reportExecuteCallToInteractionTest()
+        val blockExecutions = config.onExecute(this@BaseMvRxViewModel)
+        if (blockExecutions != MvRxViewModelConfig.BlockExecutions.No) {
             return Disposables.disposed()
         }
 

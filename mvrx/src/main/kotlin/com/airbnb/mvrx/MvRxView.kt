@@ -7,7 +7,6 @@ import android.os.Parcelable
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import com.airbnb.mvrx.mock.EmptyMocks
-import com.airbnb.mvrx.mock.MvRxMockPrinter
 import com.airbnb.mvrx.mock.MvRxViewMocks
 import kotlin.reflect.KProperty1
 
@@ -17,7 +16,6 @@ private val handler = Handler(Looper.getMainLooper(), Handler.Callback { message
     val view = message.obj as MvRxView
     pendingInvalidates.remove(System.identityHashCode(view))
     if (view.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
-        view.enableMockPrinterReceiver()
         view.invalidate()
     }
     true
@@ -82,17 +80,6 @@ interface MvRxView : LifecycleOwner {
      * via [MvRxViewMocks.getFrom] instead.
      */
     fun provideMocks(): MvRxViewMocks<out MvRxView, out Parcelable> = EmptyMocks
-
-    /**
-     * When called, this view registers a callback with a broadcast receiver to enable printing
-     * out the state of the ViewModels.
-     *
-     * This is not intended to be overridden. By default it is called when the view is invalidated,
-     * and it is safe to call this multiple times - only one receiver will ever be registered.
-     */
-    fun enableMockPrinterReceiver() {
-        MvRxMockPrinter.startReceiverIfInDebug(this)
-    }
 
     /**
      * Subscribes to all state updates for the given viewModel.

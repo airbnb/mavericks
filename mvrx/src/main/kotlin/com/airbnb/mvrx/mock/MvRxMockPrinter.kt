@@ -195,8 +195,11 @@ internal class MvRxMockPrinter private constructor(private val mvrxView: MvRxVie
 private class MvRxPrintStateBroadcastReceiver(val mvrxView: MvRxView) : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
-        Log.d(INFO_TAG, "Intent received $intent")
-        if (intent.action != ACTION_COPY_MVRX_STATE) return
+        Log.d(INFO_TAG, "$mvrxView: Intent received $intent")
+        if (intent.action != ACTION_COPY_MVRX_STATE) {
+            Log.d(INFO_TAG, "Unsupported action: ${intent.action}")
+            return
+        }
         // The script looks for "started" and "done messages to know when work is done. If multiple Fragments are started then
         // it needs to know how many are still working, so it tracks how many are not yet done.
         Log.d(RESULTS_TAG, "started")
@@ -210,56 +213,39 @@ private class MvRxPrintStateBroadcastReceiver(val mvrxView: MvRxView) : Broadcas
         val listTruncationThreshold: Int = intent.getIntExtra("EXTRA_LIST_TRUNCATION_THRESHOLD", 3)
         val excludeArgs = intent.getBooleanExtra("EXTRA_EXCLUDE_ARGS", false)
 
-        if (viewName != null && !mvrxView::class.qualifiedName!!.contains(
-                viewName,
-                ignoreCase = true
-            )
-        ) {
-            Log.d(INFO_TAG, "View name did not match: $viewName")
-            return
-        }
-
-        Log.d(
-            INFO_TAG,
-            "Starting state printing. " +
-                    "viewName=$viewName " +
-                    "stateName=$stateName " +
-                    "stringTruncationThreshold=$stringTruncationThreshold " +
-                    "listTruncationThreshold=$listTruncationThreshold " +
-                    "excludeArgs=$excludeArgs"
-        )
 
         // This is done async since the reflection can be slow.
         AsyncTask.THREAD_POOL_EXECUTOR.execute {
-            writeStatesForView(
-                mvrxView,
-                context,
-                stateName,
-                listTruncationThreshold,
-                stringTruncationThreshold
-            )
+            if (isMatchingView(viewName)) {
+                Log.d(
+                    INFO_TAG,
+                    "Starting state printing. " +
+                            "viewName=$viewName " +
+                            "stateName=$stateName " +
+                            "stringTruncationThreshold=$stringTruncationThreshold " +
+                            "listTruncationThreshold=$listTruncationThreshold " +
+                            "excludeArgs=$excludeArgs"
+                )
 
-            if (!excludeArgs) {
-                @Suppress("DEPRECATION")
-                when (mvrxView) {
-                    is Fragment -> mvrxView.arguments
-                    is android.app.Fragment -> mvrxView.arguments
-                    else -> {
-                        Log.d(
-                            ERROR_TAG,
-                            "Don't know how to get arguments off of view ${mvrxView::class.qualifiedName}. " +
-                                    "Only Fragments are currently supported."
-                        )
-                        null
-                    }
-                }
-                    ?.get(MvRx.KEY_ARG)
-                    ?.let { args ->
+                writeStatesForView(
+                    mvrxView,
+                    context,
+                    stateName,
+                    listTruncationThreshold,
+                    stringTruncationThreshold
+                )
+
+                if (!excludeArgs) {
+                    getArgs(mvrxView)?.let { args ->
                         writeMock(context, args, listTruncationThreshold, stringTruncationThreshold)
                     }
+                }
+            } else {
+                Log.d(INFO_TAG, "View name did not match: $viewName")
+                // Continue onward so we still report "done"
             }
 
-            // We need to pass the package name to the script so that it knows where the pull the files from.
+            // We need to pass the package name to the script so that it knows where to pull the files from.
             Log.d(RESULTS_TAG, "package=${context.applicationContext.packageName}")
             // The command line tooling watches for this "done" message to know when all states have been printed,
             // so it is important that this text doesn't change and matches exactly.
@@ -268,6 +254,31 @@ private class MvRxPrintStateBroadcastReceiver(val mvrxView: MvRxView) : Broadcas
             Thread.sleep(1000)
             Log.d(RESULTS_TAG, "done")
         }
+    }
+
+    private fun isMatchingView(viewName: String?): Boolean {
+        return viewName != null && !mvrxView::class.qualifiedName!!.contains(
+            viewName,
+            ignoreCase = true
+        )
+    }
+
+    private fun getArgs(mvrxView: MvRxView): Any? {
+        @Suppress("DEPRECATION")
+        val argsBundle = when (mvrxView) {
+            is Fragment -> mvrxView.arguments
+            is android.app.Fragment -> mvrxView.arguments
+            else -> {
+                Log.d(
+                    ERROR_TAG,
+                    "Don't know how to get arguments off of view ${mvrxView::class.qualifiedName}. " +
+                            "Only Fragments are currently supported."
+                )
+                null
+            }
+        }
+
+        return argsBundle?.get(MvRx.KEY_ARG)
     }
 }
 
@@ -289,7 +300,7 @@ private fun writeStatesForView(
             "Error getting viewmodels on view ${view::class.simpleName}",
             e
         )
-        emptyList<BaseMvRxViewModel<MvRxState>>()
+        emptyList()
     }
 
     viewModels.forEach { viewModel ->

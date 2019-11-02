@@ -1,9 +1,7 @@
 package com.airbnb.mvrx
 
-import com.airbnb.mvrx.mock.ConstructorCode
 import com.airbnb.mvrx.mock.MockPrinterConfiguration
 import com.airbnb.mvrx.mock.MockStateHolder
-import com.airbnb.mvrx.mock.MvRxMockPrinter.Companion.ACTION_COPY_MVRX_STATE
 import com.airbnb.mvrx.mock.MvRxViewModelConfigProvider
 
 object MvRx {
@@ -46,4 +44,7 @@ object MvRx {
      * TODO - Link to documentation.
      */
     var mockPrinterConfiguration: MockPrinterConfiguration = MockPrinterConfiguration()
+
+    var viewModelProviderFactory: ViewModelProviderFactory =
+        DefaultViewModelProviderFactory()
 }
