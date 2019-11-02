@@ -1,4 +1,4 @@
-package com.airbnb.mvrx.mock
+package com.airbnb.mvrx.mock.printer
 
 import com.airbnb.mvrx.getIfReflectionSupported
 import com.airbnb.mvrx.isEnum

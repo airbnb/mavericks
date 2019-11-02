@@ -1,16 +1,17 @@
 package com.airbnb.mvrx.mock
 
 
+import android.content.Context
 import android.util.Log
 import com.airbnb.mvrx.BaseMvRxViewModel
-import com.airbnb.mvrx.Loading
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxStateStore
 import com.airbnb.mvrx.MvRxViewModelConfig
+import com.airbnb.mvrx.MvRxViewModelConfigProvider
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.RealMvRxStateStore
-import io.reactivex.disposables.Disposables
+import com.airbnb.mvrx.mock.printer.MvRxMockPrinter
 import java.util.LinkedList
 
 class MockableMvRxViewModelConfig<S : Any>(
@@ -127,16 +128,8 @@ data class MockBehavior(
     }
 }
 
-/**
- * Switch between using a mock view model store and a normal view model store.
- *
- * @param debugMode True if this is a debug build of the app, false for production builds.
- * When true,
- */
-open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
+open class MockMvRxViewModelConfigProvider(val context: Context) : MvRxViewModelConfigProvider(true) {
 
-    private val onConfigProvidedListener =
-        mutableListOf<(BaseMvRxViewModel<*>, MvRxViewModelConfig<*>) -> Unit>()
     private val mockConfigs = mutableMapOf<MvRxStateStore<*>, MockableMvRxViewModelConfig<*>>()
 
     /**
@@ -151,6 +144,12 @@ open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
         set(value) {
             field = if (validateDebug(debugMode) == true) value else null
         }
+
+    init {
+        addOnConfigProvidedListener { baseMvRxViewModel, mvRxViewModelConfig ->
+            MvRxMockPrinter.startReceiver(context, baseMvRxViewModel)
+        }
+    }
 
     /**
      * Any view models created within the [block] will be given a viewmodel store that was created according to the rules of the given mock behavior.
@@ -184,10 +183,7 @@ open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
         mockConfigs.remove(store)
     }
 
-    fun <S : MvRxState> provideConfig(
-        viewModel: BaseMvRxViewModel<S>,
-        initialState: S
-    ): MvRxViewModelConfig<S> {
+    override fun <S : MvRxState> buildConfig(initialState: S): MvRxViewModelConfig<S> {
         val mockBehavior = mockBehavior
 
         val stateStore = buildStateStore(initialState, mockBehavior)
@@ -201,9 +197,9 @@ open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
                 mockConfigs[stateStore] = config
                 stateStore.addOnDisposeListener(::onMockStoreDisposed)
             }
-            onConfigProvidedListener.forEach { callback -> callback(viewModel, config) }
         }
     }
+
 
     open fun <S : Any> buildStateStore(
         initialState: S,
@@ -217,21 +213,6 @@ open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
         } else {
             RealMvRxStateStore(initialState)
         }
-    }
-
-    /**
-     * Add a listener that will be called every time a [MvRxViewModelConfig] is created for a new
-     * view model. This will happen each time a new ViewModel is created.
-     *
-     * The callback includes a reference to the ViewModel that the config was created for, as well
-     * as the configuration itself.
-     */
-    fun addOnConfigProvidedListener(callback: (BaseMvRxViewModel<*>, MvRxViewModelConfig<*>) -> Unit) {
-        onConfigProvidedListener.add(callback)
-    }
-
-    fun removeOnConfigProvidedListener(callback: (BaseMvRxViewModel<*>, MvRxViewModelConfig<*>) -> Unit) {
-        onConfigProvidedListener.remove(callback)
     }
 
     /**
@@ -252,7 +233,7 @@ open class MvRxViewModelConfigProvider(val debugMode: Boolean = true) {
     }
 }
 
-internal fun validateDebug(debug: Boolean = MvRx.viewModelConfigProvider.debugMode): Boolean? {
+internal fun validateDebug(debug: Boolean = MvRx.nonNullViewModelConfigProvider.debugMode): Boolean? {
     return if (debug) {
         true
     } else {

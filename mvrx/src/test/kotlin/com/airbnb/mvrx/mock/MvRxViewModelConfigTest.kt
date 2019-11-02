@@ -4,6 +4,7 @@ import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.BaseTest
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MvRxViewModelConfigProvider
 import com.airbnb.mvrx.RealMvRxStateStore
 import org.junit.Assert.*
 import org.junit.Before
@@ -12,7 +13,8 @@ import org.junit.Test
 class MvRxViewModelConfigTest : BaseTest() {
     @Before
     fun resetProvider() {
-        MvRx.viewModelConfigProvider = MvRxViewModelConfigProvider()
+        MvRx.viewModelConfigProvider =
+            MvRxViewModelConfigProvider()
     }
 
     @Test
@@ -33,7 +35,8 @@ class MvRxViewModelConfigTest : BaseTest() {
 
     @Test
     fun nullMockBehaviorWhenNotDebugMode() {
-        val provider = MvRxViewModelConfigProvider(debugMode = false)
+        val provider =
+            MvRxViewModelConfigProvider(debugMode = false)
 
         provider.mockBehavior = MockBehavior(
             MockBehavior.InitialState.Full,
@@ -86,7 +89,8 @@ class MvRxViewModelConfigTest : BaseTest() {
         val vm = TestViewModel()
         assertTrue(vm.config.debugMode)
 
-        MvRx.viewModelConfigProvider = MvRxViewModelConfigProvider(debugMode = false)
+        MvRx.viewModelConfigProvider =
+            MvRxViewModelConfigProvider(debugMode = false)
         val vm2 = TestViewModel()
         assertFalse(vm2.config.debugMode)
     }

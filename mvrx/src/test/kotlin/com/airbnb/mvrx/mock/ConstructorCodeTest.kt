@@ -2,6 +2,8 @@ package com.airbnb.mvrx.mock
 
 import com.airbnb.mvrx.BaseTest
 import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.mock.printer.ConstructorCode
+import com.airbnb.mvrx.mock.printer.typePrinter
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -10,7 +12,11 @@ class ConstructorCodeTest : BaseTest() {
 
     @Test
     fun testImports() {
-        val code = ConstructorCode(State(), Integer.MAX_VALUE, Integer.MAX_VALUE)
+        val code = ConstructorCode(
+            State(),
+            Integer.MAX_VALUE,
+            Integer.MAX_VALUE
+        )
 
         assertEquals(
             "com.airbnb.mvrx.mock.ConstructorCodeTest.MyEnum, com.airbnb.mvrx.mock.ConstructorCodeTest.MySingleton, com.airbnb.mvrx.mock.ConstructorCodeTest.NestedObject, com.airbnb.mvrx.mock.ConstructorCodeTest.State, kotlin.Double, kotlin.Float, kotlin.Int, kotlin.String",
@@ -20,7 +26,11 @@ class ConstructorCodeTest : BaseTest() {
 
     @Test
     fun testConstructor() {
-        val code = ConstructorCode(State(), Integer.MAX_VALUE, Integer.MAX_VALUE)
+        val code = ConstructorCode(
+            State(),
+            Integer.MAX_VALUE,
+            Integer.MAX_VALUE
+        )
 
         assertEquals(
             "val mockState by lazy { State(\n" +
@@ -46,7 +56,11 @@ class ConstructorCodeTest : BaseTest() {
 
     @Test
     fun testJsonObject() {
-        val code = ConstructorCode(StateWithJsonObject(), Integer.MAX_VALUE, Integer.MAX_VALUE)
+        val code = ConstructorCode(
+            StateWithJsonObject(),
+            Integer.MAX_VALUE,
+            Integer.MAX_VALUE
+        )
 
         assertEquals(
             "val mockStateWithJsonObject by lazy { StateWithJsonObject(json = \"\"\"{\n" +
@@ -66,7 +80,11 @@ class ConstructorCodeTest : BaseTest() {
 
     @Test
     fun testJsonObjectNotTruncated() {
-        val code = ConstructorCode(StateWithJsonObject(), Integer.MAX_VALUE, 3)
+        val code = ConstructorCode(
+            StateWithJsonObject(),
+            Integer.MAX_VALUE,
+            3
+        )
 
         assertEquals(
             "val mockStateWithJsonObject by lazy { StateWithJsonObject(json = \"\"\"{\n" +
@@ -86,7 +104,11 @@ class ConstructorCodeTest : BaseTest() {
 
     @Test
     fun testJsonArray() {
-        val code = ConstructorCode(StateWithJsonArray(), Integer.MAX_VALUE, Integer.MAX_VALUE)
+        val code = ConstructorCode(
+            StateWithJsonArray(),
+            Integer.MAX_VALUE,
+            Integer.MAX_VALUE
+        )
 
         assertEquals(
             "val mockStateWithJsonArray by lazy { StateWithJsonArray(json = \"\"\"[\n" +
@@ -104,7 +126,11 @@ class ConstructorCodeTest : BaseTest() {
     @Test
     fun testInvalidJson() {
         val code =
-            ConstructorCode(StateWithInvalidJsonObject(), Integer.MAX_VALUE, Integer.MAX_VALUE)
+            ConstructorCode(
+                StateWithInvalidJsonObject(),
+                Integer.MAX_VALUE,
+                Integer.MAX_VALUE
+            )
 
         assertEquals(
             "val mockStateWithInvalidJsonObject by lazy { StateWithInvalidJsonObject(json = \"not valid{\\\"color\\\":\\\"red\\\",\\\"numbers\\\":[{\\\"favorite\\\":7},{\\\"lowest\\\":0}]}\") }",
@@ -114,7 +140,11 @@ class ConstructorCodeTest : BaseTest() {
 
     @Test
     fun testLazy() {
-        val code = ConstructorCode(StateWithLazy(), Integer.MAX_VALUE, Integer.MAX_VALUE)
+        val code = ConstructorCode(
+            StateWithLazy(),
+            Integer.MAX_VALUE,
+            Integer.MAX_VALUE
+        )
 
         assertEquals(
             "val mockStateWithLazy by lazy { StateWithLazy(lazyInt = lazy { 1 }) }",

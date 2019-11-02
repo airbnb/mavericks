@@ -1,4 +1,4 @@
-package com.airbnb.mvrx.mock
+package com.airbnb.mvrx.mock.printer
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -13,101 +13,11 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.MvRx
-import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxView
-import com.airbnb.mvrx.mock.MvRxMockPrinter.Companion.ACTION_COPY_MVRX_STATE
+import com.airbnb.mvrx.mock.MvRxMocks
+import com.airbnb.mvrx.mock.printer.MvRxMockPrinter.Companion.ACTION_COPY_MVRX_STATE
 import com.airbnb.mvrx.withState
 import java.io.File
-import kotlin.reflect.KProperty1
-import kotlin.reflect.full.createType
-import kotlin.reflect.full.isSubtypeOf
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.jvm.isAccessible
-
-/**
- * Set configuration details for how mock state is generated.
- */
-class MockPrinterConfiguration(
-    /**
-     * Given a [MvRxView] that we are generating mock states for, returns which package name to use
-     * for the generated file.
-     *
-     * By default mock states are place in a "mocks" subpackage within the package of the view
-     * it is mocking.
-     */
-    val mockPackage: (mockedView: Any) -> String = { mockedView ->
-        val packageName = mockedView::class.qualifiedName!!.substringBeforeLast(".")
-        "$packageName.mocks"
-    },
-    /**
-     * Define functions for generating code for a custom class.
-     *
-     * This allows the mock printer to generate code to construct instances of a custom type.
-     * By default, primitive types, enums, collections, Kotlin 'object's, AutoValue classes,
-     * and Kotlin data classes are supported.
-     *
-     * These are called in order. The first one to return true from [TypePrinter.acceptsObject] will
-     * be used, otherwise a default implementation will be used for the object.
-     */
-    val customTypePrinters: List<TypePrinter<*>> = emptyList()
-)
-
-/**
- * This interface defines how to generate mock code for a custom object type.
- *
- * Use [typePrinter] for simple, basic implementation.
- */
-interface TypePrinter<T : Any> {
-
-    /** Return true if [obj] is a valid  object to pass to [generateCode]. */
-    fun acceptsObject(obj: Any): Boolean
-
-    /**
-     * A function that takes an instance of an object and returns a String representing the Kotlin code
-     * that can be used to recreate the instance with the same data.
-     *
-     * @param generateConstructor This function can be used to access the default code generation
-     * for arbitrary object types. This can be used to generate code for any nested objects within
-     * the target instance. Note that calling  this with [instance] will cause an infinite loop.
-     */
-    fun generateCode(instance: T, generateConstructor: (Any?) -> String): String
-
-    /**
-     * Optionally modify the import statements that will be added to the generated mock file.
-     * By default, each processed type is added as an import.
-     *
-     * This function can be used if your generated code depends on anything beyond the instance
-     * types that are processed.
-     *
-     * This will be called once per registered [TypePrinter], after all other code has been generated,
-     * but only if this instance is actually used to generated code (ie it returned true from
-     * [acceptsObject] at least once).
-     */
-    fun modifyImports(imports: List<String>): List<String> = imports
-}
-
-/**
- * Helper for easily creating a [TypePrinter].
- *
- * @param codeGenerator See [TypePrinter.generateCode]
- */
-inline fun <reified T : Any> typePrinter(
-    crossinline transformImports: (List<String>) -> List<String> = { it },
-    crossinline codeGenerator: (instance: T, generateConstructor: (Any?) -> String) -> String
-): TypePrinter<T> {
-    return object : TypePrinter<T> {
-        override fun acceptsObject(obj: Any): Boolean = obj is T
-
-        override fun generateCode(instance: T, generateConstructor: (Any?) -> String): String {
-            return codeGenerator(instance, generateConstructor)
-        }
-
-        override fun modifyImports(imports: List<String>): List<String> {
-            return transformImports(imports)
-        }
-
-    }
-}
 
 
 /**
@@ -118,7 +28,11 @@ inline fun <reified T : Any> typePrinter(
  */
 internal class MvRxMockPrinter private constructor(private val mvrxView: MvRxView) :
     LifecycleObserver {
-    private val broadcastReceiver by lazy { MvRxPrintStateBroadcastReceiver(mvrxView) }
+    private val broadcastReceiver by lazy {
+        ViewArgPrinter(
+            mvrxView
+        )
+    }
     private val context: Context
         get() {
             @Suppress("DEPRECATION")
@@ -172,11 +86,13 @@ internal class MvRxMockPrinter private constructor(private val mvrxView: MvRxVie
          * Register the given view to listen for broadcast receiver intents for mock state
          * printing. This is safe to call multiple times for the same [MvRxView].
          */
-        fun startReceiverIfInDebug(mvrxView: MvRxView) {
-            // Avoid an object allocation in the case of production
-            if (MvRx.viewModelConfigProvider.debugMode) {
-                MvRxMockPrinter(mvrxView)
-            }
+        fun startReceiver(mvrxView: MvRxView) {
+            MvRxMockPrinter(mvrxView)
+        }
+
+        fun startReceiver(context: Context, viewModel: BaseMvRxViewModel<*>) {
+            // TODO - setting to filter out singleton view models (view models not attached to life cycle?)
+            context.registerReceiver(ViewModelStatePrinter(viewModel), IntentFilter(ACTION_COPY_MVRX_STATE))
         }
     }
 }
@@ -192,12 +108,20 @@ internal class MvRxMockPrinter private constructor(private val mvrxView: MvRxVie
  * 6. Uses logcat to signal where on device the files were saved, and when the process is done
  * 7. A listener can wait for the output signals, and then pull the resulting files off the device.
  */
-private class MvRxPrintStateBroadcastReceiver(val mvrxView: MvRxView) : BroadcastReceiver() {
+abstract class MvRxPrintStateBroadcastReceiver : BroadcastReceiver() {
+
+    data class Settings(
+        val viewName: String?,
+        val stateName: String?,
+        val stringTruncationThreshold: Int,
+        val listTruncationThreshold: Int,
+        val excludeArgs: Boolean
+    )
 
     override fun onReceive(context: Context, intent: Intent) {
-        Log.d(INFO_TAG, "$mvrxView: Intent received $intent")
+        Log.d(INFO_TAG, "$tag - Intent received $intent")
         if (intent.action != ACTION_COPY_MVRX_STATE) {
-            Log.d(INFO_TAG, "Unsupported action: ${intent.action}")
+            Log.d(INFO_TAG, "$tag - Unsupported action: ${intent.action}")
             return
         }
         // The script looks for "started" and "done messages to know when work is done. If multiple Fragments are started then
@@ -206,42 +130,39 @@ private class MvRxPrintStateBroadcastReceiver(val mvrxView: MvRxView) : Broadcas
 
         // These string extra names are defined in the mock printer kts script, and
         // they allow for configuration in how the mock state is gathered and printed.
-        val viewName: String? = intent.getStringExtra("EXTRA_VIEW_NAME")
-        val stateName: String? = intent.getStringExtra("EXTRA_STATE_NAME")
-        val stringTruncationThreshold: Int =
-            intent.getIntExtra("EXTRA_STRING_TRUNCATION_THRESHOLD", 300)
-        val listTruncationThreshold: Int = intent.getIntExtra("EXTRA_LIST_TRUNCATION_THRESHOLD", 3)
-        val excludeArgs = intent.getBooleanExtra("EXTRA_EXCLUDE_ARGS", false)
+        val settings =
+            Settings(
+                viewName = intent.getStringExtra("EXTRA_VIEW_NAME"),
+                stateName = intent.getStringExtra("EXTRA_STATE_NAME"),
+                stringTruncationThreshold = intent.getIntExtra(
+                    "EXTRA_STRING_TRUNCATION_THRESHOLD",
+                    300
+                ),
+                listTruncationThreshold = intent.getIntExtra("EXTRA_LIST_TRUNCATION_THRESHOLD", 3),
+                excludeArgs = intent.getBooleanExtra("EXTRA_EXCLUDE_ARGS", false)
+            )
 
 
         // This is done async since the reflection can be slow.
         AsyncTask.THREAD_POOL_EXECUTOR.execute {
-            if (isMatchingView(viewName)) {
-                Log.d(
-                    INFO_TAG,
-                    "Starting state printing. " +
-                            "viewName=$viewName " +
-                            "stateName=$stateName " +
-                            "stringTruncationThreshold=$stringTruncationThreshold " +
-                            "listTruncationThreshold=$listTruncationThreshold " +
-                            "excludeArgs=$excludeArgs"
-                )
-
-                writeStatesForView(
-                    mvrxView,
-                    context,
-                    stateName,
-                    listTruncationThreshold,
-                    stringTruncationThreshold
-                )
-
-                if (!excludeArgs) {
-                    getArgs(mvrxView)?.let { args ->
-                        writeMock(context, args, listTruncationThreshold, stringTruncationThreshold)
-                    }
+            if (isMatch(settings)) {
+                val objectToMock = provideObjectToMock()
+                if (objectToMock == null) {
+                    Log.d(INFO_TAG, "$tag - No object to mock")
+                } else {
+                    Log.d(
+                        INFO_TAG,
+                        "$tag - Starting state printing for ${objectToMock.javaClass.simpleName}. $settings"
+                    )
+                    writeMock(
+                        context,
+                        objectToMock,
+                        settings.listTruncationThreshold,
+                        settings.stringTruncationThreshold
+                    )
                 }
             } else {
-                Log.d(INFO_TAG, "View name did not match: $viewName")
+                Log.d(INFO_TAG, "$tag - did not match intent target")
                 // Continue onward so we still report "done"
             }
 
@@ -256,14 +177,29 @@ private class MvRxPrintStateBroadcastReceiver(val mvrxView: MvRxView) : Broadcas
         }
     }
 
-    private fun isMatchingView(viewName: String?): Boolean {
-        return viewName != null && !mvrxView::class.qualifiedName!!.contains(
-            viewName,
+    abstract fun isMatch(settings: Settings): Boolean
+
+    abstract fun provideObjectToMock(): Any?
+
+    abstract val tag: String
+
+}
+
+
+private class ViewArgPrinter(val mvrxView: MvRxView) : MvRxPrintStateBroadcastReceiver() {
+
+
+    override fun isMatch(settings: Settings): Boolean {
+        if (settings.viewName == null) return true
+
+        return mvrxView::class.qualifiedName!!.contains(
+            settings.viewName,
             ignoreCase = true
         )
     }
 
-    private fun getArgs(mvrxView: MvRxView): Any? {
+
+    override fun provideObjectToMock(): Any? {
         @Suppress("DEPRECATION")
         val argsBundle = when (mvrxView) {
             is Fragment -> mvrxView.arguments
@@ -280,40 +216,32 @@ private class MvRxPrintStateBroadcastReceiver(val mvrxView: MvRxView) : Broadcas
 
         return argsBundle?.get(MvRx.KEY_ARG)
     }
+
+    override val tag: String = mvrxView.javaClass.simpleName
 }
 
-private fun writeStatesForView(
-    view: MvRxView,
-    context: Context,
-    stateName: String?,
-    listTruncationThreshold: Int,
-    stringTruncationThreshold: Int
-) {
+private class ViewModelStatePrinter(val viewModel: BaseMvRxViewModel<*>) :
+    MvRxPrintStateBroadcastReceiver() {
 
-    @Suppress("Detekt.TooGenericExceptionCaught")
-    val viewModels = try {
-        Log.d(INFO_TAG, "Looking up view models on view.")
-        view.getAllViewModelsForTesting()
-    } catch (e: Throwable) {
-        Log.e(
-            ERROR_TAG,
-            "Error getting viewmodels on view ${view::class.simpleName}",
-            e
+
+    override fun isMatch(settings: Settings): Boolean {
+        if (settings.stateName == null) return true
+
+
+        return currentState()::class.qualifiedName!!.contains(
+            settings.stateName,
+            ignoreCase = true
         )
-        emptyList()
     }
 
-    viewModels.forEach { viewModel ->
-        withState(viewModel) { state ->
-            val stateClassName = state::class.qualifiedName!!
-            if (stateName != null && !stateClassName.contains(stateName, ignoreCase = true)) {
-                Log.d(INFO_TAG, "Ignoring state $stateClassName")
-                return@withState
-            }
-
-            writeMock(context, state, listTruncationThreshold, stringTruncationThreshold)
-        }
+    private fun currentState(): Any {
+        return withState(viewModel) { it }
     }
+
+
+    override fun provideObjectToMock(): Any? = currentState()
+
+    override val tag: String = viewModel.javaClass.simpleName
 }
 
 private fun writeMock(
@@ -328,7 +256,12 @@ private fun writeMock(
     @Suppress("Detekt.TooGenericExceptionCaught")
     try {
         Log.d(INFO_TAG, "Generating state for $objectName")
-        printMockFile(context, objectToMock, listTruncationThreshold, stringTruncationThreshold)
+        printMockFile(
+            context,
+            objectToMock,
+            listTruncationThreshold,
+            stringTruncationThreshold
+        )
     } catch (e: Throwable) {
         Log.e(ERROR_TAG, "Error creating mvrx mock code for $objectName", e)
     }
@@ -353,13 +286,13 @@ private fun <T : Any> printMockFile(
         instanceToMock,
         listTruncationThreshold.maxIfLTEZero(),
         stringTruncationThreshold.maxIfLTEZero(),
-        MvRx.mockPrinterConfiguration.customTypePrinters
+        MvRxMocks.mockPrinterConfiguration.customTypePrinters
     )
 
     val file = File(context.cacheDir, "${instanceToMock::class.simpleName}Mock.kt")
 
     file.printWriter().use { out ->
-        out.println("package ${MvRx.mockPrinterConfiguration.mockPackage(instanceToMock)}")
+        out.println("package ${MvRxMocks.mockPrinterConfiguration.mockPackage(instanceToMock)}")
         out.println()
 
         code.imports.forEach {
@@ -371,30 +304,6 @@ private fun <T : Any> printMockFile(
     }
 
     Log.d(RESULTS_TAG, file.canonicalPath)
-}
-
-private fun MvRxView.getAllViewModelsForTesting(): List<BaseMvRxViewModel<MvRxState>> {
-    return this::class.memberProperties
-        .filter {
-            it.returnType.isSubtypeOf(
-                BaseMvRxViewModel::class.createType(
-                    arguments = listOf(
-                        kotlin.reflect.KTypeProjection.STAR
-                    )
-                )
-            )
-        }
-        .filterIsInstance<KProperty1<MvRxView, BaseMvRxViewModel<MvRxState>>>()
-        .onEach {
-            it.isAccessible = true
-        }
-        .map {
-            // The value needs to be manually retrieved from the viewmodel delegate like this for some reason, otherwise it crashes
-            // saying Lazy cannot be cast to MvrxViewModel
-            @Suppress("UNCHECKED_CAST")
-            val delegate = it.getDelegate(this) as Lazy<BaseMvRxViewModel<MvRxState>>
-            delegate.value
-        }
 }
 
 /**

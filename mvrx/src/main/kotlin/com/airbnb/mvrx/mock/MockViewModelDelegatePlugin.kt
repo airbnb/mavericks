@@ -9,6 +9,7 @@ import com.airbnb.mvrx.RealMvRxStateFactory
 import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.ViewModelProvider
 import com.airbnb.mvrx.lifecycleAwareLazy
+import com.airbnb.mvrx.mock.printer.MvRxMockPrinter
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
@@ -33,12 +34,7 @@ class MockViewModelDelegatePlugin<VM : BaseMvRxViewModel<S>, S : MvRxState>(
                 mockBehavior
             ) {
                 originalProvider(stateFactory(mockState))
-                    .apply {
-                        subscribe(view, subscriber = {
-                            view.postInvalidate()
-                            MvRxMockPrinter.startReceiverIfInDebug(view)
-                        })
-                    }
+                    .apply { subscribe(view, subscriber = { view.postInvalidate() }) }
                     .also { vm ->
                         if (mockState != null && mockBehavior?.initialState == MockBehavior.InitialState.Full) {
                             // Custom viewmodel factories can override initial state, so we also force state on the viewmodel
@@ -64,7 +60,7 @@ class MockViewModelDelegatePlugin<VM : BaseMvRxViewModel<S>, S : MvRxState>(
                 // Tracking all view model delegates created for a view allows us to
                 // initialize existing view models first, since Fragment view models
                 // may depend on existing view models.
-                MvRx.mockStateHolder.addViewModelDelegate(
+                MvRxMocks.mockStateHolder.addViewModelDelegate(
                     view = view,
                     existingViewModel = existingViewModel,
                     viewModelProperty = viewModelProperty,
@@ -84,7 +80,7 @@ class MockViewModelDelegatePlugin<VM : BaseMvRxViewModel<S>, S : MvRxState>(
      */
     private fun getMockedState(): S? {
         return if (mockBehavior != null && mockBehavior.initialState != MockBehavior.InitialState.None) {
-            MvRx.mockStateHolder.getMockedState(
+            MvRxMocks.mockStateHolder.getMockedState(
                 view = view,
                 viewModelProperty = viewModelProperty,
                 existingViewModel = existingViewModel,

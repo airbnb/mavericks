@@ -5,6 +5,7 @@ import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.BaseTest
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MvRxViewModelConfigProvider
 import com.airbnb.mvrx.fragmentViewModel
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -25,7 +26,8 @@ class MockStateHolderTest : BaseTest() {
 
     @After
     fun tearDown() {
-        MvRx.viewModelConfigProvider = MvRxViewModelConfigProvider()
+        MvRx.viewModelConfigProvider =
+            MvRxViewModelConfigProvider()
     }
 
     @Test

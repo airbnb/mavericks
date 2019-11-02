@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
-import com.airbnb.mvrx.mock.MvRxViewModelConfigProvider
 import io.reactivex.Scheduler
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.annotations.NonNull
@@ -60,7 +59,8 @@ abstract class BaseTest {
 
     @Before
     fun resetConfigurationDefaults() {
-        MvRx.viewModelConfigProvider = MvRxViewModelConfigProvider()
+        MvRx.viewModelConfigProvider =
+            MvRxViewModelConfigProvider()
     }
 
     protected inline fun <reified F : Fragment, reified A : AppCompatActivity> createFragment(

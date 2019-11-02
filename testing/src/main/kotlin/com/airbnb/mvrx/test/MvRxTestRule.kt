@@ -3,7 +3,7 @@ package com.airbnb.mvrx.test
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxTestOverridesProxy
 import com.airbnb.mvrx.mock.MockBehavior
-import com.airbnb.mvrx.mock.MvRxViewModelConfigProvider
+import com.airbnb.mvrx.MvRxViewModelConfigProvider
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.exceptions.CompositeException
 import io.reactivex.plugins.RxJavaPlugins

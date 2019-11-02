@@ -1,6 +1,8 @@
 package com.airbnb.mvrx.mock
 
 import com.airbnb.mvrx.BaseTest
+import com.airbnb.mvrx.mock.printer.AutoValueTypePrinter
+import com.airbnb.mvrx.mock.printer.ConstructorCode
 import org.junit.Assert.*
 import org.junit.Test
 
