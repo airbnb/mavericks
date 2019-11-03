@@ -74,14 +74,6 @@ interface MvRxView : LifecycleOwner {
     }
 
     /**
-     * Override this to provide the mock states that should be used for testing this view.
-     *
-     * You should NOT invoke this function directly. You can access the mocks for a view
-     * via [MvRxViewMocks.getFrom] instead.
-     */
-    fun provideMocks(): MvRxViewMocks<out MvRxView, out Parcelable> = EmptyMocks
-
-    /**
      * Subscribes to all state updates for the given viewModel.
      *
      * @param deliveryMode If [UniqueOnly] when this MvRxView goes from a stopped to started lifecycle a state value

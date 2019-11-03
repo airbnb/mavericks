@@ -8,6 +8,7 @@ import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.Uninitialized
 import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.fragmentViewModel
+import com.airbnb.mvrx.mock.MockableMvRxView
 import com.airbnb.mvrx.mock.MvRxViewMocks
 import com.airbnb.mvrx.mock.mockSingleViewModel
 import com.airbnb.mvrx.sample.core.BaseFragment
@@ -49,7 +50,7 @@ class RandomDadJokeViewModel(
     }
 }
 
-class RandomDadJokeFragment : BaseFragment() {
+class RandomDadJokeFragment : BaseFragment(), MockableMvRxView {
     private val viewModel: RandomDadJokeViewModel by fragmentViewModel()
 
     override fun epoxyController() = simpleController(viewModel) { state ->

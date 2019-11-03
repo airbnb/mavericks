@@ -32,7 +32,7 @@ class MockStateHolderTest : BaseTest() {
 
     @Test
     fun getDefaultState() {
-        val holder = MvRx.mockStateHolder
+        val holder = MvRxMocks.mockStateHolder
         val frag = Frag()
         val viewMocks = MvRxViewMocks.getFrom(frag)
         val mockToUse = viewMocks.mocks.first { it.isDefaultState }
@@ -160,7 +160,7 @@ class MockStateHolderTest : BaseTest() {
     }
 
 
-    class Frag : BaseMvRxFragment() {
+    class Frag : BaseMvRxFragment(), MockableMvRxView {
         val fragmentVm: FragmentVM by fragmentViewModel()
 
         override fun invalidate() {
@@ -186,4 +186,5 @@ class MockStateHolderTest : BaseTest() {
 
     data class TestState(val num: Int = 0) : MvRxState
     class FragmentVM(initialState: TestState) : BaseMvRxViewModel<TestState>(initialState)
+
 }

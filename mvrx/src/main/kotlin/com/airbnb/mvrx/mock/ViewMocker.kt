@@ -11,7 +11,7 @@ import kotlin.system.measureTimeMillis
 /**
  * See [getMockVariants]
  *
- * Provides mocks for the view specified by the fully qualified name of its class..
+ * Provides mocks for the view specified by the fully qualified name of its class.
  *
  * @param viewClassName The fully qualified name of the view's class.
  * @param viewProvider Creates an instance of the view from the view class. The view should be created
@@ -20,21 +20,21 @@ import kotlin.system.measureTimeMillis
  */
 fun getMockVariants(
     viewClassName: String,
-    viewProvider: (viewClass: Class<MvRxView>, argumentsBundle: Bundle?) -> MvRxView = { viewClass, argumentsBundle ->
+    viewProvider: (viewClass: Class<MockableMvRxView>, argumentsBundle: Bundle?) -> MockableMvRxView = { viewClass, argumentsBundle ->
         @Suppress("UNCHECKED_CAST")
-        val view = viewClass.newInstance() as MvRxView
+        val view = viewClass.newInstance() as MockableMvRxView
         if (view is Fragment) view.arguments = argumentsBundle
         view
     },
-    emptyMockPlaceholder: Pair<String, MvRxViewMocks<MvRxView, Nothing>> = Pair(
+    emptyMockPlaceholder: Pair<String, MvRxViewMocks<MockableMvRxView, Nothing>> = Pair(
         EmptyMocks::class.java.simpleName,
         EmptyMocks
     ),
     mockGroupIndex: Int? = null
-): List<MockedViewProvider<MvRxView>>? {
+): List<MockedViewProvider<MockableMvRxView>>? {
     @Suppress("UNCHECKED_CAST")
     return getMockVariants(
-        viewClass = Class.forName(viewClassName) as Class<MvRxView>,
+        viewClass = Class.forName(viewClassName) as Class<MockableMvRxView>,
         viewProvider = viewProvider,
         emptyMockPlaceholder = emptyMockPlaceholder,
         mockGroupIndex = mockGroupIndex
@@ -85,20 +85,20 @@ fun <T : MockableMvRxView> List<MockedViewProvider<T>>.forDefaultInitialization(
  * [MvRx.KEY_ARG] key.
  */
 fun getMockVariants(
-    viewClass: Class<MvRxView>,
-    viewProvider: (viewClass: Class<MvRxView>, argumentsBundle: Bundle?) -> MvRxView = { viewClass, argumentsBundle ->
+    viewClass: Class<MockableMvRxView>,
+    viewProvider: (viewClass: Class<MockableMvRxView>, argumentsBundle: Bundle?) -> MockableMvRxView = { viewClass, argumentsBundle ->
         @Suppress("UNCHECKED_CAST")
-        val view = viewClass.newInstance() as MvRxView
+        val view = viewClass.newInstance() as MockableMvRxView
         if (view is Fragment) view.arguments = argumentsBundle
         view
     },
-    emptyMockPlaceholder: Pair<String, MvRxViewMocks<MvRxView, Nothing>> = Pair(
+    emptyMockPlaceholder: Pair<String, MvRxViewMocks<MockableMvRxView, Nothing>> = Pair(
         EmptyMocks::class.java.simpleName,
         EmptyMocks
     ),
     mockGroupIndex: Int? = null
-): List<MockedViewProvider<MvRxView>>? {
-    return getMockVariants<MvRxView, Nothing>(
+): List<MockedViewProvider<MockableMvRxView>>? {
+    return getMockVariants<MockableMvRxView, Nothing>(
         viewProvider = { _, argumentsBundle ->
             viewProvider(viewClass, argumentsBundle)
         },
@@ -125,9 +125,9 @@ fun getMockVariants(
  * only the mocks in that group index will be returned. Will throw an error if this is not a valid
  * group index for this view's mocks.
  */
-fun <V : MvRxView, A : Parcelable> getMockVariants(
+fun <V : MockableMvRxView, A : Parcelable> getMockVariants(
     viewProvider: (arguments: A?, argumentsBundle: Bundle?) -> V,
-    emptyMockPlaceholder: Pair<String, MvRxViewMocks<MvRxView, Nothing>> = Pair(
+    emptyMockPlaceholder: Pair<String, MvRxViewMocks<MockableMvRxView, Nothing>> = Pair(
         EmptyMocks::class.java.simpleName,
         EmptyMocks
     ),
@@ -137,7 +137,7 @@ fun <V : MvRxView, A : Parcelable> getMockVariants(
     // This needs to be the FQN to completely define the view and make it creatable from reflection
     val viewName = view.javaClass.canonicalName
 
-    lateinit var mocks: List<MvRxMock<out MvRxView, out Parcelable>>
+    lateinit var mocks: List<MvRxMock<out MockableMvRxView, out Parcelable>>
     val elapsedMs: Long = measureTimeMillis {
         val mockData =
             MvRxViewMocks.getFrom(view).takeIf { it !== emptyMockPlaceholder.second } ?: return null

@@ -42,6 +42,4 @@ abstract class BaseMvRxFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(
         // subscribe to a ViewModel.
         postInvalidate()
     }
-
-    override fun provideMocks(): MvRxViewMocks<out MvRxView, out Parcelable> = EmptyMocks
 }

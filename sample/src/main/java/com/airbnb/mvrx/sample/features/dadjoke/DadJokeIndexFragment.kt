@@ -5,6 +5,7 @@ import com.google.android.material.snackbar.Snackbar
 import android.util.Log
 import android.view.View
 import com.airbnb.mvrx.fragmentViewModel
+import com.airbnb.mvrx.mock.MockableMvRxView
 import com.airbnb.mvrx.mock.mockSingleViewModel
 import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.core.BaseFragment
@@ -17,7 +18,7 @@ import com.airbnb.mvrx.sample.views.marquee
 
 private const val TAG = "DadJokeIndexFragment"
 
-class DadJokeIndexFragment : BaseFragment() {
+class DadJokeIndexFragment : BaseFragment(), MockableMvRxView {
 
     /**
      * This will get or create a new ViewModel scoped to this Fragment. It will also automatically
