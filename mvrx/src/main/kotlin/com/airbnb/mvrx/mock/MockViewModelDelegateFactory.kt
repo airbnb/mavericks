@@ -13,11 +13,16 @@ import com.airbnb.mvrx.lifecycleAwareLazy
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
-class MockGlobalViewModelPlugin() : ViewModelDelegateFactory {
-
-    // TODO safe way to get this
-    private val configFactory: MockMvRxViewModelConfigFactory =
-        (MvRx.viewModelConfigFactory as MockMvRxViewModelConfigFactory)
+/**
+ * This delegate factory creates ViewModels that are optionally mockable, as configured by
+ * [MockMvRxViewModelConfigFactory.mockBehavior].
+ *
+ * If a mock behavior is enabled, then when a ViewModel is created this will look for a mock state
+ * in [MvRxMocks.mockStateHolder], and if one exists it will be forced onto the ViewModel.
+ */
+class MockViewModelDelegateFactory(
+    val configFactory: MockMvRxViewModelConfigFactory
+) : ViewModelDelegateFactory {
 
     // We lock  in the mockBehavior at the time that the Fragment is created (which is when the
     // delegate provider is created). Using the mockbehavior at this time is necessary since it allows
@@ -27,17 +32,21 @@ class MockGlobalViewModelPlugin() : ViewModelDelegateFactory {
     private val mockBehavior = configFactory.mockBehavior
 
     override fun <S : MvRxState, T : Fragment, VM : BaseMvRxViewModel<S>> createLazyViewModel(
-        stateClass: KClass<S>,
-        view: T,
+        fragment: T,
         viewModelProperty: KProperty<*>,
+        stateClass: KClass<S>,
         existingViewModel: Boolean,
         viewModelProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM
     ): Lazy<VM> where T : MvRxView {
-        return lifecycleAwareLazy(view) {
+        check(configFactory == MvRx.viewModelConfigFactory) {
+            "Config factory provided in constructor is not the same one as installed on MvRx object."
+        }
+
+        return lifecycleAwareLazy(fragment) {
             val mockState: S? =
                 if (mockBehavior != null && mockBehavior.initialState != MockBehavior.InitialState.None) {
                     MvRxMocks.mockStateHolder.getMockedState(
-                        view = view,
+                        view = fragment,
                         viewModelProperty = viewModelProperty,
                         existingViewModel = existingViewModel,
                         stateClass = stateClass.java,
@@ -51,7 +60,7 @@ class MockGlobalViewModelPlugin() : ViewModelDelegateFactory {
                 mockBehavior
             ) {
                 viewModelProvider(stateFactory(mockState))
-                    .apply { subscribe(view, subscriber = { view.postInvalidate() }) }
+                    .apply { subscribe(fragment, subscriber = { fragment.postInvalidate() }) }
                     .also { vm ->
                         if (mockState != null && mockBehavior?.initialState == MockBehavior.InitialState.Full) {
                             // Custom viewmodel factories can override initial state, so we also force state on the viewmodel
@@ -78,7 +87,7 @@ class MockGlobalViewModelPlugin() : ViewModelDelegateFactory {
                 // initialize existing view models first, since Fragment view models
                 // may depend on existing view models.
                 MvRxMocks.mockStateHolder.addViewModelDelegate(
-                    view = view,
+                    view = fragment,
                     existingViewModel = existingViewModel,
                     viewModelProperty = viewModelProperty,
                     viewModelDelegate = viewModelDelegate

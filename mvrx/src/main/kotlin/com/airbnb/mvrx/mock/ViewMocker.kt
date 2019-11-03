@@ -42,6 +42,39 @@ fun getMockVariants(
 }
 
 /**
+ * Helper for getting all mock variants off of a Fragment.
+ * It is an error to call this if the Fragment does not define any mocks.
+ */
+inline fun <reified T> mockVariants(): List<MockedViewProvider<T>> where T : Fragment, T : MockableMvRxView {
+    @Suppress("UNCHECKED_CAST")
+    val mocks: List<MockedViewProvider<MvRxView>>? = getMockVariants(
+        viewClass = T::class.java as Class<MvRxView>
+    )
+
+    @Suppress("UNCHECKED_CAST")
+    return checkNotNull(mocks) {
+        "${T::class.java.simpleName} does not have mocks defined for it"
+    } as List<MockedViewProvider<T>>
+}
+
+/**
+ * Helper for pulling the default state mock out of a list of mocks.
+ */
+fun <T : MockableMvRxView> List<MockedViewProvider<T>>.forDefaultState(): MockedViewProvider<T> {
+    return firstOrNull { it.mock.type == MvRxMock.Type.DefaultState }
+        ?: error("No default state mock found")
+}
+
+/**
+ * Helper for pulling the default initialization mock out of a list of mocks.
+ */
+fun <T : MockableMvRxView> List<MockedViewProvider<T>>.forDefaultInitialization(): MockedViewProvider<T> {
+    return firstOrNull { it.mock.type == MvRxMock.Type.DefaultInitialization }
+        ?: error("No default initialization mock found")
+}
+
+
+/**
  * See [getMockVariants]
  *
  * Provides mocks for the view specified by the given class.
@@ -141,12 +174,12 @@ fun <V : MvRxView, A : Parcelable> getMockVariants(
                     viewProvider(arguments, bundle)
                 }.let { view ->
                     // Set the view to be initialized with the mocked state when its viewmodels are created
-                    MvRx.mockStateHolder.setMock(view, mockInfo)
+                    MvRxMocks.mockStateHolder.setMock(view, mockInfo)
                     MockedView(
                         viewInstance = view,
                         viewName = viewName,
                         mockData = mockInfo,
-                        cleanupMockState = { MvRx.mockStateHolder.clearMock(view) }
+                        cleanupMockState = { MvRxMocks.mockStateHolder.clearMock(view) }
                     )
                 }
             },

@@ -1,9 +1,11 @@
 package com.airbnb.mvrx.mock
 
-import android.util.Log
-import androidx.annotation.VisibleForTesting
+import android.content.Context
+import android.content.pm.ApplicationInfo
 import com.airbnb.mvrx.BaseMvRxViewModel
+import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MvRxViewModelConfigFactory
 import com.airbnb.mvrx.ScriptableStateStore
 import com.airbnb.mvrx.mock.printer.MockPrinterConfiguration
 
@@ -30,8 +32,27 @@ object MvRxMocks {
      *
      * TODO - Link to documentation.
      */
-    var mockPrinterConfiguration: MockPrinterConfiguration =
-        MockPrinterConfiguration()
+    var mockPrinterConfiguration: MockPrinterConfiguration = MockPrinterConfiguration()
+
+    /**
+     * If the application was built with the debuggable flag enabled in its Android Manifest then
+     * this will add plugins to [MvRx] that enable working with mock State. This is useful for
+     * both manual and automated testing of development builds.
+     *
+     * If the app is not debuggable then a non debug version of [MvRxViewModelConfigFactory] will be
+     * set on [MvRx.viewModelConfigFactory].
+     */
+    fun install(context: Context) {
+        val isDebuggable = 0 != (context.applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE)
+
+        if (isDebuggable) {
+            val mockConfigFactory = MockMvRxViewModelConfigFactory(context)
+            MvRx.viewModelConfigFactory = mockConfigFactory
+            MvRx.viewModelDelegateFactory = MockViewModelDelegateFactory(mockConfigFactory)
+        } else {
+            MvRx.viewModelConfigFactory = MvRxViewModelConfigFactory(debugMode = false)
+        }
+    }
 
     /**
      * If the given viewmodel has a state store that implements [ScriptableStateStore] then this

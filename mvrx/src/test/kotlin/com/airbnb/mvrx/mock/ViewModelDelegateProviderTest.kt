@@ -5,6 +5,7 @@ import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.BaseTest
 import com.airbnb.mvrx.CONTAINER_ID
 import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MvRxViewModelConfig
 import com.airbnb.mvrx.RealMvRxStateStore
 import com.airbnb.mvrx.TestActivity
 import com.airbnb.mvrx.activityViewModel
@@ -60,7 +61,7 @@ class ViewModelDelegateProviderTest : BaseTest() {
 
         val mockBehavior = MockBehavior(
             initialState = MockBehavior.InitialState.Full,
-            blockExecutions = MockBehavior.BlockExecutions.No,
+            blockExecutions = MvRxViewModelConfig.BlockExecutions.No,
             stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
         )
 
@@ -83,7 +84,7 @@ class ViewModelDelegateProviderTest : BaseTest() {
 
         val mockBehavior = MockBehavior(
             initialState = MockBehavior.InitialState.Full,
-            blockExecutions = MockBehavior.BlockExecutions.No,
+            blockExecutions = MvRxViewModelConfig.BlockExecutions.No,
             stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
         )
 

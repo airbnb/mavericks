@@ -128,7 +128,9 @@ data class MockBehavior(
     }
 }
 
-open class MockMvRxViewModelConfigFactory(val context: Context) : MvRxViewModelConfigFactory(true) {
+open class MockMvRxViewModelConfigFactory(val context: Context) : MvRxViewModelConfigFactory(
+    debugMode = true
+) {
 
     private val mockConfigs = mutableMapOf<MvRxStateStore<*>, MockableMvRxViewModelConfig<*>>()
 
