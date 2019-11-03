@@ -1,5 +1,6 @@
 package com.airbnb.mvrx.mock
 
+import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
@@ -7,32 +8,49 @@ import com.airbnb.mvrx.MvRxStateFactory
 import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.RealMvRxStateFactory
 import com.airbnb.mvrx.ViewModelContext
-import com.airbnb.mvrx.GlobalViewModelFactory
+import com.airbnb.mvrx.ViewModelDelegateFactory
 import com.airbnb.mvrx.lifecycleAwareLazy
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
-class MockGlobalViewModelPlugin<VM : BaseMvRxViewModel<S>, S : MvRxState>(
-    val stateClass: KClass<S>,
-    val view: MvRxView,
-    val viewModelProperty: KProperty<*>,
-    val existingViewModel: Boolean
-) : GlobalViewModelFactory<VM, S> {
+class MockGlobalViewModelPlugin() : ViewModelDelegateFactory {
+
+    // TODO safe way to get this
+    private val configFactory: MockMvRxViewModelConfigFactory =
+        (MvRx.viewModelConfigFactory as MockMvRxViewModelConfigFactory)
+
     // We lock  in the mockBehavior at the time that the Fragment is created (which is when the
     // delegate provider is created). Using the mockbehavior at this time is necessary since it allows
     // consistency in knowing what mock behavior a Fragment will get. If we used the mock behavior
     // at the time when the viewmodel is created it would be some point in the future that is harder
     // to determine and control for.
-    private val mockBehavior = MvRx.viewModelConfigFactory.mockBehavior
+    private val mockBehavior = configFactory.mockBehavior
 
-    override fun createLazyViewModel(originalProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM): lifecycleAwareLazy<VM> {
+    override fun <S : MvRxState, T : Fragment, VM : BaseMvRxViewModel<S>> createLazyViewModel(
+        stateClass: KClass<S>,
+        view: T,
+        viewModelProperty: KProperty<*>,
+        existingViewModel: Boolean,
+        viewModelProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM
+    ): Lazy<VM> where T : MvRxView {
         return lifecycleAwareLazy(view) {
-            val mockState: S? = getMockedState()
+            val mockState: S? =
+                if (mockBehavior != null && mockBehavior.initialState != MockBehavior.InitialState.None) {
+                    MvRxMocks.mockStateHolder.getMockedState(
+                        view = view,
+                        viewModelProperty = viewModelProperty,
+                        existingViewModel = existingViewModel,
+                        stateClass = stateClass.java,
+                        forceMockExistingViewModel = mockBehavior.initialState == MockBehavior.InitialState.ForceMockExistingViewModel
+                    )
+                } else {
+                    null
+                }
 
-            MvRx.viewModelConfigFactory.withMockBehavior(
+            configFactory.withMockBehavior(
                 mockBehavior
             ) {
-                originalProvider(stateFactory(mockState))
+                viewModelProvider(stateFactory(mockState))
                     .apply { subscribe(view, subscriber = { view.postInvalidate() }) }
                     .also { vm ->
                         if (mockState != null && mockBehavior?.initialState == MockBehavior.InitialState.Full) {
@@ -70,28 +88,8 @@ class MockGlobalViewModelPlugin<VM : BaseMvRxViewModel<S>, S : MvRxState>(
         }
     }
 
-    /**
-     * If a [MockBehavior] has been set that specifies a mock initial state, then this looks up
-     * which mock state was registered to be used for this ViewModel and View.
-     *
-     * Even if we are expected to mock initial state, the state can be null
-     * if it is being created from mock arguments and this is not an "existing" view model.
-     */
-    private fun getMockedState(): S? {
-        return if (mockBehavior != null && mockBehavior.initialState != MockBehavior.InitialState.None) {
-            MvRxMocks.mockStateHolder.getMockedState(
-                view = view,
-                viewModelProperty = viewModelProperty,
-                existingViewModel = existingViewModel,
-                stateClass = stateClass.java,
-                forceMockExistingViewModel = mockBehavior.initialState == MockBehavior.InitialState.ForceMockExistingViewModel
-            )
-        } else {
-            null
-        }
-    }
 
-    private fun stateFactory(
+    private fun <S : MvRxState, VM : BaseMvRxViewModel<S>> stateFactory(
         mockState: S?
     ): MvRxStateFactory<VM, S> {
         return if (mockState == null) {
@@ -109,4 +107,6 @@ class MockGlobalViewModelPlugin<VM : BaseMvRxViewModel<S>, S : MvRxState>(
             }
         }
     }
+
+
 }

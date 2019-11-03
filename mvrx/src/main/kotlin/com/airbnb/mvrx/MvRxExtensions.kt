@@ -24,7 +24,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragm
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 
-): ViewModelDelegateProvider<T, VM, S> where T : Fragment, T : MvRxView =
+): MvRxDelegateProvider<T, VM> where T : Fragment, T : MvRxView =
     viewModelDelegateProvider(false) { stateFactory ->
         MvRxViewModelProvider.get(
             viewModelClass = viewModelClass.java,
@@ -47,7 +47,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragm
 inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.parentFragmentViewModel(
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
-): ViewModelDelegateProvider<T, VM, S> where T : Fragment, T : MvRxView =
+): MvRxDelegateProvider<T, VM> where T : Fragment, T : MvRxView =
     viewModelDelegateProvider(true) { stateFactory ->
         // 'existingViewModel' is set to true. Although this function works in both cases of
         // either existing or new viewmodel it would be more difficult to support both cases,
@@ -101,7 +101,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.paren
 inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.targetFragmentViewModel(
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
-): ViewModelDelegateProvider<T, VM, S> where T : Fragment, T : MvRxView =
+): MvRxDelegateProvider<T, VM> where T : Fragment, T : MvRxView =
     viewModelDelegateProvider(true) { stateFactory ->
         // 'existingViewModel' is set to true. Although this function works in both cases of
         // either existing or new viewmodel it would be more difficult to support both cases,
@@ -132,7 +132,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.exist
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 
-): ViewModelDelegateProvider<T, VM, S> where T : Fragment, T : MvRxView =
+): MvRxDelegateProvider<T, VM> where T : Fragment, T : MvRxView =
     viewModelDelegateProvider(true) { stateFactory ->
 
         MvRxViewModelProvider.get(
@@ -154,7 +154,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.exist
 inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activityViewModel(
     viewModelClass: KClass<VM> = VM::class,
     noinline keyFactory: () -> String = { viewModelClass.java.name }
-): ViewModelDelegateProvider<T, VM, S> where T : Fragment, T : MvRxView =
+): MvRxDelegateProvider<T, VM> where T : Fragment, T : MvRxView =
     viewModelDelegateProvider(false) { stateFactory ->
 
         MvRxViewModelProvider.get(

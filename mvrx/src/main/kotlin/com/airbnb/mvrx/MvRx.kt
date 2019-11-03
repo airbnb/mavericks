@@ -19,8 +19,18 @@ object MvRx {
      */
     var viewModelConfigFactory: MvRxViewModelConfigFactory? = null
 
-    var viewModelDelegateFactory: ViewModelDelegateFactory =
-        DefaultGlobalViewModelFactory()
+    /**
+     * A factory that provides the Lazy ViewModels created for MvRx extension functions,
+     * such as [activityViewModel].
+     *
+     * Each time a ViewModel is accessed via one of these extension functions this factory
+     * creates the Kotlin property delegate that wraps the ViewModel.
+     *
+     * The default implementation [DefaultViewModelDelegateFactory] is fine for general usage,
+     * but a custom factory may be provided to assist with testing, or if you want control
+     * over how and when ViewModels and their State are created.
+     */
+    var viewModelDelegateFactory: ViewModelDelegateFactory = DefaultViewModelDelegateFactory()
 
     internal val nonNullViewModelConfigFactory: MvRxViewModelConfigFactory
         get() {

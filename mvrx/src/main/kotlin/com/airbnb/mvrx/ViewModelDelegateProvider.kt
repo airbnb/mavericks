@@ -4,32 +4,32 @@ import androidx.fragment.app.Fragment
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
+/**
+ * Creates an object that provides a Lazy ViewModel for use in Fragments.
+ */
 @PublishedApi
 internal inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> viewModelDelegateProvider(
     existingViewModel: Boolean,
     noinline viewModelProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM
-): DelegateProvider<T, VM> where T : Fragment, T : MvRxView {
-    return object : DelegateProvider<T, VM>() {
+): MvRxDelegateProvider<T, VM> where T : Fragment, T : MvRxView {
+    return object : MvRxDelegateProvider<T, VM>() {
 
         override operator fun provideDelegate(
             thisRef: T,
             property: KProperty<*>
         ): Lazy<VM> {
-            val delegateFactory: ViewModelDelegateFactory = MvRx.viewModelDelegateFactory
-
-            val viewModelDelegateFactory = delegateFactory.createViewModelDelegate<VM, S>(
+            return MvRx.viewModelDelegateFactory.createLazyViewModel(
                 stateClass = S::class,
-                view = thisRef,
+                fragment = thisRef,
                 viewModelProperty = property,
-                existingViewModel = existingViewModel
+                existingViewModel = existingViewModel,
+                viewModelProvider = viewModelProvider
             )
-            return viewModelDelegateFactory.createLazyViewModel(viewModelProvider)
         }
     }
 }
 
-@PublishedApi
-internal abstract class DelegateProvider<T, R>  {
+abstract class MvRxDelegateProvider<T, R> {
 
     abstract operator fun provideDelegate(
         thisRef: T,
@@ -37,33 +37,54 @@ internal abstract class DelegateProvider<T, R>  {
     ): Lazy<R>
 }
 
+/**
+ * This is invoked each time a Fragment accesses a ViewModel via the MvRx extension functions
+ * (eg [fragmentViewModel], [activityViewModel], [existingViewModel]).
+ *
+ * It allows global callbacks for when a view model is instantiated, with control over how the view model state
+ * should be instantiated.
+ */
 interface ViewModelDelegateFactory {
-    fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModelDelegate(
-        stateClass: KClass<S>,
-        view: MvRxView,
+    /**
+     * Create a Lazy ViewModel for the given Fragment.
+     *
+     * @param existingViewModel If true the view model is expected to already exist, so a new
+     * one should not need to be created.
+     * @param viewModelProvider This function should be used to actually do the work of creating
+     * the viewmodel. It knows how to configure the viewmodel, and just needs to be provided with
+     * a state factory.
+     */
+    fun <S : MvRxState, T, VM : BaseMvRxViewModel<S>> createLazyViewModel(
+        fragment: T,
         viewModelProperty: KProperty<*>,
-        existingViewModel: Boolean
-    ): GlobalViewModelFactory<VM, S>
+        stateClass: KClass<S>,
+        existingViewModel: Boolean,
+        viewModelProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM
+    ): Lazy<VM> where T : Fragment, T : MvRxView
 }
 
-interface GlobalViewModelFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> {
-    fun createLazyViewModel(originalProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM): Lazy<VM>
-}
-
-class DefaultGlobalViewModelFactory : ViewModelDelegateFactory {
-    override fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModelDelegate(
-        stateClass: KClass<S>,
-        view: MvRxView,
+/**
+ * Creates ViewModels that are wrapped with a [lifecycleAwareLazy] so that the ViewModel
+ * is automatically created when the Fragment is started (if it is not accessed before then).
+ *
+ * ViewModels are created with a [RealMvRxStateStore].
+ *
+ * The Fragment is subscribed to all changes to the ViewModel, so that [MvRxView.postInvalidate] is
+ * called on each State change. This allows the Fragment view to be automatically invalidated,
+ * only while the Fragment is in the STARTED lifecycle state.
+ */
+class DefaultViewModelDelegateFactory : ViewModelDelegateFactory {
+    override fun <S : MvRxState, T : Fragment, VM : BaseMvRxViewModel<S>> createLazyViewModel(
+        fragment: T,
         viewModelProperty: KProperty<*>,
-        existingViewModel: Boolean
-    ): GlobalViewModelFactory<VM, S> {
-        return object : GlobalViewModelFactory<VM, S> {
-            override fun createLazyViewModel(originalProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM): lifecycleAwareLazy<VM> {
-                return lifecycleAwareLazy(view) {
-                    originalProvider(RealMvRxStateFactory())
-                        .apply { subscribe(view, subscriber = { view.postInvalidate() }) }
-                }
-            }
+        stateClass: KClass<S>,
+        existingViewModel: Boolean,
+        viewModelProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM
+    ): Lazy<VM> where T : MvRxView {
+        return lifecycleAwareLazy(fragment) {
+            viewModelProvider(RealMvRxStateFactory())
+                .apply { subscribe(fragment, subscriber = { fragment.postInvalidate() }) }
         }
     }
+
 }

@@ -183,7 +183,10 @@ open class MockMvRxViewModelConfigFactory(val context: Context) : MvRxViewModelC
         mockConfigs.remove(store)
     }
 
-    override fun <S : MvRxState> buildConfig(initialState: S): MvRxViewModelConfig<S> {
+    override fun <S : MvRxState> buildConfig(
+        viewModel: BaseMvRxViewModel<S>,
+        initialState: S
+    ): MvRxViewModelConfig<S> {
         val mockBehavior = mockBehavior
 
         val stateStore = buildStateStore(initialState, mockBehavior)
@@ -199,7 +202,6 @@ open class MockMvRxViewModelConfigFactory(val context: Context) : MvRxViewModelC
             }
         }
     }
-
 
     open fun <S : Any> buildStateStore(
         initialState: S,
