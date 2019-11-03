@@ -1,6 +1,7 @@
 package com.airbnb.mvrx
 
 import com.airbnb.mvrx.mock.MockBehavior
+import com.airbnb.mvrx.mock.MvRxMocks
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -11,7 +12,7 @@ class ScriptableStateStoreTest : BaseTest() {
 
     @Before
     fun setup() {
-        MvRx.viewModelConfigProvider.withMockBehavior(MockBehavior(
+        MvRx.viewModelConfigFactory.withMockBehavior(MockBehavior(
             initialState = MockBehavior.InitialState.None,
             blockExecutions = MockBehavior.BlockExecutions.No,
             stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
@@ -30,7 +31,7 @@ class ScriptableStateStoreTest : BaseTest() {
 
     @Test
     fun testCanScriptState() {
-        viewModel.freezeStateForTesting(TestState(foo = 2))
+        MvRxMocks.setScriptableState(viewModel, TestState(foo = 2))
         withState(viewModel) {
             Assert.assertEquals(2, it.foo)
         }

@@ -130,7 +130,7 @@ fun <V : MvRxView, A : Parcelable> getMockVariants(
         MockedViewProvider(
             viewName = viewName,
             createView = { mockBehavior ->
-                val configProvider = MvRx.viewModelConfigProvider
+                val configProvider = MvRx.viewModelConfigFactory
 
                 // Test argument serialization/deserialization
 

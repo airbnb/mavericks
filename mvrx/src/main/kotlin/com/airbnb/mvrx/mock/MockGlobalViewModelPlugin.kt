@@ -7,30 +7,29 @@ import com.airbnb.mvrx.MvRxStateFactory
 import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.RealMvRxStateFactory
 import com.airbnb.mvrx.ViewModelContext
-import com.airbnb.mvrx.ViewModelProvider
+import com.airbnb.mvrx.GlobalViewModelFactory
 import com.airbnb.mvrx.lifecycleAwareLazy
-import com.airbnb.mvrx.mock.printer.MvRxMockPrinter
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
-class MockViewModelDelegatePlugin<VM : BaseMvRxViewModel<S>, S : MvRxState>(
+class MockGlobalViewModelPlugin<VM : BaseMvRxViewModel<S>, S : MvRxState>(
     val stateClass: KClass<S>,
     val view: MvRxView,
     val viewModelProperty: KProperty<*>,
     val existingViewModel: Boolean
-) : ViewModelProvider<VM, S> {
+) : GlobalViewModelFactory<VM, S> {
     // We lock  in the mockBehavior at the time that the Fragment is created (which is when the
     // delegate provider is created). Using the mockbehavior at this time is necessary since it allows
     // consistency in knowing what mock behavior a Fragment will get. If we used the mock behavior
     // at the time when the viewmodel is created it would be some point in the future that is harder
     // to determine and control for.
-    private val mockBehavior = MvRx.viewModelConfigProvider.mockBehavior
+    private val mockBehavior = MvRx.viewModelConfigFactory.mockBehavior
 
-    override fun provideViewModel(originalProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM): lifecycleAwareLazy<VM> {
+    override fun createLazyViewModel(originalProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM): lifecycleAwareLazy<VM> {
         return lifecycleAwareLazy(view) {
             val mockState: S? = getMockedState()
 
-            MvRx.viewModelConfigProvider.withMockBehavior(
+            MvRx.viewModelConfigFactory.withMockBehavior(
                 mockBehavior
             ) {
                 originalProvider(stateFactory(mockState))

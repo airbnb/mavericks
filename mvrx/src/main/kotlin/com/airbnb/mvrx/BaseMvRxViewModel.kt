@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
 import androidx.lifecycle.Lifecycle
-import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModel
@@ -36,7 +35,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 
     @Suppress("LeakingThis")
     @PublishedApi
-    internal val config: MvRxViewModelConfig<S> = MvRx.viewModelConfigProvider.provideConfig(
+    internal val config: MvRxViewModelConfig<S> = MvRx.nonNullViewModelConfigFactory.provideConfig(
         this,
         initialState
     )
@@ -103,7 +102,6 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     @CallSuper
     override fun onCleared() {
         super.onCleared()
-        stateStore.dispose()
         disposables.dispose()
         stateStore.dispose()
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
@@ -159,25 +157,6 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             }
         } else {
             stateStore.set(reducer)
-        }
-    }
-
-    /**
-     * If this state store is a [ScriptableStateStore], this function can be called to force
-     * the current state to the given state. It is an error to call this if the store is not
-     * scriptable.
-     */
-    @PublishedApi
-    @VisibleForTesting
-    internal fun freezeStateForTesting(state: S) {
-        if (stateStore is ScriptableStateStore) {
-            stateStore.next(state)
-        } else {
-            if (debugMode) {
-                error("ScriptableStateStore must be enabled to use this")
-            } else {
-                Log.e(tag, "ScriptableStateStore must be set to freeze state")
-            }
         }
     }
 

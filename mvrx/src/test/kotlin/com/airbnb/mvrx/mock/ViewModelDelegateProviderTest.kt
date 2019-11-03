@@ -15,7 +15,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.robolectric.android.controller.ActivityController
 
-class ViewModelDelegateTest : BaseTest() {
+class ViewModelDelegateProviderTest : BaseTest() {
     private inline fun <reified T : BaseMvRxFragment> createFragment(
         existingController: ActivityController<TestActivity>? = null
     ): Pair<ActivityController<TestActivity>, T> {

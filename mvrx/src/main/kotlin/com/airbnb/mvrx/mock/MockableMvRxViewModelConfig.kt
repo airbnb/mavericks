@@ -8,7 +8,7 @@ import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxStateStore
 import com.airbnb.mvrx.MvRxViewModelConfig
-import com.airbnb.mvrx.MvRxViewModelConfigProvider
+import com.airbnb.mvrx.MvRxViewModelConfigFactory
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.RealMvRxStateStore
 import com.airbnb.mvrx.mock.printer.MvRxMockPrinter
@@ -128,7 +128,7 @@ data class MockBehavior(
     }
 }
 
-open class MockMvRxViewModelConfigProvider(val context: Context) : MvRxViewModelConfigProvider(true) {
+open class MockMvRxViewModelConfigFactory(val context: Context) : MvRxViewModelConfigFactory(true) {
 
     private val mockConfigs = mutableMapOf<MvRxStateStore<*>, MockableMvRxViewModelConfig<*>>()
 
@@ -233,7 +233,7 @@ open class MockMvRxViewModelConfigProvider(val context: Context) : MvRxViewModel
     }
 }
 
-internal fun validateDebug(debug: Boolean = MvRx.nonNullViewModelConfigProvider.debugMode): Boolean? {
+internal fun validateDebug(debug: Boolean = MvRx.nonNullViewModelConfigFactory.debugMode): Boolean? {
     return if (debug) {
         true
     } else {

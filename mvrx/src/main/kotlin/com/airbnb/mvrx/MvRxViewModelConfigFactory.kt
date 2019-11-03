@@ -3,7 +3,7 @@ package com.airbnb.mvrx
 /**
  * Factory for providing the [MvRxViewModelConfig] for each new ViewModel that is created.
  *
- * An instance of this must be set on [MvRx.viewModelConfigProvider].
+ * An instance of this must be set on [MvRx.viewModelConfigFactory].
  *
  * A custom subclass of this may be used to allow you to override [buildConfig], but this should
  * generally not be necessary.
@@ -13,7 +13,7 @@ package com.airbnb.mvrx
  * not be used in production! However, they do help to catch common issues so it is highly
  * recommended that you enable debug when applicable.
  */
-open class MvRxViewModelConfigProvider(val debugMode: Boolean) {
+open class MvRxViewModelConfigFactory(val debugMode: Boolean) {
 
     private val onConfigProvidedListener =
         mutableListOf<(BaseMvRxViewModel<*>, MvRxViewModelConfig<*>) -> Unit>()

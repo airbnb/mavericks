@@ -1,5 +1,8 @@
 package com.airbnb.mvrx
 
+/**
+ *
+ */
 abstract class MvRxViewModelConfig<S : Any>(
     val debugMode: Boolean,
     @PublishedApi internal val stateStore: MvRxStateStore<S>

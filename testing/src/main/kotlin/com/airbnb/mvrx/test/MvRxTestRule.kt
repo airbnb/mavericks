@@ -3,7 +3,7 @@ package com.airbnb.mvrx.test
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxTestOverridesProxy
 import com.airbnb.mvrx.mock.MockBehavior
-import com.airbnb.mvrx.MvRxViewModelConfigProvider
+import com.airbnb.mvrx.MvRxViewModelConfigFactory
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.exceptions.CompositeException
 import io.reactivex.plugins.RxJavaPlugins
@@ -30,7 +30,7 @@ class MvRxTestRule(
     private val setForceDisableLifecycleAwareObserver: Boolean = true
 ) : ExternalResource() {
     private var defaultExceptionHandler: Thread.UncaughtExceptionHandler? = null
-    private val defaultConfigProvider = MvRx.viewModelConfigProvider
+    private val defaultConfigProvider = MvRx.viewModelConfigFactory
 
     override fun before() {
         RxAndroidPlugins.reset()
@@ -39,11 +39,11 @@ class MvRxTestRule(
         if (setRxImmediateSchedulers) setRxImmediateSchedulers()
 
         if (debugMode != DebugMode.Unset) {
-            MvRx.viewModelConfigProvider =
-                MvRxViewModelConfigProvider(debugMode = debugMode.value == true)
+            MvRx.viewModelConfigFactory =
+                MvRxViewModelConfigFactory(debugMode = debugMode.value == true)
         }
 
-        MvRx.viewModelConfigProvider.mockBehavior = mockBehavior
+        MvRx.viewModelConfigFactory.mockBehavior = mockBehavior
 
         MvRxTestOverridesProxy.forceDisableLifecycleAwareObserver(
             setForceDisableLifecycleAwareObserver
@@ -53,7 +53,7 @@ class MvRxTestRule(
     override fun after() {
         RxAndroidPlugins.reset()
         if (setRxImmediateSchedulers) clearRxImmediateSchedulers()
-        MvRx.viewModelConfigProvider = defaultConfigProvider
+        MvRx.viewModelConfigFactory = defaultConfigProvider
     }
 
     private fun setRxImmediateSchedulers() {

@@ -8,21 +8,23 @@ object MvRx {
     const val KEY_ARG = "mvrx:arg"
 
     /**
-     * Defines configuration for how ViewModels are created and what settings they use.
-     * By default this applies debug settings to all ViewModels and SHOULD be overridden in
-     * production builds to disable debug mode for performance reasons.
+     * A factory for creating a [MvRxViewModelConfig] for each ViewModel.
      *
-     * Additionally, this allows various mock settings to be applied to ViewModels to enable
-     * forcing states for testing and development.
+     * You MUST provide an instance here before creating any viewmodels. You can do this when
+     * your application is created.
+     *
+     * This allows you to specify whether MvRx should run in debug mode or not. Additionally, it
+     * allows custom state stores or execution behavior for the ViewModel, which can be helpful
+     * for testing.
      */
-    var viewModelConfigProvider: MvRxViewModelConfigProvider? = null
+    var viewModelConfigFactory: MvRxViewModelConfigFactory? = null
 
-    var viewModelProviderFactory: ViewModelProviderFactory =
-        DefaultViewModelProviderFactory()
+    var viewModelDelegateFactory: ViewModelDelegateFactory =
+        DefaultGlobalViewModelFactory()
 
-    internal val nonNullViewModelConfigProvider: MvRxViewModelConfigProvider
+    internal val nonNullViewModelConfigFactory: MvRxViewModelConfigFactory
         get() {
-            return viewModelConfigProvider
+            return viewModelConfigFactory
                 ?: error("You must specify a viewModelConfigProvider in the MvRx object")
         }
 }

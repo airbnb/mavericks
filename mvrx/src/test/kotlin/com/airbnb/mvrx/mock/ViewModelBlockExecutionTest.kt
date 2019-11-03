@@ -14,7 +14,7 @@ import org.junit.Test
 class ViewModelBlockExecutionTest : BaseTest() {
     @Test
     fun executeNormally(){
-        MvRx.viewModelConfigProvider.mockBehavior = MockBehavior(
+        MvRx.viewModelConfigFactory.mockBehavior = MockBehavior(
             MockBehavior.InitialState.None,
             MockBehavior.BlockExecutions.No,
             MockBehavior.StateStoreBehavior.Synchronous
@@ -27,7 +27,7 @@ class ViewModelBlockExecutionTest : BaseTest() {
 
     @Test
     fun executeBlockedCompletely(){
-        MvRx.viewModelConfigProvider.mockBehavior = MockBehavior(
+        MvRx.viewModelConfigFactory.mockBehavior = MockBehavior(
             MockBehavior.InitialState.None,
             MockBehavior.BlockExecutions.Completely,
             MockBehavior.StateStoreBehavior.Synchronous
@@ -40,7 +40,7 @@ class ViewModelBlockExecutionTest : BaseTest() {
 
     @Test
     fun executeBlockedWithLoading(){
-        MvRx.viewModelConfigProvider.mockBehavior = MockBehavior(
+        MvRx.viewModelConfigFactory.mockBehavior = MockBehavior(
             MockBehavior.InitialState.None,
             MockBehavior.BlockExecutions.WithLoading,
             MockBehavior.StateStoreBehavior.Synchronous

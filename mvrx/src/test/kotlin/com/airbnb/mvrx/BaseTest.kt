@@ -59,8 +59,8 @@ abstract class BaseTest {
 
     @Before
     fun resetConfigurationDefaults() {
-        MvRx.viewModelConfigProvider =
-            MvRxViewModelConfigProvider()
+        MvRx.viewModelConfigFactory =
+            MvRxViewModelConfigFactory()
     }
 
     protected inline fun <reified F : Fragment, reified A : AppCompatActivity> createFragment(

@@ -1,6 +1,10 @@
 package com.airbnb.mvrx.mock
 
+import android.util.Log
+import androidx.annotation.VisibleForTesting
+import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.ScriptableStateStore
 import com.airbnb.mvrx.mock.printer.MockPrinterConfiguration
 
 object MvRxMocks {
@@ -28,4 +32,19 @@ object MvRxMocks {
      */
     var mockPrinterConfiguration: MockPrinterConfiguration =
         MockPrinterConfiguration()
+
+    /**
+     * If the given viewmodel has a state store that implements [ScriptableStateStore] then this
+     * function can be used to set the next state via [ScriptableStateStore.next].
+     *
+     *
+     * It is an error to call this if the store is not scriptable.
+     */
+    fun <VM : BaseMvRxViewModel<S>, S : MvRxState> setScriptableState(viewModel: VM, state: S) {
+        val stateStore = viewModel.config.stateStore
+        check(stateStore is ScriptableStateStore) {
+            "State store of ${viewModel.javaClass.simpleName} must be a ScriptableStateStore"
+        }
+        stateStore.next(state)
+    }
 }

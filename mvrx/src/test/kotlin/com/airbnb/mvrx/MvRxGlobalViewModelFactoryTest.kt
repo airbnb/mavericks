@@ -35,7 +35,7 @@ data class InvalidState(val count: Int = 0) : MvRxState {
 
 class InvalidViewModel(initialState: InvalidState) : TestMvRxViewModel<InvalidState>(initialState)
 
-class MvRxViewModelProviderTest : BaseTest() {
+class MvRxGlobalViewModelFactoryTest : BaseTest() {
     @get:Rule val thrown: ExpectedException = ExpectedException.none()
 
     @Test(expected = ViewModelDoesNotExistException::class)
