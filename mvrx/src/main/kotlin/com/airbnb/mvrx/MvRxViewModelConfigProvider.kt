@@ -1,10 +1,17 @@
 package com.airbnb.mvrx
 
 /**
- * Switch between using a mock view model store and a normal view model store.
+ * Factory for providing the [MvRxViewModelConfig] for each new ViewModel that is created.
+ *
+ * An instance of this must be set on [MvRx.viewModelConfigProvider].
+ *
+ * A custom subclass of this may be used to allow you to override [buildConfig], but this should
+ * generally not be necessary.
  *
  * @param debugMode True if this is a debug build of the app, false for production builds.
- * When true,
+ * When true, certain validations are applied to the ViewModel. These can be slow and should
+ * not be used in production! However, they do help to catch common issues so it is highly
+ * recommended that you enable debug when applicable.
  */
 open class MvRxViewModelConfigProvider(val debugMode: Boolean) {
 
@@ -12,19 +19,24 @@ open class MvRxViewModelConfigProvider(val debugMode: Boolean) {
         mutableListOf<(BaseMvRxViewModel<*>, MvRxViewModelConfig<*>) -> Unit>()
 
 
-    fun <S : MvRxState> provideConfig(
+    internal fun <S : MvRxState> provideConfig(
         viewModel: BaseMvRxViewModel<S>,
         initialState: S
     ): MvRxViewModelConfig<S> {
-        return buildConfig(initialState).also { config ->
+        return buildConfig(viewModel, initialState).also { config ->
             onConfigProvidedListener.forEach { callback -> callback(viewModel, config) }
         }
     }
 
-    open fun <S : MvRxState> buildConfig(initialState: S): MvRxViewModelConfig<S> {
-        return object : MvRxViewModelConfig<S>(debugMode,
-            RealMvRxStateStore(initialState)
-        ) {
+    /**
+     * Create a new [MvRxViewModelConfig] for the given viewmodel.
+     * This can be overridden to customize the config.
+     */
+    open fun <S : MvRxState> buildConfig(
+        viewModel: BaseMvRxViewModel<S>,
+        initialState: S
+    ): MvRxViewModelConfig<S> {
+        return object : MvRxViewModelConfig<S>(debugMode, RealMvRxStateStore(initialState)) {
             override fun <S : MvRxState> onExecute(viewModel: BaseMvRxViewModel<S>): BlockExecutions {
                 return BlockExecutions.No
             }
