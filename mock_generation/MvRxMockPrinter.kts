@@ -27,7 +27,7 @@ class MvrxPrinterApi : CommandLineArgs() {
     @CommandLine.Option(
         names = ["--includeRegexes"],
         description = [
-            "A comma separated list of regexes. Any mockable objects (ie views or view models) whose FQN match one of the regexes" +
+            "A comma separated list of regexes. Any mockable objects (ie views or view models) whose FQN contain a match with one of the regexes" +
                     " will have their state printed. If no regexes are provided then all STARTED objects will be included."
         ]
     )
@@ -36,7 +36,7 @@ class MvrxPrinterApi : CommandLineArgs() {
     @CommandLine.Option(
         names = ["--excludeRegexes"],
         description = [
-            "A comma separated list of regexes. Any mockable objects (ie views or view models) whose FQN match one of the regexes" +
+            "A comma separated list of regexes. Any mockable objects (ie views or view models) whose FQN contain a match with one of the regexes" +
                     " will be excluded from state printing have their state printed. A match here trumps a match in includeRegexes."
         ]
     )
@@ -182,6 +182,11 @@ getLogcatOutputForTag("MVRX_PRINTER_ERROR")
  * timeout is used.
  */
 fun parseStateFileNamesFromLogcat(): List<String>? = pollWithTimeout(timeoutMs = 20_000) {
+    //  Give a little time for the device to process the broadcast intent and kick off
+    // the state generation. We don't want slow devices to output their "start" indicators late,
+    // and have this script miss them and think there are no screens to print
+    Thread.sleep(2000)
+
     getLogcatOutputForTag("MVRX_PRINTER_RESULTS")
         .takeIf { lines -> areAllViewsFinished(lines) }
         ?.filter { it.endsWith(".kt") }

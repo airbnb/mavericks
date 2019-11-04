@@ -163,7 +163,7 @@ abstract class MvRxPrintStateBroadcastReceiver : BroadcastReceiver() {
                     )
                 }
             } else {
-                Log.d(INFO_TAG, "$tag - did not match intent target")
+                Log.d(INFO_TAG, "$tag - did not match intent target. $settings")
                 // Continue onward so we still report "done", so that the script isn't left hanging
                 // waiting for it.
             }
@@ -189,9 +189,11 @@ abstract class MvRxPrintStateBroadcastReceiver : BroadcastReceiver() {
         target ?: return false
         val name = target.javaClass.canonicalName ?: return false
 
-        if (settings.excludeRegexes.any { it.matches(name) }) return false
+        if (settings.excludeRegexes.any { it.containsMatchIn(name) }) return false
 
-        return settings.includeRegexes.isEmpty() || settings.includeRegexes.any { it.matches(name) }
+        return settings.includeRegexes.isEmpty() || settings.includeRegexes.any {
+            it.containsMatchIn(name)
+        }
     }
 
     protected open val objectsToCheckForNameMatch: List<Any?> get() = listOf(provideObjectToMock())
