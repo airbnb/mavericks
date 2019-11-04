@@ -109,11 +109,10 @@ abstract class MvRxPrintStateBroadcastReceiver : BroadcastReceiver() {
     private var isRegistered: Boolean = false
 
     data class Settings(
-        val viewName: String?,
-        val stateName: String?,
+        val includeRegexes: List<Regex>,
+        val excludeRegexes: List<Regex>,
         val stringTruncationThreshold: Int,
-        val listTruncationThreshold: Int,
-        val excludeArgs: Boolean
+        val listTruncationThreshold: Int
     )
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -126,17 +125,21 @@ abstract class MvRxPrintStateBroadcastReceiver : BroadcastReceiver() {
         // it needs to know how many are still working, so it tracks how many are not yet done.
         Log.d(RESULTS_TAG, "started")
 
+        fun String?.parseRegexes(): List<Regex> {
+            if (this == null) return emptyList()
+            return split(",").filter { it.isNotBlank() }.map { Regex(it) }
+        }
+
         // These string extra names are defined in the mock printer kts script, and
         // they allow for configuration in how the mock state is gathered and printed.
         val settings = Settings(
-            viewName = intent.getStringExtra("EXTRA_VIEW_NAME"),
-            stateName = intent.getStringExtra("EXTRA_STATE_NAME"),
+            includeRegexes = intent.getStringExtra("EXTRA_INCLUDE_REGEXES").parseRegexes(),
+            excludeRegexes = intent.getStringExtra("EXTRA_EXCLUDE_REGEXES").parseRegexes(),
             stringTruncationThreshold = intent.getIntExtra(
                 "EXTRA_STRING_TRUNCATION_THRESHOLD",
                 300
             ),
-            listTruncationThreshold = intent.getIntExtra("EXTRA_LIST_TRUNCATION_THRESHOLD", 3),
-            excludeArgs = intent.getBooleanExtra("EXTRA_EXCLUDE_ARGS", false)
+            listTruncationThreshold = intent.getIntExtra("EXTRA_LIST_TRUNCATION_THRESHOLD", 3)
         )
 
 
@@ -175,7 +178,22 @@ abstract class MvRxPrintStateBroadcastReceiver : BroadcastReceiver() {
         }
     }
 
-    abstract fun isMatch(settings: Settings): Boolean
+    private fun isMatch(settings: Settings): Boolean {
+        return objectsToCheckForNameMatch.any {
+            doesObjectPassNameFilters(settings, it)
+        }
+    }
+
+    private fun doesObjectPassNameFilters(settings: Settings, target: Any?): Boolean {
+        target ?: return false
+        val name = target.javaClass.canonicalName ?: return false
+
+        if (settings.excludeRegexes.any { it.matches(name) }) return false
+
+        return settings.includeRegexes.isEmpty() || settings.includeRegexes.any { it.matches(name) }
+    }
+
+    protected open val objectsToCheckForNameMatch: List<Any?> get() = listOf(provideObjectToMock())
 
     abstract fun provideObjectToMock(): Any?
 
@@ -199,15 +217,6 @@ abstract class MvRxPrintStateBroadcastReceiver : BroadcastReceiver() {
  */
 private class ViewArgPrinter(val mvrxView: MvRxView) : MvRxPrintStateBroadcastReceiver() {
 
-    override fun isMatch(settings: Settings): Boolean {
-        if (settings.viewName == null) return true
-
-        return mvrxView::class.qualifiedName!!.contains(
-            settings.viewName,
-            ignoreCase = true
-        )
-    }
-
     override fun provideObjectToMock(): Any? {
         @Suppress("DEPRECATION")
         val argsBundle = when (mvrxView) {
@@ -226,6 +235,10 @@ private class ViewArgPrinter(val mvrxView: MvRxView) : MvRxPrintStateBroadcastRe
         return argsBundle?.get(MvRx.KEY_ARG)
     }
 
+    //  Include arguments in mock printing if either the arguments or Fragment match the name filters
+    override val objectsToCheckForNameMatch: List<Any?>
+        get() = listOf(mvrxView, provideObjectToMock())
+
     override val tag: String = mvrxView.javaClass.simpleName
 }
 
@@ -236,23 +249,15 @@ internal class ViewModelStatePrinter(
     val viewModel: BaseMvRxViewModel<*>
 ) : MvRxPrintStateBroadcastReceiver() {
 
-
-    override fun isMatch(settings: Settings): Boolean {
-        if (settings.stateName == null) return true
-
-
-        return currentState()::class.qualifiedName!!.contains(
-            settings.stateName,
-            ignoreCase = true
-        )
-    }
-
     private fun currentState(): Any {
         return withState(viewModel) { it }
     }
 
-
     override fun provideObjectToMock(): Any? = currentState()
+
+    //  Include state in mock printing if either the state or view model match the name filters
+    override val objectsToCheckForNameMatch: List<Any?>
+        get() = listOf(viewModel, provideObjectToMock())
 
     override val tag: String = viewModel.javaClass.simpleName
 }

@@ -25,28 +25,22 @@ import kotlin.system.exitProcess
 class MvrxPrinterApi : CommandLineArgs() {
 
     @CommandLine.Option(
-        names = ["--fragmentName", "--viewName"],
+        names = ["--includeRegexes"],
         description = [
-            "Pass the name of a specific MvRx view whose states should be copied." +
-                    " If not specified then all MvRxViews in the Started state will be copied."
+            "A comma separated list of regexes. Any mockable objects (ie views or view models) whose FQN match one of the regexes" +
+                    " will have their state printed. If no regexes are provided then all STARTED objects will be included."
         ]
     )
-    var fragmentName: String? = null
+    var includeRegexes: String? = null
 
     @CommandLine.Option(
-        names = ["--noArgs"],
-        description = ["Pass to disable copying Fragment Arguments (if any exist)."]
-    )
-    var excludeFragmentArgs: Boolean = false
-
-    @CommandLine.Option(
-        names = ["--stateName"],
+        names = ["--excludeRegexes"],
         description = [
-            "Pass the name of a specific MvRx State to copy. Only states with a matching name will be used." +
-                    " If not specified then all states will be copied."
+            "A comma separated list of regexes. Any mockable objects (ie views or view models) whose FQN match one of the regexes" +
+                    " will be excluded from state printing have their state printed. A match here trumps a match in includeRegexes."
         ]
     )
-    var stateName: String? = null
+    var excludeRegexes: String? = null
 
     @CommandLine.Option(
         names = ["--copyToModule"],
@@ -104,16 +98,12 @@ buildString {
     append(" --ei EXTRA_LIST_TRUNCATION_THRESHOLD ${printerApi.listTruncationThreshold}")
     append(" --ei EXTRA_STRING_TRUNCATION_THRESHOLD ${printerApi.stringTruncationThreshold}")
 
-    if (printerApi.excludeFragmentArgs) {
-        append(" --ez EXTRA_EXCLUDE_ARGS true")
+    printerApi.includeRegexes?.let {
+        append(" --es EXTRA_INCLUDE_REGEXES $it")
     }
 
-    printerApi.stateName?.let {
-        append(" --es EXTRA_STATE_NAME $it")
-    }
-
-    printerApi.fragmentName?.let {
-        append(" --es EXTRA_FRAGMENT_NAME $it")
+    printerApi.excludeRegexes?.let {
+        append(" --es EXTRA_EXCLUDE_REGEXES $it")
     }
 }.execute()
 
