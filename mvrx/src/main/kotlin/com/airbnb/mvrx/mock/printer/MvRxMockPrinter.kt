@@ -180,20 +180,21 @@ abstract class MvRxPrintStateBroadcastReceiver : BroadcastReceiver() {
     }
 
     private fun isMatch(settings: Settings): Boolean {
-        return objectsToCheckForNameMatch.any {
-            doesObjectPassNameFilters(settings, it)
+        val names = objectsToCheckForNameMatch.mapNotNull {
+            it?.javaClass?.canonicalName
         }
-    }
 
-    private fun doesObjectPassNameFilters(settings: Settings, target: Any?): Boolean {
-        target ?: return false
-        val name = target.javaClass.canonicalName ?: return false
+        if (names.isEmpty()) return false
 
-        if (settings.excludeRegexes.any { it.containsMatchIn(name) }) return false
-
-        return settings.includeRegexes.isEmpty() || settings.includeRegexes.any {
-            it.containsMatchIn(name)
+        if (names.any { name -> settings.excludeRegexes.any { it.containsMatchIn(name) } }) {
+            return false
         }
+
+        if (settings.includeRegexes.isEmpty()) {
+            return true
+        }
+
+        return names.any { name -> settings.includeRegexes.any { it.containsMatchIn(name) } }
     }
 
     protected open val objectsToCheckForNameMatch: List<Any?> get() = listOf(provideObjectToMock())
