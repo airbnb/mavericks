@@ -2,6 +2,7 @@ package com.airbnb.mvrx.sample.core
 
 import android.app.Application
 import com.airbnb.mvrx.launcher.MvRxLauncherMockActivity
+import com.airbnb.mvrx.mock.MvRxMocks
 import com.airbnb.mvrx.sample.LauncherActivity
 import com.airbnb.mvrx.sample.network.DadJokeService
 import com.squareup.moshi.Moshi
@@ -17,6 +18,7 @@ class MvRxApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        MvRxMocks.install(this)
         // Override the default activity for showing mocks from the launcher
         MvRxLauncherMockActivity.activityToShowMock = LauncherActivity::class
 

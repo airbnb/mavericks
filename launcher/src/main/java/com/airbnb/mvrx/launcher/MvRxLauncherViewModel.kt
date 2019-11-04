@@ -167,7 +167,7 @@ class MvRxLauncherViewModel(
         loadViewsFromCache(initialState)
 
         GlobalScope.launch {
-            val mocks = MvRxMocks.getMocks()
+            val mocks = MvRxGlobalMockLibrary.getMocks()
             log("loaded mocks from state")
             setState {
                 // The previously selected view (last time the app ran) may have been deleted or renamed.

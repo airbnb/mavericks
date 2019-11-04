@@ -2,6 +2,7 @@ package com.airbnb.mvrx.sample
 
 import android.os.Bundle
 import android.os.Handler
+import androidx.appcompat.app.AppCompatActivity
 import androidx.collection.SparseArrayCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -10,7 +11,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
-import com.airbnb.mvrx.BaseMvRxActivity
 import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.launcher.MvRxLauncherMockActivity.Companion.showNextMockFromActivity
 
@@ -26,7 +26,7 @@ import com.airbnb.mvrx.launcher.MvRxLauncherMockActivity.Companion.showNextMockF
  * Note: The work around to support navigation architecture here works for the sample use case,
  * but is not extensively tested or intended to be a complete solution.
  */
-class LauncherActivity : BaseMvRxActivity() {
+class LauncherActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

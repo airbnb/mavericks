@@ -45,12 +45,15 @@ class MockableMvRxViewModelConfig<S : Any>(
 
     companion object {
         /**
-         * Allows access to the configuration of a ViewModel.
+         * Allows access to the mock configuration of a ViewModel.
+         *
          * The config is not directly exposed to discourage use. It should only be carefully
          * used in testing frameworks.
+         *
+         * This assumes the viewmodel was created with a mock config applied, and fails otherwise.
          */
-        fun <S : MvRxState> access(viewModel: BaseMvRxViewModel<S>): MvRxViewModelConfig<S> {
-            return viewModel.config
+        fun <S : MvRxState> access(viewModel: BaseMvRxViewModel<S>): MockableMvRxViewModelConfig<S> {
+            return viewModel.config as MockableMvRxViewModelConfig
         }
     }
 

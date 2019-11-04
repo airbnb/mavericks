@@ -35,11 +35,6 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
 
     private val viewModel: MvRxLauncherViewModel by fragmentViewModel()
 
-    override fun enableMockPrinterReceiver() {
-        // Disabling this because we don't want it spitting it out its mocks because it clutters
-        // logcat and the user won't want these states included in their output.
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)

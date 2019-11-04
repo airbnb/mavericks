@@ -6,10 +6,11 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.MvRxView
+import com.airbnb.mvrx.MvRxViewModelConfig
 import com.airbnb.mvrx.mock.MockBehavior
+import com.airbnb.mvrx.mock.MockableMvRxViewModelConfig
 import com.airbnb.mvrx.mock.MockedView
 import com.airbnb.mvrx.mock.MockedViewProvider
-import com.airbnb.mvrx.mock.MvRxViewModelConfig
 import kotlin.reflect.KProperty1
 
 /**
@@ -42,9 +43,9 @@ class ViewModelEnabler(
                         .get(view)
                 }
                 .forEach { viewModel ->
-                    MvRxViewModelConfig.access(viewModel).pushBehaviorOverride(
+                    MockableMvRxViewModelConfig.access(viewModel).pushBehaviorOverride(
                         MockBehavior(
-                            blockExecutions = MockBehavior.BlockExecutions.No,
+                            blockExecutions = MvRxViewModelConfig.BlockExecutions.No,
                             stateStoreBehavior = MockBehavior.StateStoreBehavior.Normal
                         )
                     )

@@ -4,7 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
-import com.airbnb.mvrx.BaseMvRxActivity
+import androidx.appcompat.app.AppCompatActivity
 import com.airbnb.mvrx.mock.MockedViewProvider
 import java.util.LinkedList
 
@@ -16,7 +16,7 @@ import java.util.LinkedList
  * Override [provideIntentToTestMock] in order to customize what activity is used to test each
  * mock.
  */
-class MvRxLauncherTestMocksActivity : BaseMvRxActivity() {
+class MvRxLauncherTestMocksActivity : AppCompatActivity() {
 
     private val mockCount = mocksToShow.size
 

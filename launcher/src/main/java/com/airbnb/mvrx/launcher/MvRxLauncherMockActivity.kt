@@ -9,6 +9,7 @@ import android.os.Parcelable
 import android.util.Log
 import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.MvRxView
+import com.airbnb.mvrx.MvRxViewModelConfig
 import com.airbnb.mvrx.launcher.utils.toastLong
 import com.airbnb.mvrx.mock.MockBehavior
 import com.airbnb.mvrx.mock.MockedView
@@ -180,7 +181,7 @@ class MvRxLauncherMockActivity : MvRxBaseLauncherActivity() {
                 mock.forInitialization || mock.isForProcessRecreation -> MockBehavior(
                     initialState = MockBehavior.InitialState.Partial,
                     stateStoreBehavior = MockBehavior.StateStoreBehavior.Normal,
-                    blockExecutions = MockBehavior.BlockExecutions.No
+                    blockExecutions = MvRxViewModelConfig.BlockExecutions.No
                 )
                 // The Fragment is fully mocked out and we prevent initialization code from overriding the mock.
                 // However, our ViewModelEnabler will later toggle executions to be allowed, once initialization is over,
@@ -188,7 +189,7 @@ class MvRxLauncherMockActivity : MvRxBaseLauncherActivity() {
                 else -> MockBehavior(
                     initialState = MockBehavior.InitialState.Full,
                     stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable,
-                    blockExecutions = MockBehavior.BlockExecutions.Completely
+                    blockExecutions = MvRxViewModelConfig.BlockExecutions.Completely
                 )
             }
         }

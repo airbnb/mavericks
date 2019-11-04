@@ -1,7 +1,6 @@
 package com.airbnb.mvrx.launcher
 
 import androidx.annotation.WorkerThread
-import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.mock.MockableMvRxView
 import com.airbnb.mvrx.mock.MockedViewProvider
 import com.airbnb.mvrx.mock.getMockVariants
@@ -15,7 +14,7 @@ import java.lang.reflect.Modifier
 /**
  * Provides all of the mocks declared on MvRxViews in the app.
  */
-object MvRxMocks {
+object MvRxGlobalMockLibrary {
 
     /**
      * Returns all of the mocks declared on MvRxViews in the app.
@@ -36,7 +35,7 @@ object MvRxMocks {
     @get:WorkerThread
     private val viewsFromDex: List<MockedViewProvider<*>> by lazy {
         runBlocking {
-            val classLoader = MvRxMocks::class.java.classLoader as BaseDexClassLoader
+            val classLoader = MvRxGlobalMockLibrary::class.java.classLoader as BaseDexClassLoader
             loadMocks(classLoader)
         }
     }
@@ -67,7 +66,10 @@ private fun getMocksForClassName(
 ): List<MockedViewProvider<*>>? {
     val clazz = classLoader.loadClass(className)
 
-    return if (!Modifier.isAbstract(clazz.modifiers) && MockableMvRxView::class.java.isAssignableFrom(clazz)) {
+    return if (!Modifier.isAbstract(clazz.modifiers) && MockableMvRxView::class.java.isAssignableFrom(
+            clazz
+        )
+    ) {
         @Suppress("UNCHECKED_CAST")
         getMockVariants(clazz as Class<MockableMvRxView>)
     } else {
