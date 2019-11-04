@@ -13,6 +13,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.MvRx
+import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.mock.MvRxMocks
 import com.airbnb.mvrx.mock.printer.MvRxMockPrinter.Companion.ACTION_COPY_MVRX_STATE
@@ -245,11 +246,11 @@ private class ViewArgPrinter(val mvrxView: MvRxView) : MvRxPrintStateBroadcastRe
 /**
  * An instance of [MvRxPrintStateBroadcastReceiver] that prints the state of the given view model.
  */
-internal class ViewModelStatePrinter(
-    val viewModel: BaseMvRxViewModel<*>
+internal class ViewModelStatePrinter<S : MvRxState>(
+    val viewModel: BaseMvRxViewModel<S>
 ) : MvRxPrintStateBroadcastReceiver() {
 
-    private fun currentState(): Any {
+    private fun currentState(): S {
         return withState(viewModel) { it }
     }
 

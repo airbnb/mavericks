@@ -12,15 +12,16 @@ import kotlin.reflect.KProperty
  */
 class MockStateHolder {
 
-    private val stateMap = mutableMapOf<MvRxView, MvRxMock<*, *>>()
-    private val delegateInfoMap = mutableMapOf<MvRxView, MutableList<ViewModelDelegateInfo<*, *>>>()
+    private val stateMap = mutableMapOf<MockableMvRxView, MvRxMock<*, *>>()
+    private val delegateInfoMap =
+        mutableMapOf<MockableMvRxView, MutableList<ViewModelDelegateInfo<*, *>>>()
 
     /**
      * Set mock data for a view reference. The mocks will be used to provide initial state
      * when the view models are initialized as the view is started.
      */
-    fun <V : MvRxView, A : Parcelable> setMock(
-        view: MvRxView,
+    fun <V : MockableMvRxView, A : Parcelable> setMock(
+        view: MockableMvRxView,
         mockInfo: MvRxMock<V, A>
     ) {
         stateMap[view] = mockInfo
@@ -30,7 +31,7 @@ class MockStateHolder {
      * Clear the stored mock info for the given view. This should be called after the view is done initializing itself with the mock.
      * This should be done to prevent the mock data from interfering with future views of the same type.
      */
-    fun clearMock(view: MvRxView) {
+    fun clearMock(view: MockableMvRxView) {
         stateMap.remove(view)
         // If the mocked view was just mocked with args and doesn't haven't view models then this will be empty
         delegateInfoMap.remove(view)
@@ -55,7 +56,7 @@ class MockStateHolder {
      * and we should instead manually retrieve the default mock state from the View and force that as the mock state to use.
      */
     fun <S : MvRxState> getMockedState(
-        view: MvRxView,
+        view: MockableMvRxView,
         viewModelProperty: KProperty<*>,
         existingViewModel: Boolean,
         stateClass: Class<S>,
@@ -115,7 +116,7 @@ class MockStateHolder {
     }
 
     fun <VM : BaseMvRxViewModel<S>, S : MvRxState> addViewModelDelegate(
-        view: MvRxView,
+        view: MockableMvRxView,
         existingViewModel: Boolean,
         viewModelProperty: KProperty<*>,
         viewModelDelegate: lifecycleAwareLazy<VM>

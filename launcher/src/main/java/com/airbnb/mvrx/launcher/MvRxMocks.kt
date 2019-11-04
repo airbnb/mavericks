@@ -2,6 +2,7 @@ package com.airbnb.mvrx.launcher
 
 import androidx.annotation.WorkerThread
 import com.airbnb.mvrx.MvRxView
+import com.airbnb.mvrx.mock.MockableMvRxView
 import com.airbnb.mvrx.mock.MockedViewProvider
 import com.airbnb.mvrx.mock.getMockVariants
 import dalvik.system.BaseDexClassLoader
@@ -66,9 +67,9 @@ private fun getMocksForClassName(
 ): List<MockedViewProvider<*>>? {
     val clazz = classLoader.loadClass(className)
 
-    return if (!Modifier.isAbstract(clazz.modifiers) && MvRxView::class.java.isAssignableFrom(clazz)) {
+    return if (!Modifier.isAbstract(clazz.modifiers) && MockableMvRxView::class.java.isAssignableFrom(clazz)) {
         @Suppress("UNCHECKED_CAST")
-        getMockVariants(clazz as Class<MvRxView>)
+        getMockVariants(clazz as Class<MockableMvRxView>)
     } else {
         null
     }

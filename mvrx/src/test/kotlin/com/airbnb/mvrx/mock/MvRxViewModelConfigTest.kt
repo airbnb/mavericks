@@ -13,13 +13,12 @@ import org.junit.Test
 class MvRxViewModelConfigTest : BaseTest() {
     @Before
     fun resetProvider() {
-        MvRx.viewModelConfigFactory =
-            MvRxViewModelConfigFactory()
+        MvRxTestMocking.installWithoutMockPrinter(debugMode = true)
     }
 
     @Test
     fun mockBehaviorIsConfigurableViaProperty() {
-        val provider = MvRxViewModelConfigFactory()
+        val provider = MockMvRxViewModelConfigFactory(context = null)
         assertNull(provider.mockBehavior)
 
         val newBehavior = MockBehavior(
@@ -33,23 +32,10 @@ class MvRxViewModelConfigTest : BaseTest() {
         assertEquals(newBehavior, provider.mockBehavior)
     }
 
-    @Test
-    fun nullMockBehaviorWhenNotDebugMode() {
-        val provider =
-            MvRxViewModelConfigFactory(debugMode = false)
-
-        provider.mockBehavior = MockBehavior(
-            MockBehavior.InitialState.Full,
-            MockBehavior.BlockExecutions.Completely,
-            MockBehavior.StateStoreBehavior.Scriptable
-        )
-
-        assertNull(provider.mockBehavior)
-    }
 
     @Test
     fun mockBehaviorIsConfigurableInBlock() {
-        val provider = MvRxViewModelConfigFactory()
+        val provider = MockMvRxViewModelConfigFactory(context = null)
 
         val newBehavior = MockBehavior(
             MockBehavior.InitialState.Full,

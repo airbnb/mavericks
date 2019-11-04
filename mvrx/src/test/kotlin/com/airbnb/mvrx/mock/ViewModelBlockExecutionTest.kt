@@ -6,6 +6,7 @@ import com.airbnb.mvrx.BaseTest
 import com.airbnb.mvrx.Loading
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MvRxViewModelConfig
 import com.airbnb.mvrx.Uninitialized
 import io.reactivex.Observable
 import org.junit.Assert.assertEquals
@@ -13,10 +14,10 @@ import org.junit.Test
 
 class ViewModelBlockExecutionTest : BaseTest() {
     @Test
-    fun executeNormally(){
-        MvRx.viewModelConfigFactory.mockBehavior = MockBehavior(
+    fun executeNormally() {
+        MvRxMocks.mockConfigFactory.mockBehavior = MockBehavior(
             MockBehavior.InitialState.None,
-            MockBehavior.BlockExecutions.No,
+            MvRxViewModelConfig.BlockExecutions.No,
             MockBehavior.StateStoreBehavior.Synchronous
         )
 
@@ -26,10 +27,10 @@ class ViewModelBlockExecutionTest : BaseTest() {
     }
 
     @Test
-    fun executeBlockedCompletely(){
-        MvRx.viewModelConfigFactory.mockBehavior = MockBehavior(
+    fun executeBlockedCompletely() {
+        MvRxMocks.mockConfigFactory.mockBehavior = MockBehavior(
             MockBehavior.InitialState.None,
-            MockBehavior.BlockExecutions.Completely,
+            MvRxViewModelConfig.BlockExecutions.Completely,
             MockBehavior.StateStoreBehavior.Synchronous
         )
 
@@ -39,10 +40,10 @@ class ViewModelBlockExecutionTest : BaseTest() {
     }
 
     @Test
-    fun executeBlockedWithLoading(){
-        MvRx.viewModelConfigFactory.mockBehavior = MockBehavior(
+    fun executeBlockedWithLoading() {
+        MvRxMocks.mockConfigFactory.mockBehavior = MockBehavior(
             MockBehavior.InitialState.None,
-            MockBehavior.BlockExecutions.WithLoading,
+            MvRxViewModelConfig.BlockExecutions.WithLoading,
             MockBehavior.StateStoreBehavior.Synchronous
         )
 
@@ -52,7 +53,7 @@ class ViewModelBlockExecutionTest : BaseTest() {
     }
 
     data class State(val num: Async<Int> = Uninitialized) : MvRxState
-    class ViewModel(state: State = State()) :BaseMvRxViewModel<State>(state) {
+    class ViewModel(state: State = State()) : BaseMvRxViewModel<State>(state) {
         fun setNumAsync(value: Int) {
             Observable.just(value)
                 .execute { copy(num = it) }

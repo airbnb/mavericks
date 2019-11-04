@@ -44,7 +44,7 @@ class MockViewModelDelegateFactory(
 
         return lifecycleAwareLazy(fragment) {
             val mockState: S? =
-                if (mockBehavior != null && mockBehavior.initialState != MockBehavior.InitialState.None) {
+                if (fragment is MockableMvRxView && mockBehavior.initialState != MockBehavior.InitialState.None) {
                     MvRxMocks.mockStateHolder.getMockedState(
                         view = fragment,
                         viewModelProperty = viewModelProperty,
@@ -62,7 +62,7 @@ class MockViewModelDelegateFactory(
                 viewModelProvider(stateFactory(mockState))
                     .apply { subscribe(fragment, subscriber = { fragment.postInvalidate() }) }
                     .also { vm ->
-                        if (mockState != null && mockBehavior?.initialState == MockBehavior.InitialState.Full) {
+                        if (mockState != null && mockBehavior.initialState == MockBehavior.InitialState.Full) {
                             // Custom viewmodel factories can override initial state, so we also force state on the viewmodel
                             // to be the expected mocked value after the ViewModel has been created.
 
@@ -80,7 +80,7 @@ class MockViewModelDelegateFactory(
                     }
             }
         }.also { viewModelDelegate ->
-            if (mockBehavior != null) {
+            if (fragment is MockableMvRxView) {
                 // If a view is being mocked then one of its view models may depend on another,
                 // in which case the dependent needs to be initialized after the VM it depends on.
                 // Tracking all view model delegates created for a view allows us to
