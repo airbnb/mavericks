@@ -5,6 +5,7 @@ import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.BaseTest
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MvRxViewModelConfig
 import com.airbnb.mvrx.MvRxViewModelConfigFactory
 import com.airbnb.mvrx.fragmentViewModel
 import org.junit.After
@@ -17,18 +18,13 @@ class MockStateHolderTest : BaseTest() {
 
     @Before
     fun setup() {
-        MvRx.viewModelConfigFactory.mockBehavior = MockBehavior(
+        MvRxMocks.mockConfigFactory.mockBehavior = MockBehavior(
             initialState = MockBehavior.InitialState.Full,
             stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable,
-            blockExecutions = MockBehavior.BlockExecutions.No
+            blockExecutions = MvRxViewModelConfig.BlockExecutions.No
         )
     }
 
-    @After
-    fun tearDown() {
-        MvRx.viewModelConfigFactory =
-            MvRxViewModelConfigFactory()
-    }
 
     @Test
     fun getDefaultState() {
@@ -51,7 +47,7 @@ class MockStateHolderTest : BaseTest() {
 
     @Test
     fun clearMock() {
-        val holder = MvRx.mockStateHolder
+        val holder = MvRxMocks.mockStateHolder
         val frag = Frag()
         val viewMocks = MvRxViewMocks.getFrom(frag)
         val mockToUse = viewMocks.mocks.first { it.isDefaultState }
@@ -72,7 +68,7 @@ class MockStateHolderTest : BaseTest() {
 
     @Test
     fun clearAllMocks() {
-        val holder = MvRx.mockStateHolder
+        val holder = MvRxMocks.mockStateHolder
         val frag = Frag()
         val viewMocks = MvRxViewMocks.getFrom(frag)
         val mockToUse = viewMocks.mocks.first { it.isDefaultState }
@@ -93,7 +89,7 @@ class MockStateHolderTest : BaseTest() {
 
     @Test
     fun defaultInitializationGivesNullState() {
-        val holder = MvRx.mockStateHolder
+        val holder = MvRxMocks.mockStateHolder
         val frag = Frag()
         val viewMocks = MvRxViewMocks.getFrom(frag)
         val mockToUse = viewMocks.mocks.first { it.isDefaultInitialization }
@@ -112,7 +108,7 @@ class MockStateHolderTest : BaseTest() {
 
     @Test
     fun defaultInitializationForExistingViewModelDoesNotGiveNullState() {
-        val holder = MvRx.mockStateHolder
+        val holder = MvRxMocks.mockStateHolder
         val frag = Frag()
         val viewMocks = MvRxViewMocks.getFrom(frag)
         val mockToUse = viewMocks.mocks.first { it.isDefaultInitialization }
@@ -131,7 +127,7 @@ class MockStateHolderTest : BaseTest() {
 
     @Test
     fun forceMockExistingViewModel() {
-        val holder = MvRx.mockStateHolder
+        val holder = MvRxMocks.mockStateHolder
         val frag = Frag()
 
         val mockedState = holder.getMockedState(
@@ -147,7 +143,7 @@ class MockStateHolderTest : BaseTest() {
 
     @Test(expected = Throwable::class)
     fun forceMockExistingViewModelThrowsIfNoMocks() {
-        val holder = MvRx.mockStateHolder
+        val holder = MvRxMocks.mockStateHolder
         val frag = FragWithNoMocks()
 
         holder.getMockedState(
@@ -176,7 +172,7 @@ class MockStateHolderTest : BaseTest() {
         }
     }
 
-    class FragWithNoMocks : BaseMvRxFragment() {
+    class FragWithNoMocks : BaseMvRxFragment(), MockableMvRxView {
         val fragmentVm: FragmentVM by fragmentViewModel()
 
         override fun invalidate() {

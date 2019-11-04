@@ -4,6 +4,7 @@ import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.BaseTest
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MvRxViewModelConfig
 import com.airbnb.mvrx.MvRxViewModelConfigFactory
 import com.airbnb.mvrx.RealMvRxStateStore
 import org.junit.Assert.*
@@ -11,43 +12,17 @@ import org.junit.Before
 import org.junit.Test
 
 class MvRxViewModelConfigTest : BaseTest() {
-    @Before
-    fun resetProvider() {
-        MvRxTestMocking.installWithoutMockPrinter(debugMode = true)
-    }
-
-    @Test
-    fun mockBehaviorIsConfigurableViaProperty() {
-        val provider = MockMvRxViewModelConfigFactory(context = null)
-        assertNull(provider.mockBehavior)
-
-        val newBehavior = MockBehavior(
-            MockBehavior.InitialState.Full,
-            MockBehavior.BlockExecutions.Completely,
-            MockBehavior.StateStoreBehavior.Scriptable
-        )
-
-        provider.mockBehavior = newBehavior
-
-        assertEquals(newBehavior, provider.mockBehavior)
-    }
 
 
     @Test
     fun mockBehaviorIsConfigurableInBlock() {
         val provider = MockMvRxViewModelConfigFactory(context = null)
 
-        val newBehavior = MockBehavior(
-            MockBehavior.InitialState.Full,
-            MockBehavior.BlockExecutions.Completely,
-            MockBehavior.StateStoreBehavior.Scriptable
-        )
-
-        val newBehavior2 = MockBehavior(
-            MockBehavior.InitialState.Full,
-            MockBehavior.BlockExecutions.Completely,
-            MockBehavior.StateStoreBehavior.Normal
-        )
+        val originalBehavior = provider.mockBehavior
+        val newBehavior =
+            MockBehavior(blockExecutions = MvRxViewModelConfig.BlockExecutions.Completely)
+        val newBehavior2 =
+            MockBehavior(blockExecutions = MvRxViewModelConfig.BlockExecutions.WithLoading)
 
         val result = provider.withMockBehavior(newBehavior) {
             assertEquals(newBehavior, provider.mockBehavior)
@@ -66,7 +41,7 @@ class MvRxViewModelConfigTest : BaseTest() {
         assertEquals(5, result)
 
         // Behavior gets set back to the original
-        assertNull(provider.mockBehavior)
+        assertEquals(provider.mockBehavior, originalBehavior)
     }
 
     @Test
@@ -75,8 +50,7 @@ class MvRxViewModelConfigTest : BaseTest() {
         val vm = TestViewModel()
         assertTrue(vm.config.debugMode)
 
-        MvRx.viewModelConfigFactory =
-            MvRxViewModelConfigFactory(debugMode = false)
+        MvRx.viewModelConfigFactory = MvRxViewModelConfigFactory(debugMode = false)
         val vm2 = TestViewModel()
         assertFalse(vm2.config.debugMode)
     }
@@ -90,13 +64,12 @@ class MvRxViewModelConfigTest : BaseTest() {
             providedConfig = config
         }
 
-        MvRx.viewModelConfigFactory.addOnConfigProvidedListener(onConfigProvided)
+        MvRx.nonNullViewModelConfigFactory.addOnConfigProvidedListener(onConfigProvided)
         val vm = TestViewModel()
 
         assertEquals(vm, providedVm)
         assertEquals(true, providedConfig?.debugMode)
         assertEquals(vm.config.stateStore, providedConfig?.stateStore)
-        assertNull(providedConfig?.currentMockBehavior)
     }
 
     @Test
@@ -108,8 +81,8 @@ class MvRxViewModelConfigTest : BaseTest() {
             providedConfig = config
         }
 
-        MvRx.viewModelConfigFactory.addOnConfigProvidedListener(onConfigProvided)
-        MvRx.viewModelConfigFactory.removeOnConfigProvidedListener(onConfigProvided)
+        MvRx.nonNullViewModelConfigFactory.addOnConfigProvidedListener(onConfigProvided)
+        MvRx.nonNullViewModelConfigFactory.removeOnConfigProvidedListener(onConfigProvided)
         TestViewModel()
 
         assertNull(providedConfig)
@@ -117,49 +90,19 @@ class MvRxViewModelConfigTest : BaseTest() {
     }
 
     @Test
-    fun testNoMockBehaviorByDefault() {
-        val vm = TestViewModel()
-        assertTrue(vm.config.stateStore is RealMvRxStateStore)
-    }
-
-    @Test
-    fun mockableMvRxStateStoreIsUsedWhenMockBehaviorIsSet() {
-        MvRx.viewModelConfigFactory.mockBehavior = MockBehavior(
-            MockBehavior.InitialState.Full,
-            MockBehavior.BlockExecutions.Completely,
-            MockBehavior.StateStoreBehavior.Scriptable
-        )
-
-        val vm = TestViewModel()
-        val stateStore = vm.config.stateStore
-        check(stateStore is MockableMvRxStateStore)
-
-        // The store behavior should be what was set in the mock behavior
-        assertEquals(
-            MockBehavior.StateStoreBehavior.Scriptable,
-            stateStore.mockBehavior.stateStoreBehavior
-        )
-        assertEquals(MockBehavior.StateStoreBehavior.Scriptable, vm.config.currentMockBehavior?.stateStoreBehavior)
-    }
-
-    @Test
     fun pushMockBehaviorOverride() {
-        val originalBehavior = MockBehavior(
-            MockBehavior.InitialState.Full,
-            MockBehavior.BlockExecutions.Completely,
-            MockBehavior.StateStoreBehavior.Scriptable
-        )
-        MvRx.viewModelConfigFactory.mockBehavior = originalBehavior
+        val originalBehavior = MvRxMocks.mockConfigFactory.mockBehavior
 
         val vm = TestViewModel()
 
         val newBehavior =
             originalBehavior.copy(stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous)
-        MvRx.viewModelConfigFactory.pushMockBehaviorOverride(newBehavior)
+
+        MvRxMocks.mockConfigFactory.pushMockBehaviorOverride(newBehavior)
 
         assertEquals(
             newBehavior,
-            vm.config.currentMockBehavior
+            (vm.config as MockableMvRxViewModelConfig).currentMockBehavior
         )
 
         assertEquals(
@@ -167,7 +110,7 @@ class MvRxViewModelConfigTest : BaseTest() {
             (vm.config.stateStore as MockableStateStore).mockBehavior
         )
 
-        MvRx.viewModelConfigFactory.popMockBehaviorOverride()
+        MvRxMocks.mockConfigFactory.popMockBehaviorOverride()
 
         assertEquals(
             originalBehavior,
@@ -176,7 +119,7 @@ class MvRxViewModelConfigTest : BaseTest() {
 
         assertEquals(
             originalBehavior,
-            (vm.config.stateStore as MockableStateStore).mockBehavior
+            vm.config.stateStore.mockBehavior
         )
     }
 

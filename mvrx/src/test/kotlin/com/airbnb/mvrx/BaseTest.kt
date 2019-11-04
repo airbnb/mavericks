@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
+import com.airbnb.mvrx.mock.MvRxTestMocking
 import io.reactivex.Scheduler
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.annotations.NonNull
@@ -14,6 +15,7 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.exceptions.CompositeException
 import io.reactivex.internal.schedulers.ExecutorScheduler
 import io.reactivex.plugins.RxJavaPlugins
+import org.junit.After
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Ignore
@@ -58,9 +60,9 @@ abstract class BaseTest {
     }
 
     @Before
+    @After
     fun resetConfigurationDefaults() {
-        MvRx.viewModelConfigFactory =
-            MvRxViewModelConfigFactory()
+        MvRxTestMocking.installWithoutMockPrinter(debugMode = true)
     }
 
     protected inline fun <reified F : Fragment, reified A : AppCompatActivity> createFragment(

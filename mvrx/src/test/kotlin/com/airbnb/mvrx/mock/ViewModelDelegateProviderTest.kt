@@ -26,18 +26,6 @@ class ViewModelDelegateProviderTest : BaseTest() {
         )
     }
 
-    @Test
-    fun fragmentViewModelDelegateIsRealByDefault() {
-        val (_, frag) = createFragment<Frag>()
-        assertTrue(frag.fragmentVm.config.stateStore is RealMvRxStateStore)
-    }
-
-    @Test
-    fun activityViewModelDelegateIsRealByDefault() {
-        val (_, frag) = createFragment<Frag>()
-        assertTrue(frag.activityVm.config.stateStore is RealMvRxStateStore)
-    }
-
     @Test(expected = Exception::class)
     fun existingViewModelDelegateThrowsIfNoViewModelExists() {
         val (_, frag) = createFragment<Frag2>()
@@ -53,19 +41,14 @@ class ViewModelDelegateProviderTest : BaseTest() {
 
     @Test
     fun createFragmentWithMockedState() {
-        val mockVariants = getMockVariants<Frag, Nothing>(viewProvider = { _, _ ->
-            Frag()
-        })
-
-        checkNotNull(mockVariants)
+        val mockVariants = mockVariants<Frag>()
 
         val mockBehavior = MockBehavior(
             initialState = MockBehavior.InitialState.Full,
-            blockExecutions = MvRxViewModelConfig.BlockExecutions.No,
             stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
         )
 
-        val mockedView = mockVariants.first { it.mock.isDefaultState }.createView(mockBehavior)
+        val mockedView = mockVariants.forDefaultState().createView(mockBehavior)
 
         val frag = mockedView.viewInstance
         frag.addToActivity<Frag, TestActivity>()
@@ -84,7 +67,6 @@ class ViewModelDelegateProviderTest : BaseTest() {
 
         val mockBehavior = MockBehavior(
             initialState = MockBehavior.InitialState.Full,
-            blockExecutions = MvRxViewModelConfig.BlockExecutions.No,
             stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
         )
 

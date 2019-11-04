@@ -44,6 +44,7 @@ class AutoValueTypePrinter : TypePrinter<Any> {
                                 "set"
                             ).decapitalize()
                         }
+                        ?.also { it.isAccessible = true }
                         ?.invoke(instance)
                         ?.let { generateConstructor(it) }
                         ?: return@mapNotNull null

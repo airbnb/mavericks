@@ -73,7 +73,7 @@ class MockStateHolder {
                 .firstOrNull { it.isDefaultState }
                 ?.let {
                     @Suppress("UNCHECKED_CAST")
-                    it as MvRxMock<MvRxView, *>
+                    it as MvRxMock<MockableMvRxView, *>
                 }
                 ?: error(
                     "No mock state found in ${view.javaClass.simpleName} for ViewModel ${viewModelProperty.name}. " +

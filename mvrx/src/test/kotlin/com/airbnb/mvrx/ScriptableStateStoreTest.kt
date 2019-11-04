@@ -12,11 +12,13 @@ class ScriptableStateStoreTest : BaseTest() {
 
     @Before
     fun setup() {
-        MvRx.viewModelConfigFactory.withMockBehavior(MockBehavior(
-            initialState = MockBehavior.InitialState.None,
-            blockExecutions = MockBehavior.BlockExecutions.No,
-            stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
-        )) {
+        MvRxMocks.mockConfigFactory.withMockBehavior(
+            MockBehavior(
+                initialState = MockBehavior.InitialState.None,
+                blockExecutions = MvRxViewModelConfig.BlockExecutions.No,
+                stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
+            )
+        ) {
             viewModel = TestViewModel()
         }
     }

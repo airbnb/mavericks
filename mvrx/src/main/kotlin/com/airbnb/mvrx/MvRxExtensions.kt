@@ -25,7 +25,11 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragm
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 
 ): MvRxDelegateProvider<T, VM> where T : Fragment, T : MvRxView =
-    viewModelDelegateProvider(false) { stateFactory ->
+    viewModelDelegateProvider(
+        viewModelClass,
+        keyFactory,
+        existingViewModel = false
+    ) { stateFactory ->
         MvRxViewModelProvider.get(
             viewModelClass = viewModelClass.java,
             stateClass = S::class.java,
@@ -48,7 +52,11 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.paren
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ): MvRxDelegateProvider<T, VM> where T : Fragment, T : MvRxView =
-    viewModelDelegateProvider(true) { stateFactory ->
+    viewModelDelegateProvider(
+        viewModelClass,
+        keyFactory,
+        existingViewModel = true
+    ) { stateFactory ->
         // 'existingViewModel' is set to true. Although this function works in both cases of
         // either existing or new viewmodel it would be more difficult to support both cases,
         // so we just test the common case of "existing". We can't be sure that the fragment
@@ -102,7 +110,11 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.targe
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ): MvRxDelegateProvider<T, VM> where T : Fragment, T : MvRxView =
-    viewModelDelegateProvider(true) { stateFactory ->
+    viewModelDelegateProvider(
+        viewModelClass,
+        keyFactory,
+        existingViewModel = true
+    ) { stateFactory ->
         // 'existingViewModel' is set to true. Although this function works in both cases of
         // either existing or new viewmodel it would be more difficult to support both cases,
         // so we just test the common case of "existing". We can't be sure that the fragment
@@ -133,7 +145,11 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.exist
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 
 ): MvRxDelegateProvider<T, VM> where T : Fragment, T : MvRxView =
-    viewModelDelegateProvider(true) { stateFactory ->
+    viewModelDelegateProvider(
+        viewModelClass,
+        keyFactory,
+        existingViewModel = true
+    ) { stateFactory ->
 
         MvRxViewModelProvider.get(
             viewModelClass = viewModelClass.java,
@@ -155,7 +171,11 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activ
     viewModelClass: KClass<VM> = VM::class,
     noinline keyFactory: () -> String = { viewModelClass.java.name }
 ): MvRxDelegateProvider<T, VM> where T : Fragment, T : MvRxView =
-    viewModelDelegateProvider(false) { stateFactory ->
+    viewModelDelegateProvider(
+        viewModelClass,
+        keyFactory,
+        existingViewModel = false
+    ) { stateFactory ->
 
         MvRxViewModelProvider.get(
             viewModelClass = viewModelClass.java,

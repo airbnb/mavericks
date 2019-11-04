@@ -398,7 +398,7 @@ class MockBuilderTest : BaseTest() {
         }
     }
 
-    class TestFragment : BaseMvRxFragment() {
+    class TestFragment : BaseMvRxFragment(), MockableMvRxView {
         val viewModel1: TestViewModel by fragmentViewModel()
         val viewModel2: TestViewModel by fragmentViewModel()
         val viewModel3: TestViewModel by fragmentViewModel()

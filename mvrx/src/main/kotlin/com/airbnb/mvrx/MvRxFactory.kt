@@ -24,7 +24,7 @@ class MvRxFactory<VM : BaseMvRxViewModel<S>, S : MvRxState>(
             throw ViewModelDoesNotExistException(viewModelClass, viewModelContext, key)
         }
 
-        val viewModel = createLazyViewModel(
+        val viewModel = createViewModel(
             viewModelClass,
             stateClass,
             viewModelContext,
@@ -36,7 +36,7 @@ class MvRxFactory<VM : BaseMvRxViewModel<S>, S : MvRxState>(
 }
 
 @Suppress("UNCHECKED_CAST")
-private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createLazyViewModel(
+private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModel(
     viewModelClass: Class<out VM>,
     stateClass: Class<out S>,
     viewModelContext: ViewModelContext,

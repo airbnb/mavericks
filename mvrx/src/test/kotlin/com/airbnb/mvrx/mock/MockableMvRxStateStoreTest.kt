@@ -1,6 +1,7 @@
 package com.airbnb.mvrx.mock
 
 import com.airbnb.mvrx.BaseTest
+import com.airbnb.mvrx.MvRxViewModelConfig
 import com.airbnb.mvrx.mock.MockBehavior.StateStoreBehavior
 import org.junit.Assert.*
 import org.junit.Test
@@ -52,7 +53,7 @@ class MockableMvRxStateStoreTest : BaseTest() {
 
         var previousState: TestState? = null
         var newState: TestState? = null
-        store.addOnStateSetListener  { prev, new ->
+        store.addOnStateSetListener { prev, new ->
             previousState = prev
             newState = new
         }
@@ -139,7 +140,8 @@ class MockableMvRxStateStoreTest : BaseTest() {
         val store = createStore()
         store.next(TestState(5))
 
-        store.mockBehavior = store.mockBehavior.copy(stateStoreBehavior = StateStoreBehavior.Synchronous)
+        store.mockBehavior =
+            store.mockBehavior.copy(stateStoreBehavior = StateStoreBehavior.Synchronous)
 
         // State forced by "next" is inherited when the state stores are switched
         store.get { state -> assertEquals(5, state.num) }
@@ -154,7 +156,8 @@ class MockableMvRxStateStoreTest : BaseTest() {
         val store = createStore(StateStoreBehavior.Synchronous)
         store.set { TestState(5) }
 
-        store.mockBehavior = store.mockBehavior.copy(stateStoreBehavior = StateStoreBehavior.Scriptable)
+        store.mockBehavior =
+            store.mockBehavior.copy(stateStoreBehavior = StateStoreBehavior.Scriptable)
 
         // State forced by "set" is inherited when the state stores are switched
         store.get { state ->
@@ -173,7 +176,7 @@ class MockableMvRxStateStoreTest : BaseTest() {
             TestState(),
             MockBehavior(
                 initialState = MockBehavior.InitialState.None,
-                blockExecutions = MockBehavior.BlockExecutions.No,
+                blockExecutions = MvRxViewModelConfig.BlockExecutions.No,
                 stateStoreBehavior = storeBehavior
             )
         )

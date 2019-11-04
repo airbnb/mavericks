@@ -9,10 +9,13 @@ import kotlin.reflect.KProperty
  */
 @PublishedApi
 internal inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> viewModelDelegateProvider(
+    viewModelClass: KClass<VM>,
+    crossinline keyFactory: () -> String,
     existingViewModel: Boolean,
     noinline viewModelProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM
 ): MvRxDelegateProvider<T, VM> where T : Fragment, T : MvRxView {
     return object : MvRxDelegateProvider<T, VM>() {
+
 
         override operator fun provideDelegate(
             thisRef: T,
@@ -22,6 +25,8 @@ internal inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState
                 stateClass = S::class,
                 fragment = thisRef,
                 viewModelProperty = property,
+                viewModelClass = viewModelClass,
+                keyFactory = { keyFactory() },
                 existingViewModel = existingViewModel,
                 viewModelProvider = viewModelProvider
             )
@@ -57,6 +62,8 @@ interface ViewModelDelegateFactory {
     fun <S : MvRxState, T, VM : BaseMvRxViewModel<S>> createLazyViewModel(
         fragment: T,
         viewModelProperty: KProperty<*>,
+        viewModelClass: KClass<VM>,
+        keyFactory: () -> String,
         stateClass: KClass<S>,
         existingViewModel: Boolean,
         viewModelProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM
@@ -74,13 +81,15 @@ interface ViewModelDelegateFactory {
  * only while the Fragment is in the STARTED lifecycle state.
  */
 class DefaultViewModelDelegateFactory : ViewModelDelegateFactory {
-    override fun <S : MvRxState, T : Fragment, VM : BaseMvRxViewModel<S>> createLazyViewModel(
+    override fun <S : MvRxState, T, VM : BaseMvRxViewModel<S>> createLazyViewModel(
         fragment: T,
         viewModelProperty: KProperty<*>,
+        viewModelClass: KClass<VM>,
+        keyFactory: () -> String,
         stateClass: KClass<S>,
         existingViewModel: Boolean,
         viewModelProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM
-    ): Lazy<VM> where T : MvRxView {
+    ): Lazy<VM> where T : MvRxView, T : Fragment {
         return lifecycleAwareLazy(fragment) {
             viewModelProvider(RealMvRxStateFactory())
                 .apply { subscribe(fragment, subscriber = { fragment.postInvalidate() }) }
