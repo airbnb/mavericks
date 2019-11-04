@@ -30,6 +30,9 @@ interface MockableMvRxView : MvRxView {
      * Register this view to listen for broadcast receiver intents for mock state
      * printing. This is safe to call multiple times for the same [MvRxView].
      *
+     * Doing this allows the arguments for the view to be printed out. View model states
+     * will be printed out if [MvRxMocks.install] has been done.
+     *
      * This should be called when the view is created, so it is available to have its state
      * printed.
      *

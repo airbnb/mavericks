@@ -18,7 +18,7 @@ import com.airbnb.mvrx.sample.views.marquee
 
 private const val TAG = "DadJokeIndexFragment"
 
-class DadJokeIndexFragment : BaseFragment(), MockableMvRxView {
+class DadJokeIndexFragment : BaseFragment() {
 
     /**
      * This will get or create a new ViewModel scoped to this Fragment. It will also automatically
