@@ -47,8 +47,8 @@ fun getMockVariants(
  */
 inline fun <reified T> mockVariants(): List<MockedViewProvider<T>> where T : Fragment, T : MockableMvRxView {
     @Suppress("UNCHECKED_CAST")
-    val mocks: List<MockedViewProvider<MvRxView>>? = getMockVariants(
-        viewClass = T::class.java as Class<MvRxView>
+    val mocks: List<MockedViewProvider<MockableMvRxView>>? = getMockVariants(
+        viewClass = T::class.java as Class<MockableMvRxView>
     )
 
     @Suppress("UNCHECKED_CAST")
@@ -135,7 +135,7 @@ fun <V : MockableMvRxView, A : Parcelable> getMockVariants(
 ): List<MockedViewProvider<V>>? {
     val view = viewProvider(null, null)
     // This needs to be the FQN to completely define the view and make it creatable from reflection
-    val viewName = view.javaClass.canonicalName
+    val viewName = view.javaClass.canonicalName ?: error("Null canonical name for $view")
 
     lateinit var mocks: List<MvRxMock<out MockableMvRxView, out Parcelable>>
     val elapsedMs: Long = measureTimeMillis {
@@ -163,7 +163,8 @@ fun <V : MockableMvRxView, A : Parcelable> getMockVariants(
         MockedViewProvider(
             viewName = viewName,
             createView = { mockBehavior ->
-                val configProvider = MvRx.viewModelConfigFactory
+                val configProvider = MvRxMocks.mockConfigFactory
+
 
                 // Test argument serialization/deserialization
 

@@ -2,6 +2,7 @@ package com.airbnb.mvrx.mock
 
 
 import android.content.Context
+import android.content.IntentFilter
 import android.util.Log
 import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.MvRx
@@ -12,40 +13,30 @@ import com.airbnb.mvrx.MvRxViewModelConfigFactory
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.RealMvRxStateStore
 import com.airbnb.mvrx.mock.printer.MvRxMockPrinter
+import com.airbnb.mvrx.mock.printer.ViewModelStatePrinter
 import java.util.LinkedList
 
 class MockableMvRxViewModelConfig<S : Any>(
-    debugMode: Boolean,
-    stateStore: MvRxStateStore<S>,
-    private val initialMockBehavior: MockBehavior? = null
-) : MvRxViewModelConfig<S>(debugMode, stateStore) {
+    private val mockableStateStore: MockableMvRxStateStore<S>,
+    private val initialMockBehavior: MockBehavior
+) : MvRxViewModelConfig<S>(debugMode = true, stateStore = mockableStateStore) {
 
 
-    val currentMockBehavior: MockBehavior?
+    val currentMockBehavior: MockBehavior
         get() = mockBehaviorOverrides.peek() ?: initialMockBehavior
     private val mockBehaviorOverrides = LinkedList<MockBehavior>()
 
-    init {
-        if (!debugMode && initialMockBehavior != null) {
-            Log.e("MvRx", "Mock behavior should only be used in debug", IllegalStateException())
-        }
-    }
-
     fun pushBehaviorOverride(mockBehavior: MockBehavior) {
-        validateDebug(debugMode) ?: return
         mockBehaviorOverrides.push(mockBehavior)
         updateStateStore()
     }
 
     private fun updateStateStore() {
         val currentBehavior = currentMockBehavior
-        if (stateStore is MockableStateStore && currentBehavior != null) {
-            stateStore.mockBehavior = currentBehavior
-        }
+        mockableStateStore.mockBehavior = currentBehavior
     }
 
     fun popBehaviorOverride() {
-        validateDebug(debugMode) ?: return
         // It is ok if this list is empty, as the config may have been created after others,
         // so it may not have an override set while other active configs may have one.
         mockBehaviorOverrides.pollFirst()
@@ -66,7 +57,7 @@ class MockableMvRxViewModelConfig<S : Any>(
     override fun <S : MvRxState> onExecute(
         viewModel: BaseMvRxViewModel<S>
     ): BlockExecutions {
-        val blockExecutions = currentMockBehavior?.blockExecutions ?: BlockExecutions.No
+        val blockExecutions = currentMockBehavior.blockExecutions
 
         if (blockExecutions != BlockExecutions.No) {
             viewModel.reportExecuteCallToInteractionTest()
@@ -128,7 +119,7 @@ data class MockBehavior(
     }
 }
 
-open class MockMvRxViewModelConfigFactory(val context: Context) : MvRxViewModelConfigFactory(
+open class MockMvRxViewModelConfigFactory(val context: Context?) : MvRxViewModelConfigFactory(
     debugMode = true
 ) {
 
@@ -139,19 +130,12 @@ open class MockMvRxViewModelConfigFactory(val context: Context) : MvRxViewModelC
      * This can be changed via [withMockBehavior] to affect behavior when creating a new Fragment.
      *
      * A value can also be set directly here if you want to change the global default.
-     *
-     * It is only valid to call this when in Debug mode.
      */
-    var mockBehavior: MockBehavior? = null
-        set(value) {
-            field = if (validateDebug(debugMode) == true) value else null
-        }
-
-    init {
-        addOnConfigProvidedListener { baseMvRxViewModel, mvRxViewModelConfig ->
-            MvRxMockPrinter.startReceiver(context, baseMvRxViewModel)
-        }
-    }
+    var mockBehavior: MockBehavior = MockBehavior(
+        initialState = MockBehavior.InitialState.None,
+        blockExecutions = MvRxViewModelConfig.BlockExecutions.No,
+        stateStoreBehavior = MockBehavior.StateStoreBehavior.Normal
+    )
 
     /**
      * Any view models created within the [block] will be given a viewmodel store that was created according to the rules of the given mock behavior.
@@ -164,7 +148,7 @@ open class MockMvRxViewModelConfigFactory(val context: Context) : MvRxViewModelC
      * If not null, the [MockableMvRxStateStore] will be created with the options declared in the [MockBehavior]
      */
     fun <R> withMockBehavior(
-        mockBehavior: MockBehavior? = this.mockBehavior,
+        mockBehavior: MockBehavior = this.mockBehavior,
         block: () -> R
     ): R {
         // This function is not inlined so that the caller cannot return early,
@@ -191,31 +175,26 @@ open class MockMvRxViewModelConfigFactory(val context: Context) : MvRxViewModelC
     ): MvRxViewModelConfig<S> {
         val mockBehavior = mockBehavior
 
-        val stateStore = buildStateStore(initialState, mockBehavior)
+        val stateStore = MockableMvRxStateStore(
+            initialState = initialState,
+            mockBehavior = mockBehavior
+        )
 
         return MockableMvRxViewModelConfig(
-            debugMode,
             stateStore,
             mockBehavior
         ).also { config ->
-            if (mockBehavior != null && stateStore is MockableMvRxStateStore) {
-                mockConfigs[stateStore] = config
-                stateStore.addOnDisposeListener(::onMockStoreDisposed)
-            }
-        }
-    }
+            // Since this is an easy place to hook into all viewmodel creation and clearing
+            // we use it as an opportunity to register the mock printer on all view models.
+            // This lets us capture singleton viewmodels as well.
+            val viewModelStatePrinter = ViewModelStatePrinter(viewModel)
+            context?.let { viewModelStatePrinter.register(it) }
 
-    open fun <S : Any> buildStateStore(
-        initialState: S,
-        mockBehavior: MockBehavior?
-    ): MvRxStateStore<S> {
-        return if (mockBehavior != null && debugMode) {
-            MockableMvRxStateStore(
-                initialState = initialState,
-                mockBehavior = mockBehavior
-            )
-        } else {
-            RealMvRxStateStore(initialState)
+            mockConfigs[stateStore] = config
+            stateStore.addOnDisposeListener { stateStore ->
+                context?.let { viewModelStatePrinter.unregister(it) }
+                onMockStoreDisposed(stateStore)
+            }
         }
     }
 
@@ -227,22 +206,11 @@ open class MockMvRxViewModelConfigFactory(val context: Context) : MvRxViewModelC
      * to revert the mock behavior to its original value.
      */
     fun pushMockBehaviorOverride(mockBehavior: MockBehavior) {
-        validateDebug(debugMode) ?: return
         mockConfigs.values.forEach { it.pushBehaviorOverride(mockBehavior) }
     }
 
     fun popMockBehaviorOverride() {
-        validateDebug(debugMode) ?: return
         mockConfigs.values.forEach { it.popBehaviorOverride() }
     }
 }
 
-internal fun validateDebug(debug: Boolean = MvRx.nonNullViewModelConfigFactory.debugMode): Boolean? {
-    return if (debug) {
-        true
-    } else {
-        // Not using Log.e to avoid needing robolectric in tests.
-        System.err.println("MvRxViewModelConfigProvider: This is only accessible in debug mode")
-        null
-    }
-}

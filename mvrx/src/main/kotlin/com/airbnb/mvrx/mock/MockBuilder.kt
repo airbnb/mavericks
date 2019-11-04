@@ -2,9 +2,11 @@ package com.airbnb.mvrx.mock
 
 
 import android.os.Parcelable
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.BaseMvRxViewModel
+import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.PersistState
@@ -819,7 +821,10 @@ open class MvRxViewMocks<V : MockableMvRxView, Args : Parcelable> @PublishedApi 
          * by minification for non debug builds.
          */
         fun getFrom(view: MockableMvRxView): MvRxViewMocks<out MockableMvRxView, out Parcelable> {
-            validateDebug() ?: return EmptyMocks
+            if (!MvRx.nonNullViewModelConfigFactory.debugMode) {
+                Log.w("MockBuilder", "Mocks accessed in non debug build")
+                return EmptyMocks
+            }
 
             numAllowedCreationsOfMocks.incrementAndGet()
 

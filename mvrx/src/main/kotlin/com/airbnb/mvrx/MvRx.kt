@@ -1,5 +1,8 @@
 package com.airbnb.mvrx
 
+import android.content.Context
+import android.content.pm.ApplicationInfo
+
 object MvRx {
     /**
      * If your initial state needs to use Fragment arguments, store your arguments
@@ -35,6 +38,9 @@ object MvRx {
     internal val nonNullViewModelConfigFactory: MvRxViewModelConfigFactory
         get() {
             return viewModelConfigFactory
-                ?: error("You must specify a viewModelConfigProvider in the MvRx object")
+                ?: error("You must specify a viewModelConfigFactory in the MvRx object")
         }
 }
+
+internal val Context.isDebuggable: Boolean
+    get() = 0 != (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE)

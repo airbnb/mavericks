@@ -24,10 +24,16 @@ interface MockableMvRxView : MvRxView {
      * @see getMockVariants
      * @see mockVariants
      */
-    fun provideMocks(): MvRxViewMocks<out MvRxView, out Parcelable> = EmptyMocks
+    fun provideMocks(): MvRxViewMocks<out MockableMvRxView, out Parcelable> = EmptyMocks
 
     /**
-     * TODO
+     * Register this view to listen for broadcast receiver intents for mock state
+     * printing. This is safe to call multiple times for the same [MvRxView].
+     *
+     * This should be called when the view is created, so it is available to have its state
+     * printed.
+     *
+     * For more about mock printing, see [MvRxPrintStateBroadcastReceiver]
      */
     fun registerMockPrinter() {
         MvRxMockPrinter.startReceiver(this)

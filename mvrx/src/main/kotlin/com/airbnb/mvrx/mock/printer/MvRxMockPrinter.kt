@@ -26,13 +26,11 @@ import java.io.File
  *
  * The resulting file names are printed to logcat so tooling can copy them from device.
  */
-internal class MvRxMockPrinter private constructor(private val mvrxView: MvRxView) :
-    LifecycleObserver {
-    private val broadcastReceiver by lazy {
-        ViewArgPrinter(
-            mvrxView
-        )
-    }
+internal class MvRxMockPrinter private constructor(
+    private val mvrxView: MvRxView
+) : LifecycleObserver {
+
+    private val broadcastReceiver by lazy { ViewArgPrinter(mvrxView) }
     private val context: Context
         get() {
             @Suppress("DEPRECATION")
@@ -61,12 +59,12 @@ internal class MvRxMockPrinter private constructor(private val mvrxView: MvRxVie
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
     fun onStarted() {
-        context.registerReceiver(broadcastReceiver, IntentFilter(ACTION_COPY_MVRX_STATE))
+        broadcastReceiver.register(context)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onStopped() {
-        context.unregisterReceiver(broadcastReceiver)
+        broadcastReceiver.unregister(context)
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
@@ -84,15 +82,13 @@ internal class MvRxMockPrinter private constructor(private val mvrxView: MvRxVie
 
         /**
          * Register the given view to listen for broadcast receiver intents for mock state
-         * printing. This is safe to call multiple times for the same [MvRxView].
+         * printing. This is safe to call multiple times for the same [MvRxView], and is a no-op
+         * if not in debug mode.
          */
         fun startReceiver(mvrxView: MvRxView) {
-            MvRxMockPrinter(mvrxView)
-        }
-
-        fun startReceiver(context: Context, viewModel: BaseMvRxViewModel<*>) {
-            // TODO - setting to filter out singleton view models (view models not attached to life cycle?)
-            context.registerReceiver(ViewModelStatePrinter(viewModel), IntentFilter(ACTION_COPY_MVRX_STATE))
+            if (MvRx.nonNullViewModelConfigFactory.debugMode) {
+                MvRxMockPrinter(mvrxView)
+            }
         }
     }
 }
@@ -109,6 +105,8 @@ internal class MvRxMockPrinter private constructor(private val mvrxView: MvRxVie
  * 7. A listener can wait for the output signals, and then pull the resulting files off the device.
  */
 abstract class MvRxPrintStateBroadcastReceiver : BroadcastReceiver() {
+
+    private var isRegistered: Boolean = false
 
     data class Settings(
         val viewName: String?,
@@ -130,20 +128,19 @@ abstract class MvRxPrintStateBroadcastReceiver : BroadcastReceiver() {
 
         // These string extra names are defined in the mock printer kts script, and
         // they allow for configuration in how the mock state is gathered and printed.
-        val settings =
-            Settings(
-                viewName = intent.getStringExtra("EXTRA_VIEW_NAME"),
-                stateName = intent.getStringExtra("EXTRA_STATE_NAME"),
-                stringTruncationThreshold = intent.getIntExtra(
-                    "EXTRA_STRING_TRUNCATION_THRESHOLD",
-                    300
-                ),
-                listTruncationThreshold = intent.getIntExtra("EXTRA_LIST_TRUNCATION_THRESHOLD", 3),
-                excludeArgs = intent.getBooleanExtra("EXTRA_EXCLUDE_ARGS", false)
-            )
+        val settings = Settings(
+            viewName = intent.getStringExtra("EXTRA_VIEW_NAME"),
+            stateName = intent.getStringExtra("EXTRA_STATE_NAME"),
+            stringTruncationThreshold = intent.getIntExtra(
+                "EXTRA_STRING_TRUNCATION_THRESHOLD",
+                300
+            ),
+            listTruncationThreshold = intent.getIntExtra("EXTRA_LIST_TRUNCATION_THRESHOLD", 3),
+            excludeArgs = intent.getBooleanExtra("EXTRA_EXCLUDE_ARGS", false)
+        )
 
 
-        // This is done async since the reflection can be slow.
+        // This is done async since the mock generation reflection can be slow.
         AsyncTask.THREAD_POOL_EXECUTOR.execute {
             if (isMatch(settings)) {
                 val objectToMock = provideObjectToMock()
@@ -163,7 +160,8 @@ abstract class MvRxPrintStateBroadcastReceiver : BroadcastReceiver() {
                 }
             } else {
                 Log.d(INFO_TAG, "$tag - did not match intent target")
-                // Continue onward so we still report "done"
+                // Continue onward so we still report "done", so that the script isn't left hanging
+                // waiting for it.
             }
 
             // We need to pass the package name to the script so that it knows where to pull the files from.
@@ -183,11 +181,23 @@ abstract class MvRxPrintStateBroadcastReceiver : BroadcastReceiver() {
 
     abstract val tag: String
 
+    fun register(context: Context) {
+        check(!isRegistered) { "Already registered" }
+        isRegistered = true
+        context.registerReceiver(this, IntentFilter(ACTION_COPY_MVRX_STATE))
+    }
+
+    fun unregister(context: Context) {
+        check(isRegistered) { "Not registered" }
+        isRegistered = false
+        context.unregisterReceiver(this)
+    }
 }
 
-
+/**
+ * An instance of [MvRxPrintStateBroadcastReceiver] that prints the arguments of the given view.
+ */
 private class ViewArgPrinter(val mvrxView: MvRxView) : MvRxPrintStateBroadcastReceiver() {
-
 
     override fun isMatch(settings: Settings): Boolean {
         if (settings.viewName == null) return true
@@ -197,7 +207,6 @@ private class ViewArgPrinter(val mvrxView: MvRxView) : MvRxPrintStateBroadcastRe
             ignoreCase = true
         )
     }
-
 
     override fun provideObjectToMock(): Any? {
         @Suppress("DEPRECATION")
@@ -220,8 +229,12 @@ private class ViewArgPrinter(val mvrxView: MvRxView) : MvRxPrintStateBroadcastRe
     override val tag: String = mvrxView.javaClass.simpleName
 }
 
-private class ViewModelStatePrinter(val viewModel: BaseMvRxViewModel<*>) :
-    MvRxPrintStateBroadcastReceiver() {
+/**
+ * An instance of [MvRxPrintStateBroadcastReceiver] that prints the state of the given view model.
+ */
+internal class ViewModelStatePrinter(
+    val viewModel: BaseMvRxViewModel<*>
+) : MvRxPrintStateBroadcastReceiver() {
 
 
     override fun isMatch(settings: Settings): Boolean {

@@ -1,5 +1,7 @@
 package com.airbnb.mvrx
 
+import android.content.Context
+
 /**
  * Factory for providing the [MvRxViewModelConfig] for each new ViewModel that is created.
  *
@@ -14,6 +16,11 @@ package com.airbnb.mvrx
  * recommended that you enable debug when applicable.
  */
 open class MvRxViewModelConfigFactory(val debugMode: Boolean) {
+
+    /**
+     * Sets [debugMode] depending on whether the app was built with the Debuggable flag enabled.
+     */
+    constructor(context: Context) : this(context.isDebuggable)
 
     private val onConfigProvidedListener =
         mutableListOf<(BaseMvRxViewModel<*>, MvRxViewModelConfig<*>) -> Unit>()
