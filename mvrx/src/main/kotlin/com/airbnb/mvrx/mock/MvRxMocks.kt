@@ -80,7 +80,6 @@ object MvRxMocks {
      * If the given viewmodel has a state store that implements [ScriptableStateStore] then this
      * function can be used to set the next state via [ScriptableStateStore.next].
      *
-     *
      * It is an error to call this if the store is not scriptable.
      */
     fun <VM : BaseMvRxViewModel<S>, S : MvRxState> setScriptableState(viewModel: VM, state: S) {

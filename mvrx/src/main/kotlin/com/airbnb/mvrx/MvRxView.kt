@@ -3,11 +3,8 @@ package com.airbnb.mvrx
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
-import android.os.Parcelable
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import com.airbnb.mvrx.mock.EmptyMocks
-import com.airbnb.mvrx.mock.MvRxViewMocks
 import kotlin.reflect.KProperty1
 
 // Set of MvRxView identity hash codes that have a pending invalidate.
@@ -227,5 +224,20 @@ interface MvRxView : LifecycleOwner {
      */
     fun uniqueOnly(customId: String? = null): UniqueOnly {
         return UniqueOnly(listOfNotNull(mvrxViewId, customId).joinToString("_"))
+    }
+}
+
+/**
+ * If any callbacks to run [MvRxView.invalidate] have been posted with [MvRxView.postInvalidate]
+ * then this cancels them.
+ *
+ * This may be useful if you have manually run [MvRxView.invalidate] and want to avoid the overhead
+ * of having it run again on the next frame.
+ */
+fun MvRxView.cancelPendingInvalidates() {
+    val viewHashCode = System.identityHashCode(this)
+    if (pendingInvalidates.remove(viewHashCode)) {
+        // the hashcode is used as the "what" in the message
+        handler.removeMessages(viewHashCode)
     }
 }

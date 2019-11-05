@@ -29,7 +29,7 @@ class MockStateHolder {
 
     /**
      * Clear the stored mock info for the given view. This should be called after the view is done initializing itself with the mock.
-     * This should be done to prevent the mock data from interfering with future views of the same type.
+     * This should be done to prevent leaking references to the view and its mocks.
      */
     fun clearMock(view: MockableMvRxView) {
         stateMap.remove(view)
