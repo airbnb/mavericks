@@ -3,6 +3,7 @@ package com.airbnb.mvrx.helloDagger
 import com.airbnb.mvrx.*
 import com.airbnb.mvrx.helloDagger.di.AssistedViewModelFactory
 import com.airbnb.mvrx.helloDagger.base.BaseViewModel
+import com.airbnb.mvrx.helloDagger.di.DaggerMvRxViewModelFactory
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 
@@ -26,9 +27,5 @@ class HelloViewModel @AssistedInject constructor(
         override fun create(state: HelloState): HelloViewModel
     }
 
-    companion object : MvRxViewModelFactory<HelloViewModel, HelloState> {
-        override fun create(viewModelContext: ViewModelContext, state: HelloState): HelloViewModel? {
-            return createViewModel(viewModelContext.activity, state)
-        }
-    }
+    companion object : DaggerMvRxViewModelFactory<HelloViewModel, HelloState>(HelloViewModel::class.java)
 }

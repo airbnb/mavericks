@@ -45,14 +45,13 @@ import com.airbnb.mvrx.helloDagger.base.BaseViewModel
  *
  * The generated map can then be injected wherever it is required.
  *
- * class BaseActivity: BaseMvRxActivity() {
- *   @Inject
- *   lateinit var factories: @JvmSuppressWildcards Map<Class<out BaseViewModel<*>>, AssistedViewModelFactory<*, *>>
- *
- *   onCreate(...) {
- *     appComponent().inject(this)
- *   }
+ * interface AppComponent {
+ *   fun viewModelFactories(): Map<Class<out BaseViewModel<*>>, AssistedViewModelFactory<*, *>>
  * }
+ *
+ * class SomeClass @Inject constructor(
+ *   val viewModelFactories: Map<Class<out BaseViewModel<*>>, AssistedViewModelFactory<*, *>>
+ * )
  */
 interface AssistedViewModelFactory<VM: BaseViewModel<S>, S: MvRxState> {
     fun create(state: S): VM

@@ -1,32 +1,13 @@
 package com.airbnb.mvrx.helloDagger.base
 
-import androidx.fragment.app.FragmentActivity
 import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.helloDagger.BuildConfig
-import com.airbnb.mvrx.helloDagger.di.AssistedViewModelFactory
 
 /**
  * Base class for ViewModels.
  *
  * This class sets the 'Debug' mode in a [BaseMvRxViewModel] to the corresponding parameter
- * in the [BuildConfig] class. It also adds the ability to create instances of its subclasses
- * using their AssistedInject Factories. **Each AssistedInject Factory should implement the
- * [AssistedViewModelFactory] interface.**
+ * in the [BuildConfig] class.
  */
-abstract class BaseViewModel<S : MvRxState>(initialState: S) : BaseMvRxViewModel<S>(initialState, BuildConfig.DEBUG) {
-
-    companion object {
-        inline fun <reified VM : BaseViewModel<S>, reified S : MvRxState> createViewModel(
-                fragmentActivity: FragmentActivity,
-                state: S
-        ): VM {
-            val activity = fragmentActivity as BaseActivity
-            val viewModelFactory = activity.viewModelFactoryMap[VM::class.java]
-            @Suppress("UNCHECKED_CAST")
-            val castedViewModelFactory = viewModelFactory as? AssistedViewModelFactory<VM, S>
-            val viewModel = castedViewModelFactory?.create(state)
-            return viewModel as VM
-        }
-    }
-}
+abstract class BaseViewModel<S : MvRxState>(initialState: S) : BaseMvRxViewModel<S>(initialState, BuildConfig.DEBUG)

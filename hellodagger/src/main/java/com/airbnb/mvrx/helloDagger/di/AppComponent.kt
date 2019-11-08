@@ -1,11 +1,11 @@
 package com.airbnb.mvrx.helloDagger.di
 
-import com.airbnb.mvrx.helloDagger.base.BaseActivity
+import com.airbnb.mvrx.helloDagger.base.BaseViewModel
 import dagger.Component
 
 @Component(modules = [AppModule::class])
 interface AppComponent {
 
-    fun inject(activity: BaseActivity)
+    fun viewModelFactories(): Map<Class<out BaseViewModel<*>>, AssistedViewModelFactory<*, *>>
 
 }
