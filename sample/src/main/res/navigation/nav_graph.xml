@@ -5,49 +5,66 @@
     <fragment
         android:id="@+id/main"
         android:name="com.airbnb.mvrx.sample.MainFragment">
+<!--        <action-->
+<!--            android:id="@+id/action_mainFragment_to_dadJokeIndex"-->
+<!--            app:destination="@id/dadJokeIndex"-->
+<!--            app:enterAnim="@anim/anim_enter"-->
+<!--            app:exitAnim="@anim/anim_exit"-->
+<!--            app:popEnterAnim="@anim/anim_pop_enter"-->
+<!--            app:popExitAnim="@anim/anim_pop_exit"/>-->
+<!--        <action-->
+<!--            android:id="@+id/action_main_to_flowIntroFragment"-->
+<!--            app:destination="@id/flowIntroFragment"-->
+<!--            app:enterAnim="@anim/anim_enter"-->
+<!--            app:exitAnim="@anim/anim_exit"-->
+<!--            app:popEnterAnim="@anim/anim_pop_enter"-->
+<!--            app:popExitAnim="@anim/anim_pop_exit"/>-->
+<!--        <action-->
+<!--            android:id="@+id/action_main_to_helloWorldEpoxyFragment"-->
+<!--            app:destination="@id/helloWorldEpoxyFragment"-->
+<!--            app:enterAnim="@anim/anim_enter"-->
+<!--            app:exitAnim="@anim/anim_exit"-->
+<!--            app:popEnterAnim="@anim/anim_pop_enter"-->
+<!--            app:popExitAnim="@anim/anim_pop_exit"/>-->
+<!--        <action-->
+<!--            android:id="@+id/action_main_to_helloWorldFragment"-->
+<!--            app:destination="@id/helloWorldFragment"-->
+<!--            app:enterAnim="@anim/anim_enter"-->
+<!--            app:exitAnim="@anim/anim_exit"-->
+<!--            app:popEnterAnim="@anim/anim_pop_enter"-->
+<!--            app:popExitAnim="@anim/anim_pop_exit"/>-->
+<!--        <action-->
+<!--            android:id="@+id/action_main_to_randomDadJokeFragment"-->
+<!--            app:destination="@id/randomDadJokeFragment"-->
+<!--            app:enterAnim="@anim/anim_enter"-->
+<!--            app:exitAnim="@anim/anim_exit"-->
+<!--            app:popEnterAnim="@anim/anim_pop_enter"-->
+<!--            app:popExitAnim="@anim/anim_pop_exit" />-->
+<!--        <action-->
+<!--            android:id="@+id/action_main_to_parentFragment"-->
+<!--            app:destination="@id/parentFragment" />-->
         <action
-            android:id="@+id/action_mainFragment_to_dadJokeIndex"
-            app:destination="@id/dadJokeIndex"
-            app:enterAnim="@anim/anim_enter"
-            app:exitAnim="@anim/anim_exit"
-            app:popEnterAnim="@anim/anim_pop_enter"
-            app:popExitAnim="@anim/anim_pop_exit"/>
-        <action
-            android:id="@+id/action_main_to_flowIntroFragment"
-            app:destination="@id/flowIntroFragment"
-            app:enterAnim="@anim/anim_enter"
-            app:exitAnim="@anim/anim_exit"
-            app:popEnterAnim="@anim/anim_pop_enter"
-            app:popExitAnim="@anim/anim_pop_exit"/>
-        <action
-            android:id="@+id/action_main_to_helloWorldEpoxyFragment"
-            app:destination="@id/helloWorldEpoxyFragment"
-            app:enterAnim="@anim/anim_enter"
-            app:exitAnim="@anim/anim_exit"
-            app:popEnterAnim="@anim/anim_pop_enter"
-            app:popExitAnim="@anim/anim_pop_exit"/>
-        <action
-            android:id="@+id/action_main_to_helloWorldFragment"
-            app:destination="@id/helloWorldFragment"
-            app:enterAnim="@anim/anim_enter"
-            app:exitAnim="@anim/anim_exit"
-            app:popEnterAnim="@anim/anim_pop_enter"
-            app:popExitAnim="@anim/anim_pop_exit"/>
-        <action
-            android:id="@+id/action_main_to_randomDadJokeFragment"
-            app:destination="@id/randomDadJokeFragment"
-            app:enterAnim="@anim/anim_enter"
-            app:exitAnim="@anim/anim_exit"
-            app:popEnterAnim="@anim/anim_pop_enter"
-            app:popExitAnim="@anim/anim_pop_exit" />
-        <action
-            android:id="@+id/action_main_to_parentFragment"
-            app:destination="@id/parentFragment" />
+                android:id="@+id/action_main_to_dadJokeIndex"
+                app:destination="@id/dadJokeIndex"
+                app:enterAnim="@anim/anim_enter"
+                app:exitAnim="@anim/anim_exit"
+                app:popEnterAnim="@anim/anim_pop_enter"
+                app:popExitAnim="@anim/anim_exit" />
     </fragment>
-
+    <fragment
+            android:id="@+id/randomDadJokeFragment"
+            android:name="com.airbnb.mvrx.sample.dadjoke.RandomDadJokeFragment">
+        <action
+                android:id="@+id/action_randomDadJokeFragment_to_dadJokeIndex"
+                app:destination="@id/dadJokeIndex"
+                app:enterAnim="@anim/anim_enter"
+                app:exitAnim="@anim/anim_exit"
+                app:popEnterAnim="@anim/anim_pop_enter"
+                app:popExitAnim="@anim/anim_pop_exit" />
+    </fragment>
     <fragment
         android:id="@+id/dadJokeIndex"
-        android:name="com.airbnb.mvrx.sample.features.dadjoke.DadJokeIndexFragment">
+        android:name="com.airbnb.mvrx.sample.dadjoke.DadJokeListFragment">
         <action
             android:id="@+id/action_dadJokeIndex_to_dadJokeDetailFragment"
             app:destination="@id/dadJokeDetailFragment"
@@ -72,16 +89,14 @@
         android:name="com.airbnb.mvrx.sample.features.flow.FlowCounterFragment"/>
     <fragment
         android:id="@+id/helloWorldEpoxyFragment"
-        android:name="com.airbnb.mvrx.sample.features.helloworld.HelloWorldEpoxyFragment"/>
+        android:name="com.airbnb.mvrx.sample.helloworld.HelloWorldEpoxyFragment"/>
     <fragment
         android:id="@+id/dadJokeDetailFragment"
-        android:name="com.airbnb.mvrx.sample.features.dadjoke.DadJokeDetailFragment"/>
-    <fragment
-        android:id="@+id/randomDadJokeFragment"
-        android:name="com.airbnb.mvrx.sample.features.dadjoke.RandomDadJokeFragment"/>
+        android:name="com.airbnb.mvrx.sample.dadjoke.DadJokeDetailFragment"/>
+
     <fragment
         android:id="@+id/helloWorldFragment"
-        android:name="com.airbnb.mvrx.sample.features.helloworld.HelloWorldFragment" />
+        android:name="com.airbnb.mvrx.sample.helloworld.HelloWorldFragment" />
     <fragment
         android:id="@+id/parentFragment"
         android:name="com.airbnb.mvrx.sample.features.parentfragment.ParentFragment"

@@ -4,13 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        app:navigationIcon="@drawable/ic_arrow_back" />
 
-    <com.airbnb.mvrx.sample.views.Marquee
+    <com.airbnb.mvrx.sample.core.views.Marquee
         android:id="@+id/marquee"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
