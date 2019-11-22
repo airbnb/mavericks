@@ -819,9 +819,11 @@ open class MvRxViewMocks<V : MockableMvRxView, Args : Parcelable> @PublishedApi 
          * mocks are only used in debug mode, and so that this function can access mocks
          * reflectively. By only accessing mocks reflectively they are allowed to be stripped
          * by minification for non debug builds.
+         *
+         * This returns empty if [MvRxMocks.enableMvRxViewMocking] is disabled.
          */
         fun getFrom(view: MockableMvRxView): MvRxViewMocks<out MockableMvRxView, out Parcelable> {
-            if (!MvRx.nonNullViewModelConfigFactory.debugMode) {
+            if (!MvRxMocks.enableMvRxViewMocking) {
                 Log.w("MockBuilder", "Mocks accessed in non debug build")
                 return EmptyMocks
             }

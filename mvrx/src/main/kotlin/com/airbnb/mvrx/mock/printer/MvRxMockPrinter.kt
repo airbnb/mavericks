@@ -27,7 +27,7 @@ import java.io.File
  *
  * The resulting file names are printed to logcat so tooling can copy them from device.
  */
-internal class MvRxMockPrinter private constructor(
+class MvRxMockPrinter private constructor(
     private val mvrxView: MvRxView
 ) : LifecycleObserver {
 
@@ -84,10 +84,10 @@ internal class MvRxMockPrinter private constructor(
         /**
          * Register the given view to listen for broadcast receiver intents for mock state
          * printing. This is safe to call multiple times for the same [MvRxView], and is a no-op
-         * if not in debug mode.
+         * if [MvRxMocks.enableMockPrinterBroadcastReceiver] is disabled.
          */
         fun startReceiver(mvrxView: MvRxView) {
-            if (MvRx.nonNullViewModelConfigFactory.debugMode) {
+            if (MvRxMocks.enableMockPrinterBroadcastReceiver) {
                 MvRxMockPrinter(mvrxView)
             }
         }
@@ -105,7 +105,7 @@ internal class MvRxMockPrinter private constructor(
  * 6. Uses logcat to signal where on device the files were saved, and when the process is done
  * 7. A listener can wait for the output signals, and then pull the resulting files off the device.
  */
-abstract class MvRxPrintStateBroadcastReceiver : BroadcastReceiver() {
+internal abstract class MvRxPrintStateBroadcastReceiver : BroadcastReceiver() {
 
     private var isRegistered: Boolean = false
 

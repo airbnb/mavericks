@@ -179,7 +179,7 @@ class MvRxLauncherMockActivity : MvRxBaseLauncherActivity() {
                 // For process recreation we only mock the initial state provided to the viewmodel constructor,
                 // but then it should run it's normal code paths using that initial state
                 mock.forInitialization || mock.isForProcessRecreation -> MockBehavior(
-                    initialState = MockBehavior.InitialState.Partial,
+                    initialStateMocking = MockBehavior.InitialStateMocking.Partial,
                     stateStoreBehavior = MockBehavior.StateStoreBehavior.Normal,
                     blockExecutions = MvRxViewModelConfig.BlockExecutions.No
                 )
@@ -187,7 +187,7 @@ class MvRxLauncherMockActivity : MvRxBaseLauncherActivity() {
                 // However, our ViewModelEnabler will later toggle executions to be allowed, once initialization is over,
                 // so that the fragment is functional from the state we set it up in.
                 else -> MockBehavior(
-                    initialState = MockBehavior.InitialState.Full,
+                    initialStateMocking = MockBehavior.InitialStateMocking.Full,
                     stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable,
                     blockExecutions = MvRxViewModelConfig.BlockExecutions.Completely
                 )

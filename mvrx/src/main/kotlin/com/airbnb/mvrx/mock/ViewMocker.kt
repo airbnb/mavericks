@@ -6,6 +6,7 @@ import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxView
+import kotlin.reflect.jvm.isAccessible
 import kotlin.system.measureTimeMillis
 
 /**
@@ -163,11 +164,9 @@ fun <V : MockableMvRxView, A : Parcelable> getMockVariants(
         MockedViewProvider(
             viewName = viewName,
             createView = { mockBehavior ->
-                val configProvider = MvRxMocks.mockConfigFactory
 
 
                 // Test argument serialization/deserialization
-
                 val arguments = mockInfo.args
                 val bundle = if (arguments != null) argumentsBundle(arguments, viewName) else null
 

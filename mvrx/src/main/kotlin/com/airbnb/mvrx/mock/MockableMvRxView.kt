@@ -34,7 +34,7 @@ interface MockableMvRxView : MvRxView {
      * will be printed out if [MvRxMocks.install] has been done.
      *
      * This should be called when the view is created, so it is available to have its state
-     * printed.
+     * printed. This is a no-op if [MvRxMocks.enableMockPrinterBroadcastReceiver] is disabled.
      *
      * For more about mock printing, see [MvRxPrintStateBroadcastReceiver]
      */

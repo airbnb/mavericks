@@ -2,17 +2,14 @@ package com.airbnb.mvrx.mock
 
 
 import android.content.Context
-import android.content.IntentFilter
-import android.util.Log
 import com.airbnb.mvrx.BaseMvRxViewModel
-import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.ScriptableStateStore
 import com.airbnb.mvrx.MvRxStateStore
 import com.airbnb.mvrx.MvRxViewModelConfig
 import com.airbnb.mvrx.MvRxViewModelConfigFactory
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.RealMvRxStateStore
-import com.airbnb.mvrx.mock.printer.MvRxMockPrinter
 import com.airbnb.mvrx.mock.printer.ViewModelStatePrinter
 import java.util.LinkedList
 
@@ -81,12 +78,12 @@ class MockableMvRxViewModelConfig<S : Any>(
  * created viewmodels first.
  */
 data class MockBehavior(
-    val initialState: InitialState = InitialState.None,
+    val initialStateMocking: InitialStateMocking = InitialStateMocking.None,
     val blockExecutions: MvRxViewModelConfig.BlockExecutions = MvRxViewModelConfig.BlockExecutions.No,
     val stateStoreBehavior: StateStoreBehavior = StateStoreBehavior.Normal
 ) {
     /** Describes how a custom mocked state is applied to initialize a new ViewModel. */
-    enum class InitialState {
+    enum class InitialStateMocking {
         /** No mocked state is applied. The ViewModel initializes itself through normal means. */
         None,
         /**
@@ -111,20 +108,30 @@ data class MockBehavior(
     }
 
     enum class StateStoreBehavior {
+        /**
+         * Uses RealMvRxStateStore
+         */
         Normal,
+        /**
+         * An implementation of [ScriptableStateStore] that blocks any calls to [MvRxStateStore.set],
+         * and instead allows immediate state updates via [ScriptableStateStore.next]
+         */
         Scriptable,
         /**
-         * When toggled to use the real state store (instead of the scriptable store), this controls whether to use
-         * a synchronous version of the state store or the original MvRx state store that operates asynchronously.
-         * The immediate, synchronous store can help for testing state changes.
+         * A fully functional [MvRxStateStore] implementation that makes all updates synchronously.
          */
         Synchronous
     }
 }
 
-open class MockMvRxViewModelConfigFactory(val context: Context?) : MvRxViewModelConfigFactory(
+/**
+ * @param context The application context. If provided this will be used to register a
+ * [ViewModelStatePrinter] for each ViewModel to enable mock state printing.
+ */
+open class MockMvRxViewModelConfigFactory(context: Context?) : MvRxViewModelConfigFactory(
     debugMode = true
 ) {
+    private val applicationContext: Context? = context?.applicationContext
 
     private val mockConfigs = mutableMapOf<MvRxStateStore<*>, MockableMvRxViewModelConfig<*>>()
 
@@ -135,7 +142,7 @@ open class MockMvRxViewModelConfigFactory(val context: Context?) : MvRxViewModel
      * A value can also be set directly here if you want to change the global default.
      */
     var mockBehavior: MockBehavior = MockBehavior(
-        initialState = MockBehavior.InitialState.None,
+        initialStateMocking = MockBehavior.InitialStateMocking.None,
         blockExecutions = MvRxViewModelConfig.BlockExecutions.No,
         stateStoreBehavior = MockBehavior.StateStoreBehavior.Normal
     )
@@ -191,11 +198,11 @@ open class MockMvRxViewModelConfigFactory(val context: Context?) : MvRxViewModel
             // we use it as an opportunity to register the mock printer on all view models.
             // This lets us capture singleton viewmodels as well.
             val viewModelStatePrinter = ViewModelStatePrinter(viewModel)
-            context?.let { viewModelStatePrinter.register(it) }
+            applicationContext?.let { viewModelStatePrinter.register(it) }
 
             mockConfigs[stateStore] = config
             stateStore.addOnDisposeListener { stateStore ->
-                context?.let { viewModelStatePrinter.unregister(it) }
+                applicationContext?.let { viewModelStatePrinter.unregister(it) }
                 onMockStoreDisposed(stateStore)
             }
         }

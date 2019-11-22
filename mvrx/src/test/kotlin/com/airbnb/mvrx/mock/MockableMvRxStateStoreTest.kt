@@ -175,7 +175,7 @@ class MockableMvRxStateStoreTest : BaseTest() {
         return MockableMvRxStateStore(
             TestState(),
             MockBehavior(
-                initialState = MockBehavior.InitialState.None,
+                initialStateMocking = MockBehavior.InitialStateMocking.None,
                 blockExecutions = MvRxViewModelConfig.BlockExecutions.No,
                 stateStoreBehavior = storeBehavior
             )

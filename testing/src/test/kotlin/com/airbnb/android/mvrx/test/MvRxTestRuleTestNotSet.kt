@@ -17,8 +17,7 @@ class MvRxTestRuleTestNotSet {
 
     @Test
     fun testNotDebugNoOverride() {
-        MvRx.viewModelConfigFactory =
-            MvRxViewModelConfigFactory(debugMode = false)
+        // TODO Test rule debug override doesn't make sense anymore??
         TestRuleViewModel()
     }
 

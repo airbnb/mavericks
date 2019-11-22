@@ -3,7 +3,6 @@ package com.airbnb.mvrx.test
 import com.airbnb.mvrx.MvRxTestOverridesProxy
 import com.airbnb.mvrx.mock.MockBehavior
 import com.airbnb.mvrx.mock.MvRxMocks
-import com.airbnb.mvrx.mock.MvRxTestMocking
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.exceptions.CompositeException
 import io.reactivex.plugins.RxJavaPlugins
@@ -17,16 +16,6 @@ enum class DebugMode(internal val value: Boolean?) {
 }
 
 class MvRxTestRule(
-    /**
-     * Forces MvRx to be in debug mode or not.
-     */
-    private val debugMode: DebugMode = DebugMode.NotDebug,
-    /**
-     * If [debugMode] is [DebugMode.Debug] then this property will set the mock behavior of view
-     * models created during the test. By default this makes all state stores operate synchronously.
-     */
-    private val mockBehavior: MockBehavior? = MockBehavior(stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous),
-
     /**
      * Sets up all Rx schedulers to use an immediate scheduler. This will cause all MvRx
      * operations including setState reducers to run synchronously so you can test them.
@@ -42,21 +31,6 @@ class MvRxTestRule(
         RxAndroidPlugins.setMainThreadSchedulerHandler { Schedulers.trampoline() }
         if (setRxImmediateSchedulers) setRxImmediateSchedulers()
 
-        when (debugMode) {
-            DebugMode.NotDebug -> {
-                MvRxTestMocking.installWithoutMockPrinter(debugMode = false)
-            }
-            DebugMode.Debug -> {
-                MvRxTestMocking.installWithoutMockPrinter(debugMode = true)
-                mockBehavior?.let {
-                    MvRxMocks.mockConfigFactory.mockBehavior = it
-                }
-            }
-            DebugMode.Unset -> {
-                // No-op - we don't override whatever custom settings the user might have
-            }
-        }
-
         MvRxTestOverridesProxy.forceDisableLifecycleAwareObserver(
             setForceDisableLifecycleAwareObserver
         )
@@ -65,9 +39,6 @@ class MvRxTestRule(
     override fun after() {
         RxAndroidPlugins.reset()
         if (setRxImmediateSchedulers) clearRxImmediateSchedulers()
-        // Clear any state in the mvrx global plugins.
-        // We reset with debug mode since we assume that we want debug enabled for tests.
-        MvRxTestMocking.installWithoutMockPrinter(debugMode = true)
     }
 
     private fun setRxImmediateSchedulers() {

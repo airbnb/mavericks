@@ -6,8 +6,10 @@ import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.DefaultViewModelDelegateFactory
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MvRxStateStore
 import com.airbnb.mvrx.MvRxViewModelConfigFactory
 import com.airbnb.mvrx.ScriptableStateStore
+import com.airbnb.mvrx.mock.printer.MvRxMockPrinter
 import com.airbnb.mvrx.isDebuggable
 import com.airbnb.mvrx.mock.printer.MockPrinterConfiguration
 import com.airbnb.mvrx.mock.printer.ViewModelStatePrinter
@@ -33,45 +35,48 @@ object MvRxMocks {
      * The scripts in the MvRx/mock_generation folder are used to interact with the device to pull
      * the resulting mock files.
      *
-     * TODO - Link to documentation.
+     * See [MvRxMockPrinter]
+     * See https://github.com/airbnb/MvRx/wiki/Mock-Printer
      */
-    var mockPrinterConfiguration: MockPrinterConfiguration = MockPrinterConfiguration()
+    var mockPrinterConfiguration = MockPrinterConfiguration()
 
-    val mockConfigFactory: MockMvRxViewModelConfigFactory
-        get() {
-            return (MvRx.viewModelConfigFactory as? MockMvRxViewModelConfigFactory)
-                ?: error("Expecting MockMvRxViewModelConfigFactory for config factory. Make sure you have called MvRxMocks#install")
-        }
+    /**
+     * Calls to [MvRxMockPrinter.startReceiver] will be no-ops unless this is enabled.
+     *
+     * This will automatically be set when [install] is called.
+     */
+    var enableMockPrinterBroadcastReceiver: Boolean = false
+
+    /**
+     * Calls to [MockableMvRxView.provideMocks] will return empty unless this is enabled.
+     *
+     * This will automatically be set when [install] is called.
+     */
+    var enableMvRxViewMocking: Boolean = false
 
     /**
      * If the application was built with the debuggable flag enabled in its Android Manifest then
      * this will add plugins to [MvRx] that enable working with mock State. This is useful for
      * both manual and automated testing of development builds.
      *
-     * If the app is not debuggable then a non debug version of [MvRxViewModelConfigFactory] will be
-     * set on [MvRx.viewModelConfigFactory], so it is safe to call this in both debug and production
+     * It is safe to call this in both debug and production
      * builds and it will take care of the correct behavior for you.
      *
      * The context will be used to automatically register a broadcast receiver for each
      * ViewModel created in the app with [ViewModelStatePrinter] so that the state printing
      * system is automatically enabled.
      *
-     * Calling this subsequent times will replace the plugins with new
-     * instances.
+     * Calling this subsequent times will replace the plugins with new instances.
      */
-    fun install(context: Context) {
-        installInternal(context, context.isDebuggable)
-    }
+    fun install(debugMode: Boolean) {
+        enableMockPrinterBroadcastReceiver = debugMode
+        enableMvRxViewMocking = debugMode
 
-    internal fun installInternal(context: Context?, isDebuggable: Boolean) {
-        if (isDebuggable) {
-            val mockConfigFactory = MockMvRxViewModelConfigFactory(context)
-            MvRx.viewModelConfigFactory = mockConfigFactory
-            MvRx.viewModelDelegateFactory = MockViewModelDelegateFactory(mockConfigFactory)
+        if (debugMode) {
+            MvRx.viewModelDelegateFactory = MockViewModelDelegateFactory()
         } else {
-            // These are both set to make sure that all MvRx plugins are completely cleared
+            // This is set to make sure that all MvRx plugins are completely cleared
             // when debuggable is set to false. This helps in the unit testing case.
-            MvRx.viewModelConfigFactory = MvRxViewModelConfigFactory(debugMode = false)
             MvRx.viewModelDelegateFactory = DefaultViewModelDelegateFactory()
         }
     }
@@ -90,22 +95,19 @@ object MvRxMocks {
         stateStore.next(state)
     }
 
+    /**
+     * A helper to set a state on a view model via [MvRxStateStore.set].
+     *
+     * This may not work if the ViewModel's state store is mocked or configured to not accept
+     * state changes, and it is the responsibility of the caller to make sure that the state store
+     * can accept changes.
+     *
+     * Additionally, it is the responsibility of the caller to understand the type of state store
+     * the view model is using, and whether the state change will take affect synchronously or
+     * asynchronously depending on the state store implementation.
+     */
     fun <VM : BaseMvRxViewModel<S>, S : MvRxState> setState(viewModel: VM, state: S) {
         val stateStore = viewModel.config.stateStore
-        check(stateStore is ScriptableStateStore) {
-            "State store of ${viewModel.javaClass.simpleName} must be a ScriptableStateStore"
-        }
-        stateStore.next(state)
-    }
-}
-
-object MvRxTestMocking {
-    /**
-     * This is meant to be used in unit test environments where we want to install the mock
-     * configs, but don't have a Context so we skip using that to set up the mock printer.
-     * The mock printers don't need to be registered anyway for unit tests.
-     */
-    fun installWithoutMockPrinter(debugMode: Boolean) {
-        MvRxMocks.installInternal(context = null, isDebuggable = debugMode)
+        stateStore.set { state }
     }
 }

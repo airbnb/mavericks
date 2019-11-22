@@ -1,6 +1,7 @@
 package com.airbnb.mvrx
 
 import com.airbnb.mvrx.mock.MockBehavior
+import com.airbnb.mvrx.mock.MockMvRxViewModelConfigFactory
 import com.airbnb.mvrx.mock.MvRxMocks
 import org.junit.Assert
 import org.junit.Before
@@ -12,15 +13,15 @@ class ScriptableStateStoreTest : BaseTest() {
 
     @Before
     fun setup() {
-        MvRxMocks.mockConfigFactory.withMockBehavior(
-            MockBehavior(
-                initialState = MockBehavior.InitialState.None,
+        val configFactory = MockMvRxViewModelConfigFactory(null).apply {
+            mockBehavior = MockBehavior(
+                initialStateMocking = MockBehavior.InitialStateMocking.None,
                 blockExecutions = MvRxViewModelConfig.BlockExecutions.No,
                 stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
             )
-        ) {
-            viewModel = TestViewModel()
         }
+
+        viewModel = TestViewModel(configFactory = configFactory)
     }
 
     @Test
@@ -42,9 +43,11 @@ class ScriptableStateStoreTest : BaseTest() {
     data class TestState(val foo: Int = 1) : MvRxState
 
     private class TestViewModel(
-        initialState: TestState = TestState()
+        initialState: TestState = TestState(),
+        configFactory: MvRxViewModelConfigFactory
     ) : BaseMvRxViewModel<TestState>(
-        initialState
+        initialState,
+        configFactory
     ) {
 
         fun attemptToChangeState(newFoo: Int) {
