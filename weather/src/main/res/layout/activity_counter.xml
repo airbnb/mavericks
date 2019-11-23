@@ -5,12 +5,13 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".CounterActivity">
+    tools:context=".WeatherActivity">
 
     <fragment
-        android:name="com.airbnb.mvrx.counter.CounterFragment"
+        android:id="@+id/nav_host_fragment"
+        android:name="com.airbnb.mvrx.weather.WeatherFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:tag="counter1" />
+        android:layout_weight="1" />
+
 </LinearLayout>

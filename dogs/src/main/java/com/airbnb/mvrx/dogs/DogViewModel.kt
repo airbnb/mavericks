@@ -18,9 +18,8 @@ class DogViewModel(
     fun loveDog(dogId: Long) = setState { copy(lovedDogId = dogId) }
 
     fun adoptLovedDog() = withState { state ->
-        val lovedDog = state.lovedDog ?: throw IllegalStateException("You must love a dog first!")
+        val lovedDog = state.lovedDog ?: error("You must love a dog first!")
         dogRepository.adoptDog(lovedDog)
-            .subscribeOn(Schedulers.io())
             .execute { copy(adoptionRequest = it) }
     }
 
