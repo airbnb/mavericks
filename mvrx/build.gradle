@@ -80,11 +80,11 @@ task coverage(type: JacocoReport, dependsOn: "testDebugUnitTest") {
     ]
     def debugTree = fileTree(dir: "${buildDir}/intermediates/classes/debug", excludes: excludes)
     def kotlinDebugTree = fileTree(dir: "${buildDir}/tmp/kotlin-classes/debug", excludes: excludes)
-    classDirectories = files([debugTree], [kotlinDebugTree])
+    classDirectories.from([debugTree], [kotlinDebugTree])
 
-    sourceDirectories = files([
+    sourceDirectories.from([
             android.sourceSets.main.java.srcDirs,
             "${project.projectDir}/src/main/kotlin"
     ])
-    executionData = files("$buildDir/jacoco/testDebugUnitTest.exec")
+    executionData.from("$buildDir/jacoco/testDebugUnitTest.exec")
 }
