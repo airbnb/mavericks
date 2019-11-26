@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.os.bundleOf
 import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.MvRx
@@ -36,8 +37,6 @@ class DogDetailFragment : BaseMvRxFragment(), DogDetailFragmentHandler {
     }
 
     companion object {
-        fun arg(dogId: Long) = Bundle().apply {
-            putLong(MvRx.KEY_ARG, dogId)
-        }
+        fun arg(dogId: Long) = bundleOf(MvRx.KEY_ARG to dogId)
     }
 }
