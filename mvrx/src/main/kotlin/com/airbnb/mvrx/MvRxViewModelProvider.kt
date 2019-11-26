@@ -7,8 +7,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import java.io.Serializable
-import java.lang.IllegalArgumentException
-import java.lang.IllegalStateException
 
 /**
  * Helper ViewModelProvider that has a single method for taking either a [Fragment] or [FragmentActivity] instead
@@ -83,10 +81,10 @@ object MvRxViewModelProvider {
     ) = withState(this) { state ->
         Bundle().apply {
             putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, state.persistState())
-            initialArgs?.let {
-                when (it) {
-                    is Parcelable -> putParcelable(KEY_MVRX_SAVED_ARGS, it)
-                    is Serializable -> putSerializable(KEY_MVRX_SAVED_ARGS, it)
+            initialArgs?.let { args ->
+                when (args) {
+                    is Parcelable -> putParcelable(KEY_MVRX_SAVED_ARGS, args)
+                    is Serializable -> putSerializable(KEY_MVRX_SAVED_ARGS, args)
                     else -> error("Args must be parcelable or serializable")
                 }
             }
@@ -116,9 +114,9 @@ object MvRxViewModelProvider {
 internal fun <VM : BaseMvRxViewModel<*>> Class<VM>.factoryCompanion(): Class<out MvRxViewModelFactory<VM, *>>? {
     return declaredClasses.firstOrNull {
         MvRxViewModelFactory::class.java.isAssignableFrom(it)
-    }?.let {
+    }?.let { klass ->
         @Suppress("UNCHECKED_CAST")
-        it as Class<out MvRxViewModelFactory<VM, *>>
+        klass as Class<out MvRxViewModelFactory<VM, *>>
     }
 }
 

@@ -8,8 +8,7 @@ class HelloRepository @Inject constructor() {
 
     fun sayHello(): Observable<String> {
         return Observable
-                .just("Hello, world!")
-                .delay(2, TimeUnit.SECONDS)
+            .just("Hello, world!")
+            .delay(2, TimeUnit.SECONDS)
     }
-
 }

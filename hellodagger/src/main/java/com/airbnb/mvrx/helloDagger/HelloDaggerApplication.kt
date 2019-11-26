@@ -5,7 +5,7 @@ import androidx.fragment.app.FragmentActivity
 import com.airbnb.mvrx.helloDagger.di.AppComponent
 import com.airbnb.mvrx.helloDagger.di.DaggerAppComponent
 
-class HelloDaggerApplication: Application() {
+class HelloDaggerApplication : Application() {
 
     lateinit var appComponent: AppComponent
 
@@ -13,7 +13,6 @@ class HelloDaggerApplication: Application() {
         super.onCreate()
         appComponent = DaggerAppComponent.create()
     }
-
 }
 
 fun FragmentActivity.appComponent(): AppComponent {

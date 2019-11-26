@@ -14,5 +14,4 @@ interface AppModule {
     @IntoMap
     @ViewModelKey(HelloViewModel::class)
     fun helloViewModelFactory(factory: HelloViewModel.Factory): AssistedViewModelFactory<*, *>
-
 }
