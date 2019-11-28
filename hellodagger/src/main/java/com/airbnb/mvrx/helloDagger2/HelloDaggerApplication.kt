@@ -1,9 +1,9 @@
-package com.airbnb.mvrx.helloDagger
+package com.airbnb.mvrx.helloDagger2
 
 import android.app.Application
 import androidx.fragment.app.FragmentActivity
-import com.airbnb.mvrx.helloDagger.di.AppComponent
-import com.airbnb.mvrx.helloDagger.di.DaggerAppComponent
+import com.airbnb.mvrx.helloDagger2.di.AppComponent
+import com.airbnb.mvrx.helloDagger2.di.DaggerAppComponent
 
 class HelloDaggerApplication : Application() {
 

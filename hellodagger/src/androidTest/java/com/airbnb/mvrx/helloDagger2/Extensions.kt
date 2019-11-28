@@ -1,4 +1,4 @@
-package com.airbnb.mvrx.helloDagger
+package com.airbnb.mvrx.helloDagger2
 
 import androidx.annotation.IdRes
 import androidx.fragment.app.Fragment

@@ -1,6 +1,6 @@
-package com.airbnb.mvrx.helloDagger.di
+package com.airbnb.mvrx.helloDagger2.di
 
-import com.airbnb.mvrx.helloDagger.base.BaseViewModel
+import com.airbnb.mvrx.helloDagger2.base.BaseViewModel
 import dagger.Component
 
 @Component(modules = [AppModule::class])

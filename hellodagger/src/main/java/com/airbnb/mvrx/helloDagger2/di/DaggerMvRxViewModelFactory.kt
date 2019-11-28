@@ -1,11 +1,11 @@
-package com.airbnb.mvrx.helloDagger.di
+package com.airbnb.mvrx.helloDagger2.di
 
 import androidx.fragment.app.FragmentActivity
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.ViewModelContext
-import com.airbnb.mvrx.helloDagger.appComponent
-import com.airbnb.mvrx.helloDagger.base.BaseViewModel
+import com.airbnb.mvrx.helloDagger2.appComponent
+import com.airbnb.mvrx.helloDagger2.base.BaseViewModel
 
 /**
  * A [MvRxViewModelFactory] which makes it easy to create instances of a ViewModel

@@ -1,11 +1,11 @@
-package com.airbnb.mvrx.helloDagger
+package com.airbnb.mvrx.helloDagger2
 
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.Uninitialized
-import com.airbnb.mvrx.helloDagger.base.BaseViewModel
-import com.airbnb.mvrx.helloDagger.di.AssistedViewModelFactory
-import com.airbnb.mvrx.helloDagger.di.DaggerMvRxViewModelFactory
+import com.airbnb.mvrx.helloDagger2.base.BaseViewModel
+import com.airbnb.mvrx.helloDagger2.di.AssistedViewModelFactory
+import com.airbnb.mvrx.helloDagger2.di.DaggerMvRxViewModelFactory
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 

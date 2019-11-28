@@ -1,4 +1,4 @@
-package com.airbnb.mvrx.helloDagger
+package com.airbnb.mvrx.helloDagger2
 
 import com.airbnb.mvrx.withState
 import io.mockk.every
