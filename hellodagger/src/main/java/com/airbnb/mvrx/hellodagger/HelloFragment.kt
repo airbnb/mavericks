@@ -1,4 +1,4 @@
-package com.airbnb.mvrx.helloDagger2
+package com.airbnb.mvrx.hellodagger
 
 import android.os.Bundle
 import android.view.View

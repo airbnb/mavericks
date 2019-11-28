@@ -1,4 +1,4 @@
-package com.airbnb.mvrx.helloDagger2
+package com.airbnb.mvrx.hellodagger
 
 import androidx.appcompat.app.AppCompatActivity
 

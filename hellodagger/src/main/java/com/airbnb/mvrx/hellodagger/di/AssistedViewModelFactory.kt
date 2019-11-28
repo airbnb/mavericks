@@ -1,7 +1,7 @@
-package com.airbnb.mvrx.helloDagger2.di
+package com.airbnb.mvrx.hellodagger.di
 
 import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.helloDagger2.base.BaseViewModel
+import com.airbnb.mvrx.hellodagger.base.BaseViewModel
 
 /*
  * Serves as a supertype for AssistedInject factories in ViewModels.

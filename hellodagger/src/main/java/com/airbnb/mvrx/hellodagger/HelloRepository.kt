@@ -1,4 +1,4 @@
-package com.airbnb.mvrx.helloDagger2
+package com.airbnb.mvrx.hellodagger
 
 import io.reactivex.Observable
 import java.util.concurrent.TimeUnit

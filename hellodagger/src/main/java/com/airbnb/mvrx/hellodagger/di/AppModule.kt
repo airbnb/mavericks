@@ -1,6 +1,6 @@
-package com.airbnb.mvrx.helloDagger2.di
+package com.airbnb.mvrx.hellodagger.di
 
-import com.airbnb.mvrx.helloDagger2.HelloViewModel
+import com.airbnb.mvrx.hellodagger.HelloViewModel
 import com.squareup.inject.assisted.dagger2.AssistedModule
 import dagger.Binds
 import dagger.Module

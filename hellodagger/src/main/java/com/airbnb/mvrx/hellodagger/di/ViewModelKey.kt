@@ -1,6 +1,6 @@
-package com.airbnb.mvrx.helloDagger2.di
+package com.airbnb.mvrx.hellodagger.di
 
-import com.airbnb.mvrx.helloDagger2.base.BaseViewModel
+import com.airbnb.mvrx.hellodagger.base.BaseViewModel
 import dagger.MapKey
 import kotlin.reflect.KClass
 

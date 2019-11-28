@@ -10,11 +10,11 @@ This module contains a sample app to demonstrate how to ease the usage of Dagger
 
 * **Multibinding setup for AssistedInject Factories**
 
-  Every ViewModel using AssistedInject needs a Factory interface annotated with `@AssistedInject.Factory`. These factories are grouped together under a common parent type [AssistedViewModelFactory](src/main/java/com/airbnb/mvrx/helloDagger2/di/AssistedViewModelFactory.kt) to enable a Multibinding Dagger setup.
+  Every ViewModel using AssistedInject needs a Factory interface annotated with `@AssistedInject.Factory`. These factories are grouped together under a common parent type [AssistedViewModelFactory](src/main/java/com/airbnb/mvrx/hellodagger/di/AssistedViewModelFactory.kt) to enable a Multibinding Dagger setup.
 
 * **Removing boilerplate from a MvRxViewModelFactory**
 
-  An `MvRxViewModelFactory` is different than an AssistedInject Factory, and is still needed. Using this AssistedInject multibinding setup, most ViewModels will share the same boilerplate logic in their `MvRxViewModelFactory`'s. A [DaggerMvRxViewModelFactory](src/main/java/com/airbnb/mvrx/helloDagger2/di/DaggerMvRxViewModelFactory.kt) has been added to eliminate this boilerplate.
+  An `MvRxViewModelFactory` is different than an AssistedInject Factory, and is still needed. Using this AssistedInject multibinding setup, most ViewModels will share the same boilerplate logic in their `MvRxViewModelFactory`'s. A [DaggerMvRxViewModelFactory](src/main/java/com/airbnb/mvrx/hellodagger/di/DaggerMvRxViewModelFactory.kt) has been added to eliminate this boilerplate.
 
 ## Example
 
