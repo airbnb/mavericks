@@ -16,14 +16,10 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
+import java.lang.reflect.Modifier
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KProperty1
-import kotlin.reflect.KVisibility
-import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.full.memberProperties
-import kotlin.reflect.full.primaryConstructor
-import kotlin.reflect.jvm.isAccessible
 
 /**
  * To use MvRx, create your own base MvRxViewModel that extends this one and sets debugMode.
@@ -81,13 +77,13 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      */
     @Synchronized
     fun warmReflectionCache(initialState: S) {
-        initialState::class.primaryConstructor?.parameters?.forEach { it.annotations }
-        initialState::class.declaredMemberProperties.asSequence()
-            .filter { it.visibility == KVisibility.PUBLIC }
-            .forEach { prop ->
-                @Suppress("UNCHECKED_CAST")
-                (prop as? KProperty1<S, Any?>)?.get(initialState)
-            }
+//        initialState::class.primaryConstructor?.parameters?.forEach { it.annotations }
+//        initialState::class.declaredMemberProperties.asSequence()
+//            .filter { it.visibility == KVisibility.PUBLIC }
+//            .forEach { prop ->
+//                @Suppress("UNCHECKED_CAST")
+//                (prop as? KProperty1<S, Any?>)?.get(initialState)
+//            }
     }
 
     @CallSuper
@@ -117,8 +113,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 
                 if (firstState != secondState) {
                     @Suppress("UNCHECKED_CAST")
-                    val changedProp = firstState::class.memberProperties.asSequence()
-                        .map { it as KProperty1<S, *> }
+                    val changedProp = firstState::class.java.declaredFields.asSequence()
                         .onEach { it.isAccessible = true }
                         .firstOrNull { property ->
                             @Suppress("Detekt.TooGenericExceptionCaught")
@@ -130,14 +125,14 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
                         }
                     if (changedProp != null) {
                         throw IllegalArgumentException(
-                            "Impure reducer set on ${this@BaseMvRxViewModel::class.simpleName}! " +
+                            "Impure reducer set on ${this@BaseMvRxViewModel::class.java.simpleName}! " +
                                 "${changedProp.name} changed from ${changedProp.get(firstState)} " +
                                 "to ${changedProp.get(secondState)}. " +
                                 "Ensure that your state properties properly implement hashCode."
                         )
                     } else {
                         throw IllegalArgumentException(
-                            "Impure reducer set on ${this@BaseMvRxViewModel::class.simpleName}! Differing states were provided by the same reducer." +
+                            "Impure reducer set on ${this@BaseMvRxViewModel::class.java.simpleName}! Differing states were provided by the same reducer." +
                                 "Ensure that your state properties properly implement hashCode. First state: $firstState -> Second state: $secondState"
                         )
                     }
@@ -164,8 +159,8 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * a fair amount of reflection.
      */
     private fun validateState(initialState: S) {
-        if (state::class.visibility != KVisibility.PUBLIC) {
-            throw IllegalStateException("Your state class ${state::class.qualifiedName} must be public.")
+        if (!Modifier.isPublic(state::class.java.modifiers)) {
+            throw IllegalStateException("Your state class ${state::class.java.name} must be public.")
         }
         state::class.assertImmutability()
         val bundle = state.persistState(assertCollectionPersistability = true)
