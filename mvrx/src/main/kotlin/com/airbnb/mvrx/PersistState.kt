@@ -5,10 +5,13 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.annotation.VisibleForTesting
 import java.io.Serializable
+import kotlin.reflect.KClass
+import kotlin.reflect.KFunction
 import kotlin.reflect.KParameter
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.instanceParameter
+import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.primaryConstructor
 
 /**
@@ -127,3 +130,6 @@ object PersistStateTestHelpers {
     fun <T : Any> persistState(state: T) = state.persistState(assertCollectionPersistability = true)
     fun <T : Any> restorePersistedState(bundle: Bundle, initialState: T) = bundle.restorePersistedState(initialState)
 }
+
+@Suppress("UNCHECKED_CAST")
+private fun <T : Any> KClass<T>.copyMethod(): KFunction<T> = this.memberFunctions.first { it.name == "copy" } as KFunction<T>

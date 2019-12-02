@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.annotation.RestrictTo
 import java.lang.IllegalStateException
-import kotlin.reflect.full.primaryConstructor
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 
@@ -58,7 +57,7 @@ private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModel(
     return requireNotNull(viewModel) {
         // If null, use Kotlin reflect for best error message. We will crash anyway, so performance
         // doesn't matter.
-        if (viewModelClass.kotlin.primaryConstructor?.parameters?.size?.let { it > 1 } == true) {
+        if (viewModelClass.constructors.firstOrNull()?.parameters?.size?.let { it > 1 } == true) {
             "${viewModelClass.simpleName} takes dependencies other than initialState. " +
                 "It must have companion object implementing ${MvRxViewModelFactory::class.java.simpleName} " +
                 "with a create method returning a non-null ViewModel."
