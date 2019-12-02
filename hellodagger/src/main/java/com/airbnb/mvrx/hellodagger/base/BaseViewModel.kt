@@ -1,8 +1,8 @@
-package com.airbnb.mvrx.helloDagger.base
+package com.airbnb.mvrx.hellodagger.base
 
 import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.helloDagger.BuildConfig
+import com.airbnb.mvrx.hellodagger.BuildConfig
 
 /**
  * Base class for ViewModels.

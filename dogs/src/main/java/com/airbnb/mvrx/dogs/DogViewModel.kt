@@ -26,7 +26,7 @@ class DogViewModel(
 
     companion object : MvRxViewModelFactory<DogViewModel, DogState> {
         override fun create(viewModelContext: ViewModelContext, state: DogState): DogViewModel? {
-            val dogRepository = viewModelContext.app<DogApplication>().dogsRespository
+            val dogRepository = viewModelContext.app<DogApplication>().dogsRepository
             return DogViewModel(state, dogRepository)
         }
     }

@@ -1,11 +1,11 @@
-package com.airbnb.mvrx.helloDagger.di
+package com.airbnb.mvrx.hellodagger.di
 
 import androidx.fragment.app.FragmentActivity
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.ViewModelContext
-import com.airbnb.mvrx.helloDagger.appComponent
-import com.airbnb.mvrx.helloDagger.base.BaseViewModel
+import com.airbnb.mvrx.hellodagger.appComponent
+import com.airbnb.mvrx.hellodagger.base.BaseViewModel
 
 /**
  * A [MvRxViewModelFactory] which makes it easy to create instances of a ViewModel
@@ -32,7 +32,7 @@ import com.airbnb.mvrx.helloDagger.base.BaseViewModel
  * }
  */
 abstract class DaggerMvRxViewModelFactory<VM : BaseViewModel<S>, S : MvRxState>(
-        private val viewModelClass: Class<out BaseViewModel<S>>
+    private val viewModelClass: Class<out BaseViewModel<S>>
 ) : MvRxViewModelFactory<VM, S> {
 
     override fun create(viewModelContext: ViewModelContext, state: S): VM? {
@@ -47,5 +47,4 @@ abstract class DaggerMvRxViewModelFactory<VM : BaseViewModel<S>, S : MvRxState>(
         val viewModel = castedViewModelFactory?.create(state)
         return viewModel as VM
     }
-
 }

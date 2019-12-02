@@ -1,6 +1,6 @@
-package com.airbnb.mvrx.helloDagger.di
+package com.airbnb.mvrx.hellodagger.di
 
-import com.airbnb.mvrx.helloDagger.HelloViewModel
+import com.airbnb.mvrx.hellodagger.HelloViewModel
 import com.squareup.inject.assisted.dagger2.AssistedModule
 import dagger.Binds
 import dagger.Module
@@ -14,5 +14,4 @@ interface AppModule {
     @IntoMap
     @ViewModelKey(HelloViewModel::class)
     fun helloViewModelFactory(factory: HelloViewModel.Factory): AssistedViewModelFactory<*, *>
-
 }

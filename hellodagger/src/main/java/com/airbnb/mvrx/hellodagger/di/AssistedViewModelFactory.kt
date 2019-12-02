@@ -1,7 +1,7 @@
-package com.airbnb.mvrx.helloDagger.di
+package com.airbnb.mvrx.hellodagger.di
 
 import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.helloDagger.base.BaseViewModel
+import com.airbnb.mvrx.hellodagger.base.BaseViewModel
 
 /*
  * Serves as a supertype for AssistedInject factories in ViewModels.
@@ -53,6 +53,6 @@ import com.airbnb.mvrx.helloDagger.base.BaseViewModel
  *   val viewModelFactories: Map<Class<out BaseViewModel<*>>, AssistedViewModelFactory<*, *>>
  * )
  */
-interface AssistedViewModelFactory<VM: BaseViewModel<S>, S: MvRxState> {
+interface AssistedViewModelFactory<VM : BaseViewModel<S>, S : MvRxState> {
     fun create(state: S): VM
 }

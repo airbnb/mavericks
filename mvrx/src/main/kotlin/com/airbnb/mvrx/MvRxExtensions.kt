@@ -114,7 +114,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activ
         S::class.java,
         ActivityViewModelContext(requireActivity(), _fragmentArgsProvider()),
         keyFactory()
-    ).apply { subscribe(this@activityViewModel, subscriber = { postInvalidate() })  }
+    ).apply { subscribe(this@activityViewModel, subscriber = { postInvalidate() }) }
 }
 
 /**
