@@ -1,5 +1,6 @@
 package com.airbnb.mvrx
 
+import android.os.Bundle
 import android.util.Log
 import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
@@ -8,6 +9,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModel
 import com.airbnb.mvrx.MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER
+import com.airbnb.mvrx.persiststate.statePersistorOrNull
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -56,7 +58,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         get() = stateStore.state
 
     init {
-        Completable.fromCallable { warmReflectionCache(initialState) }.subscribeOn(Schedulers.computation()).subscribe()
+        Completable.fromCallable { statePersistorOrNull()?.warmReflectionCache(initialState) }.subscribeOn(Schedulers.computation()).subscribe({}, {})
 
         if (this.debugMode) {
             mutableStateChecker = MutableStateChecker(initialState)
@@ -64,26 +66,6 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             Completable.fromCallable { validateState(initialState) }
                 .subscribeOn(Schedulers.computation()).subscribe()
         }
-    }
-
-    /**
-     * Kotlin reflection has a large overhead the first time you run it
-     * but then is pretty fast on subsequent times. Running these methods now will
-     * initialize kotlin reflect and warm the cache so that when persistState() gets
-     * called synchronously in onSaveInstanceState() on the main thread, it will be much faster.
-     * This improved performance 10-100x for a state with 100 @PersistState properties.
-     *
-     * This is also @Synchronized to prevent a ConcurrentModificationException in kotlin-reflect: https://gist.github.com/gpeal/27a5747b3c351d4bd592a8d2d58f134a
-     */
-    @Synchronized
-    fun warmReflectionCache(initialState: S) {
-//        initialState::class.primaryConstructor?.parameters?.forEach { it.annotations }
-//        initialState::class.declaredMemberProperties.asSequence()
-//            .filter { it.visibility == KVisibility.PUBLIC }
-//            .forEach { prop ->
-//                @Suppress("UNCHECKED_CAST")
-//                (prop as? KProperty1<S, Any?>)?.get(initialState)
-//            }
     }
 
     @CallSuper
@@ -163,8 +145,8 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             throw IllegalStateException("Your state class ${state::class.qualifiedName} must be public.")
         }
         state::class.assertImmutability()
-        val bundle = state.persistState(assertCollectionPersistability = true)
-        bundle.restorePersistedState(initialState)
+        val bundle = statePersistorOrNull()?.persistState<S>(state, assertCollectionPersistability = true) ?: Bundle()
+        statePersistorOrNull()?.restorePersistedState(bundle, initialState)
     }
 
     /**

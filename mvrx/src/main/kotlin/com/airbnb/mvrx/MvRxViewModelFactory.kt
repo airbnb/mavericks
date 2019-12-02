@@ -14,7 +14,8 @@ interface MvRxViewModelFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> {
 
     /**
      * @param viewModelContext [ViewModelContext] which contains the ViewModel owner and arguments.
-     * @param state The initial state to pass to the ViewModel. In a new process, state will have all [PersistState] annotated members restored,
+     * @param state The initial state to pass to the ViewModel. In a new process, state will have all @PersistState annotated members restored.
+     *              Refer to the mvrx-persiststate library for more info.
      * therefore you should never create a custom state in this method. To customize the initial state, override [initialState].
      *
      * @return The ViewModel. If you return `null` the ViewModel must have a single argument
@@ -27,7 +28,7 @@ interface MvRxViewModelFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> {
      * The initial state for the ViewModel. Override this if the initial state requires information from arguments, or the ViewModel owner.
      * This function will take precedence over any secondary constructors defined in the state class, [S].
      *
-     * The return value of this function will be transformed with any [PersistState] values before being used in [create].
+     * The return value of this function will be transformed with any @PersistState values before being used in [create].
      *
      * @return the initial state. If `null`, the state class constructors will be used for initial state creation.
      */

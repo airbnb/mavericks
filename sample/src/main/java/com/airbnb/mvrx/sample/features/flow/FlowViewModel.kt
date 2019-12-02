@@ -1,7 +1,7 @@
 package com.airbnb.mvrx.sample.features.flow
 
 import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.PersistState
+import com.airbnb.mvrx.persiststate.PersistState
 import com.airbnb.mvrx.sample.core.MvRxViewModel
 
 /**

@@ -30,6 +30,7 @@ androidExtensions {
 
 dependencies {
     implementation project(':mvrx')
+    implementation project(':mvrx-persiststate')
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     implementation "androidx.appcompat:appcompat:$appCompatVersion"

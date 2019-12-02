@@ -6,6 +6,7 @@ buildscript {
     ext.lifecycleVersion = '2.1.0'
     ext.androidXCoreKtxVersion = '1.1.0'
     ext.robolectricVersion = '4.3'
+    ext.mockitoVersion = '2.25.1'
     ext.epoxyVersion = '3.2.0'
     ext.moshiVersion = '1.6.0'
     ext.koinVersion = '2.0.1'

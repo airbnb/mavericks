@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.PersistState
+import com.airbnb.mvrx.persiststate.PersistState
 import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.withState
 import kotlinx.android.synthetic.main.fragment_counter.counterText

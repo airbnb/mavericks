@@ -6,7 +6,6 @@ import androidx.annotation.RestrictTo
 import java.lang.IllegalStateException
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-
 class MvRxFactory<VM : BaseMvRxViewModel<S>, S : MvRxState>(
     private val viewModelClass: Class<out VM>,
     private val stateClass: Class<out S>,

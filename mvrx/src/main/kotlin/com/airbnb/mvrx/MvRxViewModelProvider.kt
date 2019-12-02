@@ -6,6 +6,7 @@ import androidx.annotation.RestrictTo
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
+import com.airbnb.mvrx.persiststate.statePersistorOrNull
 import java.io.Serializable
 
 /**
@@ -80,7 +81,7 @@ object MvRxViewModelProvider {
         initialArgs: Any?
     ) = withState(this) { state ->
         Bundle().apply {
-            putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, state.persistState())
+            putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, statePersistorOrNull()?.persistState(state) ?: Bundle())
             initialArgs?.let { args ->
                 when (args) {
                     is Parcelable -> putParcelable(KEY_MVRX_SAVED_ARGS, args)
@@ -101,7 +102,7 @@ object MvRxViewModelProvider {
             is ActivityViewModelContext -> viewModelContext.copy(args = restoredArgs)
             is FragmentViewModelContext -> viewModelContext.copy(args = restoredArgs)
         }
-        return StateRestorer(restoredContext, restoredState::restorePersistedState)
+        return StateRestorer(restoredContext) { statePersistorOrNull()?.restorePersistedState(restoredState, it) ?: it }
     }
 
     private const val KEY_MVRX_SAVED_INSTANCE_STATE = "mvrx:saved_instance_state"

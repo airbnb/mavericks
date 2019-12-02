@@ -16,7 +16,7 @@ import kotlin.reflect.KProperty
  * You will be given the initial state as well as a FragmentActivity with which you can access other dependencies to
  * pass to the ViewModel's constructor.
  *
- * MvRx will also handle persistence across process restarts. Refer to [PersistState] for more info.
+ * MvRx will also handle persistence across process restarts. Refer to PersistState from the mvrx-persiststate library for more info.
  *
  * Use [keyFactory] if you have multiple ViewModels of the same class in the same scope.
  */

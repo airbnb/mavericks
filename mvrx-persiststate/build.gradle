@@ -1,8 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
-apply plugin: "com.vanniktech.maven.publish"
 
 android {
     compileSdkVersion 28
@@ -11,7 +9,6 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 28
-        consumerProguardFiles 'proguard-rules.pro'
     }
     buildToolsVersion "$buildToolsVersion"
     lintOptions {
@@ -27,17 +24,23 @@ android {
         main.java.srcDirs += 'src/main/kotlin'
         test.java.srcDirs += 'src/test/kotlin'
     }
-}
-
-androidExtensions {
-    experimental = true
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
+    implementation project(':mvrx')
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
-    implementation project(':mvrx')
-    implementation 'junit:junit:4.12'
+
+    testImplementation project(':testing')
+    testImplementation 'junit:junit:4.12'
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
+    testImplementation "org.robolectric:robolectric:$robolectricVersion"
 }
