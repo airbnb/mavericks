@@ -5,13 +5,11 @@ import android.util.SparseArray
 import androidx.collection.ArrayMap
 import androidx.collection.LongSparseArray
 import androidx.collection.SparseArrayCompat
+import java.lang.reflect.Field
+import java.lang.reflect.Modifier
+import java.lang.reflect.ParameterizedType
 import kotlin.reflect.KCallable
 import kotlin.reflect.KClass
-import kotlin.reflect.KMutableProperty
-import kotlin.reflect.KProperty1
-import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.full.isSubtypeOf
-import kotlin.reflect.full.starProjectedType
 
 private const val IMMUTABLE_LIST_MESSAGE =
     "Use the immutable listOf(...) method instead. You can append it with `val newList = listA + listB`"
@@ -29,13 +27,19 @@ private const val IMMUTABLE_MAP_MESSAGE =
 internal fun KClass<*>.assertImmutability() {
     require(this.isData) { "MvRx state must be a data class!" }
 
-    fun KProperty1<*, *>.isSubtype(vararg classes: KClass<*>): Boolean {
-        return classes.any { klass -> returnType.isSubtypeOf(klass.starProjectedType) }
+    fun Field.isSubtype(vararg classes: KClass<*>): Boolean {
+        return classes.any { klass ->
+            return when (val returnType = this.type) {
+                is ParameterizedType -> klass.java.isAssignableFrom(returnType.rawType as Class<*>)
+                is Class -> klass.java.isAssignableFrom(returnType)
+                else -> false
+            }
+        }
     }
 
-    this.declaredMemberProperties.forEach { prop ->
+    java.declaredFields.forEach { prop ->
         when {
-            prop is KMutableProperty<*> -> "State property ${prop.name} must be a val, not a var."
+            !Modifier.isFinal(prop.modifiers) -> "State property ${prop.name} must be a val, not a var."
             prop.isSubtype(ArrayList::class) -> "You cannot use ArrayList for ${prop.name}.\n$IMMUTABLE_LIST_MESSAGE"
             prop.isSubtype(SparseArray::class) -> "You cannot use SparseArray for ${prop.name}.\n$IMMUTABLE_LIST_MESSAGE"
             prop.isSubtype(LongSparseArray::class) -> "You cannot use LongSparseArray for ${prop.name}.\n$IMMUTABLE_LIST_MESSAGE"
