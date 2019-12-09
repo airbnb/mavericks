@@ -3,6 +3,7 @@ package com.airbnb.mvrx.mock
 import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.ActivityViewModelContext
 import com.airbnb.mvrx.BaseMvRxViewModel
+import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxStateFactory
 import com.airbnb.mvrx.MvRxView
@@ -23,7 +24,9 @@ import kotlin.reflect.KProperty
  * If a mock behavior is enabled, then when a ViewModel is created this will look for a mock state
  * in [MvRxMocks.mockStateHolder], and if one exists it will be forced onto the ViewModel.
  */
-class MockViewModelDelegateFactory : ViewModelDelegateFactory {
+class MockViewModelDelegateFactory(
+    val configFactory: MockMvRxViewModelConfigFactory
+) : ViewModelDelegateFactory {
 
     override fun <S : MvRxState, T, VM : BaseMvRxViewModel<S>> createLazyViewModel(
         fragment: T,
@@ -34,6 +37,9 @@ class MockViewModelDelegateFactory : ViewModelDelegateFactory {
         existingViewModel: Boolean,
         viewModelProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM
     ): Lazy<VM> where T : MvRxView, T : Fragment {
+        check(configFactory == MvRx.viewModelConfigFactory) {
+            "Config factory provided in constructor is not the same one as installed on MvRx object."
+        }
 
         // We lock  in the mockBehavior at the time that the Fragment is created (which is when the
         // delegate provider is created). Using the mockbehavior at this time is necessary since it allows
@@ -65,7 +71,7 @@ class MockViewModelDelegateFactory : ViewModelDelegateFactory {
 
                 viewModel.apply { subscribe(fragment, subscriber = { fragment.postInvalidate() }) }
                     .also { vm ->
-                        if (mockState != null && mockBehavior.initialState == MockBehavior.InitialStateMocking.Full) {
+                        if (mockState != null && mockBehavior.initialStateMocking == MockBehavior.InitialStateMocking.Full) {
                             // Custom viewmodel factories can override initial state, so we also force state on the viewmodel
                             // to be the expected mocked value after the ViewModel has been created.
 

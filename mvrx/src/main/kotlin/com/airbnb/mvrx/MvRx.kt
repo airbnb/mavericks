@@ -23,6 +23,24 @@ object MvRx {
      */
     var viewModelDelegateFactory: ViewModelDelegateFactory = DefaultViewModelDelegateFactory()
 
+    /**
+     * A factory for creating a [MvRxViewModelConfig] for each ViewModel.
+     *
+     * You MUST provide an instance here before creating any viewmodels. You can do this when
+     * your application is created.
+     *
+     * This allows you to specify whether MvRx should run in debug mode or not. Additionally, it
+     * allows custom state stores or execution behavior for the ViewModel, which can be helpful
+     * for testing.
+     */
+    var viewModelConfigFactory: MvRxViewModelConfigFactory? = null
+
+    internal val nonNullViewModelConfigFactory: MvRxViewModelConfigFactory
+        get() {
+            return viewModelConfigFactory
+                ?: error("You must specify a viewModelConfigFactory in the MvRx object")
+        }
+
 }
 
 internal val Context.isDebuggable: Boolean

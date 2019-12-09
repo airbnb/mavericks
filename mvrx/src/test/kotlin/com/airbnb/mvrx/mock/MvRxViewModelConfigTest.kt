@@ -6,9 +6,10 @@ import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxViewModelConfig
 import com.airbnb.mvrx.MvRxViewModelConfigFactory
-import com.airbnb.mvrx.RealMvRxStateStore
-import org.junit.Assert.*
-import org.junit.Before
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class MvRxViewModelConfigTest : BaseTest() {
@@ -50,7 +51,8 @@ class MvRxViewModelConfigTest : BaseTest() {
         val vm = TestViewModel()
         assertTrue(vm.config.debugMode)
 
-        val vm2 = TestViewModel(MvRxViewModelConfigFactory(debugMode = false))
+        MvRx.viewModelConfigFactory = MvRxViewModelConfigFactory(debugMode = false)
+        val vm2 = TestViewModel()
         assertFalse(vm2.config.debugMode)
     }
 
@@ -63,11 +65,8 @@ class MvRxViewModelConfigTest : BaseTest() {
             providedConfig = config
         }
 
-        val configFactory = MvRxViewModelConfigFactory(debugMode = true).apply {
-            addOnConfigProvidedListener(onConfigProvided)
-        }
-
-        val vm = TestViewModel(configFactory)
+        MvRx.nonNullViewModelConfigFactory.addOnConfigProvidedListener(onConfigProvided)
+        val vm = TestViewModel()
 
         assertEquals(vm, providedVm)
         assertEquals(true, providedConfig?.debugMode)
@@ -83,12 +82,9 @@ class MvRxViewModelConfigTest : BaseTest() {
             providedConfig = config
         }
 
-        val configFactory = MvRxViewModelConfigFactory(debugMode = true).apply {
-            addOnConfigProvidedListener(onConfigProvided)
-            removeOnConfigProvidedListener(onConfigProvided)
-        }
-
-        TestViewModel(configFactory)
+        MvRx.nonNullViewModelConfigFactory.addOnConfigProvidedListener(onConfigProvided)
+        MvRx.nonNullViewModelConfigFactory.removeOnConfigProvidedListener(onConfigProvided)
+        TestViewModel()
 
         assertNull(providedConfig)
         assertNull(providedVm)
@@ -96,15 +92,13 @@ class MvRxViewModelConfigTest : BaseTest() {
 
     @Test
     fun pushMockBehaviorOverride() {
-        val configFactory = MockMvRxViewModelConfigFactory(null)
-        val originalBehavior = configFactory.mockBehavior
-
-        val vm = TestViewModel(configFactory)
+        val originalBehavior = MvRxMocks.mockConfigFactory.mockBehavior
+        val vm = TestViewModel()
 
         val newBehavior =
             originalBehavior.copy(stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous)
 
-        configFactory.pushMockBehaviorOverride(newBehavior)
+        MvRxMocks.mockConfigFactory.pushMockBehaviorOverride(newBehavior)
 
         assertEquals(
             newBehavior,
@@ -116,7 +110,7 @@ class MvRxViewModelConfigTest : BaseTest() {
             (vm.config.stateStore as MockableStateStore).mockBehavior
         )
 
-        configFactory.popMockBehaviorOverride()
+        MvRxMocks.mockConfigFactory.popMockBehaviorOverride()
 
         assertEquals(
             originalBehavior,
@@ -129,9 +123,7 @@ class MvRxViewModelConfigTest : BaseTest() {
         )
     }
 
-    class TestViewModel(
-        viewModelConfigFactory: MvRxViewModelConfigFactory = MockMvRxViewModelConfigFactory(null)
-    ) : BaseMvRxViewModel<TestState>(TestState(), viewModelConfigFactory)
+    class TestViewModel : BaseMvRxViewModel<TestState>(TestState())
 
     data class TestState(val num: Int = 0) : MvRxState
 }

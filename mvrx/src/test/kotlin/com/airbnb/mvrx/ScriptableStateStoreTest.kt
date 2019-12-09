@@ -13,15 +13,11 @@ class ScriptableStateStoreTest : BaseTest() {
 
     @Before
     fun setup() {
-        val configFactory = MockMvRxViewModelConfigFactory(null).apply {
-            mockBehavior = MockBehavior(
-                initialStateMocking = MockBehavior.InitialStateMocking.None,
-                blockExecutions = MvRxViewModelConfig.BlockExecutions.No,
-                stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
-            )
+        MvRxMocks.mockConfigFactory.withMockBehavior(
+            MockBehavior(stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable)
+        ) {
+            viewModel = TestViewModel()
         }
-
-        viewModel = TestViewModel(configFactory = configFactory)
     }
 
     @Test
@@ -43,11 +39,9 @@ class ScriptableStateStoreTest : BaseTest() {
     data class TestState(val foo: Int = 1) : MvRxState
 
     private class TestViewModel(
-        initialState: TestState = TestState(),
-        configFactory: MvRxViewModelConfigFactory
+        initialState: TestState = TestState()
     ) : BaseMvRxViewModel<TestState>(
-        initialState,
-        configFactory
+        initialState
     ) {
 
         fun attemptToChangeState(newFoo: Int) {

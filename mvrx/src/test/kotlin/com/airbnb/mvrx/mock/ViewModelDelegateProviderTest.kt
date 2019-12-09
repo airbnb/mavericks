@@ -112,10 +112,10 @@ class ViewModelDelegateProviderTest : BaseTest() {
 
     data class TestState(val num: Int = 0) : MvRxState
     class FragmentVM(initialState: TestState) :
-        BaseMvRxViewModel<TestState>(initialState, MockMvRxViewModelConfigFactory(null))
+        BaseMvRxViewModel<TestState>(initialState)
 
     class ActivityVM(initialState: TestState) :
-        BaseMvRxViewModel<TestState>(initialState, MockMvRxViewModelConfigFactory(null))
+        BaseMvRxViewModel<TestState>(initialState)
 }
 
 

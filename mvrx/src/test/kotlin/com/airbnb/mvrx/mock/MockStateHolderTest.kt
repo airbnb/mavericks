@@ -4,7 +4,6 @@ import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.BaseTest
 import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.MvRxViewModelConfig
 import com.airbnb.mvrx.fragmentViewModel
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -12,6 +11,14 @@ import org.junit.Before
 import org.junit.Test
 
 class MockStateHolderTest : BaseTest() {
+
+    @Before
+    fun setup() {
+        MvRxMocks.mockConfigFactory.mockBehavior = MockBehavior(
+            initialStateMocking = MockBehavior.InitialStateMocking.Full,
+            stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
+        )
+    }
 
     @Test
     fun getDefaultState() {
@@ -168,14 +175,6 @@ class MockStateHolderTest : BaseTest() {
     }
 
     data class TestState(val num: Int = 0) : MvRxState
-    class FragmentVM(initialState: TestState) : BaseMvRxViewModel<TestState>(
-        initialState = initialState,
-        viewModelConfigFactory = MockMvRxViewModelConfigFactory(null).apply {
-            mockBehavior = MockBehavior(
-                initialStateMocking = MockBehavior.InitialStateMocking.Full,
-                stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable,
-                blockExecutions = MvRxViewModelConfig.BlockExecutions.No
-            )
-        })
+    class FragmentVM(initialState: TestState) : BaseMvRxViewModel<TestState>(initialState)
 
 }

@@ -9,19 +9,31 @@ import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.Schedulers
 import org.junit.rules.ExternalResource
 
-enum class DebugMode(internal val value: Boolean?) {
-    Debug(true),
-    NotDebug(false),
-    Unset(null)
-}
-
 class MvRxTestRule(
     /**
      * Sets up all Rx schedulers to use an immediate scheduler. This will cause all MvRx
      * operations including setState reducers to run synchronously so you can test them.
      */
     private val setRxImmediateSchedulers: Boolean = true,
-    private val setForceDisableLifecycleAwareObserver: Boolean = true
+    /**
+     * If true, any subscriptions made to a MvRx view model will NOT be made lifecycle aware.
+     * This can make it easier to test subscriptions because you won't have to move the test targets to a
+     * STARTED state before they can receive subscriptions.
+     */
+    private val setForceDisableLifecycleAwareObserver: Boolean = true,
+    /**
+     * If provided, MvRx mocking will be enabled via [MvRxMocks.install] and this will be set as
+     * the mocking behavior. The default behavior simply puts the ViewModel in a configuration
+     * where state changes happen synchronously, which is often necessary for tests.
+     *
+     * You can pass a "Scriptable" state store behavior to prevent state changes while forcing
+     * your own state changes.
+     *
+     * If null is given then mock behavior is disabled via [MvRxMocks.install].
+     */
+    private val viewModelMockBehavior: MockBehavior? = MockBehavior(
+        stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
+    )
 ) : ExternalResource() {
     private var defaultExceptionHandler: Thread.UncaughtExceptionHandler? = null
 
@@ -34,11 +46,26 @@ class MvRxTestRule(
         MvRxTestOverridesProxy.forceDisableLifecycleAwareObserver(
             setForceDisableLifecycleAwareObserver
         )
+
+        setupMocking()
     }
 
     override fun after() {
         RxAndroidPlugins.reset()
+        // This is set up after again to clear any changes or listeners that were set on the plugins
+        setupMocking()
         if (setRxImmediateSchedulers) clearRxImmediateSchedulers()
+    }
+
+    private fun setupMocking() {
+        // TODO -  Does this work with robolectric?
+        if (viewModelMockBehavior == null) {
+            MvRxMocks.install(debugMode = false, context = null)
+        } else {
+            // Use a null context since we don't need mock printing during tests
+            MvRxMocks.install(debugMode = true, context = null)
+            MvRxMocks.mockConfigFactory.mockBehavior = viewModelMockBehavior
+        }
     }
 
     private fun setRxImmediateSchedulers() {

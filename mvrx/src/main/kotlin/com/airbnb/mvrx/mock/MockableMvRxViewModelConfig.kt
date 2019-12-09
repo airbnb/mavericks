@@ -198,11 +198,19 @@ open class MockMvRxViewModelConfigFactory(context: Context?) : MvRxViewModelConf
             // we use it as an opportunity to register the mock printer on all view models.
             // This lets us capture singleton viewmodels as well.
             val viewModelStatePrinter = ViewModelStatePrinter(viewModel)
-            applicationContext?.let { viewModelStatePrinter.register(it) }
+            applicationContext?.let {
+                if (MvRxMocks.enableMockPrinterBroadcastReceiver) {
+                    viewModelStatePrinter.register(it)
+                }
+            }
 
             mockConfigs[stateStore] = config
             stateStore.addOnDisposeListener { stateStore ->
-                applicationContext?.let { viewModelStatePrinter.unregister(it) }
+                applicationContext?.let {
+                    if (MvRxMocks.enableMockPrinterBroadcastReceiver) {
+                        viewModelStatePrinter.unregister(it)
+                    }
+                }
                 onMockStoreDisposed(stateStore)
             }
         }

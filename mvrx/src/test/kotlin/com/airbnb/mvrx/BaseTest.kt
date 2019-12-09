@@ -62,7 +62,8 @@ abstract class BaseTest {
     @Before
     @After
     fun resetConfigurationDefaults() {
-        MvRxMocks.install(debugMode = true)
+        // Use a null context since we don't need mock printing during tests
+        MvRxMocks.install(debugMode = true, context = null)
     }
 
     protected inline fun <reified F : Fragment, reified A : AppCompatActivity> createFragment(

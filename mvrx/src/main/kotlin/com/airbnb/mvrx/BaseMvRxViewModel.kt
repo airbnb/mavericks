@@ -30,20 +30,12 @@ import kotlin.reflect.jvm.isAccessible
  * To use MvRx, create view models that extend this base view model.
  */
 abstract class BaseMvRxViewModel<S : MvRxState>(
-    initialState: S,
-    /**
-     * A factory for creating a [MvRxViewModelConfig] for the ViewModel.
-     *
-     * This allows you to specify whether MvRx should run in debug mode or not. Additionally, it
-     * allows custom state stores or execution behavior for the ViewModel, which can be helpful
-     * for testing.
-     */
-    viewModelConfigFactory: MvRxViewModelConfigFactory
+    initialState: S
 ) : ViewModel() {
 
     @Suppress("LeakingThis")
     @PublishedApi
-    internal val config: MvRxViewModelConfig<S> = viewModelConfigFactory.provideConfig(
+    internal val config: MvRxViewModelConfig<S> = MvRx.nonNullViewModelConfigFactory.provideConfig(
         this,
         initialState
     )

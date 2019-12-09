@@ -5,7 +5,7 @@ import android.content.Context
 /**
  * Factory for providing the [MvRxViewModelConfig] for each new ViewModel that is created.
  *
- * An instance of this must be passed to each [BaseMvRxViewModel].
+ * An instance of this must be set on [MvRx.viewModelConfigFactory].
  *
  * A custom subclass of this may be used to allow you to override [buildConfig], but this should
  * generally not be necessary.
