@@ -1,6 +1,7 @@
 package com.airbnb.mvrx.test
 
 import com.airbnb.mvrx.MvRxTestOverridesProxy
+import com.airbnb.mvrx.MvRxViewModelConfigFactory
 import com.airbnb.mvrx.mock.MockBehavior
 import com.airbnb.mvrx.mock.MvRxMocks
 import io.reactivex.android.plugins.RxAndroidPlugins
@@ -33,7 +34,14 @@ class MvRxTestRule(
      */
     private val viewModelMockBehavior: MockBehavior? = MockBehavior(
         stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
-    )
+    ),
+    /**
+     * Changes whether the [MvRxViewModelConfigFactory] is initialized with debug mode or not.
+     * By default debug mode is not used so that viewmodels don't all have to run the debug checks
+     * each time they are created for Unit tests. This also prevents the need for Robolectric,
+     * since the debug checks use Android APIs.
+     */
+    private val debugMode: Boolean = false
 ) : ExternalResource() {
     private var defaultExceptionHandler: Thread.UncaughtExceptionHandler? = null
 
@@ -58,12 +66,11 @@ class MvRxTestRule(
     }
 
     private fun setupMocking() {
-        // TODO -  Does this work with robolectric?
-        if (viewModelMockBehavior == null) {
-            MvRxMocks.install(debugMode = false, context = null)
-        } else {
-            // Use a null context since we don't need mock printing during tests
-            MvRxMocks.install(debugMode = true, context = null)
+        val mocksEnabled = viewModelMockBehavior != null
+        // Use a null context since we don't need mock printing during tests
+        MvRxMocks.install(debugMode = debugMode, mocksEnabled = mocksEnabled, context = null)
+
+        if (viewModelMockBehavior != null) {
             MvRxMocks.mockConfigFactory.mockBehavior = viewModelMockBehavior
         }
     }

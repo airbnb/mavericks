@@ -15,8 +15,9 @@ import java.util.LinkedList
 
 class MockableMvRxViewModelConfig<S : Any>(
     private val mockableStateStore: MockableMvRxStateStore<S>,
-    private val initialMockBehavior: MockBehavior
-) : MvRxViewModelConfig<S>(debugMode = true, stateStore = mockableStateStore) {
+    private val initialMockBehavior: MockBehavior,
+    debugMode: Boolean
+) : MvRxViewModelConfig<S>(debugMode = debugMode, stateStore = mockableStateStore) {
 
 
     val currentMockBehavior: MockBehavior
@@ -128,9 +129,9 @@ data class MockBehavior(
  * @param context The application context. If provided this will be used to register a
  * [ViewModelStatePrinter] for each ViewModel to enable mock state printing.
  */
-open class MockMvRxViewModelConfigFactory(context: Context?) : MvRxViewModelConfigFactory(
-    debugMode = true
-) {
+open class MockMvRxViewModelConfigFactory(context: Context?, debugMode: Boolean = true) :
+    MvRxViewModelConfigFactory(debugMode) {
+
     private val applicationContext: Context? = context?.applicationContext
 
     private val mockConfigs = mutableMapOf<MvRxStateStore<*>, MockableMvRxViewModelConfig<*>>()
@@ -191,8 +192,9 @@ open class MockMvRxViewModelConfigFactory(context: Context?) : MvRxViewModelConf
         )
 
         return MockableMvRxViewModelConfig(
-            stateStore,
-            mockBehavior
+            mockableStateStore = stateStore,
+            initialMockBehavior = mockBehavior,
+            debugMode = debugMode
         ).also { config ->
             // Since this is an easy place to hook into all viewmodel creation and clearing
             // we use it as an opportunity to register the mock printer on all view models.

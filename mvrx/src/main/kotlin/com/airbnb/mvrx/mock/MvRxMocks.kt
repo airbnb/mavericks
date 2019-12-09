@@ -67,6 +67,9 @@ object MvRxMocks {
      * this will add plugins to [MvRx] that enable working with mock State. This is useful for
      * both manual and automated testing of development builds.
      *
+     * This function is a shortcut instead of setting each property in this object individually.
+     * For custom control you can set properties directly instead.
+     *
      * It is safe to call this in both debug and production
      * builds and it will take care of the correct behavior for you.
      *
@@ -77,15 +80,20 @@ object MvRxMocks {
      * Calling this subsequent times will replace the plugins with new instances.
      */
     fun install(context: Context) {
-        install(context.isDebuggable, context)
+        val isDebuggable = context.isDebuggable
+        install(
+            mocksEnabled = isDebuggable,
+            debugMode = isDebuggable,
+            context = context
+        )
     }
 
     /**
      * Choose whether to enable [MvRx] mocking tools. This is useful for
      * both manual and automated testing of development builds.
      *
-     * It is safe to call this in both debug and production
-     * builds and it will take care of the correct behavior for you.
+     * This function is a shortcut instead of setting each property in this object individually.
+     * For custom control you can set properties directly instead.
      *
      * The context will be used to automatically register a broadcast receiver for each
      * ViewModel created in the app with [ViewModelStatePrinter] so that the state printing
@@ -93,22 +101,23 @@ object MvRxMocks {
      *
      * Calling this subsequent times will replace the plugins with new instances.
      *
-     * @param  debugMode True if this is a debug build and mocking should be enabled
+     * @param debugMode True if debug checks should be enabled
+     * @param mocksEnabled True if ViewModel mocking should be enabled.
      * @param context Application context. If provided this will be used to register a
      * [ViewModelStatePrinter] for each ViewModel to support mock state printing.
      */
-    fun install(debugMode: Boolean, context: Context?) {
-        enableMockPrinterBroadcastReceiver = debugMode
-        enableMvRxViewMocking = debugMode
+    fun install(mocksEnabled: Boolean, debugMode: Boolean, context: Context?) {
+        enableMockPrinterBroadcastReceiver = mocksEnabled
+        enableMvRxViewMocking = mocksEnabled
 
-        if (debugMode) {
-            val mockConfigFactory = MockMvRxViewModelConfigFactory(context?.applicationContext)
+        if (mocksEnabled) {
+            val mockConfigFactory = MockMvRxViewModelConfigFactory(context?.applicationContext, debugMode)
             MvRx.viewModelConfigFactory = mockConfigFactory
             MvRx.viewModelDelegateFactory = MockViewModelDelegateFactory(mockConfigFactory)
         } else {
             // These are both set to make sure that all MvRx plugins are completely cleared
             // when debuggable is set to false. This helps in the unit testing case.
-            MvRx.viewModelConfigFactory = MvRxViewModelConfigFactory(debugMode = false)
+            MvRx.viewModelConfigFactory = MvRxViewModelConfigFactory(debugMode)
             MvRx.viewModelDelegateFactory = DefaultViewModelDelegateFactory()
 
         }

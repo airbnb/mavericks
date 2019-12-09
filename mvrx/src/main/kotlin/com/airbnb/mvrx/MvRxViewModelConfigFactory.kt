@@ -10,7 +10,7 @@ import android.content.Context
  * A custom subclass of this may be used to allow you to override [buildConfig], but this should
  * generally not be necessary.
  *
- * @param debugMode True if this is a debug build of the app, false for production builds.
+ * @param debugMode True if debug checks should be run. Should be false for production builds.
  * When true, certain validations are applied to the ViewModel. These can be slow and should
  * not be used in production! However, they do help to catch common issues so it is highly
  * recommended that you enable debug when applicable.

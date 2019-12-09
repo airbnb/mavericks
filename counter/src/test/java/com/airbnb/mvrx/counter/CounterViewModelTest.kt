@@ -20,6 +20,6 @@ class CounterViewModelTest {
     companion object {
         @JvmField
         @ClassRule
-        val mvrxTestRule = MvRxTestRule()
+        val mvrxTestRule = MvRxTestRule(viewModelMockBehavior = null)
     }
 }

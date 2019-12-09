@@ -7,7 +7,7 @@ import org.junit.Rule
 import org.junit.Test
 
 class MvRxTestRuleMockBehaviorTest {
-    @Rule
+    @get:Rule
     val mvrxTestRule = MvRxTestRule()
 
     @Test
@@ -18,7 +18,7 @@ class MvRxTestRuleMockBehaviorTest {
 
 class MvRxTestRuleNoMockBehaviorTest {
 
-    @Rule
+    @get:Rule
     val mvrxTestRule = MvRxTestRule(viewModelMockBehavior = null)
 
     @Test
