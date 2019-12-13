@@ -50,6 +50,12 @@ The MvRx lib comes with a working configuration in general. However, app specifi
 The configuration provided for the lib assumes that your shrinker can correctly handle Kotlin `@Metadata` annotations (e.g. Dexguard 8.6++) if it cannot (e.g. Proguard and current versions of R8) you need to add these rules to the proguard configuration of your app:
 
 ```
+# BaseMvRxViewModels loads the Companion class via reflection and thus we need to make sure we keep
+# the name of the Companion object.
+-keepclassmembers class ** extends com.airbnb.mvrx.BaseMvRxViewModel {
+    ** Companion;
+}
+
 # Members of the Kotlin data classes used as the state in MvRx are read via Kotlin reflection which cause trouble
 # with Proguard if they are not kept.
 # During reflection cache warming also the types are accessed via reflection. Need to keep them too.
@@ -65,5 +71,6 @@ The configuration provided for the lib assumes that your shrinker can correctly 
 # MvRxViewModelFactory is referenced via reflection using the Companion class name.
 -keepnames class * implements com.airbnb.mvrx.MvRxViewModelFactory
 ```
+
 
 ## For full documentation, check out the [wiki](https://github.com/airbnb/MvRx/wiki)
