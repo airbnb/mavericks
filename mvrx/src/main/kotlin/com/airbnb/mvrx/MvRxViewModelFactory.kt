@@ -101,11 +101,13 @@ data class FragmentViewModelContext(
     /**
      * The fragment owner of the ViewModel.
      */
-    val fragment: Fragment
+    val fragment: Fragment,
+    private val ownerProvider: ViewModelStoreOwner = fragment,
+    private val savedStateRegistryProvider: SavedStateRegistry = fragment.savedStateRegistry
 ) : ViewModelContext() {
 
-    override val owner get() = fragment
-    override val savedStateRegistry get() = fragment.savedStateRegistry
+    override val owner get() = ownerProvider
+    override val savedStateRegistry get() = savedStateRegistryProvider
     /**
      * Convenience method to type [fragment].
      */

@@ -1,4 +1,5 @@
 include ':mvrx'
+include ':mvrx-navigation'
 include ':sample'
 include ':todomvrx'
 include ':testing'
