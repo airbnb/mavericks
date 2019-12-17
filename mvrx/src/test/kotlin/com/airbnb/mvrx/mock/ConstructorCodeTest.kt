@@ -19,7 +19,7 @@ class ConstructorCodeTest : BaseTest() {
         )
 
         assertEquals(
-            "com.airbnb.mvrx.mock.ConstructorCodeTest.MyEnum, com.airbnb.mvrx.mock.ConstructorCodeTest.MySingleton, com.airbnb.mvrx.mock.ConstructorCodeTest.NestedObject, com.airbnb.mvrx.mock.ConstructorCodeTest.State, kotlin.Double, kotlin.Float, kotlin.Int, kotlin.String",
+            "com.airbnb.mvrx.mock.ConstructorCodeTest, kotlin.Double, kotlin.Float, kotlin.Int, kotlin.String",
             code.imports.joinToString()
         )
     }
@@ -33,24 +33,8 @@ class ConstructorCodeTest : BaseTest() {
         )
 
         assertEquals(
-            "val mockState by lazy { State(\n" +
-                    "int = 1,\n" +
-                    "float = 1.0f,\n" +
-                    "str = \"hello\",\n" +
-                    "charSequence = \"'hi' with nested \\\"quotes\\\" and \\ta tab\",\n" +
-                    "double = 4.5,\n" +
-                    "map = mutableMapOf(3 to \"three\",2 to \"two\"),\n" +
-                    "strList = listOf(\n" +
-                    "\"hi\",\n" +
-                    "\"there\"\n" +
-                    "),\n" +
-                    "nestedObject = NestedObject(myEnum = MyEnum.A),\n" +
-                    "singleTon = MySingleton,\n" +
-                    "nestedObjectList = listOf(\n" +
-                    "NestedObject(myEnum = MyEnum.A)\n" +
-                    ")\n" +
-                    ") }",
-            code.lazyPropertyToCreateObject
+            "valmockStatebylazy{ConstructorCodeTest.State(int=1,float=1.0f,str=\"hello\",charSequence=\"'hi'withnested\\\"quotes\\\"and\\tatab\",double=4.5,map=mutableMapOf(3to\"three\",2to\"two\"),strList=listOf(\"hi\",\"there\"),nestedObject=ConstructorCodeTest.NestedObject(myEnum=ConstructorCodeTest.MyEnum.A),singleTon=ConstructorCodeTest.MySingleton,nestedObjectList=listOf(ConstructorCodeTest.NestedObject(myEnum=ConstructorCodeTest.MyEnum.A)))}",
+            code.lazyPropertyToCreateObject.removeWhiteSpace()
         )
     }
 
@@ -63,18 +47,8 @@ class ConstructorCodeTest : BaseTest() {
         )
 
         assertEquals(
-            "val mockStateWithJsonObject by lazy { StateWithJsonObject(json = \"\"\"{\n" +
-                    "  \"color\": \"red\",\n" +
-                    "  \"numbers\": [\n" +
-                    "    {\n" +
-                    "      \"favorite\": 7\n" +
-                    "    },\n" +
-                    "    {\n" +
-                    "      \"lowest\": 0\n" +
-                    "    }\n" +
-                    "  ]\n" +
-                    "}\"\"\") }",
-            code.lazyPropertyToCreateObject
+            "valmockStateWithJsonObjectbylazy{ConstructorCodeTest.StateWithJsonObject(json=\"\"\"{\"color\":\"red\",\"numbers\":[{\"favorite\":7},{\"lowest\":0}]}\"\"\")}",
+            code.lazyPropertyToCreateObject.removeWhiteSpace()
         )
     }
 
@@ -87,18 +61,8 @@ class ConstructorCodeTest : BaseTest() {
         )
 
         assertEquals(
-            "val mockStateWithJsonObject by lazy { StateWithJsonObject(json = \"\"\"{\n" +
-                    "  \"color\": \"red\",\n" +
-                    "  \"numbers\": [\n" +
-                    "    {\n" +
-                    "      \"favorite\": 7\n" +
-                    "    },\n" +
-                    "    {\n" +
-                    "      \"lowest\": 0\n" +
-                    "    }\n" +
-                    "  ]\n" +
-                    "}\"\"\") }",
-            code.lazyPropertyToCreateObject
+            "valmockStateWithJsonObjectbylazy{ConstructorCodeTest.StateWithJsonObject(json=\"\"\"{\"color\":\"red\",\"numbers\":[{\"favorite\":7},{\"lowest\":0}]}\"\"\")}",
+            code.lazyPropertyToCreateObject.removeWhiteSpace()
         )
     }
 
@@ -111,15 +75,8 @@ class ConstructorCodeTest : BaseTest() {
         )
 
         assertEquals(
-            "val mockStateWithJsonArray by lazy { StateWithJsonArray(json = \"\"\"[\n" +
-                    "  {\n" +
-                    "    \"favorite\": 7\n" +
-                    "  },\n" +
-                    "  {\n" +
-                    "    \"lowest\": 0\n" +
-                    "  }\n" +
-                    "]\"\"\") }",
-            code.lazyPropertyToCreateObject
+            "valmockStateWithJsonArraybylazy{ConstructorCodeTest.StateWithJsonArray(json=\"\"\"[{\"favorite\":7},{\"lowest\":0}]\"\"\")}",
+            code.lazyPropertyToCreateObject.removeWhiteSpace()
         )
     }
 
@@ -133,8 +90,8 @@ class ConstructorCodeTest : BaseTest() {
             )
 
         assertEquals(
-            "val mockStateWithInvalidJsonObject by lazy { StateWithInvalidJsonObject(json = \"not valid{\\\"color\\\":\\\"red\\\",\\\"numbers\\\":[{\\\"favorite\\\":7},{\\\"lowest\\\":0}]}\") }",
-            code.lazyPropertyToCreateObject
+            "valmockStateWithInvalidJsonObjectbylazy{ConstructorCodeTest.StateWithInvalidJsonObject(json=\"notvalid{\\\"color\\\":\\\"red\\\",\\\"numbers\\\":[{\\\"favorite\\\":7},{\\\"lowest\\\":0}]}\")}",
+            code.lazyPropertyToCreateObject.removeWhiteSpace()
         )
     }
 
@@ -147,8 +104,8 @@ class ConstructorCodeTest : BaseTest() {
         )
 
         assertEquals(
-            "val mockStateWithLazy by lazy { StateWithLazy(lazyInt = lazy { 1 }) }",
-            code.lazyPropertyToCreateObject
+            "valmockStateWithLazybylazy{ConstructorCodeTest.StateWithLazy(lazyInt=lazy{1})}",
+            code.lazyPropertyToCreateObject.removeWhiteSpace()
         )
     }
 
@@ -171,7 +128,7 @@ class ConstructorCodeTest : BaseTest() {
             )
         )
 
-        result.expect("Test(date = CustomDate.fromString(\"2000\"))")
+        result.expect("ConstructorCodeTest.testCustomTypePrinter\$Test(date=CustomDate.fromString(\"2000\"))")
 
         assertTrue(result.imports.contains("hello world"))
     }
@@ -182,7 +139,7 @@ class ConstructorCodeTest : BaseTest() {
             val list: List<Int> = listOf(1, 2, 3, 4)
         ) : MvRxState
 
-        ConstructorCode(Test(), 3, 200).expect("Test(list = listOf(\n1,\n2,\n3\n))")
+        ConstructorCode(Test(), 3, 200).expect("ConstructorCodeTest.listIsTruncated\$Test(list=listOf(1,2,3))")
     }
 
     @Test
@@ -195,7 +152,7 @@ class ConstructorCodeTest : BaseTest() {
             Test(),
             Integer.MAX_VALUE,
             Integer.MAX_VALUE
-        ).expect("Test(list = listOf(\n1,\n2,\n3,\n4\n))")
+        ).expect("ConstructorCodeTest.listIsNotTruncated\$Test(list=listOf(1,2,3,4))")
     }
 
     @Test
@@ -204,7 +161,25 @@ class ConstructorCodeTest : BaseTest() {
             val list: List<Any> = listOf(1, 2, 3, "A")
         ) : MvRxState
 
-        ConstructorCode(Test(), 3, 200).expect("Test(list = listOf(\n1,\n2,\n3,\n\"A\"\n))")
+        ConstructorCode(Test(), 3, 200).expect("ConstructorCodeTest.listIsNotTruncatedWhenTypesDiffer\$Test(list=listOf(1,2,3,\"A\"))")
+    }
+
+    @Test
+    fun listIsNotTruncatedWhenSomeItemsAreNull() {
+        data class Test(
+            val list: List<Int?> = listOf(null, 1, 2, 3)
+        ) : MvRxState
+
+        ConstructorCode(Test(), 3, 200).expect("ConstructorCodeTest.listIsNotTruncatedWhenSomeItemsAreNull\$Test(list=listOf(null,1,2,3))")
+    }
+
+    @Test
+    fun listIsTruncatedWhenAllItemsAreNull() {
+        data class Test(
+            val list: List<Int?> = listOf(null, null, null, null)
+        ) : MvRxState
+
+        ConstructorCode(Test(), 3, 200).expect("ConstructorCodeTest.listIsTruncatedWhenAllItemsAreNull\$Test(list=listOf(null,null,null))")
     }
 
     @Suppress("ArrayInDataClass")
@@ -214,7 +189,7 @@ class ConstructorCodeTest : BaseTest() {
             val list: Array<Int> = arrayOf(1, 2, 3, 4)
         ) : MvRxState
 
-        ConstructorCode(Test(), 3, 200).expect("Test(list = arrayOf(\n1,\n2,\n3\n))")
+        ConstructorCode(Test(), 3, 200).expect("ConstructorCodeTest.arrayIsTruncated\$Test(list=arrayOf(1,2,3))")
     }
 
     @Suppress("ArrayInDataClass")
@@ -228,11 +203,11 @@ class ConstructorCodeTest : BaseTest() {
             Test(),
             Integer.MAX_VALUE,
             Integer.MAX_VALUE
-        ).expect("Test(list = arrayOf(\n1,\n2,\n3,\n4\n))")
+        ).expect("ConstructorCodeTest.arrayIsNotTruncated\$Test(list=arrayOf(1,2,3,4))")
     }
 
     private fun <T : MvRxState> ConstructorCode<T>.expect(expectedCode: String) {
-        assertEquals("val mockTest by lazy { $expectedCode }", lazyPropertyToCreateObject)
+        assertEquals("valmockTestbylazy{$expectedCode}", lazyPropertyToCreateObject.removeWhiteSpace())
     }
 
     data class StateWithJsonObject(val json: String = """{"color":"red","numbers":[{"favorite":7},{"lowest":0}]}""") :
@@ -275,4 +250,11 @@ class ConstructorCodeTest : BaseTest() {
             fun fromString(dateString: String) = CustomDate(dateString.toLong())
         }
     }
+}
+
+private fun String.removeWhiteSpace(): String {
+    return replace(" ", "")
+        .replace("\n", "")
+        .replace("\r", "")
+        .replace("\t", "")
 }

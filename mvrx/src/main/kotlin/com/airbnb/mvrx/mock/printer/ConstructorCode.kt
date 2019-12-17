@@ -62,9 +62,15 @@ class ConstructorCode<T : Any>(
         } ?: run {
 
             val kClass = this!!::class
-            dependencies.add(kClass)
+            val enclosingClassChain = enclosingClassChain(kClass)
+            // The top level enclosing class of a nested class is imported and in the code the nested class should be referenced
+            // by its nested name (eg Foo.Bar). This improves clarity and reduces the chance of naming collisions.
+            dependencies.add(enclosingClassChain.last().kotlin)
 
-            val simpleName = kClass.simpleName.orEmpty()
+            val typeName = enclosingClassChain.asReversed()
+                .mapNotNull { it.simpleName }
+                .filter { it.isNotBlank() }
+                .joinToString(separator = ".")
 
             val customResult = customTypePrinters
                 .firstOrNull { it.acceptsObject(this) }
@@ -80,12 +86,36 @@ class ConstructorCode<T : Any>(
                 this is CharSequence -> getCharSequenceConstructor()
                 this is Float -> toString() + "f"
                 this is Lazy<*> -> "lazy { ${this.value.getConstructor()} }"
-                kClass.isObjectInstance -> simpleName
-                kClass.isEnum -> simpleName + "." + toString()
-                kClass.isKotlinClass -> getKotlinConstructor()
+                kClass.isObjectInstance -> typeName
+                kClass.isEnum -> typeName + "." + toString()
+                kClass.isKotlinClass -> getKotlinConstructor(typeName)
                 //  Don't know how to handle this type, falling back to toString()
                 else -> toString()
             }
+        }
+    }
+
+
+    /**
+     * Returns a list containing this class and then all of its enclosing classes (if any) in order of hierarchy.
+     */
+    private fun enclosingClassChain(kClass: KClass<out Any>): List<Class<*>> {
+        val enclosingClassChain = mutableListOf<Class<*>>(kClass.java)
+
+        var enclosingClass: Class<*>? = kClass.java.enclosingClass
+        while (true) {
+            if (enclosingClass == null) {
+                return enclosingClassChain
+            } else {
+                enclosingClassChain.add(enclosingClass)
+                enclosingClass = enclosingClass.enclosingClass
+            }
+        }
+    }
+
+    data class EnclosingClass(val outerClass: Class<*>, val innerClass: Class<*>) {
+        fun parent(): EnclosingClass? {
+            return EnclosingClass(outerClass = outerClass.enclosingClass ?: return null, innerClass = outerClass)
         }
     }
 
@@ -147,19 +177,16 @@ class ConstructorCode<T : Any>(
 
     private fun Array<*>.hasAllSameClassType(): Boolean = toList().hasAllSameClassType()
 
-    private fun List<*>.hasAllSameClassType(): Boolean = isEmpty() || all {
-        val first = first()
-        if ((first == null) != (it == null)) {
-            // If some are null, consider them different types
-            return@all false
-        }
+    private fun List<*>.hasAllSameClassType(): Boolean {
+        if (isEmpty()) return true
 
-        if (first == null) {
-            // If they're all null, consider them the same type
-            return true
-        }
+        // If they're all null, consider them the same type
+        if (all { it == null }) return true
 
-        first::class == it!!::class
+        // If some are null, consider them different types
+        if (any { it == null }) return false
+
+        return all { first()!!::class == it!!::class }
     }
 
     private fun Map<*, *>.getMapConstructor(): String {
@@ -169,7 +196,7 @@ class ConstructorCode<T : Any>(
         return if (this is MutableMap<*, *>) "mutableMapOf($params)" else "mapOf($params)"
     }
 
-    private fun Any.getKotlinConstructor(): String {
+    private fun Any.getKotlinConstructor(typeName: String): String {
         val kClass = this::class
         val constructor = getIfReflectionSupported {
             kClass.primaryConstructor
@@ -185,10 +212,10 @@ class ConstructorCode<T : Any>(
             "${param.name} = ${value.getConstructor()}"
         }
 
-        val codeOnOneLine = "${kClass.simpleName}(${params.joinToString(separator = ",")})"
+        val codeOnOneLine = "$typeName(${params.joinToString(separator = ",")})"
 
         return if (params.size > DATA_CLASS_PROPERTIES_PER_LINE_LIMIT || codeOnOneLine.length > LINE_LIMIT) {
-            "${kClass.simpleName}(\n${params.joinToString(separator = ",\n")}\n)"
+            "$typeName(\n${params.joinToString(separator = ",\n")}\n)"
         } else {
             codeOnOneLine
         }
