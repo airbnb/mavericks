@@ -727,6 +727,8 @@ class ViewModelSubscriberTest : BaseTest() {
 
     @Test
     fun testNoEventEmittedIfSameStateIsSet() {
+        class Foo(val foo: Int = 5)
+        data class Bar(val bar: Int = 5)
         var callCount = 0
         viewModel.subscribe(owner) {
             callCount++

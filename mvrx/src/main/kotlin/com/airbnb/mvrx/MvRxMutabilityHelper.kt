@@ -25,7 +25,7 @@ private const val IMMUTABLE_MAP_MESSAGE =
  * As a result, you may not use MutableList, mutableListOf(...) or the map variants by convention only.
  */
 internal fun KClass<*>.assertImmutability() {
-    require(this.isData) { "MvRx state must be a data class!" }
+    require(java.isData) { "MvRx state must be a data class!" }
 
     fun Field.isSubtype(vararg classes: KClass<*>): Boolean {
         return classes.any { klass ->
@@ -58,6 +58,13 @@ internal fun KClass<*>.assertImmutability() {
             }?.let { throw IllegalArgumentException(it) }
         }
 }
+
+private val Class<*>.isData: Boolean
+    get() {
+        @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+        val annotationData = getDeclaredAnnotation(Metadata::class.java).data2
+        return annotationData.contains("hashCode") && annotationData.contains("equals")
+    }
 
 /**
  * Checks that a state's value is not changed over its lifetime.
