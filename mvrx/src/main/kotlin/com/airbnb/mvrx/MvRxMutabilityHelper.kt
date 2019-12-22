@@ -61,6 +61,9 @@ internal fun KClass<*>.assertImmutability() {
 
 private val Class<*>.isData: Boolean
     get() {
+        // A data class needs at least one field and it will automatically have a component1 method generated.
+        // These componentN methods are also used for @PersistState.
+        declaredMethods.firstOrNull { it.name == "component1" } ?: return false
         @Suppress("RECEIVER_NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
         val annotationData = getDeclaredAnnotation(Metadata::class.java).data2
         return annotationData.contains("hashCode") && annotationData.contains("equals")

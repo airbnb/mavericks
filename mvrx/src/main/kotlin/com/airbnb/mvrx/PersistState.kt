@@ -29,7 +29,7 @@ annotation class PersistState
  * Iterates through all member properties annotated with [PersistState] and parcels them into a bundle that can be
  * saved with savedInstanceState.
  */
-internal fun <T : Any> T.persistState(validation: Boolean = false): Bundle {
+internal fun <T : MvRxState> T.persistState(validation: Boolean = false): Bundle {
     val jvmClass = this::class.java
     // Find the first constructor annotated with @PersistState or return.
     val constructor = jvmClass.constructors.firstOrNull { it.parameters.any { it.isAnnotationPresent(PersistState::class.java) } } ?: return Bundle()
@@ -39,9 +39,8 @@ internal fun <T : Any> T.persistState(validation: Boolean = false): Bundle {
         if (!p.isAnnotationPresent(PersistState::class.java)) return@forEachIndexed
         // For each parameter in the constructor, there is a componentN function becasuse state is a data class.
         // We can rely on this to be true because the MvRxMutabilityHelpers asserts that the state class is a data class.
-        val getterName = "component${i + 1}"
         val getter = try {
-            jvmClass.getDeclaredMethod(getterName).also { it.isAccessible = true }
+            jvmClass.getDeclaredMethod("component${i + 1}").also { it.isAccessible = true }
         } catch (e: NoSuchMethodException) {
             if (validation) throw e
             return Bundle()
@@ -97,7 +96,7 @@ internal fun <T : MvRxState> Bundle.restorePersistedState(initialState: T): T {
     // can't unmarshal any custom classes.
     classLoader = jvmClass.classLoader
 
-    // For data classes, Kotlin generates a static functionc alled copy$default.
+    // For data classes, Kotlin generates a static functionc called copy$default.
     // The first parameter is the object to copy from.
     // The next parameters are all of parameters to copy (it's jvm bytecode/java so there are no optional parameters in the generated method).
     // The next parameter(s) are a bitmask. Each parameter index corresponds to one bit in the int.

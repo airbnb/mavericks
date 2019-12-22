@@ -55,8 +55,6 @@ private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModel(
     }
     val viewModel = factoryViewModel ?: createDefaultViewModel(viewModelClass, initialState)
     return requireNotNull(viewModel) {
-        // If null, use Kotlin reflect for best error message. We will crash anyway, so performance
-        // doesn't matter.
         if (viewModelClass.constructors.firstOrNull()?.parameters?.size?.let { it > 1 } == true) {
             "${viewModelClass.simpleName} takes dependencies other than initialState. " +
                 "It must have companion object implementing ${MvRxViewModelFactory::class.java.simpleName} " +
