@@ -20,7 +20,6 @@ import java.lang.reflect.Modifier
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KProperty1
-import kotlin.reflect.KVisibility
 
 /**
  * To use MvRx, create your own base MvRxViewModel that extends this one and sets debugMode.

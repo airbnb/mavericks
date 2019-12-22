@@ -45,7 +45,7 @@ internal fun <T : Any> T.persistState(validation: Boolean = false): Bundle {
         } catch (e: NoSuchMethodException) {
             if (validation) throw e
             return Bundle()
-        }  catch (e: SecurityException) {
+        } catch (e: SecurityException) {
             if (validation) throw e
             return Bundle()
         }
@@ -156,15 +156,15 @@ object PersistStateTestHelpers {
 @Suppress("UNCHECKED_CAST")
 private fun <T : Any> Class<T>.copyMethod(): Method = this.declaredMethods.first { it.name == "copy\$default" }
 
-private val Parameter.defaultParameterValue: Any? get() = when (type) {
-    Integer.TYPE -> 0
-    java.lang.Boolean.TYPE -> false
-    java.lang.Float.TYPE -> 0f
-    Character.TYPE -> 'A'
-    java.lang.Byte.TYPE -> Byte.MIN_VALUE
-    java.lang.Short.TYPE -> Short.MIN_VALUE
-    Integer.TYPE -> 0
-    java.lang.Long.TYPE -> 0L
-    java.lang.Double.TYPE -> 0.0
-    else -> null
-}
+private val Parameter.defaultParameterValue: Any?
+    get() = when (type) {
+        Integer.TYPE -> 0
+        java.lang.Boolean.TYPE -> false
+        java.lang.Float.TYPE -> 0f
+        Character.TYPE -> 'A'
+        java.lang.Byte.TYPE -> Byte.MIN_VALUE
+        java.lang.Short.TYPE -> Short.MIN_VALUE
+        java.lang.Long.TYPE -> 0L
+        java.lang.Double.TYPE -> 0.0
+        else -> null
+    }
