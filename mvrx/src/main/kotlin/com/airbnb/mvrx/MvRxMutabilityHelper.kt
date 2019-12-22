@@ -59,10 +59,12 @@ internal fun KClass<*>.assertImmutability() {
         }
 }
 
+/**
+ * Since we can only use java reflection, this basically duck types a data class.
+ * componentN methods are also used for @PersistState.
+ */
 private val Class<*>.isData: Boolean
     get() {
-        // A data class needs at least one field and it will automatically have a component1 method generated.
-        // These componentN methods are also used for @PersistState.
         declaredMethods.firstOrNull { it.name == "component1" } ?: return false
         declaredMethods.firstOrNull { it.name == "equals" } ?: return false
         declaredMethods.firstOrNull { it.name == "hashCode" } ?: return false
