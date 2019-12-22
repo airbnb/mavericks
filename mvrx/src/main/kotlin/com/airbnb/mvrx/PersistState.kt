@@ -4,11 +4,9 @@ package com.airbnb.mvrx
 
 import android.os.Bundle
 import android.os.Parcelable
-import android.util.Log
 import androidx.annotation.VisibleForTesting
 import java.io.Serializable
 import java.lang.reflect.Method
-import java.lang.reflect.Parameter
 
 /**
  * Annotate a field in your MvRxViewModel state with [PersistState] to have it automatically persisted when Android kills your process
