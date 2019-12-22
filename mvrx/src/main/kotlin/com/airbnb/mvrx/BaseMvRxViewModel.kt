@@ -143,7 +143,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         state::class.assertImmutability()
         // Assert that state can be saved and restored.
         val bundle = state.persistState(validation = true)
-        bundle.restorePersistedState(initialState)
+        bundle.restorePersistedState(initialState, validation = true)
     }
 
     /**

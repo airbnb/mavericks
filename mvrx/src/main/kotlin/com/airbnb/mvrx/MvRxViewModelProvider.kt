@@ -101,7 +101,7 @@ object MvRxViewModelProvider {
             is ActivityViewModelContext -> viewModelContext.copy(args = restoredArgs)
             is FragmentViewModelContext -> viewModelContext.copy(args = restoredArgs)
         }
-        return StateRestorer(restoredContext, restoredState::restorePersistedState)
+        return StateRestorer(restoredContext) { restoredState.restorePersistedState(it) }
     }
 
     private const val KEY_MVRX_SAVED_INSTANCE_STATE = "mvrx:saved_instance_state"

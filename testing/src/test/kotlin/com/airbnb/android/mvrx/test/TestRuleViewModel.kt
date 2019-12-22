@@ -7,6 +7,7 @@ data class TestRuleState(val foo: String = "hello") : MvRxState
 class TestRuleViewModel(debugMode: Boolean = false) : BaseMvRxViewModel<TestRuleState>(TestRuleState(), debugMode) {
 
     var subscribeCallCount = 0
+    var setStateCount = 0
 
     init {
         subscribe {
@@ -14,6 +15,9 @@ class TestRuleViewModel(debugMode: Boolean = false) : BaseMvRxViewModel<TestRule
         }
     }
 
-    fun doSomething() = setState { copy(foo = "$foo!") }
+    fun doSomething() = setState {
+        setStateCount++
+        copy(foo = "$foo!")
+    }
 }
 

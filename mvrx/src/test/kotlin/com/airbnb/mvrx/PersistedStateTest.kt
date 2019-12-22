@@ -1,6 +1,7 @@
 package com.airbnb.mvrx
 
 import android.content.Context
+import android.os.Bundle
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
 import org.junit.Assert.assertEquals
@@ -28,6 +29,14 @@ class PersistedStateTest : BaseTest() {
 
         val bundle = PersistStateTestHelpers.persistState(State())
         val newState = PersistStateTestHelpers.restorePersistedState(bundle, State())
+        assertEquals(5, newState.count)
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun validatesMissingKeyInBundle() {
+        data class State(@PersistState val count: Int = 5) : MvRxState
+
+        val newState = PersistStateTestHelpers.restorePersistedState(Bundle(), State(), validation = true)
         assertEquals(5, newState.count)
     }
 

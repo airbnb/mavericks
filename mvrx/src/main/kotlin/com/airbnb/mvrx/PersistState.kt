@@ -4,6 +4,7 @@ package com.airbnb.mvrx
 
 import android.os.Bundle
 import android.os.Parcelable
+import android.util.Log
 import androidx.annotation.VisibleForTesting
 import java.io.Serializable
 import java.lang.reflect.Method
@@ -32,11 +33,11 @@ annotation class PersistState
 internal fun <T : MvRxState> T.persistState(validation: Boolean = false): Bundle {
     val jvmClass = this::class.java
     // Find the first constructor annotated with @PersistState or return.
-    val constructor = jvmClass.constructors.firstOrNull { it.parameters.any { it.isAnnotationPresent(PersistState::class.java) } } ?: return Bundle()
+    val constructor = jvmClass.constructors.firstOrNull { it.parameterAnnotations.any { it.any { it is PersistState } } } ?: return Bundle()
 
     val bundle = Bundle()
-    constructor.parameters.forEachIndexed { i, p ->
-        if (!p.isAnnotationPresent(PersistState::class.java)) return@forEachIndexed
+    constructor.parameterAnnotations.forEachIndexed { i, p ->
+        if (!p.any { it is PersistState }) return@forEachIndexed
         // For each parameter in the constructor, there is a componentN function becasuse state is a data class.
         // We can rely on this to be true because the MvRxMutabilityHelpers asserts that the state class is a data class.
         val getter = try {
@@ -88,9 +89,9 @@ private fun <T : Any?> Bundle.putAny(key: String?, value: T): Bundle {
 /**
  * Updates the initial state object given state persisted with [PersistState] in a [Bundle].
  */
-internal fun <T : MvRxState> Bundle.restorePersistedState(initialState: T): T {
+internal fun <T : MvRxState> Bundle.restorePersistedState(initialState: T, validation: Boolean = false): T {
     val jvmClass = initialState::class.java
-    val constructor = jvmClass.constructors.firstOrNull { it.parameters.any { it.isAnnotationPresent(PersistState::class.java) } } ?: return initialState
+    val constructor = jvmClass.constructors.firstOrNull { it.parameterAnnotations.any { it.any { it is PersistState } } } ?: return initialState
 
     // If we don't set the correct class loader, when the bundle is restored in a new process, it will have the system class loader which
     // can't unmarshal any custom classes.
@@ -105,7 +106,7 @@ internal fun <T : MvRxState> Bundle.restorePersistedState(initialState: T): T {
     //     There is 1 bitmask for every 32 parameters. If there are 48 parameters, there will be 2 bitmasks. Parameter 33 will be the first bit of the 2nd bitmask.
     // The last parameter is ignored. It can be null.
     val copyFunction = jvmClass.declaredMethods.first { it.name == "copy\$default" }
-    val fieldCount = constructor.parameterCount
+    val fieldCount = constructor.parameterTypes.size
 
     // There is 1 bitmask for each block of 32 parameters.
     val parameterBitMasks = IntArray(fieldCount / 32 + 1) { 0 }
@@ -120,10 +121,14 @@ internal fun <T : MvRxState> Bundle.restorePersistedState(initialState: T): T {
             continue
         }
 
+        if (validation && constructor.parameterAnnotations[i].any { it is PersistState }) {
+            error("savedInstanceState bundle should have a key for state property at position $i but it was missing.")
+        }
+
         // Set the bitmask for this parameter to 1 so it copies the value from the original object.
         parameterBitMasks[i / 32] = parameterBitMasks[i / 32] or (1 shl (i % 32))
         // These parameters will be ignored. We just need to put in something of the correct type to match the method signature.
-        parameters[i] = copyFunction.parameters[i + 1].defaultParameterValue
+        parameters[i] = copyFunction.parameterTypes[i + 1].defaultParameterValue
     }
 
     // See the comment above for information on the parameters here.
@@ -146,7 +151,7 @@ private fun <T, R> Array<T>.firstNotEmptyOrNull(mapper: (T) -> List<R>?): List<R
 @VisibleForTesting
 object PersistStateTestHelpers {
     fun <T : MvRxState> persistState(state: T) = state.persistState(validation = true)
-    fun <T : MvRxState> restorePersistedState(bundle: Bundle, initialState: T) = bundle.restorePersistedState(initialState)
+    fun <T : MvRxState> restorePersistedState(bundle: Bundle, initialState: T, validation: Boolean = false) = bundle.restorePersistedState(initialState, validation)
 }
 
 /**
@@ -155,8 +160,8 @@ object PersistStateTestHelpers {
 @Suppress("UNCHECKED_CAST")
 private fun <T : Any> Class<T>.copyMethod(): Method = this.declaredMethods.first { it.name == "copy\$default" }
 
-private val Parameter.defaultParameterValue: Any?
-    get() = when (type) {
+private val Class<*>.defaultParameterValue: Any?
+    get() = when (this) {
         Integer.TYPE -> 0
         java.lang.Boolean.TYPE -> false
         java.lang.Float.TYPE -> 0f
