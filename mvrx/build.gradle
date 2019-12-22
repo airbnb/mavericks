@@ -51,7 +51,6 @@ jacoco {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    implementation "org.jetbrains.kotlinx:kotlinx-metadata-jvm:0.1.0"
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     kapt "androidx.lifecycle:lifecycle-compiler:$lifecycleVersion"

@@ -5,11 +5,9 @@ package com.airbnb.mvrx
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.annotation.VisibleForTesting
-import kotlinx.metadata.Flag
-import kotlinx.metadata.jvm.KotlinClassHeader
-import kotlinx.metadata.jvm.KotlinClassMetadata
 import java.io.Serializable
 import java.lang.reflect.Method
+import java.lang.reflect.Parameter
 
 /**
  * Annotate a field in your MvRxViewModel state with [PersistState] to have it automatically persisted when Android kills your process
@@ -27,43 +25,33 @@ import java.lang.reflect.Method
 @Retention(AnnotationRetention.RUNTIME)
 annotation class PersistState
 
-private val defaultMarker by lazy {
-    try {
-        Class.forName("kotlin.jvm.internal.DefaultConstructorMarker")
-    } catch (e: ClassNotFoundException) {
-        null
-    }
-}
-
 /**
  * Iterates through all member properties annotated with [PersistState] and parcels them into a bundle that can be
  * saved with savedInstanceState.
  */
-internal fun <T : Any> T.persistState(assertCollectionPersistability: Boolean = false): Bundle {
-    defaultMarker ?: return Bundle()
+internal fun <T : Any> T.persistState(validation: Boolean = false): Bundle {
     val jvmClass = this::class.java
-    val kmClass = (KotlinClassMetadata.read(jvmClass.readMetadata()) as KotlinClassMetadata.Class).toKmClass()
+    // Find the first constructor annotated with @PersistState or return.
     val constructor = jvmClass.constructors.firstOrNull { it.parameters.any { it.isAnnotationPresent(PersistState::class.java) } } ?: return Bundle()
-    val defaultConstructor = jvmClass.constructors.firstOrNull { it.parameters.any { it.type == defaultMarker } } ?: return Bundle()
-    val kmConstructor = kmClass.constructors.first { Flag.IS_FINAL(it.flags) }
-
-    if (kmConstructor.valueParameters.size != constructor.parameterCount) {
-        if (assertCollectionPersistability) error("Java constructor and kotlin constructor have different parameter lengths!")
-        return Bundle()
-    }
 
     val bundle = Bundle()
     constructor.parameters.forEachIndexed { i, p ->
         if (!p.isAnnotationPresent(PersistState::class.java)) return@forEachIndexed
-
-        if (assertCollectionPersistability && p.type != defaultConstructor.parameters[i].type) {
-            error("Parameter $i as a different type between the annotated constructor and synthetic default constructor.")
+        // For each parameter in the constructor, there is a componentN function becasuse state is a data class.
+        // We can rely on this to be true because the MvRxMutabilityHelpers asserts that the state class is a data class.
+        val getterName = "component${i + 1}"
+        val getter = try {
+            jvmClass.getDeclaredMethod(getterName).also { it.isAccessible = true }
+        } catch (e: NoSuchMethodException) {
+            if (validation) throw e
+            return Bundle()
+        }  catch (e: SecurityException) {
+            if (validation) throw e
+            return Bundle()
         }
-        val fieldName = kmConstructor.valueParameters[i].name
-        val field = jvmClass.getDeclaredField(fieldName)
-        field.isAccessible = true
-        val value = field.get(this)
-        if (assertCollectionPersistability) assertCollectionPersistability(value)
+
+        val value = getter.invoke(this)
+        if (validation) assertCollectionPersistability(value)
         bundle.putAny(i.toString(), value)
     }
     return bundle
@@ -102,46 +90,46 @@ private fun <T : Any?> Bundle.putAny(key: String?, value: T): Bundle {
  * Updates the initial state object given state persisted with [PersistState] in a [Bundle].
  */
 internal fun <T : MvRxState> Bundle.restorePersistedState(initialState: T): T {
-    defaultMarker ?: return initialState
     val jvmClass = initialState::class.java
+    val constructor = jvmClass.constructors.firstOrNull { it.parameters.any { it.isAnnotationPresent(PersistState::class.java) } } ?: return initialState
+
     // If we don't set the correct class loader, when the bundle is restored in a new process, it will have the system class loader which
     // can't unmarshal any custom classes.
     classLoader = jvmClass.classLoader
 
-    val constructor = jvmClass.constructors.firstOrNull { it.parameters.any { it.isAnnotationPresent(PersistState::class.java) } } ?: return initialState
+    // For data classes, Kotlin generates a static functionc alled copy$default.
+    // The first parameter is the object to copy from.
+    // The next parameters are all of parameters to copy (it's jvm bytecode/java so there are no optional parameters in the generated method).
+    // The next parameter(s) are a bitmask. Each parameter index corresponds to one bit in the int.
+    //     If the bitmask is 1 for a given parameter then the new object will have the original object's value and the parameter value will be ignored.
+    //     If the bitmask is 0 then it will use the value from the parameter.
+    //     There is 1 bitmask for every 32 parameters. If there are 48 parameters, there will be 2 bitmasks. Parameter 33 will be the first bit of the 2nd bitmask.
+    // The last parameter is ignored. It can be null.
     val copyFunction = jvmClass.declaredMethods.first { it.name == "copy\$default" }
     val fieldCount = constructor.parameterCount
 
+    // There is 1 bitmask for each block of 32 parameters.
     val parameterBitMasks = IntArray(fieldCount / 32 + 1) { 0 }
     val parameters = arrayOfNulls<Any?>(fieldCount)
     parameters[0] = initialState
     for (i in 0..(fieldCount - 1)) {
         val bundleKey = i.toString()
         if (containsKey(bundleKey)) {
+            // Copy the persisted value into the parameter array.
+            // The bitmask for this element will be 0 so this value will be copied to the new object.
             parameters[i] = get(bundleKey)
             continue
         }
 
-        val parameter = copyFunction.parameters[i + 1]
+        // Set the bitmask for this parameter to 1 so it copies the value from the original object.
         parameterBitMasks[i / 32] = parameterBitMasks[i / 32] or (1 shl (i % 32))
-        parameters[i] = when (parameter.type) {
-            Integer.TYPE -> 0
-            java.lang.Boolean.TYPE -> false
-            java.lang.Float.TYPE -> 0f
-            Character.TYPE -> 'A'
-            java.lang.Byte.TYPE -> Byte.MIN_VALUE
-            java.lang.Short.TYPE -> Short.MIN_VALUE
-            Integer.TYPE -> 0
-            java.lang.Long.TYPE -> 0L
-            java.lang.Double.TYPE -> 0.0
-            else -> null
-        }
+        // These parameters will be ignored. We just need to put in something of the correct type to match the method signature.
+        parameters[i] = copyFunction.parameters[i + 1].defaultParameterValue
     }
 
+    // See the comment above for information on the parameters here.
     @Suppress("UNCHECKED_CAST")
-    val newState = copyFunction.invoke(null, *arrayOf(initialState, *parameters, *parameterBitMasks.toTypedArray(), null)) as T
-
-    return newState
+    return copyFunction.invoke(null, *arrayOf(initialState, *parameters, *parameterBitMasks.toTypedArray(), null)) as T
 }
 
 private fun <T, R> Array<T>.firstNotEmptyOrNull(mapper: (T) -> List<R>?): List<R>? {
@@ -158,7 +146,7 @@ private fun <T, R> Array<T>.firstNotEmptyOrNull(mapper: (T) -> List<R>?): List<R
  */
 @VisibleForTesting
 object PersistStateTestHelpers {
-    fun <T : MvRxState> persistState(state: T) = state.persistState(assertCollectionPersistability = true)
+    fun <T : MvRxState> persistState(state: T) = state.persistState(validation = true)
     fun <T : MvRxState> restorePersistedState(bundle: Bundle, initialState: T) = bundle.restorePersistedState(initialState)
 }
 
@@ -168,9 +156,15 @@ object PersistStateTestHelpers {
 @Suppress("UNCHECKED_CAST")
 private fun <T : Any> Class<T>.copyMethod(): Method = this.declaredMethods.first { it.name == "copy\$default" }
 
-@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-private fun Class<*>.readMetadata(): KotlinClassHeader {
-    return getAnnotation(Metadata::class.java).run {
-        KotlinClassHeader(kind, metadataVersion, bytecodeVersion, data1, data2, extraString, packageName, extraInt)
-    }
+private val Parameter.defaultParameterValue: Any? get() = when (type) {
+    Integer.TYPE -> 0
+    java.lang.Boolean.TYPE -> false
+    java.lang.Float.TYPE -> 0f
+    Character.TYPE -> 'A'
+    java.lang.Byte.TYPE -> Byte.MIN_VALUE
+    java.lang.Short.TYPE -> Short.MIN_VALUE
+    Integer.TYPE -> 0
+    java.lang.Long.TYPE -> 0L
+    java.lang.Double.TYPE -> 0.0
+    else -> null
 }

@@ -57,34 +57,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         get() = stateStore.state
 
     init {
-        Completable.fromCallable { warmReflectionCache(initialState) }.subscribeOn(Schedulers.computation()).subscribe()
-
         if (this.debugMode) {
             mutableStateChecker = MutableStateChecker(initialState)
 
             Completable.fromCallable { validateState(initialState) }
                 .subscribeOn(Schedulers.computation()).subscribe()
         }
-    }
-
-    /**
-     * Kotlin reflection has a large overhead the first time you run it
-     * but then is pretty fast on subsequent times. Running these methods now will
-     * initialize kotlin reflect and warm the cache so that when persistState() gets
-     * called synchronously in onSaveInstanceState() on the main thread, it will be much faster.
-     * This improved performance 10-100x for a state with 100 @PersistState properties.
-     *
-     * This is also @Synchronized to prevent a ConcurrentModificationException in kotlin-reflect: https://gist.github.com/gpeal/27a5747b3c351d4bd592a8d2d58f134a
-     */
-    @Synchronized
-    fun warmReflectionCache(initialState: S) {
-//        initialState::class.primaryConstructor?.parameters?.forEach { it.annotations }
-//        initialState::class.declaredMemberProperties.asSequence()
-//            .filter { it.visibility == KVisibility.PUBLIC }
-//            .forEach { prop ->
-//                @Suppress("UNCHECKED_CAST")
-//                (prop as? KProperty1<S, Any?>)?.get(initialState)
-//            }
     }
 
     @CallSuper
@@ -164,7 +142,8 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             throw IllegalStateException("Your state class ${state::class.java.name} must be public.")
         }
         state::class.assertImmutability()
-        val bundle = state.persistState(assertCollectionPersistability = true)
+        // Assert that state can be saved and restored.
+        val bundle = state.persistState(validation = true)
         bundle.restorePersistedState(initialState)
     }
 

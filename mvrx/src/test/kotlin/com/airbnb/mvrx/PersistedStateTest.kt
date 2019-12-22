@@ -32,6 +32,17 @@ class PersistedStateTest : BaseTest() {
     }
 
     @Test
+    fun savePrivateDefaultInt() {
+        data class State(@PersistState private val count: Int = 5) : MvRxState {
+            fun exposeCount() = count
+        }
+
+        val bundle = PersistStateTestHelpers.persistState(State())
+        val newState = PersistStateTestHelpers.restorePersistedState(bundle, State())
+        assertEquals(5, newState.exposeCount())
+    }
+
+    @Test
     fun saveSetInt() {
         data class State(@PersistState val count: Int = 0) : MvRxState
 
