@@ -11,9 +11,9 @@ import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.withState
 import kotlinx.android.synthetic.main.fragment_counter.counterText
 
-private data class CounterState(@PersistState val count: Int = 0) : MvRxState
+data class CounterState(@PersistState val count: Int = 0) : MvRxState
 
-private class CounterViewModel(state: CounterState) : MvRxViewModel<CounterState>(state) {
+class CounterViewModel(state: CounterState) : MvRxViewModel<CounterState>(state) {
 
     fun incrementCount() = setState { copy(count = count + 1) }
 }
