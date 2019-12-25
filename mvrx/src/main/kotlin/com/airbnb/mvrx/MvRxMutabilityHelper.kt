@@ -39,7 +39,7 @@ internal fun KClass<*>.assertImmutability() {
 
     java.declaredFields
         // During tests, jacoco can add a transient field called jacocoData.
-        .filter { !Modifier.isTransient(it.modifiers) }
+        .filterNot { Modifier.isTransient(it.modifiers) }
         .forEach { prop ->
             when {
                 !Modifier.isFinal(prop.modifiers) -> "State property ${prop.name} must be a val, not a var."
@@ -65,6 +65,7 @@ internal fun KClass<*>.assertImmutability() {
  */
 private val Class<*>.isData: Boolean
     get() {
+        declaredMethods.firstOrNull { it.name == "copy\$default" } ?: return false
         declaredMethods.firstOrNull { it.name == "component1" } ?: return false
         declaredMethods.firstOrNull { it.name == "equals" } ?: return false
         declaredMethods.firstOrNull { it.name == "hashCode" } ?: return false

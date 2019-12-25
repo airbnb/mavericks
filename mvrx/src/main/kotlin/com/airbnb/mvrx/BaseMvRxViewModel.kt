@@ -16,7 +16,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
-import java.lang.reflect.Modifier
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KProperty1
@@ -137,9 +136,6 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * a fair amount of reflection.
      */
     private fun validateState(initialState: S) {
-        if (!Modifier.isPublic(state::class.java.modifiers)) {
-            throw IllegalStateException("Your state class ${state::class.java.name} must be public.")
-        }
         state::class.assertImmutability()
         // Assert that state can be saved and restored.
         val bundle = state.persistState(validation = true)

@@ -30,12 +30,12 @@ annotation class PersistState
  */
 internal fun <T : MvRxState> T.persistState(validation: Boolean = false): Bundle {
     val jvmClass = this::class.java
-    // Find the first constructor annotated with @PersistState or return.
+    // Find the first constructor that has parameters annotated with @PersistState or return.
     val constructor = jvmClass.constructors.firstOrNull { it.parameterAnnotations.any { it.any { it is PersistState } } } ?: return Bundle()
 
     val bundle = Bundle()
     constructor.parameterAnnotations.forEachIndexed { i, p ->
-        if (!p.any { it is PersistState }) return@forEachIndexed
+        if (p.none { it is PersistState }) return@forEachIndexed
         // For each parameter in the constructor, there is a componentN function becasuse state is a data class.
         // We can rely on this to be true because the MvRxMutabilityHelpers asserts that the state class is a data class.
         val getter = try {

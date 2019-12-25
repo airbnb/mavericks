@@ -57,15 +57,6 @@ class StateImmutabilityTest : BaseTest() {
         State::class.assertImmutability()
     }
 
-    fun ifItQuacksLikeADuck() {
-        class State {
-            operator fun component1() = 5
-            override fun equals(other: Any?) = true
-            override fun hashCode() = 123
-        }
-        State::class.assertImmutability()
-    }
-
     @Test(expected = IllegalArgumentException::class)
     fun varState() {
         data class State(var foo: Int = 5)

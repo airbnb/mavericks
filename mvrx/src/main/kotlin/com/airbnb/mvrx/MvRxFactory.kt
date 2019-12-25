@@ -66,13 +66,20 @@ private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModel(
     }
 }
 
-@Suppress("UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST", "NestedBlockDepth")
 private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createDefaultViewModel(viewModelClass: Class<VM>, state: S): VM? {
     // If we are checking for a default ViewModel, we expect only a single default constructor. Any other case
     // is a misconfiguration and we will throw an appropriate error under further inspection.
     if (viewModelClass.constructors.size == 1) {
         val primaryConstructor = viewModelClass.constructors[0]
         if (primaryConstructor.parameterTypes.size == 1 && primaryConstructor.parameterTypes[0].isAssignableFrom(state::class.java)) {
+            if (!primaryConstructor.isAccessible) {
+                try {
+                    primaryConstructor.isAccessible = true
+                } catch (e: SecurityException) {
+                    throw IllegalStateException("ViewModel class is not public and MvRx could not make the primary constructor accessible.", e)
+                }
+            }
             return primaryConstructor?.newInstance(state) as? VM
         }
     }
