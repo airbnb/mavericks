@@ -23,8 +23,10 @@
      public *** initialState(...);
 }
 
-# The constructor of the Kotlin data classes used as the state in MvRx are read via reflection which cause trouble
-# with Proguard if they are not kept.
+# The constructor as well as the copy$default() method and the component*() methods of the Kotlin data classes used as
+# the state in MvRx are read via reflection which cause trouble with Proguard if they are not kept.
 -keepclassmembers class ** implements com.airbnb.mvrx.MvRxState {
    public <init>(...);
+   synthetic *** copy$default(...);
+   public *** component*();
 }
