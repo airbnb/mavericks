@@ -43,33 +43,35 @@ object MvRxGlobalMockLibrary {
 
 private suspend fun loadMocks(classLoader: BaseDexClassLoader): List<MockedViewProvider<*>> {
     return getDexFiles(classLoader)
-        .asSequence()
-        .flatMap { it.entries().asSequence() }
-        .filterNot {
-            // These are optimizations to avoid having to check every class in the dex files.
-            it.startsWith("java.") ||
-                    it.startsWith("android.") ||
-                    it.startsWith("androidx.")
-            // TODO: Allow mvrx configuration to specify package name prefix whitelist, or
-            //  more generally, naming whitelist to identify views, for faster initialization
-        }
-        .map { GlobalScope.async { getMocksForClassName(it, classLoader) } }
-        .toList()
-        .awaitAll()
-        .filterNotNull()
-        .flatten()
+            .asSequence()
+            .flatMap { it.entries().asSequence() }
+            .filterNot {
+                // These are optimizations to avoid having to check every class in the dex files.
+                it.startsWith("java.") ||
+                        it.startsWith("android.") ||
+                        it.startsWith("androidx.")
+                // TODO: Allow mvrx configuration to specify package name prefix whitelist, or
+                //  more generally, naming whitelist to identify views, for faster initialization
+            }
+            .map { GlobalScope.async { getMocksForClassName(it, classLoader) } }
+            .toList()
+            .awaitAll()
+            .filterNotNull()
+            .flatten()
 }
 
 private fun getMocksForClassName(
-    className: String,
-    classLoader: ClassLoader
+        className: String,
+        classLoader: ClassLoader
 ): List<MockedViewProvider<*>>? {
-    val clazz = classLoader.loadClass(className)
 
-    return if (!Modifier.isAbstract(clazz.modifiers) && MockableMvRxView::class.java.isAssignableFrom(
-            clazz
-        )
-    ) {
+    val clazz = try {
+        classLoader.loadClass(className)
+    } catch (e: ClassNotFoundException) {
+        return null
+    }
+
+    return if (!Modifier.isAbstract(clazz.modifiers) && MockableMvRxView::class.java.isAssignableFrom(clazz)) {
         @Suppress("UNCHECKED_CAST")
         getMockVariants(clazz as Class<MockableMvRxView>)
     } else {
