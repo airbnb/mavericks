@@ -38,16 +38,8 @@ internal fun <T : MvRxState> T.persistState(validation: Boolean = false): Bundle
         if (p.none { it is PersistState }) return@forEachIndexed
         // For each parameter in the constructor, there is a componentN function becasuse state is a data class.
         // We can rely on this to be true because the MvRxMutabilityHelpers asserts that the state class is a data class.
-        val getter = try {
-            jvmClass.getDeclaredMethod("component${i + 1}").also { it.isAccessible = true }
-        } catch (e: NoSuchMethodException) {
-            if (validation) throw e
-            return Bundle()
-        } catch (e: SecurityException) {
-            if (validation) throw e
-            return Bundle()
-        }
-
+        // See MvRxMutabilityHelper Class<*>.isData
+        val getter = jvmClass.getDeclaredMethod("component${i + 1}").also { it.isAccessible = true }
         val value = getter.invoke(this)
         if (validation) assertCollectionPersistability(value)
         bundle.putAny(i.toString(), value)
