@@ -33,6 +33,6 @@ class CounterFragment : BaseMvRxFragment() {
     }
 
     override fun invalidate() = withState(viewModel) { state ->
-        counterText.text = state.count.toString()
+        counterText.text = "${state.count}"
     }
 }

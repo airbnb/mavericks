@@ -1,6 +1,7 @@
 package com.airbnb.mvrx
 
 import androidx.annotation.RestrictTo
+import java.lang.reflect.Modifier
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 interface MvRxStateFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> {
@@ -69,15 +70,23 @@ internal fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createStateFromConstruct
     @Suppress("UNCHECKED_CAST")
     return argsConstructor?.newInstance(args) as? S
         ?: try {
-            stateClass.newInstance()
+            if (Modifier.isPublic(stateClass.modifiers)) {
+                stateClass.newInstance()
+            } else {
+                stateClass.constructors.firstOrNull { it.parameterCount == 0 }?.let { c ->
+                    c.isAccessible = true
+                    c.newInstance() as? S
+                }
+            }
         } catch (@Suppress("TooGenericExceptionCaught") e: Throwable) {
-            null
+            // Throw this exception if something we explicitly tried failed.
+            throw java.lang.IllegalStateException("Failed to create initial state!", e)
         }
+        // Throw this exception if we don't know which method to use to create the initial state.
         ?: throw IllegalStateException(
             "Attempt to create the MvRx state class ${stateClass.simpleName} has failed. One of the following must be true:" +
                 "\n 1) The state class has default values for every constructor property." +
-                "\n 2) The state class has a secondary constructor for ${args?.javaClass?.simpleName
-                    ?: "a fragment argument"}." +
+                "\n 2) The state class has a secondary constructor for ${args?.javaClass?.simpleName ?: "a fragment argument"}." +
                 "\n 3) ${viewModelClass.simpleName} must have a companion object implementing MvRxFactory with an initialState function " +
                 "that does not return null. "
         )

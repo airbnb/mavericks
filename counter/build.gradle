@@ -12,6 +12,27 @@ android {
         versionCode 1
         versionName "1.0"
     }
+
+    signingConfigs {
+        release {
+            storeFile file('counter.keystore')
+            storePassword 'counter'
+            keyAlias 'counter-release'
+            keyPassword 'counter'
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.release
+        }
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.pro'
+        }
+    }
 }
 
 dependencies {

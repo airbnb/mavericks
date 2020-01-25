@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.annotation.RestrictTo
 import java.lang.IllegalStateException
-import kotlin.reflect.full.primaryConstructor
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 
@@ -56,9 +55,7 @@ private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModel(
     }
     val viewModel = factoryViewModel ?: createDefaultViewModel(viewModelClass, initialState)
     return requireNotNull(viewModel) {
-        // If null, use Kotlin reflect for best error message. We will crash anyway, so performance
-        // doesn't matter.
-        if (viewModelClass.kotlin.primaryConstructor?.parameters?.size?.let { it > 1 } == true) {
+        if (viewModelClass.constructors.firstOrNull()?.parameterTypes?.size?.let { it > 1 } == true) {
             "${viewModelClass.simpleName} takes dependencies other than initialState. " +
                 "It must have companion object implementing ${MvRxViewModelFactory::class.java.simpleName} " +
                 "with a create method returning a non-null ViewModel."
@@ -69,13 +66,20 @@ private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModel(
     }
 }
 
-@Suppress("UNCHECKED_CAST")
+@Suppress("UNCHECKED_CAST", "NestedBlockDepth")
 private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createDefaultViewModel(viewModelClass: Class<VM>, state: S): VM? {
     // If we are checking for a default ViewModel, we expect only a single default constructor. Any other case
     // is a misconfiguration and we will throw an appropriate error under further inspection.
     if (viewModelClass.constructors.size == 1) {
         val primaryConstructor = viewModelClass.constructors[0]
         if (primaryConstructor.parameterTypes.size == 1 && primaryConstructor.parameterTypes[0].isAssignableFrom(state::class.java)) {
+            if (!primaryConstructor.isAccessible) {
+                try {
+                    primaryConstructor.isAccessible = true
+                } catch (e: SecurityException) {
+                    throw IllegalStateException("ViewModel class is not public and MvRx could not make the primary constructor accessible.", e)
+                }
+            }
             return primaryConstructor?.newInstance(state) as? VM
         }
     }

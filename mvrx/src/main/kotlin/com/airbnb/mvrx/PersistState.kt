@@ -1,15 +1,12 @@
 @file:SuppressWarnings("Detekt.StringLiteralDuplication")
+
 package com.airbnb.mvrx
 
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.annotation.VisibleForTesting
 import java.io.Serializable
-import kotlin.reflect.KParameter
-import kotlin.reflect.KProperty1
-import kotlin.reflect.full.declaredMemberProperties
-import kotlin.reflect.full.instanceParameter
-import kotlin.reflect.full.primaryConstructor
+import java.lang.reflect.Method
 
 /**
  * Annotate a field in your MvRxViewModel state with [PersistState] to have it automatically persisted when Android kills your process
@@ -31,30 +28,23 @@ annotation class PersistState
  * Iterates through all member properties annotated with [PersistState] and parcels them into a bundle that can be
  * saved with savedInstanceState.
  */
-internal fun <T : Any> T.persistState(assertCollectionPersistability: Boolean = false): Bundle {
-    val klass = this::class
-    val persistStateArgs = klass.primaryConstructor
-            ?.parameters
-            ?.filter { it.annotations.any { it.annotationClass == PersistState::class } }
-    if (persistStateArgs?.isEmpty() != false) {
-        return Bundle()
-    }
+internal fun <T : MvRxState> T.persistState(validation: Boolean = false): Bundle {
+    val jvmClass = this::class.java
+    // Find the first constructor that has parameters annotated with @PersistState or return.
+    val constructor = jvmClass.constructors.firstOrNull { it.parameterAnnotations.any { it.any { it is PersistState } } } ?: return Bundle()
 
-    val persistStateArgNames = persistStateArgs.map { it.name }
-    /**
-     * Filter out params that don't have an associated @PersistState prop.
-     * Map the parameter name to the current value of its associated property
-     * Reduce the @PersistState parameters into a bundle mapping the parameter name to the property value.
-     */
-    return klass.declaredMemberProperties.asSequence()
-            .filter { persistStateArgNames.contains(it.name) }
-            .map { prop ->
-                @Suppress("UNCHECKED_CAST")
-                val value = (prop as? KProperty1<T, Any?>)?.get(this@persistState)
-                if (assertCollectionPersistability) assertCollectionPersistability(value)
-                prop to value
-            }
-            .fold(Bundle()) { bundle, (param, value) -> bundle.putAny(param.name, value) }
+    val bundle = Bundle()
+    constructor.parameterAnnotations.forEachIndexed { i, p ->
+        if (p.none { it is PersistState }) return@forEachIndexed
+        // For each parameter in the constructor, there is a componentN function becasuse state is a data class.
+        // We can rely on this to be true because the MvRxMutabilityHelpers asserts that the state class is a data class.
+        // See MvRxMutabilityHelper Class<*>.isData
+        val getter = jvmClass.getDeclaredMethod("component${i + 1}").also { it.isAccessible = true }
+        val value = getter.invoke(this)
+        if (validation) assertCollectionPersistability(value)
+        bundle.putAny(i.toString(), value)
+    }
+    return bundle
 }
 
 private fun assertCollectionPersistability(value: Any?) {
@@ -73,7 +63,7 @@ private fun assertCollectionPersistability(value: Any?) {
 }
 
 private fun assertPersistable(item: Any) {
-    if (item !is Serializable && item !is Parcelable) throw IllegalStateException("Cannot parcel ${item::class.simpleName}")
+    if (item !is Serializable && item !is Parcelable) throw IllegalStateException("Cannot parcel ${item::class.java.simpleName}")
 }
 
 private fun <T : Any?> Bundle.putAny(key: String?, value: T): Bundle {
@@ -81,7 +71,7 @@ private fun <T : Any?> Bundle.putAny(key: String?, value: T): Bundle {
         is Parcelable -> putParcelable(key, value)
         is Serializable -> putSerializable(key, value)
         null -> putString(key, null)
-        else -> throw IllegalStateException("Cannot persist $key. It must be null, Serializable, or Parcelable.")
+        else -> error("Cannot persist $key. It must be null, Serializable, or Parcelable.")
     }
     return this
 }
@@ -89,33 +79,59 @@ private fun <T : Any?> Bundle.putAny(key: String?, value: T): Bundle {
 /**
  * Updates the initial state object given state persisted with [PersistState] in a [Bundle].
  */
-internal fun <T : Any> Bundle.restorePersistedState(initialState: T): T {
+internal fun <T : MvRxState> Bundle.restorePersistedState(initialState: T, validation: Boolean = false): T {
+    val jvmClass = initialState::class.java
+    val constructor = jvmClass.constructors.firstOrNull { it.parameterAnnotations.any { it.any { it is PersistState } } } ?: return initialState
+
     // If we don't set the correct class loader, when the bundle is restored in a new process, it will have the system class loader which
-    // can't unmarshall any custom classes.
-    val stateClass = initialState::class
-    classLoader = stateClass.java.classLoader
-    val constructor = stateClass.primaryConstructor ?: throw IllegalStateException("${stateClass.simpleName} has no primary constructor!")
-    val persistedConstructorParamNames = constructor.parameters.asSequence()
-        .filter { it.name != null }
-        .filter { it.annotations.any { it.annotationClass == PersistState::class } }
-        .map { it.name }
-        .toSet()
-    if (persistedConstructorParamNames.isEmpty()) {
-        return initialState
+    // can't unmarshal any custom classes.
+    classLoader = jvmClass.classLoader
+
+    // For data classes, Kotlin generates a static functionc called copy$default.
+    // The first parameter is the object to copy from.
+    // The next parameters are all of parameters to copy (it's jvm bytecode/java so there are no optional parameters in the generated method).
+    // The next parameter(s) are a bitmask. Each parameter index corresponds to one bit in the int.
+    //     If the bitmask is 1 for a given parameter then the new object will have the original object's value and the parameter value will be ignored.
+    //     If the bitmask is 0 then it will use the value from the parameter.
+    //     There is 1 bitmask for every 32 parameters. If there are 48 parameters, there will be 2 bitmasks. Parameter 33 will be the first bit of the 2nd bitmask.
+    // The last parameter is ignored. It can be null.
+    val copyFunction = jvmClass.declaredMethods.first { it.name == "copy\$default" }
+    val fieldCount = constructor.parameterTypes.size
+
+    // There is 1 bitmask for each block of 32 parameters.
+    val parameterBitMasks = IntArray(fieldCount / 32 + 1) { 0 }
+    val parameters = arrayOfNulls<Any?>(fieldCount)
+    parameters[0] = initialState
+    for (i in 0..(fieldCount - 1)) {
+        val bundleKey = i.toString()
+        if (containsKey(bundleKey)) {
+            // Copy the persisted value into the parameter array.
+            // The bitmask for this element will be 0 so this value will be copied to the new object.
+            parameters[i] = get(bundleKey)
+            continue
+        }
+
+        if (validation && constructor.parameterAnnotations[i].any { it is PersistState }) {
+            error("savedInstanceState bundle should have a key for state property at position $i but it was missing.")
+        }
+
+        // Set the bitmask for this parameter to 1 so it copies the value from the original object.
+        parameterBitMasks[i / 32] = parameterBitMasks[i / 32] or (1 shl (i % 32))
+        // These parameters will be ignored. We just need to put in something of the correct type to match the method signature.
+        parameters[i] = copyFunction.parameterTypes[i + 1].defaultParameterValue
     }
 
-    val copyMethod = stateClass.copyMethod()
-    val copyArgs = copyMethod.parameters.asSequence()
-        .filter { persistedConstructorParamNames.contains(it.name) }
-        .fold(mutableMapOf<KParameter, Any?>()) { map, param ->
-            // We do the containsKey check to differentiate between a missing key and one that is explicitly null.
-            if (containsKey(param.name)) map[param] = this[param.name]
-            map
-        }
-    // Add the instance to call copy on
-    copyArgs[copyMethod.instanceParameter ?: throw IllegalStateException("Copy method not a member of a class. This should never happen.")] =
-        initialState
-    return copyMethod.callBy(copyArgs)
+    // See the comment above for information on the parameters here.
+    @Suppress("UNCHECKED_CAST")
+    return copyFunction.invoke(null, *arrayOf(initialState, *parameters, *parameterBitMasks.toTypedArray(), null)) as T
+}
+
+private fun <T, R> Array<T>.firstNotEmptyOrNull(mapper: (T) -> List<R>?): List<R>? {
+    forEach { v ->
+        val listOrNull = mapper(v)
+        if (listOrNull?.isNotEmpty() == true) return listOrNull
+    }
+    return null
 }
 
 /**
@@ -124,6 +140,25 @@ internal fun <T : Any> Bundle.restorePersistedState(initialState: T): T {
  */
 @VisibleForTesting
 object PersistStateTestHelpers {
-    fun <T : Any> persistState(state: T) = state.persistState(assertCollectionPersistability = true)
-    fun <T : Any> restorePersistedState(bundle: Bundle, initialState: T) = bundle.restorePersistedState(initialState)
+    fun <T : MvRxState> persistState(state: T) = state.persistState(validation = true)
+    fun <T : MvRxState> restorePersistedState(bundle: Bundle, initialState: T, validation: Boolean = false) = bundle.restorePersistedState(initialState, validation)
 }
+
+/**
+ * Throws [NoSuchElementException] if there is no method.
+ */
+@Suppress("UNCHECKED_CAST")
+private fun <T : Any> Class<T>.copyMethod(): Method = this.declaredMethods.first { it.name == "copy\$default" }
+
+private val Class<*>.defaultParameterValue: Any?
+    get() = when (this) {
+        Integer.TYPE -> 0
+        java.lang.Boolean.TYPE -> false
+        java.lang.Float.TYPE -> 0f
+        Character.TYPE -> 'A'
+        java.lang.Byte.TYPE -> Byte.MIN_VALUE
+        java.lang.Short.TYPE -> Short.MIN_VALUE
+        java.lang.Long.TYPE -> 0L
+        java.lang.Double.TYPE -> 0.0
+        else -> null
+    }

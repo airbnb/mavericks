@@ -12,7 +12,7 @@ import org.junit.Test
 import org.robolectric.Robolectric
 import java.lang.reflect.InvocationTargetException
 
-data class FactoryState(val greeting: String = "") : MvRxState {
+private data class FactoryState(val greeting: String = "") : MvRxState {
     constructor(args: TestArgs) : this("${args.greeting} constructor")
 }
 
@@ -26,7 +26,7 @@ class ViewModelFactoryTestFragment : Fragment()
  */
 class NoFactoryTest : BaseTest() {
 
-    class MyViewModelWithNonFactoryCompanion(initialState: FactoryState) : TestMvRxViewModel<FactoryState>(initialState) {
+    private class MyViewModelWithNonFactoryCompanion(initialState: FactoryState) : TestMvRxViewModel<FactoryState>(initialState) {
         companion object {
             // Companion object does not implement MvRxViewModelFactory
         }
@@ -66,16 +66,6 @@ class NoFactoryTest : BaseTest() {
         withState(viewModel) { state ->
             assertEquals(FactoryState("hello constructor"), state)
         }
-    }
-
-    private data class PrivateState(val count1: Int = 0) : MvRxState
-
-    @Test(expected = InvocationTargetException::class)
-    fun failOnPrivateState() {
-        class MyViewModel(initialState: PrivateState) : TestMvRxViewModel<PrivateState>(initialState)
-        // Create a view model to run state validation checks.
-        @Suppress("UNUSED_VARIABLE")
-        val viewModel = MvRxViewModelProvider.get(MyViewModel::class.java, PrivateState::class.java, ActivityViewModelContext(activity, null))
     }
 
     @Test(expected = IllegalArgumentException::class)

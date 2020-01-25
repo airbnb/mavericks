@@ -3,6 +3,7 @@ package com.airbnb.android.mvrx.test
 import com.airbnb.mvrx.test.DebugMode
 import com.airbnb.mvrx.test.MvRxTestRule
 import io.reactivex.exceptions.OnErrorNotImplementedException
+import org.junit.Assert.assertEquals
 import org.junit.ClassRule
 import org.junit.Test
 
@@ -15,11 +16,14 @@ class MvRxTestRuleTestNotSet {
 
     @Test
     fun testNotDebugNoOverride() {
-        TestRuleViewModel()
+        val viewModel = TestRuleViewModel()
+        viewModel.doSomething()
+        assertEquals(1, viewModel.setStateCount)
     }
 
-    @Test(expected = OnErrorNotImplementedException::class)
     fun testDebugNoOverride() {
-        TestRuleViewModel(true)
+        val viewModel = TestRuleViewModel(true)
+        viewModel.doSomething()
+        assertEquals(2, viewModel.setStateCount)
     }
 }

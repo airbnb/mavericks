@@ -34,6 +34,30 @@ class StateImmutabilityTest : BaseTest() {
     }
 
     @Test(expected = IllegalArgumentException::class)
+    fun nonDataStateWithComponent1() {
+        class State {
+            operator fun component1() = 5
+        }
+        State::class.assertImmutability()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun nonDataStateWithHashCode() {
+        class State {
+            override fun hashCode() = 123
+        }
+        State::class.assertImmutability()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun nonDataStateWithEquals() {
+        class State {
+            override fun equals(other: Any?) = false
+        }
+        State::class.assertImmutability()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
     fun varState() {
         data class State(var foo: Int = 5)
         State::class.assertImmutability()
