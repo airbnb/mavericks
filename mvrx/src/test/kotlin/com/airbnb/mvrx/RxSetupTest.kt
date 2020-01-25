@@ -11,10 +11,12 @@ class RxSetupTest : BaseTest() {
         class RxSetupViewModel(initialState: RxSetupState) : TestMvRxViewModel<RxSetupState>(initialState) {
             fun throwInWithState() {
                 withState {
-                    throw IllegalArgumentException()
+                    println("withState thread ${Thread.currentThread().id}")
+                    throw IllegalArgumentException("Intentional Exception")
                 }
             }
         }
+        println("Test thread ${Thread.currentThread().id}")
         RxSetupViewModel(RxSetupState()).throwInWithState()
     }
 }

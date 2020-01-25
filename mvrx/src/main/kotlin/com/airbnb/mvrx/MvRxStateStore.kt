@@ -1,11 +1,11 @@
 package com.airbnb.mvrx
 
-import io.reactivex.Observable
-import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.flow.Flow
 
-interface MvRxStateStore<S : Any> : Disposable {
+interface MvRxStateStore<S : Any> {
     val state: S
     fun get(block: (S) -> Unit)
     fun set(stateReducer: S.() -> S)
-    val observable: Observable<S>
+    fun cancel()
+    val flow: Flow<S>
 }

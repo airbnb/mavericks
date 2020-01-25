@@ -211,7 +211,7 @@ class ViewModelSubscriberTest : BaseTest() {
     fun setup() {
         viewModel = ViewModelTestViewModel(ViewModelTestState())
         owner = TestLifecycleOwner()
-        owner.lifecycle.markState(Lifecycle.State.RESUMED)
+        owner.lifecycle.currentState = Lifecycle.State.RESUMED
     }
 
     @Test
@@ -489,7 +489,7 @@ class ViewModelSubscriberTest : BaseTest() {
 
     @Test
     fun testSubscribeNotCalledInInitialized() {
-        owner.lifecycle.markState(Lifecycle.State.INITIALIZED)
+        owner.lifecycle.currentState = Lifecycle.State.INITIALIZED
 
         var callCount = 0
         viewModel.subscribe(owner) {
@@ -501,7 +501,7 @@ class ViewModelSubscriberTest : BaseTest() {
 
     @Test
     fun testSubscribeNotCalledInCreated() {
-        owner.lifecycle.markState(Lifecycle.State.CREATED)
+        owner.lifecycle.currentState = Lifecycle.State.CREATED
 
         var callCount = 0
         viewModel.subscribe(owner) {
@@ -513,7 +513,7 @@ class ViewModelSubscriberTest : BaseTest() {
 
     @Test
     fun testSubscribeCalledInStarted() {
-        owner.lifecycle.markState(Lifecycle.State.STARTED)
+        owner.lifecycle.currentState = Lifecycle.State.STARTED
 
         var callCount = 0
         viewModel.subscribe(owner) {
@@ -525,7 +525,7 @@ class ViewModelSubscriberTest : BaseTest() {
 
     @Test
     fun testSubscribeCalledInResumed() {
-        owner.lifecycle.markState(Lifecycle.State.RESUMED)
+        owner.lifecycle.currentState = Lifecycle.State.RESUMED
 
         var callCount = 0
         viewModel.subscribe(owner) {
@@ -537,7 +537,7 @@ class ViewModelSubscriberTest : BaseTest() {
 
     @Test
     fun testSubscribeNotCalledInDestroyed() {
-        owner.lifecycle.markState(Lifecycle.State.DESTROYED)
+        owner.lifecycle.currentState = Lifecycle.State.DESTROYED
 
         var callCount = 0
         viewModel.subscribe(owner) {
@@ -549,7 +549,7 @@ class ViewModelSubscriberTest : BaseTest() {
 
     @Test
     fun testSubscribeNotCalledWhenTransitionedToStopped() {
-        owner.lifecycle.markState(Lifecycle.State.RESUMED)
+        owner.lifecycle.currentState = Lifecycle.State.RESUMED
 
         var callCount = 0
         viewModel.subscribe(owner) {
@@ -567,7 +567,7 @@ class ViewModelSubscriberTest : BaseTest() {
 
     @Test
     fun testSubscribeNotCalledWhenTransitionedToDestroyed() {
-        owner.lifecycle.markState(Lifecycle.State.RESUMED)
+        owner.lifecycle.currentState = Lifecycle.State.RESUMED
 
         var callCount = 0
         viewModel.subscribe(owner) {
@@ -585,7 +585,7 @@ class ViewModelSubscriberTest : BaseTest() {
 
     @Test
     fun testSubscribeCalledWhenTransitionToStarted() {
-        owner.lifecycle.markState(Lifecycle.State.CREATED)
+        owner.lifecycle.currentState = Lifecycle.State.CREATED
 
         var callCount = 0
         viewModel.subscribe(owner) {
@@ -599,7 +599,7 @@ class ViewModelSubscriberTest : BaseTest() {
 
     @Test
     fun testSubscribeCalledWhenTransitionToResumed() {
-        owner.lifecycle.markState(Lifecycle.State.STARTED)
+        owner.lifecycle.currentState = Lifecycle.State.STARTED
 
         var callCount = 0
         viewModel.subscribe(owner) {
@@ -617,7 +617,7 @@ class ViewModelSubscriberTest : BaseTest() {
 
     @Test
     fun testSubscribeCalledOnRestart() {
-        owner.lifecycle.markState(Lifecycle.State.RESUMED)
+        owner.lifecycle.currentState = Lifecycle.State.RESUMED
         var callCount = 0
         viewModel.subscribe(owner) {
             callCount++
@@ -633,7 +633,7 @@ class ViewModelSubscriberTest : BaseTest() {
 
     @Test
     fun testUniqueOnlySubscribeCalledOnStartIfUpdateOccurredInStop() {
-        owner.lifecycle.markState(Lifecycle.State.STARTED)
+        owner.lifecycle.currentState = Lifecycle.State.STARTED
 
         var callCount = 0
         viewModel.subscribe(owner, deliveryMode = UniqueOnly("id")) {
@@ -651,7 +651,7 @@ class ViewModelSubscriberTest : BaseTest() {
 
     @Test
     fun testSubscribeNotCalledOnStartIfNoUpdateOccurredInStop() {
-        owner.lifecycle.markState(Lifecycle.State.STARTED)
+        owner.lifecycle.currentState = Lifecycle.State.STARTED
 
         var callCount = 0
         viewModel.subscribe(owner, deliveryMode = UniqueOnly("id")) {

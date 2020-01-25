@@ -243,6 +243,16 @@ class FragmentSubscriberTest : BaseTest() {
     }
 
     @Test
+    fun foo() {
+        val (controller, fragment) = createFragmentInTestActivity<ViewSubscriberFragment>()
+        val fragmentManager = controller.get().supportFragmentManager
+        fragmentManager.beginTransaction().replace(CONTAINER_ID, Fragment(), "TAG").addToBackStack(null).commit()
+        fragmentManager.popBackStackImmediate()
+        assertEquals(1, fragment.viewCreatedUniqueOnlyCallCount)
+    }
+
+
+    @Test
     fun subscribeOnBackStackResumeWhenStateNotChanged() {
         val (controller, fragment) = createFragmentInTestActivity<ViewSubscriberFragment>()
         assertEquals(1, fragment.subscribeCallCount)

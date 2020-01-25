@@ -6,13 +6,16 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
-import io.reactivex.Scheduler
-import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.annotations.NonNull
-import io.reactivex.disposables.Disposable
-import io.reactivex.exceptions.CompositeException
-import io.reactivex.internal.schedulers.ExecutorScheduler
-import io.reactivex.plugins.RxJavaPlugins
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Runnable
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.TestCoroutineExceptionHandler
+import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.UncaughtExceptionCaptor
+import kotlinx.coroutines.test.setMain
 import org.junit.BeforeClass
 import org.junit.Ignore
 import org.junit.runner.RunWith
@@ -20,36 +23,47 @@ import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.android.controller.ActivityController
 import org.robolectric.shadows.ShadowLog
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
+import kotlin.coroutines.CoroutineContext
 
+@Suppress("EXPERIMENTAL_API_USAGE")
 @RunWith(RobolectricTestRunner::class)
-@Ignore
+@Ignore("Base Class")
 abstract class BaseTest {
+
+    private class ExceptionHandler : CoroutineExceptionHandler, UncaughtExceptionCaptor {
+        override val key: CoroutineContext.Key<*> get() = CoroutineExceptionHandler
+
+        override fun handleException(context: CoroutineContext, exception: Throwable) {
+            println("Caught exception in ${Thread.currentThread().id}")
+            throw exception
+        }
+
+        override val uncaughtExceptions = emptyList<Throwable>()
+
+        override fun cleanupTestCoroutines() {
+        }
+
+    }
+
     companion object {
         @JvmStatic
         @BeforeClass
         fun classSetUp() {
             ShadowLog.stream = System.out
-            RxAndroidPlugins.reset()
-            RxJavaPlugins.reset()
-            val immediate = object : Scheduler() {
-                // this prevents StackOverflowErrors when scheduling with a delay
-                override fun scheduleDirect(@NonNull run: Runnable, delay: Long, @NonNull unit: TimeUnit): Disposable = super.scheduleDirect(run, 0, unit)
+//            val coroutineContext = TestCoroutineDispatcher()
+//            Dispatchers.setMain(coroutineContext)
+            CoroutinesStateStore.scopeFactory = { CoroutineScope(
+                object  : CoroutineDispatcher() {
+                    override fun dispatch(context: CoroutineContext, block: Runnable) {
+                        block.run()
+                    }
 
-                override fun createWorker(): Worker = ExecutorScheduler.ExecutorWorker(Executor { it.run() }, true)
-            }
-            RxJavaPlugins.setNewThreadSchedulerHandler { immediate }
-            RxJavaPlugins.setComputationSchedulerHandler { immediate }
-            RxJavaPlugins.setInitIoSchedulerHandler { immediate }
-            RxJavaPlugins.setSingleSchedulerHandler { immediate }
-            // This is necessary to prevent rxjava from swallowing errors
-            // https://github.com/ReactiveX/RxJava/issues/5234
-            Thread.setDefaultUncaughtExceptionHandler { _, e ->
-                if (e is CompositeException && e.exceptions.size == 1) throw e.exceptions[0]
-                throw e
-            }
-            RxAndroidPlugins.setInitMainThreadSchedulerHandler { immediate }
+                } +
+                CoroutineExceptionHandler { _, throwable ->
+                   println("Caught exception $throwable")
+                    throw throwable
+                }
+            ) }
         }
     }
 

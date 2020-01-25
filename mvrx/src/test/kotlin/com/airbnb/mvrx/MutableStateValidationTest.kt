@@ -17,7 +17,10 @@ class MutableStateValidationTest : BaseTest() {
                 val myMap = withState(this) { it.map }
                 myMap["foo"] = "bar"
 
-                setState { copy(map = myMap) }
+                setState {
+                    println("in setState")
+                    copy(map = myMap)
+                }
             }
         }
         ViewModel(StateWithMutableMap()).addKeyToMap()

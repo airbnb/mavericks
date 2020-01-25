@@ -1,23 +1,27 @@
 package com.airbnb.mvrx
 
+import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.runBlockingTest
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 
-data class MvRxStateStoreTestState(val count: Int = 1, val list: List<Int> = emptyList())
+data class MvRxStateStoreTestState(val count: Int = 1, val list: List<Int> = emptyList()) : MvRxState
 
+@Suppress("EXPERIMENTAL_API_USAGE")
 class StateStoreTest : BaseTest() {
-
-    private lateinit var store: MvRxStateStore<MvRxStateStoreTestState>
-
-    @Before
-    fun setup() {
-        store = RealMvRxStateStore(MvRxStateStoreTestState())
-    }
 
     @Test
     fun testGetRunsSynchronouslyForTests() {
+        val store = CoroutinesStateStore(MvRxStateStoreTestState(), TestCoroutineScope())
         var callCount = 0
         store.get { callCount++ }
         assertEquals(1, callCount)
@@ -25,6 +29,7 @@ class StateStoreTest : BaseTest() {
 
     @Test
     fun testSetState() {
+        val store = CoroutinesStateStore(MvRxStateStoreTestState(), TestCoroutineScope())
         store.set {
             copy(count = 2)
         }
@@ -38,10 +43,12 @@ class StateStoreTest : BaseTest() {
 
     @Test
     fun testSubscribeNotCalledForNoop() {
+        val scope = TestCoroutineScope()
+        val store = CoroutinesStateStore(MvRxStateStoreTestState(), scope)
         var callCount = 0
-        store.observable.subscribe {
+        store.flow.onEach {
             callCount++
-        }
+        }.launchIn(scope)
         assertEquals(1, callCount)
         store.set { this }
         assertEquals(1, callCount)
@@ -49,10 +56,12 @@ class StateStoreTest : BaseTest() {
 
     @Test
     fun testSubscribeNotCalledForSameValue() {
+        val scope = TestCoroutineScope()
+        val store = CoroutinesStateStore(MvRxStateStoreTestState(), scope)
         var callCount = 0
-        store.observable.subscribe {
+        store.flow.onEach {
             callCount++
-        }
+        }.launchIn(scope)
         assertEquals(1, callCount)
         store.set { copy() }
         assertEquals(1, callCount)

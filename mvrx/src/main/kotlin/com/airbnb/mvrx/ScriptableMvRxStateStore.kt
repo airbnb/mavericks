@@ -1,7 +1,8 @@
 package com.airbnb.mvrx
 
-import io.reactivex.Observable
-import io.reactivex.subjects.BehaviorSubject
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 
 /**
  * A [MvRxStateStore] which ignores standard calls to [set]. Instead it can be scripted via calls to
@@ -9,14 +10,15 @@ import io.reactivex.subjects.BehaviorSubject
  * how your UI code reacts to different ViewModel states. This is not as useful for unit testing your view model,
  * as business logic in state reducers will not be used.
  */
+@Suppress("EXPERIMENTAL_API_USAGE")
 class ScriptableMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
 
-    private val subject: BehaviorSubject<S> = BehaviorSubject.createDefault(initialState)
+    private val channel = ConflatedBroadcastChannel<S>(initialState)
 
-    override val observable: Observable<S> = subject.distinctUntilChanged()
+    override val flow: Flow<S> get() = channel.asFlow()
 
     override val state: S
-        get() = subject.value!!
+        get() = channel.value
 
     override fun get(block: (S) -> Unit) {
         block(state)
@@ -26,9 +28,8 @@ class ScriptableMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
         // No-op set the state via next
     }
 
-    fun next(state: S) = subject.onNext(state)
+    override fun cancel() {
+    }
 
-    override fun isDisposed() = false
-
-    override fun dispose() {}
+    fun next(state: S) = channel.offer(state)
 }
