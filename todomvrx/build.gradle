@@ -4,17 +4,27 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
+    buildToolsVersion "$buildToolsVersion"
+
     defaultConfig {
         applicationId "com.airbnb.mvrx.todoapp"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "0.0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-    buildToolsVersion "$buildToolsVersion"
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 }
 
 androidExtensions {
@@ -31,17 +41,17 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
     implementation("com.airbnb.android:epoxy:$epoxyVersion") { exclude group: 'com.android.support' }
     kapt "com.airbnb.android:epoxy-processor:$epoxyVersion"
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    implementation "io.reactivex.rxjava2:rxjava:2.2.8"
+    implementation "io.reactivex.rxjava2:rxandroid:$rxandroidVersion"
+    implementation "io.reactivex.rxjava2:rxjava:$rxjavaVersion"
     implementation "androidx.navigation:navigation-fragment-ktx:$navVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navVersion"
     implementation "androidx.room:room-runtime:$roomVersion"
     implementation "androidx.room:room-rxjava2:$roomVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
     implementation "androidx.test.espresso:espresso-idling-resource:$espressoVersion"
-    debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
+    debugImplementation 'com.amitshekhar.android:debug-db:1.0.6'
 
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0'
+    testImplementation "junit:junit:$junitVersion"
+    testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.2.0'
     testImplementation project(':testing')
 }

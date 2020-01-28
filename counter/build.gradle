@@ -3,12 +3,13 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
+    buildToolsVersion "$buildToolsVersion"
 
     defaultConfig {
         applicationId "com.airbnb.mvrx.counter"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
     }
@@ -20,6 +21,15 @@ android {
             keyAlias 'counter-release'
             keyPassword 'counter'
         }
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
     }
 
     buildTypes {
@@ -43,6 +53,6 @@ dependencies {
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation "junit:junit:$junitVersion"
     testImplementation project(':testing')
 }

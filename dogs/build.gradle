@@ -4,14 +4,24 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
+    buildToolsVersion "$buildToolsVersion"
 
     defaultConfig {
         applicationId "com.airbnb.mvrx.dogs"
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
     }
 
     dataBinding {
@@ -30,8 +40,8 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:$navVersion"
     implementation("com.airbnb.android:epoxy:$epoxyVersion") { exclude group: 'com.android.support' }
     implementation 'com.squareup.picasso:picasso:2.5.2'
-    implementation 'com.airbnb.android:lottie:3.0.0'
+    implementation 'com.airbnb.android:lottie:3.3.1'
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation "junit:junit:$junitVersion"
     testImplementation project(':testing')
 }

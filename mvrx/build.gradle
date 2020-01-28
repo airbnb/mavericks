@@ -6,28 +6,37 @@ apply plugin: "jacoco"
 apply plugin: "com.vanniktech.maven.publish"
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
+    buildToolsVersion "$buildToolsVersion"
+
     resourcePrefix 'mvrx_'
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 28
+        targetSdkVersion 29
         consumerProguardFiles 'proguard-rules.pro'
     }
-    buildToolsVersion "$buildToolsVersion"
+
     lintOptions {
         abortOnError true
         textReport true
         textOutput 'stdout'
     }
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
         test.java.srcDirs += 'src/test/kotlin'
     }
+
     testOptions {
         unitTests {
             includeAndroidResources = true
@@ -45,7 +54,7 @@ androidExtensions {
 }
 
 jacoco {
-    toolVersion = "0.8.2"
+    toolVersion = '0.8.5'
 }
 
 dependencies {
@@ -54,11 +63,11 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
     implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
     kapt "androidx.lifecycle:lifecycle-compiler:$lifecycleVersion"
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    api "io.reactivex.rxjava2:rxjava:2.2.8"
+    implementation "io.reactivex.rxjava2:rxandroid:$rxandroidVersion"
+    api "io.reactivex.rxjava2:rxjava:$rxjavaVersion"
 
-    testImplementation "org.mockito:mockito-core:2.25.1"
-    testImplementation 'junit:junit:4.12'
+    testImplementation "org.mockito:mockito-core:3.2.4"
+    testImplementation "junit:junit:$junitVersion"
     testImplementation "org.robolectric:robolectric:$robolectricVersion"
 }
 
