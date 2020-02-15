@@ -1,12 +1,21 @@
 package com.airbnb.mvrx
 
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Test
+import java.lang.IllegalStateException
 
 
 data class StateWithMutableMap(val map: MutableMap<String, String> = mutableMapOf()) : MvRxState
 data class StateWithImmutableMap(val map: Map<String, String> = mapOf()) : MvRxState
 
 class MutableStateValidationTest : BaseTest() {
+
+    @Test(expected = IllegalStateException::class)
+    fun mutableStateShouldFail2() = runBlockingTest {
+        class ViewModel(initialState: StateWithMutableMap) : TestMvRxViewModel<StateWithMutableMap>(initialState)
+    }
 
     @Test(expected = IllegalArgumentException::class)
     fun mutableStateShouldFail() {

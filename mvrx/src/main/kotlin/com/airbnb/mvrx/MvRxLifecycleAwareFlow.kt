@@ -38,7 +38,7 @@ private suspend fun LifecycleOwner.launchWhenStartedAndCancelWhenStopped(block: 
 /**
  * Transforms a [Flow] into a new one that only emits when the lifecycle owner is started.
  *
- * The behavior when the owne transitions back to start can be specified by [deliveryMode].
+ * The behavior when the owner transitions back to start can be specified by [deliveryMode].
  */
 fun <T : Any> Flow<T>.flowWhenStarted(
     owner: LifecycleOwner,
@@ -61,7 +61,7 @@ fun <T : Any> Flow<T>.flowWhenStarted(
 
             while (true) {
                 val item = stateChannel.receive()
-                channel.send(item)
+                send(item)
                 lastDeliveredItem = item
             }
         }
