@@ -11,7 +11,7 @@ class MvRxTestRuleTestNotSet {
     companion object {
         @JvmField
         @ClassRule
-        val mvrxTestRule = MvRxTestRule(DebugMode.Unset, setRxImmediateSchedulers = true)
+        val mvrxTestRule = MvRxTestRule(DebugMode.Unset, immediateReducers = true)
     }
 
     @Test

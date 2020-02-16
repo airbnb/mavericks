@@ -12,11 +12,6 @@ data class StateWithImmutableMap(val map: Map<String, String> = mapOf()) : MvRxS
 
 class MutableStateValidationTest : BaseTest() {
 
-    @Test(expected = IllegalStateException::class)
-    fun mutableStateShouldFail2() = runBlockingTest {
-        class ViewModel(initialState: StateWithMutableMap) : TestMvRxViewModel<StateWithMutableMap>(initialState)
-    }
-
     @Test(expected = IllegalArgumentException::class)
     fun mutableStateShouldFail() {
         class ViewModel(initialState: StateWithMutableMap) :

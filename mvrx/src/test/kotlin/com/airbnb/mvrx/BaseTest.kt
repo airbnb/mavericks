@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Runnable
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import org.junit.BeforeClass
 import org.junit.Ignore
 import org.junit.runner.RunWith
@@ -28,15 +29,7 @@ abstract class BaseTest {
         @BeforeClass
         fun classSetUp() {
             ShadowLog.stream = System.out
-            CoroutinesStateStore.scopeFactory = {
-                CoroutineScope(
-                    object : CoroutineDispatcher() {
-                        override fun dispatch(context: CoroutineContext, block: Runnable) {
-                            block.run()
-                        }
-                    }
-                )
-            }
+            CoroutinesStateStore.scopeFactory = { CoroutineScope(TestCoroutineDispatcher()) }
         }
     }
 
