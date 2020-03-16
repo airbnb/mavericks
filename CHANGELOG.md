@@ -1,5 +1,9 @@
 # Change log
 
+## Version 1.4.0
+- Remove Kotlin-Reflect entirely (#334)
+- Remove extra proguard dependency (#310)
+
 ## Version 1.3.0
 - Revamp state saving to use Android Jetpack `SavedStateRegistry` (#254)
 
