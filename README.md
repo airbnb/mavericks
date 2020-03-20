@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.com/airbnb/MvRx.svg?branch=master)](https://travis-ci.com/github/airbnb/MvRx)
+
 # MvRx: Android on Autopilot
 
 ## For full documentation, check out the [wiki](https://github.com/airbnb/MvRx/wiki)
