@@ -14,12 +14,12 @@ class DogImageView @JvmOverloads constructor(
 
     fun setUrl(url: String?) {
         if (url == null) {
-            Picasso.with(context).cancelRequest(this)
+            Picasso.get().cancelRequest(this)
             setImageDrawable(null)
             return
         }
 
-        Picasso.with(context)
+        Picasso.get()
             .load(url)
             .placeholder(R.color.loading)
             .into(this)
