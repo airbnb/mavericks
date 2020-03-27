@@ -11,6 +11,7 @@ android {
         applicationId "com.airbnb.sample"
         minSdkVersion versions.minSdk
         targetSdkVersion versions.targetSdk
+        multiDexEnabled true
         versionCode 1
         versionName "0.0.1"
 
@@ -51,6 +52,7 @@ dependencies {
     implementation libraries.lifecycleExtensions
     implementation libraries.moshi
     implementation libraries.moshiKotlin
+    implementation libraries.multidex
     implementation libraries.navigationFragmentKtx
     implementation libraries.navigationUiKtx
     implementation libraries.recyclerview
