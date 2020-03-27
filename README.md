@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.com/airbnb/MvRx.svg?branch=master)](https://travis-ci.com/github/airbnb/MvRx)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx)
+
 # MvRx: Android on Autopilot
 
 ## For full documentation, check out the [wiki](https://github.com/airbnb/MvRx/wiki)

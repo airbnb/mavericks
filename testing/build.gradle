@@ -13,16 +13,24 @@ android {
         targetSdkVersion 28
         consumerProguardFiles 'proguard-rules.pro'
     }
+
     buildToolsVersion "$buildToolsVersion"
+
     lintOptions {
         abortOnError true
         textReport true
         textOutput 'stdout'
     }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
         test.java.srcDirs += 'src/test/kotlin'
