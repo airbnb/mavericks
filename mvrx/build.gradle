@@ -1,24 +1,25 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-android-extensions"
+apply plugin: "kotlin-kapt"
 apply plugin: "jacoco"
 apply plugin: "com.vanniktech.maven.publish"
 
 android {
-    compileSdkVersion 28
-    resourcePrefix 'mvrx_'
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
+    resourcePrefix "mvrx_"
 
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 28
-        consumerProguardFiles 'proguard-rules.pro'
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
+        consumerProguardFiles "proguard-rules.pro"
     }
-    buildToolsVersion "$buildToolsVersion"
+
     lintOptions {
         abortOnError true
         textReport true
-        textOutput 'stdout'
+        textOutput "stdout"
     }
 
     compileOptions {
@@ -27,8 +28,8 @@ android {
     }
 
     sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-        test.java.srcDirs += 'src/test/kotlin'
+        main.java.srcDirs += "src/main/kotlin"
+        test.java.srcDirs += "src/test/kotlin"
     }
 
     testOptions {
@@ -52,17 +53,18 @@ jacoco {
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    implementation "androidx.appcompat:appcompat:$appCompatVersion"
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
-    kapt "androidx.lifecycle:lifecycle-compiler:$lifecycleVersion"
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    api "io.reactivex.rxjava2:rxjava:2.2.8"
+    kapt annotationProcessors.lifecycle
 
-    testImplementation "org.mockito:mockito-core:2.25.1"
-    testImplementation 'junit:junit:4.12'
-    testImplementation "org.robolectric:robolectric:$robolectricVersion"
+    api libraries.rxAndroid
+    api libraries.rxJava
+
+    implementation libraries.appcompat
+    implementation libraries.kotlin
+    implementation libraries.lifecycleExtensions
+
+    testImplementation testLibraries.junit
+    testImplementation testLibraries.mockito
+    testImplementation testLibraries.roboeletric
 }
 
 task coverage(type: JacocoReport, dependsOn: "testDebugUnitTest") {
