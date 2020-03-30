@@ -1,6 +1,7 @@
 package com.airbnb.mvrx.test
 
 import com.airbnb.mvrx.CoroutinesStateStore
+import com.airbnb.mvrx.MvRxTestOverrides
 import com.airbnb.mvrx.MvRxTestOverridesProxy
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.exceptions.CompositeException
@@ -11,6 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.rules.ExternalResource
 import kotlin.coroutines.CoroutineContext
@@ -32,27 +34,24 @@ class MvRxTestRule(
         private val immediateReducers: Boolean = true,
         private val setForceDisableLifecycleAwareObserver: Boolean = true
 ) : ExternalResource() {
-    private var defaultExceptionHandler: Thread.UncaughtExceptionHandler? = null
 
     @ExperimentalCoroutinesApi
     override fun before() {
-        if (immediateReducers) CoroutinesStateStore.scopeFactory = { CoroutineScope(TestCoroutineDispatcher()) }
         Dispatchers.setMain(TestCoroutineDispatcher())
 
         MvRxTestOverridesProxy.forceMvRxDebug(debugMode.value)
         MvRxTestOverridesProxy.forceDisableLifecycleAwareObserver(setForceDisableLifecycleAwareObserver)
-    }
-
-    override fun after() {
-        MvRxTestOverridesProxy.forceMvRxDebug(DebugMode.Unset.value)
         if (immediateReducers) {
-            CoroutinesStateStore.scopeFactory = null
+            MvRxTestOverridesProxy.forceSynchronousStateStores(true)
         }
     }
 
-    private fun clearRxImmediateSchedulers() {
-        Thread.setDefaultUncaughtExceptionHandler(defaultExceptionHandler)
-        defaultExceptionHandler = null
-        RxJavaPlugins.reset()
+    override fun after() {
+        Dispatchers.resetMain()
+
+        MvRxTestOverridesProxy.forceMvRxDebug(DebugMode.Unset.value)
+        if (immediateReducers) {
+            MvRxTestOverridesProxy.forceSynchronousStateStores(false)
+        }
     }
 }

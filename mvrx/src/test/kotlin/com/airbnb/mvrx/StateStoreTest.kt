@@ -21,7 +21,7 @@ class StateStoreTest : BaseTest() {
 
     @Test
     fun testGetRunsSynchronouslyForTests() {
-        val store = CoroutinesStateStore(MvRxStateStoreTestState(), TestCoroutineScope())
+        val store = CoroutinesStateStore(MvRxStateStoreTestState())
         var callCount = 0
         store.get { callCount++ }
         assertEquals(1, callCount)
@@ -29,7 +29,7 @@ class StateStoreTest : BaseTest() {
 
     @Test
     fun testSetState() {
-        val store = CoroutinesStateStore(MvRxStateStoreTestState(), TestCoroutineScope())
+        val store = CoroutinesStateStore(MvRxStateStoreTestState())
         store.set {
             copy(count = 2)
         }
@@ -44,7 +44,7 @@ class StateStoreTest : BaseTest() {
     @Test
     fun testSubscribeNotCalledForNoop() {
         val scope = TestCoroutineScope()
-        val store = CoroutinesStateStore(MvRxStateStoreTestState(), scope)
+        val store = CoroutinesStateStore(MvRxStateStoreTestState())
         var callCount = 0
         store.flow.onEach {
             callCount++
@@ -57,7 +57,7 @@ class StateStoreTest : BaseTest() {
     @Test
     fun testSubscribeNotCalledForSameValue() {
         val scope = TestCoroutineScope()
-        val store = CoroutinesStateStore(MvRxStateStoreTestState(), scope)
+        val store = CoroutinesStateStore(MvRxStateStoreTestState())
         var callCount = 0
         store.flow.onEach {
             callCount++

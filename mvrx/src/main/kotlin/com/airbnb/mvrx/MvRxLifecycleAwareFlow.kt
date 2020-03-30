@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 /**
  * Similar to LifecycleScope.launchWhenStarted but cancels the block when the owner is stopped.
- * This function suspends until the next time the owner is stopped.
+ * This function suspends until the next time the owner is started.
  */
 private suspend fun LifecycleOwner.launchWhenStartedAndCancelWhenStopped(block: suspend () -> Unit) {
     var parentJob = SupervisorJob()
@@ -24,10 +24,8 @@ private suspend fun LifecycleOwner.launchWhenStartedAndCancelWhenStopped(block: 
         override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
             when (event) {
                 Lifecycle.Event.ON_START -> lifecycleScope.launch(parentJob) { block() }
-                Lifecycle.Event.ON_STOP -> {
-                    lifecycle.removeObserver(this)
-                    parentJob.cancel()
-                }
+                Lifecycle.Event.ON_STOP -> parentJob.cancel()
+                Lifecycle.Event.ON_DESTROY -> lifecycle.removeObserver(this)
                 else -> Unit
             }
         }

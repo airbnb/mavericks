@@ -16,4 +16,6 @@ public class MvRxTestOverrides {
      * This is Java so it can be package private.
      */
     static Boolean FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER = false;
+
+    static boolean FORCE_SYNCHRONOUS_STATE_STORES = false;
 }

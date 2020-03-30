@@ -13,35 +13,72 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
-import java.util.concurrent.atomic.AtomicInteger
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-class CoroutinesStateStore<S : MvRxState>(
-    initialState: S,
-    private val scope: CoroutineScope = createCoroutineScope()
-) : MvRxStateStore<S> {
+class CoroutinesStateStore<S : MvRxState>(initialState: S) : MvRxStateStore<S> {
 
+    /** Channel that serves as a trigger to flush the setState and withState queues. */
+    private val flushQueuesChannel = Channel<Unit>(capacity = Channel.CONFLATED)
     private val setStateChannel = Channel<S.() -> S>(capacity = Channel.UNLIMITED)
     private val withStateChannel = Channel<(S) -> Unit>(capacity = Channel.UNLIMITED)
-    private val flushQueuesChannel = Channel<Unit>(capacity = Channel.CONFLATED)
 
     private val stateChannel = ConflatedBroadcastChannel<S>(initialState)
-    override val state: S get() = stateChannel.valueOrNull ?: error("There is no state yet! This should never happen.")
+    override val state: S
+        get() = stateChannel.valueOrNull
+                ?: error("There is no state yet! This should never happen.")
+
+    private val scope = CoroutineScope(Job())
 
     init {
-        scope.launch {
-            flushQueuesChannel.consumeEach {
-                while (!setStateChannel.isEmpty || !withStateChannel.isEmpty) {
-                    var reducer = setStateChannel.poll()
-                    while (reducer != null) {
-                        stateChannel.offer(state.reducer())
-                        reducer = setStateChannel.poll()
-                    }
+        setupTriggerFlushQueues()
+    }
 
-                    withStateChannel.poll()?.let { withStateBlock ->
-                        withStateBlock(state)
-                    }
-                }
+    /**
+     * Observe [flushQueuesChannel] and flush queues whenever there is a new item.
+     * This no-ops if [MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES] is set.
+     */
+    private fun setupTriggerFlushQueues() {
+        if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) return
+
+        val executor = Executors.newSingleThreadExecutor()
+        scope.coroutineContext[Job]!!.invokeOnCompletion {
+            executor.shutdownNow()
+        }
+
+        scope.launch(executor.asCoroutineDispatcher()) {
+            flushQueuesChannel.consumeEach {
+                flushQueues()
+            }
+        }
+    }
+
+    /**
+     * Flush the setState and withState queues.
+     * All pending setState reducers will be run prior to every single withState lambda.
+     * This ensures that situations such as the following will work correctly:
+     *
+     * Sitaution 1
+     *
+     * setState { ... }
+     * withState { ... }
+     *
+     * Sitaution 2
+     *
+     * withState {
+     *     setState { ... }
+     *     withState { ... }
+     * }
+     */
+    private fun flushQueues() {
+        while (!setStateChannel.isEmpty || !withStateChannel.isEmpty) {
+            var reducer = setStateChannel.poll()
+            while (reducer != null) {
+                stateChannel.offer(state.reducer())
+                reducer = setStateChannel.poll()
+            }
+
+            withStateChannel.poll()?.let { withStateBlock ->
+                withStateBlock(state)
             }
         }
     }
@@ -49,13 +86,21 @@ class CoroutinesStateStore<S : MvRxState>(
     override fun get(block: (S) -> Unit) {
         if (!scope.isActive) return
         withStateChannel.offer(block)
-        flushQueuesChannel.offer(Unit)
+        if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
+            flushQueues()
+        } else {
+            flushQueuesChannel.offer(Unit)
+        }
     }
 
     override fun set(stateReducer: S.() -> S) {
         if (!scope.isActive) return
         setStateChannel.offer(stateReducer)
-        flushQueuesChannel.offer(Unit)
+        if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
+            flushQueues()
+        } else {
+            flushQueuesChannel.offer(Unit)
+        }
     }
 
     override val flow: Flow<S> get() = stateChannel.asFlow().distinctUntilChanged()
@@ -65,21 +110,5 @@ class CoroutinesStateStore<S : MvRxState>(
         withStateChannel.cancel()
         flushQueuesChannel.cancel()
         stateChannel.cancel()
-    }
-
-    companion object {
-        private val threadCount = AtomicInteger(1)
-        private val defaultScopeFactory = {
-            val executor = Executors.newSingleThreadExecutor()
-            val job = Job()
-            job.invokeOnCompletion {
-                executor.shutdown()
-            }
-            CoroutineScope(executor.asCoroutineDispatcher() + job)
-        }
-
-        var scopeFactory: (() -> CoroutineScope)? = null
-
-        fun createCoroutineScope() = (scopeFactory ?: defaultScopeFactory).invoke()
     }
 }
