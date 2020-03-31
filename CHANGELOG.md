@@ -1,5 +1,8 @@
 # Change log
 
+## Version 2.0.0-beta4
+- FragmentViewModelContext now allows for custom ViewModelStoreOwner and/or SavedStateRegistry that are different from the fragment ones in FragmentViewModelContext.
+
 ## Version 2.0.0-beta3
 
 Changes since beta 2
