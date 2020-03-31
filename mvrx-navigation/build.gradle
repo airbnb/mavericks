@@ -1,0 +1,102 @@
+import com.airbnb.mvrx.JacocoReportTask
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'jacoco'
+apply plugin: 'com.vanniktech.maven.publish'
+
+android {
+    compileSdkVersion Versions.compileSdk
+    buildToolsVersion Versions.buildTools
+    resourcePrefix "mvrx_"
+
+    defaultConfig {
+        minSdkVersion Versions.minSdk
+        targetSdkVersion Versions.targetSdk
+        consumerProguardFiles "proguard-rules.pro"
+    }
+
+    lintOptions {
+        abortOnError true
+        textReport true
+        textOutput "stdout"
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+        test.res.srcDirs += 'src/test/res'
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+            all {
+                jacoco {
+                    includeNoLocationClasses = true
+                }
+            }
+        }
+    }
+}
+
+androidExtensions {
+    experimental = true
+}
+
+jacoco {
+    toolVersion = "0.8.2"
+}
+
+dependencies {
+
+    implementation project(":mvrx")
+    implementation project(":testing")
+    implementation Libraries.lifecycleCommon
+
+    testImplementation Libraries.rxAndroid
+    testImplementation TestLibraries.junit
+    testImplementation TestLibraries.mockito
+    testImplementation TestLibraries.roboeletric
+    testAnnotationProcessor "com.google.auto.service:auto-service:1.0-rc4"
+
+    // module specific dependencies that don't need to be shared via a common dependencies file.
+    def nav_version = "2.3.0"
+    api "androidx.navigation:navigation-fragment-ktx:$nav_version"
+    api "androidx.navigation:navigation-ui-ktx:$nav_version"
+
+    def fragment_version = "1.2.5"
+    testImplementation "androidx.fragment:fragment-ktx:$fragment_version"
+    testImplementation "androidx.fragment:fragment-testing:$fragment_version"
+}
+
+// Ensure custom source sets are included:
+// https://www.virag.si/2015/01/publishing-gradle-android-library-to-jcenter/
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+tasks.withType(Javadoc).all {
+    enabled = false
+}
+
+tasks.register("coverage", JacocoReportTask.class) {
+    coverage.dependsOn("testDebugUnitTest")
+}

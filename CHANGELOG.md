@@ -1,6 +1,16 @@
 # Change log
 ## Version 1.5.2
 - FragmentViewModelContext now allows for custom ViewModelStoreOwner and/or SavedStateRegistry that are different from the fragment ones in FragmentViewModelContext.
+- New: `navGraphViewModel(R.id.graph_action_id)` will create or return a navigation graph ViewModel
+- New: MvRxNavDirections an implementation of a NavDirections wraps the MvRx Fragment argument key for use in navigationController
+```kotlin
+MvRxNavDirections(
+   R.id.nav_action_idx,
+   title = "Fragment Nav Tile",
+   data = ViewModelX.Args(name = "name")
+)
+```
+
 ## Version 1.5.1
 - Fix incorrectly failing debug assertions for state class being a data class when a property has internal visibility
 

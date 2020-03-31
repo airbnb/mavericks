@@ -1,5 +1,6 @@
 // Libraries
 include ":mvrx"
+include ':mvrx-navigation'
 include ":testing"
 
 // Samples
