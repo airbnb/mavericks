@@ -2,6 +2,7 @@
 include ":mvrx"
 include ":mvrx-rxjava2"
 include ':mvrx-mocking'
+include ':mvrx-navigation'
 include ':launcher'
 include ":testing"
 
