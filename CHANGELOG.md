@@ -1,4 +1,6 @@
 # Change log
+## Version 1.5.2
+- FragmentViewModelContext now allows for custom ViewModelStoreOwner and/or SavedStateRegistry that are different from the fragment ones in FragmentViewModelContext.
 ## Version 1.5.1
 - Fix incorrectly failing debug assertions for state class being a data class when a property has internal visibility
 
