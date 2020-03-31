@@ -28,6 +28,7 @@ Now, it will run:
 - If your MvRxView/Fragment does not use any ViewModels, invalidate() will NOT be called in onStart(). In MvRx 1.x, invalidate would be called even if MvRx was not used at all. If you would like to maintain the original behavior, call `postInvalidate()` from onStart in your base Fragment class.
 - BaseMvRxViewModel no longer extends Jetpack ViewModel
 - viewModelScope is now a property on BaseMvRxViewModel, not the Jetpack extension function for ViewModel. Functionally, this is the same but the previous viewModelScope import will now be unused.
+- FragmentViewModelContext now allows for custom ViewModelStoreOwner and/or SavedStateRegistry that are different from the fragment ones in FragmentViewModelContext.
 
 ## Version 1.5.1
 - Fix incorrectly failing debug assertions for state class being a data class when a property has internal visibility
