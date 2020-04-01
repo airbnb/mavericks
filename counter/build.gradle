@@ -1,24 +1,25 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-android-extensions"
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
 
     defaultConfig {
-        applicationId "com.airbnb.mvrx.counter"
-        minSdkVersion 21
-        targetSdkVersion 28
+        applicationId 'com.airbnb.mvrx.counter'
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
         versionCode 1
-        versionName "1.0"
+        versionName '1.0'
     }
 
     signingConfigs {
         release {
-            storeFile file('counter.keystore')
-            storePassword 'counter'
-            keyAlias 'counter-release'
-            keyPassword 'counter'
+            storeFile file("counter.keystore")
+            storePassword "counter"
+            keyAlias "counter-release"
+            keyPassword "counter"
         }
     }
 
@@ -30,28 +31,28 @@ android {
             signingConfig signingConfigs.release
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.pro'
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-project.pro"
         }
     }
 
     compileOptions {
-        sourceCompatibility = 1.8
-        targetCompatibility = 1.8
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 }
 
 dependencies {
-    implementation project(':mvrx')
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    implementation "androidx.appcompat:appcompat:$appCompatVersion"
-    implementation "androidx.core:core-ktx:$androidXCoreKtxVersion"
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
-    implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
+    implementation libraries.appcompat
+    implementation libraries.constraintlayout
+    implementation libraries.coreKtx
+    implementation libraries.lifecycleExtensions
+    implementation libraries.kotlin
+    implementation project(":mvrx")
 
-    testImplementation 'junit:junit:4.12'
-    testImplementation project(':testing')
+    testImplementation testLibraries.junit
+    testImplementation project(":testing")
 }

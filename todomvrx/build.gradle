@@ -1,28 +1,29 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-android-extensions"
+apply plugin: "kotlin-kapt"
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
+
     defaultConfig {
         applicationId "com.airbnb.mvrx.todoapp"
-        minSdkVersion 21
-        targetSdkVersion 28
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
         versionCode 1
         versionName "0.0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-    buildToolsVersion "$buildToolsVersion"
 
     compileOptions {
-        sourceCompatibility = 1.8
-        targetCompatibility = 1.8
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 }
 
@@ -31,26 +32,27 @@ androidExtensions {
 }
 
 dependencies {
-    implementation project(':mvrx')
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    implementation("androidx.appcompat:appcompat:$appCompatVersion")
-    implementation("androidx.recyclerview:recyclerview:$recyclerViewVersion")
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
-    implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
-    implementation("com.airbnb.android:epoxy:$epoxyVersion") { exclude group: 'com.android.support' }
-    kapt "com.airbnb.android:epoxy-processor:$epoxyVersion"
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    implementation "io.reactivex.rxjava2:rxjava:2.2.8"
-    implementation "androidx.navigation:navigation-fragment-ktx:$navVersion"
-    implementation "androidx.navigation:navigation-ui-ktx:$navVersion"
-    implementation "androidx.room:room-runtime:$roomVersion"
-    implementation "androidx.room:room-rxjava2:$roomVersion"
-    kapt "androidx.room:room-compiler:$roomVersion"
-    implementation "androidx.test.espresso:espresso-idling-resource:$espressoVersion"
-    debugImplementation 'com.amitshekhar.android:debug-db:1.0.4'
+    kapt annotationProcessors.epoxy
+    kapt annotationProcessors.room
 
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0'
-    testImplementation project(':testing')
+    implementation libraries.appcompat
+    implementation libraries.constraintlayout
+    implementation (libraries.epoxy) { exclude group: "com.android.support" }
+    implementation libraries.espressoIdlingResource
+    implementation libraries.kotlin
+    implementation libraries.lifecycleExtensions
+    implementation libraries.navigationFragmentKtx
+    implementation libraries.navigationUiKtx
+    implementation libraries.recyclerview
+    implementation libraries.roomRuntime
+    implementation libraries.roomRxJava
+    implementation libraries.rxAndroid
+    implementation libraries.rxJava
+    implementation project(":mvrx")
+
+    debugImplementation libraries.debugDb
+
+    testImplementation testLibraries.junit
+    testImplementation testLibraries.mockitoKotlin
+    testImplementation project(":testing")
 }

@@ -1,15 +1,16 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-kapt"
+apply plugin: "kotlin-android-extensions"
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
 
     defaultConfig {
         applicationId "com.airbnb.mvrx.dogs"
-        minSdkVersion 21
-        targetSdkVersion 28
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
         versionCode 1
         versionName "1.0"
     }
@@ -24,23 +25,23 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 }
 
 dependencies {
-    implementation project(':mvrx')
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    implementation "androidx.appcompat:appcompat:$appCompatVersion"
-    implementation "androidx.core:core-ktx:$androidXCoreKtxVersion"
-    implementation 'androidx.cardview:cardview:1.0.0'
-    implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
-    implementation "androidx.navigation:navigation-fragment-ktx:$navVersion"
-    implementation "androidx.navigation:navigation-ui-ktx:$navVersion"
-    implementation("com.airbnb.android:epoxy:$epoxyVersion") { exclude group: 'com.android.support' }
-    implementation 'com.squareup.picasso:picasso:2.5.2'
-    implementation 'com.airbnb.android:lottie:3.0.0'
+    implementation libraries.appcompat
+    implementation libraries.cardview
+    implementation libraries.constraintlayout
+    implementation libraries.coreKtx
+    implementation (libraries.epoxy) { exclude group: "com.android.support" }
+    implementation libraries.kotlin
+    implementation libraries.lottie
+    implementation libraries.navigationFragmentKtx
+    implementation libraries.navigationUiKtx
+    implementation libraries.picasso
+    implementation project(":mvrx")
 
-    testImplementation 'junit:junit:4.12'
-    testImplementation project(':testing')
+    testImplementation testLibraries.junit
+    testImplementation project(":testing")
 }
