@@ -1,8 +1,8 @@
 package com.airbnb.mvrx
 
+import androidx.annotation.RestrictTo
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.annotation.RestrictTo
 import java.lang.IllegalStateException
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)

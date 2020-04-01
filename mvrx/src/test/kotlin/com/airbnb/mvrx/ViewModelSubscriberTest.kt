@@ -13,16 +13,16 @@ import org.junit.Before
 import org.junit.Test
 
 data class ViewModelTestState(
-        val foo: Int = 0,
-        val bar: Int = 0,
-        val bam: Int = 0,
-        val list: List<Int> = emptyList(),
+    val foo: Int = 0,
+    val bar: Int = 0,
+    val bam: Int = 0,
+    val list: List<Int> = emptyList(),
         // for Single and Observable tests
-        val async: Async<String> = Uninitialized,
+    val async: Async<String> = Uninitialized,
         // for Completable tests
-        val asyncUnit: Async<Unit> = Uninitialized,
-        val prop6: Int = 0,
-        val prop7: Int = 0
+    val asyncUnit: Async<Unit> = Uninitialized,
+    val prop6: Int = 0,
+    val prop7: Int = 0
 ) : MvRxState
 
 class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewModel<ViewModelTestState>(initialState) {
@@ -198,7 +198,6 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewMod
         }
         Observable.just("Hello World").execute(mapper = { "$it!" }) { copy(async = it) }
         assertEquals(3, callCount)
-
     }
 }
 
@@ -289,7 +288,6 @@ class ViewModelSubscriberTest : BaseTest() {
         viewModel.set { copy(list = listOf(1, 2, 3)) }
         assertEquals(5, callCount)
     }
-
 
     @Test
     fun testSelectSubscribe5External() {
@@ -735,6 +733,5 @@ class ViewModelSubscriberTest : BaseTest() {
 
         viewModel.set { copy() }
         assertEquals(1, callCount)
-
     }
 }

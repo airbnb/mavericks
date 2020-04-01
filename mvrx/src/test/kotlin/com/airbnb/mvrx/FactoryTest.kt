@@ -10,7 +10,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.robolectric.Robolectric
-import java.lang.reflect.InvocationTargetException
 
 private data class FactoryState(val greeting: String = "") : MvRxState {
     constructor(args: TestArgs) : this("${args.greeting} constructor")
@@ -107,7 +106,6 @@ class FactoryViewModelTest : BaseTest() {
                     else -> TestFactoryViewModel(state, 5L)
                 }
             }
-
         }
     }
 
@@ -214,7 +212,6 @@ class FactoryStateTest : BaseTest() {
                     is FragmentViewModelContext -> FactoryState("${viewModelContext.fragment.arguments?.getString("greeting")!!} and ${viewModelContext.args<TestArgs>().greeting} factory")
                     else -> FactoryState("${viewModelContext.args<TestArgs>().greeting} factory")
                 }
-
             }
         }
     }
@@ -326,5 +323,4 @@ class FactoryViewModelAndStateTest : BaseTest() {
         }
         assertEquals(5, viewModel.otherProp)
     }
-
 }

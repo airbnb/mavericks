@@ -2,7 +2,9 @@ package com.airbnb.mvrx
 
 import com.airbnb.mvrx.Async.Companion.getMetadata
 import com.airbnb.mvrx.Async.Companion.setMetadata
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 
 class AsyncTest : BaseTest() {
