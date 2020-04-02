@@ -2,11 +2,11 @@
 
 package com.airbnb.mvrx
 
+import androidx.annotation.RestrictTo
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.OnLifecycleEvent
-import androidx.annotation.RestrictTo
 import java.io.Serializable
 
 private object UninitializedValue

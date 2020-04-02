@@ -3,6 +3,7 @@ package com.airbnb.mvrx
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.fragment.app.FragmentActivity
+import java.lang.IllegalStateException
 import kotlinx.android.parcel.Parcelize
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -11,7 +12,6 @@ import org.junit.Test
 import org.junit.rules.ExpectedException
 import org.robolectric.Robolectric
 import org.robolectric.android.controller.ActivityController
-import java.lang.IllegalStateException
 
 @Parcelize
 data class MvRxTestArgs(val initialCount: Int = 1) : Parcelable
