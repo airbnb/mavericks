@@ -73,7 +73,7 @@ ext {
             koin                  : "org.koin:koin-android:${versions.koin}",
             kotlin                : "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}",
             kotlinReflect         : "org.jetbrains.kotlin:kotlin-reflect:${versions.kotlin}",
-            lifecycleExtensions   : "androidx.lifecycle:lifecycle-extensions:${versions.lifecycle}",
+            lifecycleCommon       : "androidx.lifecycle:lifecycle-common-java8:${versions.lifecycle}",
             lottie                : "com.airbnb.android:lottie:${versions.lottie}",
             moshi                 : "com.squareup.moshi:moshi:${versions.moshi}",
             multidex              : "androidx.multidex:multidex:${versions.multidex}",

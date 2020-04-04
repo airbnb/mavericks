@@ -49,7 +49,7 @@ dependencies {
     implementation libraries.appcompat
     implementation libraries.constraintlayout
     implementation libraries.coreKtx
-    implementation libraries.lifecycleExtensions
+    implementation libraries.lifecycleCommon
     implementation libraries.kotlin
     implementation project(":mvrx")
 

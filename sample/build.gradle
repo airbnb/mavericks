@@ -49,7 +49,7 @@ dependencies {
     implementation (libraries.epoxy) { exclude group: "com.android.support" }
     implementation libraries.koin
     implementation libraries.kotlin
-    implementation libraries.lifecycleExtensions
+    implementation libraries.lifecycleCommon
     implementation libraries.moshi
     implementation libraries.moshiKotlin
     implementation libraries.multidex

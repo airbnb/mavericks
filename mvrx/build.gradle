@@ -64,7 +64,7 @@ dependencies {
 
     implementation libraries.appcompat
     implementation libraries.kotlin
-    implementation libraries.lifecycleExtensions
+    implementation libraries.lifecycleCommon
 
     testImplementation testLibraries.junit
     testImplementation testLibraries.mockito
