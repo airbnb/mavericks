@@ -4,13 +4,9 @@ apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
 
 android {
-    compileSdkVersion versions.compileSdk
-    buildToolsVersion versions.buildTools
 
     defaultConfig {
         applicationId "com.airbnb.sample"
-        minSdkVersion versions.minSdk
-        targetSdkVersion versions.targetSdk
         multiDexEnabled true
         versionCode 1
         versionName "0.0.1"
@@ -25,43 +21,30 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-project.pro"
         }
     }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-    }
 }
 
-androidExtensions {
-    experimental = true
-}
 
 dependencies {
-    kapt annotationProcessors.epoxy
-    kapt annotationProcessors.moshi
+    kapt AnnotationProcessors.epoxy
+    kapt AnnotationProcessors.moshi
 
-    implementation libraries.appcompat
-    implementation libraries.constraintlayout
-    implementation (libraries.epoxy) { exclude group: "com.android.support" }
-    implementation libraries.koin
-    implementation libraries.kotlin
-    implementation libraries.lifecycleCommon
-    implementation libraries.moshi
-    implementation libraries.moshiKotlin
-    implementation libraries.multidex
-    implementation libraries.navigationFragmentKtx
-    implementation libraries.navigationUiKtx
-    implementation libraries.recyclerview
-    implementation libraries.retrofit
-    implementation libraries.retrofitMoshi
-    implementation libraries.retrofitRxJava
-    implementation libraries.rxAndroid
-    implementation libraries.rxJava
+    implementation Libraries.appcompat
+    implementation Libraries.constraintlayout
+    implementation (Libraries.epoxy) { exclude group: "com.android.support" }
+    implementation Libraries.koin
+    implementation Libraries.lifecycleCommon
+    implementation Libraries.moshi
+    implementation Libraries.moshiKotlin
+    implementation Libraries.multidex
+    implementation Libraries.navigationFragmentKtx
+    implementation Libraries.navigationUiKtx
+    implementation Libraries.recyclerview
+    implementation Libraries.retrofit
+    implementation Libraries.retrofitMoshi
+    implementation Libraries.retrofitRxJava
+    implementation Libraries.rxAndroid
+    implementation Libraries.rxJava
     implementation project(":mvrx")
 
-    testImplementation testLibraries.junit
+    testImplementation TestLibraries.junit
 }
