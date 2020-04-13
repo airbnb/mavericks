@@ -27,6 +27,10 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+
     sourceSets {
         main.java.srcDirs += "src/main/kotlin"
         test.java.srcDirs += "src/test/kotlin"
@@ -60,7 +64,7 @@ dependencies {
 
     implementation libraries.appcompat
     implementation libraries.kotlin
-    implementation libraries.lifecycleExtensions
+    implementation libraries.lifecycleCommon
 
     testImplementation testLibraries.junit
     testImplementation testLibraries.mockito

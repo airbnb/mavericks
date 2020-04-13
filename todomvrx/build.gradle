@@ -40,7 +40,7 @@ dependencies {
     implementation (libraries.epoxy) { exclude group: "com.android.support" }
     implementation libraries.espressoIdlingResource
     implementation libraries.kotlin
-    implementation libraries.lifecycleExtensions
+    implementation libraries.lifecycleCommon
     implementation libraries.navigationFragmentKtx
     implementation libraries.navigationUiKtx
     implementation libraries.recyclerview
