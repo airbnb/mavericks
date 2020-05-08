@@ -6,6 +6,13 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.savedstate.SavedStateRegistryOwner
 
+/**
+ * A class that allows for delegation of lifecycle and process death semantics to an external
+ * [owner], and the invalidation of the view to a generic [onInvalidated] function.
+ *
+ * This is most useful in cases where inheriting from BaseMvRxFragment is
+ * unfeasible, undesirable, or for composing with a custom view.
+ */
 class DelegateMvRxView(
         private val owner: SavedStateRegistryOwner,
         private val onInvalidated: () -> Unit
