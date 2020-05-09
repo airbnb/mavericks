@@ -12,7 +12,10 @@ import java.util.Arrays
 sealed class Async<out T>(val complete: Boolean, val shouldLoad: Boolean, private val value: T?) {
 
     /**
-     * Returns the Success value or null.
+     * Returns the value or null.
+     *
+     * Success always have a value. Loading and Fail can also return a value which is useful for
+     * pagination or progressive data loading.
      *
      * Can be invoked as an operator like: `yourProp()`
      */
