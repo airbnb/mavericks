@@ -8,6 +8,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.isActive
@@ -22,10 +23,8 @@ class CoroutinesStateStore<S : MvRxState>(initialState: S) : MvRxStateStore<S> {
     private val setStateChannel = Channel<S.() -> S>(capacity = Channel.UNLIMITED)
     private val withStateChannel = Channel<(S) -> Unit>(capacity = Channel.UNLIMITED)
 
-    private val stateChannel = ConflatedBroadcastChannel<S>(initialState)
-    override val state: S
-        get() = stateChannel.valueOrNull
-                ?: error("There is no state yet! This should never happen.")
+    private val stateFlow = MutableStateFlow(initialState)
+    override val state: S get() = stateFlow.value
 
     private val scope = CoroutineScope(Job())
 
@@ -73,7 +72,7 @@ class CoroutinesStateStore<S : MvRxState>(initialState: S) : MvRxStateStore<S> {
         while (!setStateChannel.isEmpty || !withStateChannel.isEmpty) {
             var reducer = setStateChannel.poll()
             while (reducer != null) {
-                stateChannel.offer(state.reducer())
+                stateFlow.value = state.reducer()
                 reducer = setStateChannel.poll()
             }
 
@@ -103,12 +102,11 @@ class CoroutinesStateStore<S : MvRxState>(initialState: S) : MvRxStateStore<S> {
         }
     }
 
-    override val flow: Flow<S> get() = stateChannel.asFlow().distinctUntilChanged()
+    override val flow: Flow<S> get() = stateFlow
 
     override fun cancel() {
         scope.cancel()
         withStateChannel.cancel()
         flushQueuesChannel.cancel()
-        stateChannel.cancel()
     }
 }
