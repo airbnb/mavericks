@@ -9,14 +9,14 @@ import java.util.Arrays
  * Complete: Success, Fail
  * ShouldLoad: Uninitialized, Fail
  */
-sealed class Async<out T>(val complete: Boolean, val shouldLoad: Boolean, private val invokeValue: T?) {
+sealed class Async<out T>(val complete: Boolean, val shouldLoad: Boolean, private val value: T?) {
 
     /**
      * Returns the Success value or null.
      *
      * Can be invoked as an operator like: `yourProp()`
      */
-    open operator fun invoke(): T? = invokeValue
+    open operator fun invoke(): T? = value
 
     companion object {
         /**
@@ -36,15 +36,17 @@ sealed class Async<out T>(val complete: Boolean, val shouldLoad: Boolean, privat
     }
 }
 
-object Uninitialized : Async<Nothing>(complete = false, shouldLoad = true, invokeValue = null), Incomplete
+object Uninitialized : Async<Nothing>(complete = false, shouldLoad = true, value = null), Incomplete
 
-class Loading<out T>(value: T? = null) : Async<T>(complete = false, shouldLoad = false, invokeValue = value), Incomplete {
+class Loading<out T>(value: T? = null) : Async<T>(complete = false, shouldLoad = false, value = value), Incomplete {
     override fun equals(other: Any?) = other is Loading<*>
 
     override fun hashCode() = "Loading".hashCode()
 }
 
-data class Success<out T>(private val value: T) : Async<T>(complete = true, shouldLoad = false, invokeValue = value) {
+class Success<out T>(value: T) : Async<T>(complete = true, shouldLoad = false, value = value) {
+
+    override fun invoke(): T = super.invoke() as T
 
     /**
      * Optional information about the value.
@@ -60,7 +62,7 @@ data class Success<out T>(private val value: T) : Async<T>(complete = true, shou
     internal var metadata: Any? = null
 }
 
-data class Fail<out T>(val error: Throwable, private val value: T? = null) : Async<T>(complete = true, shouldLoad = true, invokeValue = value) {
+data class Fail<out T>(val error: Throwable, private val value: T? = null) : Async<T>(complete = true, shouldLoad = true, value = value) {
     override fun equals(other: Any?): Boolean {
         if (other !is Fail<*>) return false
 
