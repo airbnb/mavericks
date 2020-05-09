@@ -1,17 +1,21 @@
 package com.airbnb.mvrx
 
-import kotlinx.coroutines.cancelChildren
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.produce
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onEmpty
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.runBlockingTest
-import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.Test
 
 data class MvRxStateStoreTestState(val count: Int = 1, val list: List<Int> = emptyList()) : MvRxState
@@ -65,5 +69,32 @@ class StateStoreTest : BaseTest() {
         assertEquals(1, callCount)
         store.set { copy() }
         assertEquals(1, callCount)
+    }
+
+    @Test
+    fun testStateFlowReceivesAllStates() = runBlockingTest {
+        val store = CoroutinesStateStore(MvRxStateStoreTestState(), this)
+        val receivedValues = mutableListOf<Int>()
+        val subscribeJob = store.flow.onEach {
+            println("received count=${it.count}")
+            receivedValues += it.count
+            delay(1000)
+        }.launchIn(this)
+        (2..6).forEach {
+            println("send count=$it")
+            store.set { copy(count = it) }
+        }
+        delay(6000)
+        assertEquals(listOf(1, 2, 3, 4, 5, 6), receivedValues)
+        subscribeJob.cancel()
+    }
+
+    @Test
+    fun testScope() = runBlockingTest {
+        val store = CoroutinesStateStore(MvRxStateStoreTestState(), this)
+        val job = store.flow.onEach {
+            println("it")
+        }.launchIn(this)
+        job.cancel()
     }
 }

@@ -35,9 +35,10 @@ import kotlin.reflect.KProperty1
 abstract class BaseMvRxViewModel<S : MvRxState>(
     initialState: S,
     debugMode: Boolean,
-    private val stateStore: MvRxStateStore<S> = CoroutinesStateStore(initialState)
+    stateStoreOveride: MvRxStateStore<S>? = null
 ) : ViewModel() {
     private val debugMode = if (MvRxTestOverrides.FORCE_DEBUG == null) debugMode else MvRxTestOverrides.FORCE_DEBUG
+    private val stateStore = stateStoreOveride ?: CoroutinesStateStore(initialState, viewModelScope)
 
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
@@ -75,7 +76,6 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     override fun onCleared() {
         super.onCleared()
         disposables.dispose()
-        stateStore.cancel()
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
     }
 

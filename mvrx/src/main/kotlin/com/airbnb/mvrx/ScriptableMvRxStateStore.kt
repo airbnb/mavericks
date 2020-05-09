@@ -28,8 +28,5 @@ class ScriptableMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
         // No-op set the state via next
     }
 
-    override fun cancel() {
-    }
-
     fun next(state: S) = channel.offer(state)
 }

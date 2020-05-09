@@ -3,20 +3,20 @@ package com.airbnb.mvrx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-class CoroutinesStateStore<S : MvRxState>(initialState: S) : MvRxStateStore<S> {
+class CoroutinesStateStore<S : MvRxState>(
+        initialState: S,
+        private val scope: CoroutineScope = CoroutineScope(Job())
+) : MvRxStateStore<S> {
 
     /** Channel that serves as a trigger to flush the setState and withState queues. */
     private val flushQueuesChannel = Channel<Unit>(capacity = Channel.CONFLATED)
@@ -25,11 +25,17 @@ class CoroutinesStateStore<S : MvRxState>(initialState: S) : MvRxStateStore<S> {
 
     private val stateFlow = MutableStateFlow(initialState)
     override val state: S get() = stateFlow.value
-
-    private val scope = CoroutineScope(Job())
+    // Buffer will ensure that subscribers gets all intermediate states even if they are slower
+    // then new states are published. 50 is an arbitrary number.
+    override val flow: Flow<S> get() = stateFlow.buffer(50)
 
     init {
         setupTriggerFlushQueues()
+        scope.coroutineContext[Job]?.invokeOnCompletion {
+            flushQueuesChannel.close()
+            setStateChannel.close()
+            withStateChannel.close()
+        }
     }
 
     /**
@@ -100,13 +106,5 @@ class CoroutinesStateStore<S : MvRxState>(initialState: S) : MvRxStateStore<S> {
         } else {
             flushQueuesChannel.offer(Unit)
         }
-    }
-
-    override val flow: Flow<S> get() = stateFlow
-
-    override fun cancel() {
-        scope.cancel()
-        withStateChannel.cancel()
-        flushQueuesChannel.cancel()
     }
 }
