@@ -42,7 +42,7 @@ data class Loading<out T>(private val value: T? = null) : Async<T>(complete = fa
 
 data class Success<out T>(private val value: T) : Async<T>(complete = true, shouldLoad = false, value = value) {
 
-    override fun invoke(): T = super.invoke() as T
+    override operator fun invoke(): T = value
 
     /**
      * Optional information about the value.
