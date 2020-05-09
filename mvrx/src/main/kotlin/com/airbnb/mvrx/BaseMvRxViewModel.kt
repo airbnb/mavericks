@@ -35,7 +35,6 @@ import kotlin.reflect.KProperty1
  *
  * All subsequent ViewModels in your app should use that one.
  */
-@Suppress("EXPERIMENTAL_API_USAGE")
 abstract class BaseMvRxViewModel<S : MvRxState>(
     initialState: S,
     debugMode: Boolean,
@@ -63,10 +62,30 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     private val lifecycleOwner: LifecycleOwner = LifecycleOwner { lifecycleRegistry }
     private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(lifecycleOwner).apply { currentState = Lifecycle.State.RESUMED }
 
+    /**
+     * Synchronous access to state is not exposed externally because there is no guarantee that
+     * all setState reducers have run yet.
+     */
     internal val state: S
         get() = stateStore.state
 
+    /**
+     * Return the current state as a Flow. For certain situations, this may be more convenient
+     * than subscribe and selectSubscribe becaause it can easily be composed with other
+     * coroutines operations and chained with operatorss.
+     */
     val stateFlow: Flow<S>
+        get() = stateStore.flow
+
+    /**
+     * Like [bufferedStateFlow] except the result is buffered with 10 slots. Use this if you want higher
+     * confidence that you will be able to receive all events even if the consumere is temporarily
+     * slower than the producer.
+     *
+     * Use this for things like analytics where all states are important.
+     * Use the non-buffered version for states related to the UI.
+     */
+    val bufferedStateFlow: Flow<S>
         get() = stateStore.flow.buffer(10)
 
     init {
@@ -237,7 +256,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * For ViewModels that want to subscribe to itself.
      */
     protected fun subscribe(subscriber: (S) -> Unit) =
-        stateFlow.subscribeLifecycle(null, RedeliverOnStart, subscriber)
+        bufferedStateFlow.subscribeLifecycle(null, RedeliverOnStart, subscriber)
 
     /**
      * For ViewModels that want to subscribe to another ViewModel.
@@ -252,7 +271,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun subscribe(owner: LifecycleOwner, deliveryMode: DeliveryMode = RedeliverOnStart, subscriber: (S) -> Unit) =
-        stateFlow.subscribeLifecycle(owner, deliveryMode, subscriber)
+        bufferedStateFlow.subscribeLifecycle(owner, deliveryMode, subscriber)
 
     /**
      * Subscribe to state changes for only a single property.
@@ -287,7 +306,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop1: KProperty1<S, A>,
         deliveryMode: DeliveryMode,
         subscriber: (A) -> Unit
-    ) = stateFlow
+    ) = bufferedStateFlow
         .map { MvRxTuple1(prop1.get(it)) }
         .distinctUntilChanged()
         .subscribeLifecycle(owner, deliveryMode.appendPropertiesToId(prop1)) { (a) -> subscriber(a) }
@@ -376,7 +395,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop2: KProperty1<S, B>,
         deliveryMode: DeliveryMode,
         subscriber: (A, B) -> Unit
-    ) = stateFlow
+    ) = bufferedStateFlow
         .map { MvRxTuple2(prop1.get(it), prop2.get(it)) }
         .distinctUntilChanged()
         .subscribeLifecycle(owner, deliveryMode.appendPropertiesToId(prop1, prop2)) { (a, b) -> subscriber(a, b) }
@@ -422,7 +441,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop3: KProperty1<S, C>,
         deliveryMode: DeliveryMode,
         subscriber: (A, B, C) -> Unit
-    ) = stateFlow
+    ) = bufferedStateFlow
         .map { MvRxTuple3(prop1.get(it), prop2.get(it), prop3.get(it)) }
         .distinctUntilChanged()
         .subscribeLifecycle(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3)) { (a, b, c) ->
@@ -478,7 +497,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop4: KProperty1<S, D>,
         deliveryMode: DeliveryMode,
         subscriber: (A, B, C, D) -> Unit
-    ) = stateFlow
+    ) = bufferedStateFlow
         .map { MvRxTuple4(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it)) }
         .distinctUntilChanged()
         .subscribeLifecycle(
@@ -535,7 +554,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop5: KProperty1<S, E>,
         deliveryMode: DeliveryMode,
         subscriber: (A, B, C, D, E) -> Unit
-    ) = stateFlow
+    ) = bufferedStateFlow
         .map { MvRxTuple5(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it)) }
         .distinctUntilChanged()
         .subscribeLifecycle(
@@ -596,7 +615,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop6: KProperty1<S, F>,
         deliveryMode: DeliveryMode,
         subscriber: (A, B, C, D, E, F) -> Unit
-    ) = stateFlow
+    ) = bufferedStateFlow
         .map { MvRxTuple6(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it), prop6.get(it)) }
         .distinctUntilChanged()
         .subscribeLifecycle(
@@ -661,7 +680,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop7: KProperty1<S, G>,
         deliveryMode: DeliveryMode,
         subscriber: (A, B, C, D, E, F, G) -> Unit
-    ) = stateFlow
+    ) = bufferedStateFlow
         .map { state ->
             MvRxTuple7(
                 prop1.get(state),

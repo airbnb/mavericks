@@ -1,10 +1,6 @@
 package com.airbnb.mvrx
 
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Test
-import java.lang.IllegalStateException
 
 data class StateWithMutableMap(val map: MutableMap<String, String> = mutableMapOf()) : MvRxState
 data class StateWithImmutableMap(val map: Map<String, String> = mapOf()) : MvRxState
@@ -20,10 +16,7 @@ class MutableStateValidationTest : BaseTest() {
                 val myMap = withState(this) { it.map }
                 myMap["foo"] = "bar"
 
-                setState {
-                    println("in setState")
-                    copy(map = myMap)
-                }
+                setState { copy(map = myMap) }
             }
         }
         ViewModel(StateWithMutableMap()).addKeyToMap()

@@ -1,7 +1,6 @@
 package com.airbnb.mvrx
 
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
@@ -11,7 +10,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -403,12 +401,12 @@ class ViewModelSubscriberTest : BaseTest() {
     @Test
     fun testChangingBar() {
         viewModel.setBar(1)
-//        assertEquals(2, viewModel.subscribeCallCount)
+        assertEquals(2, viewModel.subscribeCallCount)
         assertEquals(1, viewModel.selectSubscribe1Called)
-//        assertEquals(2, viewModel.selectSubscribe2Called)
-//        assertEquals(2, viewModel.selectSubscribe3Called)
-//        assertEquals(0, viewModel.onSuccessCalled)
-//        assertEquals(0, viewModel.onFailCalled)
+        assertEquals(2, viewModel.selectSubscribe2Called)
+        assertEquals(2, viewModel.selectSubscribe3Called)
+        assertEquals(0, viewModel.onSuccessCalled)
+        assertEquals(0, viewModel.onFailCalled)
     }
 
     @Test
@@ -746,7 +744,7 @@ class ViewModelSubscriberTest : BaseTest() {
     @Test
     fun testStateFlowReceivesAllStates() = runBlockingTest {
         val receivedValues = mutableListOf<Int>()
-        val subscribeJob = viewModel.stateFlow.onEach {
+        val subscribeJob = viewModel.bufferedStateFlow.onEach {
             println("received count=${it.foo}")
             receivedValues += it.foo
             delay(1000)
