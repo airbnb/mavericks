@@ -489,8 +489,8 @@ class FragmentSubscriberTest : BaseTest() {
         override fun invalidate() { }
     }
 
-    @Test(expected = IllegalStateException::class)
-    fun duplicateUniqueOnlySubscribeThrowIllegalStateException() {
+    @Test(expected = RuntimeException::class)
+    fun duplicateUniqueOnlySubscribeCrashes() {
         createFragment<DuplicateUniqueSubscriberFragment, TestActivity>(containerId = CONTAINER_ID)
     }
 

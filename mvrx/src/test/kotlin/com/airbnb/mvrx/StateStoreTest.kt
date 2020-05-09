@@ -72,24 +72,6 @@ class StateStoreTest : BaseTest() {
     }
 
     @Test
-    fun testStateFlowReceivesAllStates() = runBlockingTest {
-        val store = CoroutinesStateStore(MvRxStateStoreTestState(), this)
-        val receivedValues = mutableListOf<Int>()
-        val subscribeJob = store.flow.onEach {
-            println("received count=${it.count}")
-            receivedValues += it.count
-            delay(1000)
-        }.launchIn(this)
-        (2..6).forEach {
-            println("send count=$it")
-            store.set { copy(count = it) }
-        }
-        delay(6000)
-        assertEquals(listOf(1, 2, 3, 4, 5, 6), receivedValues)
-        subscribeJob.cancel()
-    }
-
-    @Test
     fun testScope() = runBlockingTest {
         val store = CoroutinesStateStore(MvRxStateStoreTestState(), this)
         val job = store.flow.onEach {

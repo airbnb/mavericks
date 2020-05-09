@@ -3,66 +3,31 @@
 package com.airbnb.mvrx
 
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancelFutureOnCompletion
-import kotlinx.coroutines.channels.Channel
+import androidx.lifecycle.OnLifecycleEvent
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.transform
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combineTransform
 
 /**
- * Similar to LifecycleScope.launchWhenStarted but cancels the block when the owner is stopped.
- * This function suspends until the next time the owner is started.
+ * Emits values from the source flow only when the owner is started.
+ * When the owner transitions to started, the most recent value will be emitted.
  */
-private suspend fun LifecycleOwner.launchWhenStartedAndCancelWhenStopped(block: suspend () -> Unit) {
-    var parentJob = SupervisorJob()
-    lifecycle.addObserver(object : LifecycleEventObserver {
-        override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-            when (event) {
-                Lifecycle.Event.ON_START -> lifecycleScope.launch(parentJob) { block() }
-                Lifecycle.Event.ON_STOP -> parentJob.cancel()
-                Lifecycle.Event.ON_DESTROY -> lifecycle.removeObserver(this)
-                else -> Unit
-            }
+fun <T : Any> Flow<T>.flowWhenStarted(owner: LifecycleOwner): Flow<T> {
+    val startedFlow = MutableStateFlow(false)
+    owner.lifecycle.addObserver(object : LifecycleObserver {
+        @OnLifecycleEvent(Lifecycle.Event.ON_START)
+        fun onStart() {
+            startedFlow.value = true
+        }
+
+        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+        fun onStop() {
+            startedFlow.value = false
         }
     })
-    return parentJob.join()
-}
-
-/**
- * Transforms a [Flow] into a new one that only emits when the lifecycle owner is started.
- *
- * The behavior when the owner transitions back to start can be specified by [deliveryMode].
- */
-fun <T : Any> Flow<T>.flowWhenStarted(
-        owner: LifecycleOwner,
-        deliveryMode: DeliveryMode = RedeliverOnStart,
-        lastDeliveredValueFromPriorObserver: T? = null
-): Flow<T> = channelFlow {
-    val stateChannel = Channel<T>(capacity = Channel.CONFLATED)
-    invokeOnClose { stateChannel.close() }
-    onEach(stateChannel::send).launchIn(owner.lifecycleScope)
-
-    var lastDeliveredItem: T? = lastDeliveredValueFromPriorObserver
-    while (true) {
-        owner.launchWhenStartedAndCancelWhenStopped {
-            when (deliveryMode) {
-                RedeliverOnStart -> stateChannel.poll() ?: lastDeliveredItem
-                is UniqueOnly -> stateChannel.poll()?.takeIf { it != lastDeliveredItem }
-            }?.let(stateChannel::offer)
-
-            while (true) {
-                val item = stateChannel.receive()
-                send(item)
-                lastDeliveredItem = item
-            }
-        }
+    return combineTransform<T, Boolean, T>(startedFlow) { value, started ->
+        if (started) emit(value)
     }
 }

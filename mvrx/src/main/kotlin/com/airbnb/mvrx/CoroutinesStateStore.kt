@@ -5,19 +5,16 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.buffer
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 class CoroutinesStateStore<S : MvRxState>(
-        initialState: S,
-        private val scope: CoroutineScope = CoroutineScope(Job())
+    initialState: S,
+    private val scope: CoroutineScope = CoroutineScope(Job())
 ) : MvRxStateStore<S> {
 
     /** Channel that serves as a trigger to flush the setState and withState queues. */
