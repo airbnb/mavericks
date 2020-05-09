@@ -1,8 +1,7 @@
 package com.airbnb.mvrx
 
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * A [MvRxStateStore] which ignores standard calls to [set]. Instead it can be scripted via calls to
@@ -13,12 +12,12 @@ import kotlinx.coroutines.flow.asFlow
 @Suppress("EXPERIMENTAL_API_USAGE")
 class ScriptableMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
 
-    private val channel = ConflatedBroadcastChannel<S>(initialState)
+    private val stateFlow = MutableStateFlow(initialState)
 
-    override val flow: Flow<S> get() = channel.asFlow()
+    override val flow: StateFlow<S> = stateFlow
 
     override val state: S
-        get() = channel.value
+        get() = stateFlow.value
 
     override fun get(block: (S) -> Unit) {
         block(state)
@@ -28,5 +27,7 @@ class ScriptableMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
         // No-op set the state via next
     }
 
-    fun next(state: S) = channel.offer(state)
+    fun next(state: S) {
+        stateFlow.value = state
+    }
 }

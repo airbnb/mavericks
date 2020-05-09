@@ -7,7 +7,9 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
@@ -27,7 +29,7 @@ class CoroutinesStateStore<S : MvRxState>(
     override val state: S get() = stateFlow.value
     // Buffer will ensure that subscribers gets all intermediate states even if they are slower
     // then new states are published. 50 is an arbitrary number.
-    override val flow: Flow<S> get() = stateFlow.buffer(50)
+    override val flow: StateFlow<S> get() = stateFlow
 
     init {
         setupTriggerFlushQueues()

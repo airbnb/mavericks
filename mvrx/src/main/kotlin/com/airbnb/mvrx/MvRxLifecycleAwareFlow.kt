@@ -7,11 +7,14 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelFutureOnCompletion
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
 
 /**
@@ -39,19 +42,17 @@ private suspend fun LifecycleOwner.launchWhenStartedAndCancelWhenStopped(block: 
  * The behavior when the owner transitions back to start can be specified by [deliveryMode].
  */
 fun <T : Any> Flow<T>.flowWhenStarted(
-    owner: LifecycleOwner,
-    deliveryMode: DeliveryMode = RedeliverOnStart,
-    lastDeliveredValueFromPriorObserver: T? = null,
-    onStart: (() -> Unit)? = null,
-    onStop: (() -> Unit)? = null
+        owner: LifecycleOwner,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
+        lastDeliveredValueFromPriorObserver: T? = null
 ): Flow<T> = channelFlow {
     val stateChannel = Channel<T>(capacity = Channel.CONFLATED)
+    invokeOnClose { stateChannel.close() }
     onEach(stateChannel::send).launchIn(owner.lifecycleScope)
 
     var lastDeliveredItem: T? = lastDeliveredValueFromPriorObserver
     while (true) {
         owner.launchWhenStartedAndCancelWhenStopped {
-            onStart?.invoke()
             when (deliveryMode) {
                 RedeliverOnStart -> stateChannel.poll() ?: lastDeliveredItem
                 is UniqueOnly -> stateChannel.poll()?.takeIf { it != lastDeliveredItem }
@@ -63,6 +64,5 @@ fun <T : Any> Flow<T>.flowWhenStarted(
                 lastDeliveredItem = item
             }
         }
-        onStop?.invoke()
     }
 }

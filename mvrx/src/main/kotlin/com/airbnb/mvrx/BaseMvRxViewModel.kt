@@ -7,6 +7,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewModelScope
 import com.airbnb.mvrx.MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER
 import io.reactivex.Completable
@@ -16,7 +17,9 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -683,29 +686,35 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     }
 
     private fun <T : Any> Flow<T>.resolveSubscription(
-        lifecycleOwner: LifecycleOwner? = null,
-        deliveryMode: DeliveryMode,
-        subscriber: (T) -> Unit
-    ): Job = if (lifecycleOwner == null || FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER) {
-        onEach { subscriber(it) }.launchIn(viewModelScope)
-    } else if (deliveryMode is UniqueOnly) {
-        flowWhenStarted<T>(
-            lifecycleOwner,
-            deliveryMode,
-            lastDeliveredValue(deliveryMode),
-            onStart = {
-                if (activeSubscriptions.contains(deliveryMode.subscriptionId)) error(duplicateSubscriptionMessage(deliveryMode))
-                activeSubscriptions += deliveryMode.subscriptionId
-            },
-            onStop = {
+            lifecycleOwner: LifecycleOwner? = null,
+            deliveryMode: DeliveryMode,
+            subscriber: (T) -> Unit
+    ): Job {
+        val flow = if (lifecycleOwner == null || FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER) {
+            distinctUntilChanged()
+        } else if (deliveryMode is UniqueOnly) {
+            lifecycleOwner.assertOneActiveSubscription(deliveryMode)
+            flowWhenStarted<T>(lifecycleOwner, deliveryMode, lastDeliveredValue(deliveryMode))
+                    .onEach { lastDeliveredStates[deliveryMode.subscriptionId] = it }
+        } else {
+            flowWhenStarted<T>(lifecycleOwner, deliveryMode, lastDeliveredValue(deliveryMode))
+        }
+        return flow
+                .buffer(10)
+                .onEach { subscriber(it) }
+                .launchIn(viewModelScope)
+    }
+
+    private fun LifecycleOwner.assertOneActiveSubscription(deliveryMode: UniqueOnly) {
+        lifecycleScope.launchWhenStarted {
+            if (activeSubscriptions.contains(deliveryMode.subscriptionId)) error(duplicateSubscriptionMessage(deliveryMode))
+            activeSubscriptions += deliveryMode.subscriptionId
+            try {
+                delay(Long.MAX_VALUE)
+            } finally {
                 activeSubscriptions.remove(deliveryMode.subscriptionId)
             }
-        ).onEach { item ->
-            lastDeliveredStates[deliveryMode.subscriptionId] = item
-            subscriber(item)
-        }.launchIn(viewModelScope)
-    } else {
-        flowWhenStarted<T>(lifecycleOwner, deliveryMode).onEach { subscriber(it) }.launchIn(viewModelScope)
+        }
     }
 
     private fun <T> lastDeliveredValue(deliveryMode: DeliveryMode): T? {
