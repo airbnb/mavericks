@@ -7,16 +7,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
+import java.lang.IllegalStateException
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.lang.IllegalStateException
 
 data class ViewSubscriberState(val foo: Int = 0) : MvRxState
 
 class ViewSubscriberViewModel(initialState: ViewSubscriberState) : TestMvRxViewModel<ViewSubscriberState>(initialState) {
     fun setFoo(foo: Int) = setState { copy(foo = foo) }
 }
-
 
 open class ViewSubscriberFragment : BaseMvRxFragment() {
     private val viewModel: ViewSubscriberViewModel by fragmentViewModel()
@@ -57,8 +56,8 @@ open class ViewSubscriberFragment : BaseMvRxFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.subscribe { _ ->  viewCreatedSubscribeCallCount ++ }
-        viewModel.subscribe(deliveryMode = uniqueOnly("onCreateView")) { _ ->  viewCreatedUniqueOnlyCallCount ++ }
+        viewModel.subscribe { _ -> viewCreatedSubscribeCallCount ++ }
+        viewModel.subscribe(deliveryMode = uniqueOnly("onCreateView")) { _ -> viewCreatedUniqueOnlyCallCount ++ }
     }
 
     fun setFoo(foo: Int) = viewModel.setFoo(foo)
@@ -325,7 +324,6 @@ class FragmentSubscriberTest : BaseTest() {
         }
     }
 
-
     @Test
     fun selectSubscribeOnConfigurationChangeWhenStateChanged() {
         val (controller, fragment) = createFragmentInTestActivity<FragmentWithStateChangeDuringOrientationChange>()
@@ -463,8 +461,8 @@ class FragmentSubscriberTest : BaseTest() {
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-            viewModel.subscribe(deliveryMode = uniqueOnly()) {  }
-            viewModel.subscribe(deliveryMode = uniqueOnly()) {  }
+            viewModel.subscribe(deliveryMode = uniqueOnly()) { }
+            viewModel.subscribe(deliveryMode = uniqueOnly()) { }
         }
 
         override fun invalidate() { }
@@ -472,7 +470,7 @@ class FragmentSubscriberTest : BaseTest() {
 
     @Test(expected = IllegalStateException::class)
     fun duplicateUniqueOnlySubscribeThrowIllegalStateException() {
-         createFragment<DuplicateUniqueSubscriberFragment, TestActivity>(containerId = CONTAINER_ID)
+        createFragment<DuplicateUniqueSubscriberFragment, TestActivity>(containerId = CONTAINER_ID)
     }
 
     class ParentFragment : BaseMvRxFragment() {

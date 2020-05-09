@@ -732,7 +732,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         }
     }
 
-    override fun toString(): String = "${this::class.simpleName} $state"
+    override fun toString(): String = "${this::class.java.simpleName} $state"
 }
 
 /**

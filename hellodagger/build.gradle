@@ -4,12 +4,13 @@ apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.2"
+    compileSdkVersion versions.compileSdk
+    buildToolsVersion versions.buildTools
+
     defaultConfig {
         applicationId "com.airbnb.mvrx.helloDagger"
-        minSdkVersion 21
-        targetSdkVersion 29
+        minSdkVersion versions.minSdk
+        targetSdkVersion versions.targetSdk
         versionCode 1
         versionName "0.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -29,15 +30,15 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
     signingConfigs {
         debug {
-            storeFile file('debug.keystore')
-            storePassword 'testing'
-            keyAlias 'helloDagger'
-            keyPassword 'testing'
+            storeFile file("debug.keystore")
+            storePassword "testing"
+            keyAlias "helloDagger"
+            keyPassword "testing"
         }
     }
 }
@@ -47,28 +48,27 @@ androidExtensions {
 }
 
 dependencies {
+    kapt annotationProcessors.dagger
+    kapt annotationProcessors.daggerAssisted
+
+    implementation libraries.appcompat
+    implementation libraries.constraintlayout
+    implementation libraries.coreKtx
+    implementation libraries.dagger
+    implementation libraries.daggerAssisted
+    implementation libraries.fragmentKtx
+    implementation libraries.kotlin
+    implementation libraries.rxJava
+    implementation libraries.viewModelKtx
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(":mvrx")
 
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    debugImplementation libraries.fragmentTesting
 
-    implementation "androidx.appcompat:appcompat:1.1.0"
-    implementation "androidx.core:core-ktx:1.1.0"
-    implementation "androidx.constraintlayout:constraintlayout:1.1.3"
-    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.1.0"
-    implementation "androidx.fragment:fragment-ktx:1.2.0-beta02"
+    androidTestImplementation instrumentedTestLibraries.core
+    androidTestImplementation instrumentedTestLibraries.espresso
+    androidTestImplementation instrumentedTestLibraries.junit
 
-    implementation "io.reactivex.rxjava2:rxjava:2.2.12"
-
-    implementation "com.google.dagger:dagger:2.24"
-    kapt "com.google.dagger:dagger-compiler:2.24"
-    implementation "com.squareup.inject:assisted-inject-annotations-dagger2:0.5.0"
-    kapt "com.squareup.inject:assisted-inject-processor-dagger2:0.5.0"
-
-    testImplementation "junit:junit:4.12"
-    testImplementation "io.mockk:mockk:1.9.3"
-    debugImplementation "androidx.fragment:fragment-testing:1.2.0-beta02"
-    androidTestImplementation "androidx.test:core:1.2.0"
-    androidTestImplementation "androidx.test.ext:junit:1.1.1"
-    androidTestImplementation "androidx.test.espresso:espresso-core:3.2.0"
+    testImplementation testLibraries.junit
+    testImplementation testLibraries.mockk
 }

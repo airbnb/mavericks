@@ -8,7 +8,6 @@ import org.junit.Test
 @Parcelize
 data class MvrxArgsTestArgs(val count: Int = 0) : Parcelable
 
-
 @Parcelize
 data class MvrxArgsTestArgs2(val count: Int = 0) : Parcelable
 

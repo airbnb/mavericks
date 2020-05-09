@@ -4,14 +4,12 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Parcelable
-import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.parcel.Parcelize
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Test
 import org.robolectric.Robolectric
 import org.robolectric.annotation.Config
-import java.lang.IllegalStateException
 
 @Parcelize
 data class ViewModelStoreTestArgs(val count: Int = 2) : Parcelable
@@ -241,7 +239,6 @@ class ViewModelStoreTest : BaseTest() {
 
         val savedInstanceState = Bundle()
         controller.saveInstanceState(savedInstanceState)
-
 
         val controller2 = Robolectric.buildActivity(ViewModelStoreActivity::class.java, intent).setup(savedInstanceState)
 

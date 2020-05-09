@@ -44,5 +44,4 @@ class ScriptableStateStoreTest : BaseTest() {
             setState { copy(foo = newFoo) }
         }
     }
-
 }

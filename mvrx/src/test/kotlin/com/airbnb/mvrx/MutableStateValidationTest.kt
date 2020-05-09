@@ -6,7 +6,6 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Test
 import java.lang.IllegalStateException
 
-
 data class StateWithMutableMap(val map: MutableMap<String, String> = mutableMapOf()) : MvRxState
 data class StateWithImmutableMap(val map: Map<String, String> = mapOf()) : MvRxState
 
