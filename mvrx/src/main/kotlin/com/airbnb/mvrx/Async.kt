@@ -38,13 +38,9 @@ sealed class Async<out T>(val complete: Boolean, val shouldLoad: Boolean, privat
 
 object Uninitialized : Async<Nothing>(complete = false, shouldLoad = true, value = null), Incomplete
 
-class Loading<out T>(value: T? = null) : Async<T>(complete = false, shouldLoad = false, value = value), Incomplete {
-    override fun equals(other: Any?) = other is Loading<*>
+data class Loading<out T>(private val value: T? = null) : Async<T>(complete = false, shouldLoad = false, value = value), Incomplete
 
-    override fun hashCode() = "Loading".hashCode()
-}
-
-class Success<out T>(value: T) : Async<T>(complete = true, shouldLoad = false, value = value) {
+data class Success<out T>(private val value: T) : Async<T>(complete = true, shouldLoad = false, value = value) {
 
     override fun invoke(): T = super.invoke() as T
 
