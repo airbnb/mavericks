@@ -18,7 +18,11 @@ abstract class BaseMvRxFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewDelegate = DelegateMvRxView(this, ::invalidate)
+        viewDelegate = DelegateMvRxView(
+                savedStateRegistryOwner = this,
+                subscriptionLifecycleOwner = this,
+                onInvalidated = ::invalidate
+        )
     }
 
     override val subscriptionLifecycleOwner: LifecycleOwner
