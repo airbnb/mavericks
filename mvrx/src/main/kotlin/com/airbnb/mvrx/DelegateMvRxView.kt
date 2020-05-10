@@ -29,6 +29,11 @@ class DelegateMvRxView(
                     mvrxViewId // Read from the delegate to init the unique id.
                     mvrxViewIdProperty.restoreFrom(owner.savedStateRegistry.consumeRestoredStateForKey(name))
                 }
+                Lifecycle.Event.ON_START -> {
+                    // This ensures that invalidate() is called for static screens that don't
+                    // subscribe to a ViewModel.
+                    postInvalidate()
+                }
                 Lifecycle.Event.ON_DESTROY -> {
                     source.lifecycle.removeObserver(this)
                     owner.savedStateRegistry.unregisterSavedStateProvider(name)
