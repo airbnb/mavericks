@@ -16,12 +16,6 @@ android {
         consumerProguardFiles "proguard-rules.pro"
     }
 
-    lintOptions {
-        abortOnError true
-        textReport true
-        textOutput "stdout"
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8

@@ -31,8 +31,7 @@ internal fun KClass<*>.assertImmutability() {
         return classes.any { klass ->
             return when (val returnType = this.type) {
                 is ParameterizedType -> klass.java.isAssignableFrom(returnType.rawType as Class<*>)
-                is Class -> klass.java.isAssignableFrom(returnType)
-                else -> false
+                else -> klass.java.isAssignableFrom(returnType)
             }
         }
     }
