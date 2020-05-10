@@ -16,10 +16,10 @@ import androidx.savedstate.SavedStateRegistryOwner
 class DelegateMvRxView(
         private val savedStateRegistryOwner: SavedStateRegistryOwner,
         override val subscriptionLifecycleOwner: LifecycleOwner = savedStateRegistryOwner,
+        private val name: String = savedStateRegistryOwner.javaClass.name,
         private val onInvalidated: () -> Unit
 ) : MvRxView {
 
-    private val name: String = savedStateRegistryOwner.javaClass.name
     private val mvrxViewIdProperty = MvRxViewId()
 
     init {
