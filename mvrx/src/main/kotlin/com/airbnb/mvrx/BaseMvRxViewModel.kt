@@ -3,6 +3,7 @@ package com.airbnb.mvrx
 import android.util.Log
 import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -71,21 +72,14 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 
     /**
      * Return the current state as a Flow. For certain situations, this may be more convenient
-     * than subscribe and selectSubscribe becaause it can easily be composed with other
-     * coroutines operations and chained with operatorss.
+     * than subscribe and selectSubscribe because it can easily be composed with other
+     * coroutines operations and chained with operators.
      */
     val stateFlow: Flow<S>
         get() = stateStore.flow
 
-    /**
-     * Like [bufferedStateFlow] except the result is buffered with 10 slots. Use this if you want higher
-     * confidence that you will be able to receive all events even if the consumere is temporarily
-     * slower than the producer.
-     *
-     * Use this for things like analytics where all states are important.
-     * Use the non-buffered version for states related to the UI.
-     */
-    val bufferedStateFlow: Flow<S>
+    @VisibleForTesting
+    internal val bufferedStateFlow: Flow<S>
         get() = stateStore.flow.buffer(10)
 
     init {
@@ -719,16 +713,16 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             assertOneActiveSubscription(lifecycleOwner, deliveryMode)
             val lastDeliveredValue: T? = lastDeliveredValue(deliveryMode)
             this
-                    .dropWhile { it == lastDeliveredValue }
-                    .flowWhenStarted<T>(lifecycleOwner)
-                    .distinctUntilChanged()
-                    .onEach { lastDeliveredStates[deliveryMode.subscriptionId] = it }
+                .dropWhile { it == lastDeliveredValue }
+                .flowWhenStarted(lifecycleOwner)
+                .distinctUntilChanged()
+                .onEach { lastDeliveredStates[deliveryMode.subscriptionId] = it }
         } else {
-            flowWhenStarted<T>(lifecycleOwner)
+            flowWhenStarted(lifecycleOwner)
         }
         return flow
-                .onEach { subscriber(it) }
-                .launchIn(viewModelScope)
+            .onEach { subscriber(it) }
+            .launchIn(viewModelScope)
     }
 
     private fun <T> Flow<T>.assertOneActiveSubscription(owner: LifecycleOwner, deliveryMode: UniqueOnly) {
@@ -746,8 +740,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         })
     }
 
-    private fun <T> lastDeliveredValue(deliveryMode: DeliveryMode): T? {
-        if (deliveryMode !is UniqueOnly) return null
+    private fun <T> lastDeliveredValue(deliveryMode: UniqueOnly): T? {
         @Suppress("UNCHECKED_CAST")
         return lastDeliveredStates[deliveryMode.subscriptionId] as T?
     }

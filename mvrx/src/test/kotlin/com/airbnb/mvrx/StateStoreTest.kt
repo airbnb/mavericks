@@ -36,29 +36,29 @@ class StateStoreTest : BaseTest() {
     }
 
     @Test
-    fun testSubscribeNotCalledForNoop() {
-        val scope = TestCoroutineScope()
-        val store = CoroutinesStateStore(MvRxStateStoreTestState())
+    fun testSubscribeNotCalledForNoop() = runBlockingTest {
+        val store = CoroutinesStateStore(MvRxStateStoreTestState(), this)
         var callCount = 0
-        store.flow.onEach {
+        val job = store.flow.onEach {
             callCount++
-        }.launchIn(scope)
+        }.launchIn(this)
         assertEquals(1, callCount)
         store.set { this }
         assertEquals(1, callCount)
+        job.cancel()
     }
 
     @Test
-    fun testSubscribeNotCalledForSameValue() {
-        val scope = TestCoroutineScope()
-        val store = CoroutinesStateStore(MvRxStateStoreTestState())
+    fun testSubscribeNotCalledForSameValue() = runBlockingTest {
+        val store = CoroutinesStateStore(MvRxStateStoreTestState(), this)
         var callCount = 0
-        store.flow.onEach {
+        val job = store.flow.onEach {
             callCount++
-        }.launchIn(scope)
+        }.launchIn(this)
         assertEquals(1, callCount)
         store.set { copy() }
         assertEquals(1, callCount)
+        job.cancel()
     }
 
     @Test

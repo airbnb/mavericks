@@ -7,7 +7,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
@@ -88,7 +87,6 @@ class CoroutinesStateStore<S : MvRxState>(
     }
 
     override fun get(block: (S) -> Unit) {
-        if (!scope.isActive) return
         withStateChannel.offer(block)
         if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
             flushQueues()
@@ -98,7 +96,6 @@ class CoroutinesStateStore<S : MvRxState>(
     }
 
     override fun set(stateReducer: S.() -> S) {
-        if (!scope.isActive) return
         setStateChannel.offer(stateReducer)
         if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
             flushQueues()

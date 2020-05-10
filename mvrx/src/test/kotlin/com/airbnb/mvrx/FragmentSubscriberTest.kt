@@ -7,7 +7,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
-import java.lang.IllegalStateException
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -67,30 +66,10 @@ open class ViewSubscriberFragment : BaseMvRxFragment() {
     }
 }
 
-open class SimpleViewSubscriberFragment : BaseMvRxFragment(R.layout.abc_action_bar_title_item) {
-    private val viewModel: ViewSubscriberViewModel by fragmentViewModel()
-
-    var subscribeCallCount = 0
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        viewModel.subscribe { _ -> subscribeCallCount++ }
-    }
-
-    override fun invalidate() {
-    }
-}
-
 
 class FragmentSubscriberTest : BaseTest() {
 
     private inline fun <reified T : Fragment> createFragmentInTestActivity() = createFragment<T, TestActivity>(containerId = CONTAINER_ID)
-
-    @Test
-    fun testSimpleSubscribe() {
-        val (_, fragment) = createFragmentInTestActivity<SimpleViewSubscriberFragment>()
-        assertEquals(1, fragment.subscribeCallCount)
-    }
 
     @Test
     fun testSubscribe() {
@@ -260,15 +239,6 @@ class FragmentSubscriberTest : BaseTest() {
 
         assertEquals(2, fragment.subscribeCallCount)
         assertEquals(1, fragment.subscribeUniqueOnlyCallCount)
-    }
-
-    @Test
-    fun foo() {
-        val (controller, fragment) = createFragmentInTestActivity<ViewSubscriberFragment>()
-        val fragmentManager = controller.get().supportFragmentManager
-        fragmentManager.beginTransaction().replace(CONTAINER_ID, Fragment(), "TAG").addToBackStack(null).commit()
-        fragmentManager.popBackStackImmediate()
-        assertEquals(1, fragment.viewCreatedUniqueOnlyCallCount)
     }
 
 
