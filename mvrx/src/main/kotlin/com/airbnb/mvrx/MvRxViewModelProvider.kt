@@ -49,31 +49,32 @@ object MvRxViewModelProvider {
 
         val restoredContext = stateRestorer?.viewModelContext ?: viewModelContext
 
-        val viewModel = ViewModelProvider(
-            viewModelContext.owner,
-            MvRxFactory(
-                viewModelClass,
-                stateClass,
-                restoredContext,
-                key,
-                stateRestorer?.toRestoredState,
-                forExistingViewModel,
-                initialStateFactory
-            )
-        ).get(key, viewModelClass)
+        @Suppress("UNCHECKED_CAST")
+        val viewModel: MvRxViewModelWrapper<VM, S> = ViewModelProvider(
+                viewModelContext.owner,
+                MvRxFactory(
+                        viewModelClass,
+                        stateClass,
+                        restoredContext,
+                        key,
+                        stateRestorer?.toRestoredState,
+                        forExistingViewModel,
+                        initialStateFactory
+                )
+        ).get(key, MvRxViewModelWrapper::class.java) as MvRxViewModelWrapper<VM, S>
 
         try {
             // Save the view model's state to the bundle so that it can be used to recreate
             // state across system initiated process death.
             viewModelContext.savedStateRegistry.registerSavedStateProvider(key) {
-                viewModel.getSavedStateBundle(restoredContext.args)
+                viewModel.viewModel.getSavedStateBundle(restoredContext.args)
             }
         } catch (e: IllegalArgumentException) {
             // The view model was already registered with the context. We only want the initial
             // fragment that creates the view model to register with the saved state registry so
             // that it saves the correct arguments.
         }
-        return viewModel
+        return viewModel.viewModel
     }
 
     private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> VM.getSavedStateBundle(

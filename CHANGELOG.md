@@ -26,6 +26,8 @@ Previously, setState would only be prioritized at that nesting level so it would
 Now, it will run:
 [W1, S1, S2, S3, W2]
 - If your MvRxView/Fragment does not use any ViewModels, invalidate() will NOT be called in onStart(). In MvRx 1.x, invalidate would be called even if MvRx was not used at all. If you would like to maintain the original behavior, call `postInvalidate()` from onStart in your base Fragment class.
+- BaseMvRxViewModel no longer extends Jetpack ViewModel
+- viewModelScope is now a property on BaseMvRxViewModel, not the Jetpack extension function for ViewModel. Functionally, this is the same but the previous viewModelScope import will now be unused.
 
 ## Version 1.4.0
 - Remove Kotlin-Reflect entirely (#334)
