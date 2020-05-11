@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.Executors
 
 @Suppress("EXPERIMENTAL_API_USAGE")
@@ -76,12 +77,12 @@ class CoroutinesStateStore<S : MvRxState>(
      * }
      */
     @Synchronized
-    private fun flushQueues() {
+    private suspend fun flushQueues() {
         while (!setStateChannel.isEmpty || !withStateChannel.isEmpty) {
             var reducer = setStateChannel.poll()
             while (reducer != null) {
                 val newState = state.reducer()
-                stateChannel.offer(newState)
+                stateChannel.send(newState)
                 state = newState
                 reducer = setStateChannel.poll()
             }
@@ -95,7 +96,7 @@ class CoroutinesStateStore<S : MvRxState>(
     override fun get(block: (S) -> Unit) {
         withStateChannel.offer(block)
         if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
-            flushQueues()
+            runBlocking { flushQueues() }
         } else {
             flushQueuesChannel.offer(Unit)
         }
@@ -104,7 +105,7 @@ class CoroutinesStateStore<S : MvRxState>(
     override fun set(stateReducer: S.() -> S) {
         setStateChannel.offer(stateReducer)
         if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
-            flushQueues()
+            runBlocking { flushQueues() }
         } else {
             flushQueuesChannel.offer(Unit)
         }
