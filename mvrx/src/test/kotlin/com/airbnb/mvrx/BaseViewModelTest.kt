@@ -6,7 +6,10 @@ import org.junit.Test
 
 class BaseViewModelTest : BaseTest() {
     data class TestState(val foo: Int = 5) : MvRxState
-    class TestViewModel : BaseMvRxViewModel<TestState>(TestState(), debugMode = false)
+    class TestViewModel : BaseMvRxViewModel<TestState>(TestState(), debugMode = false) {
+        // Make viewModelScope public
+        val scope = viewModelScope
+    }
 
     @Test
     fun testScopeIsCancelled() {

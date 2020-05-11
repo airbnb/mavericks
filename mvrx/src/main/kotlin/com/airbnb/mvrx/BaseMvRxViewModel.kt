@@ -42,9 +42,8 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     stateStoreOveride: MvRxStateStore<S>? = null
 ) {
     private val debugMode = if (MvRxTestOverrides.FORCE_DEBUG == null) debugMode else MvRxTestOverrides.FORCE_DEBUG
-    @VisibleForTesting
-    internal val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-    private val stateStore = stateStoreOveride ?: CoroutinesStateStore(initialState, scope)
+    protected val viewModelScope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private val stateStore = stateStoreOveride ?: CoroutinesStateStore(initialState, viewModelScope)
 
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
@@ -88,14 +87,14 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         if (this.debugMode) {
             mutableStateChecker = MutableStateChecker(initialState)
 
-            scope.launch(Dispatchers.Default) {
+            viewModelScope.launch(Dispatchers.Default) {
                 validateState(initialState)
             }
         }
     }
 
     fun onCleared() {
-        scope.cancel()
+        viewModelScope.cancel()
         disposables.dispose()
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
     }
@@ -723,7 +722,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         }
         return flow
             .onEach { subscriber(it) }
-            .launchIn(scope)
+            .launchIn(viewModelScope)
     }
 
     private fun <T> Flow<T>.assertOneActiveSubscription(owner: LifecycleOwner, deliveryMode: UniqueOnly) {

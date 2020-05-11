@@ -1,5 +1,10 @@
 # Change log
 
+## Version 2.0.0
+### Breaking Changes
+- BaseMvRxViewModel no longer extends Jetpack ViewModel
+- viewModelScope is now a protected property on BaseMvRxViewModel, not the Jetpack extension function for ViewModel.
+
 ## Version 1.4.0
 - Remove Kotlin-Reflect entirely (#334)
 - Remove extra proguard dependency (#310)
