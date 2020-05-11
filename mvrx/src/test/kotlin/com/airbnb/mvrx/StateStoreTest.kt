@@ -1,8 +1,11 @@
 package com.airbnb.mvrx
 
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -14,16 +17,16 @@ data class MvRxStateStoreTestState(val count: Int = 1, val list: List<Int> = emp
 class StateStoreTest : BaseTest() {
 
     @Test
-    fun testGetRunsSynchronouslyForTests() {
-        val store = CoroutinesStateStore(MvRxStateStoreTestState())
+    fun testGetRunsSynchronouslyForTests() = runBlocking {
+        val store = CoroutinesStateStore(MvRxStateStoreTestState(), this)
         var callCount = 0
         store.get { callCount++ }
         assertEquals(1, callCount)
     }
 
     @Test
-    fun testSetState() {
-        val store = CoroutinesStateStore(MvRxStateStoreTestState())
+    fun testSetState() = runBlocking {
+        val store = CoroutinesStateStore(MvRxStateStoreTestState(), this)
         store.set {
             copy(count = 2)
         }
@@ -62,11 +65,22 @@ class StateStoreTest : BaseTest() {
     }
 
     @Test
-    fun testScope() = runBlockingTest {
+    fun testBlockingReceiver() = runBlockingTest {
         val store = CoroutinesStateStore(MvRxStateStoreTestState(), this)
-        val job = store.flow.onEach {
-            println("it")
-        }.launchIn(this)
-        job.cancel()
+        val values = mutableListOf<Int>()
+        val job1 = launch {
+            store.flow.collect {
+                println("Collect ${it.count}")
+                values += it.count
+                delay(10)
+            }
+        }
+
+        (2..10).forEach {
+            store.set { copy(count = it) }
+        }
+        delay(100)
+        job1.cancel()
+        assertEquals(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), values)
     }
 }
