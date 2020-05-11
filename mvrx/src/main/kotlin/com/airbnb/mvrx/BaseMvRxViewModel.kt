@@ -18,6 +18,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -41,7 +42,8 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     stateStoreOveride: MvRxStateStore<S>? = null
 ) {
     private val debugMode = if (MvRxTestOverrides.FORCE_DEBUG == null) debugMode else MvRxTestOverrides.FORCE_DEBUG
-    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    @VisibleForTesting
+    internal val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     private val stateStore = stateStoreOveride ?: CoroutinesStateStore(initialState, scope)
 
     private val tag by lazy { javaClass.simpleName }
@@ -93,6 +95,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     }
 
     fun onCleared() {
+        scope.cancel()
         disposables.dispose()
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
     }
