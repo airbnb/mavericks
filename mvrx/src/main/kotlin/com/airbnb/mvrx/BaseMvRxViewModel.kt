@@ -1,7 +1,6 @@
 package com.airbnb.mvrx
 
 import android.util.Log
-import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Lifecycle
@@ -9,16 +8,16 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.OnLifecycleEvent
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.airbnb.mvrx.MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -40,9 +39,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     initialState: S,
     debugMode: Boolean,
     stateStoreOveride: MvRxStateStore<S>? = null
-) : ViewModel() {
+) {
     private val debugMode = if (MvRxTestOverrides.FORCE_DEBUG == null) debugMode else MvRxTestOverrides.FORCE_DEBUG
-    private val stateStore = stateStoreOveride ?: CoroutinesStateStore(initialState, viewModelScope)
+    private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    private val stateStore = stateStoreOveride ?: CoroutinesStateStore(initialState, scope)
 
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
@@ -86,15 +86,13 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         if (this.debugMode) {
             mutableStateChecker = MutableStateChecker(initialState)
 
-            viewModelScope.launch(Dispatchers.Default) {
+            scope.launch(Dispatchers.Default) {
                 validateState(initialState)
             }
         }
     }
 
-    @CallSuper
-    override fun onCleared() {
-        super.onCleared()
+    fun onCleared() {
         disposables.dispose()
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
     }
@@ -722,7 +720,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         }
         return flow
             .onEach { subscriber(it) }
-            .launchIn(viewModelScope)
+            .launchIn(scope)
     }
 
     private fun <T> Flow<T>.assertOneActiveSubscription(owner: LifecycleOwner, deliveryMode: UniqueOnly) {
