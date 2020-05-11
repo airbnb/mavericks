@@ -75,6 +75,7 @@ class CoroutinesStateStore<S : MvRxState>(
      *     withState { ... }
      * }
      */
+    @Synchronized
     private fun flushQueues() {
         while (!setStateChannel.isEmpty || !withStateChannel.isEmpty) {
             var reducer = setStateChannel.poll()
