@@ -1,5 +1,31 @@
 # Change log
 
+## Version 2.0.0
+### Breaking Changes
+- The order of nested with and set states has changed slightly. It now matches the original intention.
+If you had code like:
+```kotlin
+withState {
+    // W1
+    withState {
+        // W2
+    }
+    setState {
+        // S1
+        setState {
+            // S2
+            setState {
+                // S3
+            }
+        }
+    }
+}
+```
+Previously, setState would only be prioritized at that nesting level so it would run:
+[W1, S1, W2, S2, S3]
+Now, it will run:
+[W1, S1, S2, S3, W2]
+
 ## Version 1.4.0
 - Remove Kotlin-Reflect entirely (#334)
 - Remove extra proguard dependency (#310)
