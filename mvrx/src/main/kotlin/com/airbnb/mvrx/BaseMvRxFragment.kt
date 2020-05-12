@@ -18,9 +18,8 @@ abstract class BaseMvRxFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewDelegate = DelegateMvRxView(
-                savedStateRegistryOwner = this,
-                subscriptionLifecycleOwner = this,
+        viewDelegate = delegateMvRxView(
+                subscriptionLifecycleOwner = subscriptionLifecycleOwner,
                 onInvalidated = ::invalidate
         )
     }
@@ -29,8 +28,6 @@ abstract class BaseMvRxFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(
         get() = this.viewLifecycleOwnerLiveData.value ?: this
 
     override fun uniqueOnly(customId: String?): UniqueOnly = viewDelegate.uniqueOnly(customId)
-
-    override fun invalidate() = Unit
 
     override fun postInvalidate() = viewDelegate.postInvalidate()
 }

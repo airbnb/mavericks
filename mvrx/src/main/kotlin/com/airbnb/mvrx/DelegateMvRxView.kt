@@ -1,6 +1,7 @@
 package com.airbnb.mvrx
 
 import android.os.Bundle
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
@@ -16,7 +17,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 class DelegateMvRxView(
         private val savedStateRegistryOwner: SavedStateRegistryOwner,
         override val subscriptionLifecycleOwner: LifecycleOwner = savedStateRegistryOwner,
-        private val name: String = savedStateRegistryOwner.javaClass.name,
+        private val name: String,
         private val onInvalidated: () -> Unit
 ) : MvRxView {
 
@@ -50,3 +51,16 @@ class DelegateMvRxView(
 
     override fun getLifecycle(): Lifecycle = savedStateRegistryOwner.lifecycle
 }
+
+/**
+ * Convenience for providing a [DelegateMvRxView] to a [Fragment]
+ */
+fun Fragment.delegateMvRxView(
+        subscriptionLifecycleOwner: LifecycleOwner = this,
+        onInvalidated: () -> Unit
+) = DelegateMvRxView(
+        name = this.javaClass.name,
+        savedStateRegistryOwner = this,
+        subscriptionLifecycleOwner = subscriptionLifecycleOwner,
+        onInvalidated = onInvalidated
+)
