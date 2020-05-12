@@ -761,12 +761,10 @@ class ViewModelSubscriberTest : BaseTest() {
     fun testStateFlowReceivesAllStates() = runBlockingTest {
         val receivedValues = mutableListOf<Int>()
         val subscribeJob = viewModel.stateFlow.onEach {
-            println("received count=${it.foo}")
             receivedValues += it.foo
             delay(1000)
         }.launchIn(this)
         (1..6).forEach {
-            println("send count=$it")
             viewModel.set { copy(foo = it) }
         }
         delay(6000)

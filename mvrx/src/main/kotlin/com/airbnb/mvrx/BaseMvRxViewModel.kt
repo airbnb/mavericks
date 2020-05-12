@@ -730,8 +730,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
                 .distinctUntilChanged()
                 .onEach { lastDeliveredStates[deliveryMode.subscriptionId] = it }
         } else {
-            this
-                .flowWhenStarted(lifecycleOwner)
+            flowWhenStarted(lifecycleOwner)
         }
         return flow
             .onEach { subscriber(it) }

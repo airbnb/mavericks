@@ -70,7 +70,6 @@ class StateStoreTest : BaseTest() {
         val values = mutableListOf<Int>()
         val job1 = launch {
             store.flow.collect {
-                println("Collect ${it.count}")
                 values += it.count
                 delay(10)
             }

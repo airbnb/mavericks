@@ -144,8 +144,6 @@ class SetStateWithStateOrderingTest : BaseMvRxViewModel<OrderingState>(OrderingS
     private suspend fun assertMatches(calls: Collection<String>, vararg expectedCalls: String) {
         while (calls.size != expectedCalls.size) {
             delay(1)
-                println("Spin ${calls.size} ${expectedCalls.size}")
-
         }
         assertEquals(expectedCalls.toList(), calls.toList())
     }
