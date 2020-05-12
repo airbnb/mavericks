@@ -1,12 +1,14 @@
 package com.airbnb.mvrx
 
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -696,6 +698,20 @@ class ViewModelSubscriberTest : BaseTest() {
 
         viewModel.set { copy(list = list + 5) }
 
+        assertEquals(2, callCount)
+    }
+
+    @Test
+    fun testStopsSubscriptionWhenCancelled() {
+        var callCount = 0
+        viewModel.subscribe(owner) {
+            callCount++
+        }
+        viewModel.set { copy(list = list + 1) }
+        assertEquals(2, callCount)
+
+        owner.lifecycleScope.cancel()
+        viewModel.set { copy(list = list + 1) }
         assertEquals(2, callCount)
     }
 

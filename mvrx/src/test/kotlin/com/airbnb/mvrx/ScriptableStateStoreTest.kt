@@ -37,7 +37,7 @@ class ScriptableStateStoreTest : BaseTest() {
     ) : BaseMvRxViewModel<TestState>(
         initialState,
         debugMode = true,
-        stateStoreOveride = stateStore
+        stateStoreOverride = stateStore
     ) {
 
         fun attemptToChageState(newFoo: Int) {

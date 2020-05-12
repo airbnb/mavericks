@@ -24,6 +24,20 @@ class CoroutinesStateStore<S : MvRxState>(
     private val setStateChannel = Channel<S.() -> S>(capacity = Channel.UNLIMITED)
     private val withStateChannel = Channel<(S) -> Unit>(capacity = Channel.UNLIMITED)
 
+    /**
+     * This combination of BroadcastChannel, mutable state property and channelFlow was arrived
+     * at after multiple attempts. This code needs to:
+     * 1) Multicast
+     * 2) Never fail to deliver an intermediate state to subscribers even if updates are fast or
+     *    some subscribers are slow.
+     * 3) Be able to provide an initial value.
+     *
+     * StateFlow can't be used because it conflates new sets. If you set its value in a tight
+     * loop and listen to changes on a flow, you will miss values. ConflatedBroadcastChannel
+     * alone has the same issue.
+     *
+     * A normal Channel can't be used because it isn't multicast.
+     */
     private val stateChannel = BroadcastChannel<S>(capacity = Channel.BUFFERED)
     override var state = initialState
     override val flow: Flow<S> get() = channelFlow {

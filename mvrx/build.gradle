@@ -55,10 +55,10 @@ dependencies {
 
     api libraries.rxAndroid
     api libraries.rxJava
+    api libraries.kotlinCoroutines
 
     implementation libraries.appcompat
     implementation libraries.kotlin
-    implementation libraries.kotlinCoroutines
     implementation libraries.lifecycleCommon
     implementation libraries.lifecycleRuntimeKtx
     implementation libraries.lifecycleViewModelKtx

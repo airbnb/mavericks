@@ -10,25 +10,30 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.lifecycleScope
 import com.airbnb.mvrx.MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.KProperty1
 
 /**
@@ -37,18 +42,33 @@ import kotlin.reflect.KProperty1
  * All subsequent ViewModels in your app should use that one.
  */
 abstract class BaseMvRxViewModel<S : MvRxState>(
-    initialState: S,
-    debugMode: Boolean,
-    stateStoreOveride: MvRxStateStore<S>? = null
+        initialState: S,
+        debugMode: Boolean,
+        /**
+         * Provide an overridden state store. This should only be used for tests and should only
+         * be exposed via a shared base class within your app. If your features extend this
+         * directly, do not override this in the primary constructor of your feature ViewModel.
+         */
+        stateStoreOverride: MvRxStateStore<S>? = null,
+        /**
+         * Provide a default context for viewModelScope. It will be added after [SupervisorJob]
+         * and [Dispatchers.Main.immediate]. This should only be used for tests and should only
+         * be exposed via a shared base class within your app. If your features extend this
+         * directly, do not override this in the primary constructor of your feature ViewModel.
+         */
+        contextOverride: CoroutineContext? = null
 ) : ViewModel() {
     private val debugMode = if (MvRxTestOverrides.FORCE_DEBUG == null) debugMode else MvRxTestOverrides.FORCE_DEBUG
-    private val stateStore = stateStoreOveride ?: CoroutinesStateStore(initialState, viewModelScope)
+    protected val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate + contextOverride)
+    private val stateStore = stateStoreOverride ?: CoroutinesStateStore(initialState, viewModelScope)
 
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
     private lateinit var mutableStateChecker: MutableStateChecker<S>
     private val lastDeliveredStates = ConcurrentHashMap<String, Any>()
     private val activeSubscriptions = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
+
+    protected operator fun CoroutineContext.plus(other: CoroutineContext?) = if (other == null) this else this + other
 
     /**
      * Define a [LifecycleOwner] to control subscriptions between [BaseMvRxViewModel]s. This only
@@ -80,7 +100,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 
     @VisibleForTesting
     internal val bufferedStateFlow: Flow<S>
-        get() = stateStore.flow.buffer(10)
+        get() = stateStore.flow.buffer()
 
     init {
         if (this.debugMode) {
@@ -94,7 +114,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 
     @CallSuper
     override fun onCleared() {
-        super.onCleared()
+        viewModelScope.cancel()
         disposables.dispose()
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
     }
@@ -710,34 +730,41 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         val flow = if (lifecycleOwner == null || FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER) {
             this
         } else if (deliveryMode is UniqueOnly) {
-            assertOneActiveSubscription(lifecycleOwner, deliveryMode)
             val lastDeliveredValue: T? = lastDeliveredValue(deliveryMode)
             this
+                .assertOneActiveSubscription(lifecycleOwner, deliveryMode)
                 .dropWhile { it == lastDeliveredValue }
                 .flowWhenStarted(lifecycleOwner)
                 .distinctUntilChanged()
                 .onEach { lastDeliveredStates[deliveryMode.subscriptionId] = it }
         } else {
-            flowWhenStarted(lifecycleOwner)
+            this
+                .flowWhenStarted(lifecycleOwner)
         }
         return flow
             .onEach { subscriber(it) }
-            .launchIn(viewModelScope)
+            .launchIn(lifecycleOwner?.lifecycleScope ?: viewModelScope)
     }
 
-    private fun <T> Flow<T>.assertOneActiveSubscription(owner: LifecycleOwner, deliveryMode: UniqueOnly) {
-        owner.lifecycle.addObserver(object : LifecycleObserver {
-            @OnLifecycleEvent(Lifecycle.Event.ON_START)
+    @Suppress("EXPERIMENTAL_API_USAGE")
+    private fun <T> Flow<T>.assertOneActiveSubscription(owner: LifecycleOwner, deliveryMode: UniqueOnly): Flow<T> {
+        val observer = object : LifecycleObserver {
+            @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
             fun onStart() {
                 if (activeSubscriptions.contains(deliveryMode.subscriptionId)) error(duplicateSubscriptionMessage(deliveryMode))
                 activeSubscriptions += deliveryMode.subscriptionId
             }
 
-            @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
+            @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
             fun onStop() {
                 activeSubscriptions.remove(deliveryMode.subscriptionId)
             }
-        })
+        }
+
+        owner.lifecycle.addObserver(observer)
+        return onCompletion {
+            owner.lifecycle.removeObserver(observer)
+        }
     }
 
     private fun <T> lastDeliveredValue(deliveryMode: UniqueOnly): T? {

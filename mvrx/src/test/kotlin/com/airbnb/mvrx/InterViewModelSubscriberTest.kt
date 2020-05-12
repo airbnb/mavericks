@@ -258,16 +258,6 @@ class InnerViewModelSubscriberTest : BaseTest() {
     }
 
     @Test
-    fun testChangesAfterOuterCleared() {
-        outerViewModel.triggerCleared()
-        outerViewModel.setFoo(1)
-        outerViewModel.setAsync(Success("Hello World"))
-        assertEquals(1, innerViewModel.subscribeCalled)
-        assertEquals(0, innerViewModel.onSuccessCalled)
-        assertEquals(0, innerViewModel.onFailCalled)
-    }
-
-    @Test
     fun testSelectSubscribe2() {
         var callCount = 0
         innerViewModel.subscribeToTwoProps(outerViewModel) { callCount++ }
