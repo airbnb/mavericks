@@ -1,26 +1,29 @@
 package com.airbnb.mvrx
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.yield
 import java.util.concurrent.Executors
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 class CoroutinesStateStore<S : MvRxState>(
-    initialState: S,
-    scope: CoroutineScope
+        initialState: S,
+        scope: CoroutineScope
 ) : MvRxStateStore<S> {
 
-    /** Channel that serves as a trigger to flush the setState and withState queues. */
-    private val flushQueuesChannel = Channel<Unit>(capacity = Channel.CONFLATED)
     private val setStateChannel = Channel<S.() -> S>(capacity = Channel.UNLIMITED)
     private val withStateChannel = Channel<(S) -> Unit>(capacity = Channel.UNLIMITED)
 
@@ -48,7 +51,6 @@ class CoroutinesStateStore<S : MvRxState>(
     init {
         setupTriggerFlushQueues(scope)
         scope.coroutineContext[Job]?.invokeOnCompletion {
-            flushQueuesChannel.close()
             setStateChannel.close()
             withStateChannel.close()
         }
@@ -59,7 +61,12 @@ class CoroutinesStateStore<S : MvRxState>(
      * This no-ops if [MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES] is set.
      */
     private fun setupTriggerFlushQueues(scope: CoroutineScope) {
-        if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) return
+        if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
+            scope.launch(Dispatchers.Unconfined) {
+                flushQueues()
+            }
+            return
+        }
 
         val executor = Executors.newSingleThreadExecutor()
         scope.coroutineContext[Job]!!.invokeOnCompletion {
@@ -67,9 +74,7 @@ class CoroutinesStateStore<S : MvRxState>(
         }
 
         scope.launch(executor.asCoroutineDispatcher()) {
-            flushQueuesChannel.consumeEach {
-                flushQueues()
-            }
+            flushQueues()
         }
     }
 
@@ -90,18 +95,18 @@ class CoroutinesStateStore<S : MvRxState>(
      *     withState { ... }
      * }
      */
-    private fun flushQueues() {
-        while (!setStateChannel.isEmpty || !withStateChannel.isEmpty) {
-            var reducer = setStateChannel.poll()
-            while (reducer != null) {
-                val newState = state.reducer()
-                stateChannel.offer(newState)
-                state = newState
-                reducer = setStateChannel.poll()
-            }
-
-            withStateChannel.poll()?.let { withStateBlock ->
-                withStateBlock(state)
+    private suspend fun flushQueues() {
+        while (true) {
+            yield()
+            select<Unit> {
+                setStateChannel.onReceive { reducer ->
+                    val newState = state.reducer()
+                    stateChannel.offer(newState)
+                    state = newState
+                }
+                withStateChannel.onReceive { block ->
+                    block(state)
+                }
             }
         }
     }
@@ -110,19 +115,9 @@ class CoroutinesStateStore<S : MvRxState>(
 
     override fun get(block: (S) -> Unit) {
         withStateChannel.offer(block)
-        if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
-            flushQueuesBlocking()
-        } else {
-            flushQueuesChannel.offer(Unit)
-        }
     }
 
     override fun set(stateReducer: S.() -> S) {
         setStateChannel.offer(stateReducer)
-        if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
-            flushQueuesBlocking()
-        } else {
-            flushQueuesChannel.offer(Unit)
-        }
     }
 }
