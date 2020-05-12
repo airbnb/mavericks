@@ -9,14 +9,17 @@ import java.util.Arrays
  * Complete: Success, Fail
  * ShouldLoad: Uninitialized, Fail
  */
-sealed class Async<out T>(val complete: Boolean, val shouldLoad: Boolean) {
+sealed class Async<out T>(val complete: Boolean, val shouldLoad: Boolean, private val value: T?) {
 
     /**
-     * Returns the Success value or null.
+     * Returns the value or null.
+     *
+     * Success always have a value. Loading and Fail can also return a value which is useful for
+     * pagination or progressive data loading.
      *
      * Can be invoked as an operator like: `yourProp()`
      */
-    open operator fun invoke(): T? = null
+    open operator fun invoke(): T? = value
 
     companion object {
         /**
@@ -36,15 +39,11 @@ sealed class Async<out T>(val complete: Boolean, val shouldLoad: Boolean) {
     }
 }
 
-object Uninitialized : Async<Nothing>(complete = false, shouldLoad = true), Incomplete
+object Uninitialized : Async<Nothing>(complete = false, shouldLoad = true, value = null), Incomplete
 
-class Loading<out T> : Async<T>(complete = false, shouldLoad = false), Incomplete {
-    override fun equals(other: Any?) = other is Loading<*>
+data class Loading<out T>(private val value: T? = null) : Async<T>(complete = false, shouldLoad = false, value = value), Incomplete
 
-    override fun hashCode() = "Loading".hashCode()
-}
-
-data class Success<out T>(private val value: T) : Async<T>(complete = true, shouldLoad = false) {
+data class Success<out T>(private val value: T) : Async<T>(complete = true, shouldLoad = false, value = value) {
 
     override operator fun invoke(): T = value
 
@@ -62,7 +61,7 @@ data class Success<out T>(private val value: T) : Async<T>(complete = true, shou
     internal var metadata: Any? = null
 }
 
-data class Fail<out T>(val error: Throwable) : Async<T>(complete = true, shouldLoad = true) {
+data class Fail<out T>(val error: Throwable, private val value: T? = null) : Async<T>(complete = true, shouldLoad = true, value = value) {
     override fun equals(other: Any?): Boolean {
         if (other !is Fail<*>) return false
 
