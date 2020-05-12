@@ -34,6 +34,7 @@ class ScriptableMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
     }
 
     fun next(state: S) {
+        this.state = state
         stateChannel.offer(state)
     }
 }

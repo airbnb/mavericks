@@ -41,6 +41,13 @@ class CoroutinesStateStore<S : MvRxState>(
      */
     private val stateChannel = BroadcastChannel<S>(capacity = Channel.BUFFERED)
     override var state = initialState
+
+    /**
+     * Returns a [Flow] for this store's state. It will begin by immediately emitting
+     * the latest set value and then continue with all subsequent updates.
+     *
+     * This Flow has a buffer size of 1 to ensure that the channel is subscribed to immediately.
+     */
     override val flow: Flow<S>
         get() = flow {
             emit(state)
@@ -95,7 +102,7 @@ class CoroutinesStateStore<S : MvRxState>(
         select<Unit> {
             setStateChannel.onReceive { reducer ->
                 val newState = state.reducer()
-                stateChannel.offer(newState)
+                stateChannel.send(newState)
                 state = newState
             }
             withStateChannel.onReceive { block ->
