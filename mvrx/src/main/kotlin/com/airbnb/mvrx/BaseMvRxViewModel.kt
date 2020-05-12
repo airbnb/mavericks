@@ -42,21 +42,21 @@ import kotlin.reflect.KProperty1
  * All subsequent ViewModels in your app should use that one.
  */
 abstract class BaseMvRxViewModel<S : MvRxState>(
-        initialState: S,
-        debugMode: Boolean,
-        /**
-         * Provide an overridden state store. This should only be used for tests and should only
-         * be exposed via a shared base class within your app. If your features extend this
-         * directly, do not override this in the primary constructor of your feature ViewModel.
-         */
-        stateStoreOverride: MvRxStateStore<S>? = null,
-        /**
-         * Provide a default context for viewModelScope. It will be added after [SupervisorJob]
-         * and [Dispatchers.Main.immediate]. This should only be used for tests and should only
-         * be exposed via a shared base class within your app. If your features extend this
-         * directly, do not override this in the primary constructor of your feature ViewModel.
-         */
-        contextOverride: CoroutineContext? = null
+    initialState: S,
+    debugMode: Boolean,
+    /**
+     * Provide an overridden state store. This should only be used for tests and should only
+     * be exposed via a shared base class within your app. If your features extend this
+     * directly, do not override this in the primary constructor of your feature ViewModel.
+     */
+    stateStoreOverride: MvRxStateStore<S>? = null,
+    /**
+     * Provide a default context for viewModelScope. It will be added after [SupervisorJob]
+     * and [Dispatchers.Main.immediate]. This should only be used for tests and should only
+     * be exposed via a shared base class within your app. If your features extend this
+     * directly, do not override this in the primary constructor of your feature ViewModel.
+     */
+    contextOverride: CoroutineContext? = null
 ) : ViewModel() {
     private val debugMode = if (MvRxTestOverrides.FORCE_DEBUG == null) debugMode else MvRxTestOverrides.FORCE_DEBUG
     protected val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate + contextOverride)
