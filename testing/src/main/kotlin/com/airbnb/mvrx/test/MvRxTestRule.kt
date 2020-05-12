@@ -46,6 +46,7 @@ class MvRxTestRule(
         }
     }
 
+    @ExperimentalCoroutinesApi
     override fun after() {
         Dispatchers.resetMain()
 
