@@ -1,27 +1,25 @@
 package com.airbnb.mvrx
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.selects.select
-import kotlinx.coroutines.yield
 import java.util.concurrent.Executors
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 class CoroutinesStateStore<S : MvRxState>(
-        initialState: S,
-        scope: CoroutineScope
+    initialState: S,
+    scope: CoroutineScope
 ) : MvRxStateStore<S> {
 
     private val setStateChannel = Channel<S.() -> S>(capacity = Channel.UNLIMITED)
@@ -43,10 +41,11 @@ class CoroutinesStateStore<S : MvRxState>(
      */
     private val stateChannel = BroadcastChannel<S>(capacity = Channel.BUFFERED)
     override var state = initialState
-    override val flow: Flow<S> get() = channelFlow {
-        send(state)
-        stateChannel.consumeEach { send(it) }
-    }.distinctUntilChanged()
+    override val flow: Flow<S>
+        get() = flow {
+            emit(state)
+            stateChannel.consumeEach { emit(it) }
+        }.buffer(1).distinctUntilChanged()
 
     init {
         setupTriggerFlushQueues(scope)
@@ -61,12 +60,7 @@ class CoroutinesStateStore<S : MvRxState>(
      * This no-ops if [MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES] is set.
      */
     private fun setupTriggerFlushQueues(scope: CoroutineScope) {
-        if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
-            scope.launch(Dispatchers.Unconfined) {
-                flushQueues()
-            }
-            return
-        }
+        if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) return
 
         val executor = Executors.newSingleThreadExecutor()
         scope.coroutineContext[Job]!!.invokeOnCompletion {
@@ -74,7 +68,9 @@ class CoroutinesStateStore<S : MvRxState>(
         }
 
         scope.launch(executor.asCoroutineDispatcher()) {
-            flushQueues()
+            while (isActive) {
+                flushQueuesOnce()
+            }
         }
     }
 
@@ -95,29 +91,30 @@ class CoroutinesStateStore<S : MvRxState>(
      *     withState { ... }
      * }
      */
-    private suspend fun flushQueues() {
-        while (true) {
-            yield()
-            select<Unit> {
-                setStateChannel.onReceive { reducer ->
-                    val newState = state.reducer()
-                    stateChannel.offer(newState)
-                    state = newState
-                }
-                withStateChannel.onReceive { block ->
-                    block(state)
-                }
+    private suspend fun flushQueuesOnce() {
+        select<Unit> {
+            setStateChannel.onReceive { reducer ->
+                val newState = state.reducer()
+                stateChannel.offer(newState)
+                state = newState
+            }
+            withStateChannel.onReceive { block ->
+                block(state)
             }
         }
     }
 
-    private fun flushQueuesBlocking() = runBlocking { flushQueues() }
-
     override fun get(block: (S) -> Unit) {
         withStateChannel.offer(block)
+        if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
+            runBlocking { flushQueuesOnce() }
+        }
     }
 
     override fun set(stateReducer: S.() -> S) {
         setStateChannel.offer(stateReducer)
+        if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
+            runBlocking { flushQueuesOnce() }
+        }
     }
 }
