@@ -760,7 +760,7 @@ class ViewModelSubscriberTest : BaseTest() {
     @Test
     fun testStateFlowReceivesAllStates() = runBlockingTest {
         val receivedValues = mutableListOf<Int>()
-        val subscribeJob = viewModel.bufferedStateFlow.onEach {
+        val subscribeJob = viewModel.stateFlow.onEach {
             println("received count=${it.foo}")
             receivedValues += it.foo
             delay(1000)
