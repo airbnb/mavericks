@@ -20,6 +20,7 @@ object Versions {
     const val room = "2.2.5"
 
     // Libraries
+    const val kotlinCoroutines = "1.3.6"
     const val dagger = "2.27"
     const val daggerAssisted = "0.5.2"
     const val debugDb = "1.0.4"
@@ -71,6 +72,7 @@ object Libraries {
     const val junit = "junit:junit:${Versions.junit}"
     const val koin = "org.koin:koin-android:${Versions.koin}"
     const val kotlin = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}"
+    const val kotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.kotlinCoroutines}"
     const val kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}"
     const val lifecycleCommon = "androidx.lifecycle:lifecycle-common-java8:${Versions.lifecycle}"
     const val lottie = "com.airbnb.android:lottie:${Versions.lottie}"
@@ -89,6 +91,7 @@ object Libraries {
     const val rxAndroid = "io.reactivex.rxjava2:rxandroid:${Versions.rxAndroid}"
     const val rxJava = "io.reactivex.rxjava2:rxjava:${Versions.rxJava}"
     const val viewModelKtx = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycle}"
+    const val runtimeKtx = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}"
 }
 
 object InstrumentedTestLibraries {
@@ -99,6 +102,7 @@ object InstrumentedTestLibraries {
 
 object TestLibraries {
     const val junit = "junit:junit:${Versions.junit}"
+    const val kotlinCoroutinesTest = "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.kotlinCoroutines}"
     const val mockito = "org.mockito:mockito-core:${Versions.mockito}"
     const val mockitoKotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:${Versions.mockitoKotlin}"
     const val mockk = "io.mockk:mockk:${Versions.mockk}"
