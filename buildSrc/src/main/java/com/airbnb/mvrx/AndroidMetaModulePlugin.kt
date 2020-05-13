@@ -59,7 +59,7 @@ class AndroidMetaModulePlugin : Plugin<Project> {
                                 setSrcDirs(srcDirs + file("src/main/kotlin"))
                             }
                             getByName("test").java.apply {
-                                setSrcDirs(srcDirs + file("src/main/kotlin"))
+                                setSrcDirs(srcDirs + file("src/test/kotlin"))
                             }
                         }
                     }
@@ -67,5 +67,4 @@ class AndroidMetaModulePlugin : Plugin<Project> {
             }
         }
     }
-
 }
