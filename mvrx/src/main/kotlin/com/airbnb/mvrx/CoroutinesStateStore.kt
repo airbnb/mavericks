@@ -26,7 +26,7 @@ class CoroutinesStateStore<S : MvRxState>(
     private val withStateChannel = Channel<(S) -> Unit>(capacity = Channel.UNLIMITED)
 
     /**
-     * This combination of BroadcastChannel, mutable state property and channelFlow was arrived
+     * This combination of BroadcastChannel, mutable state property and flow was arrived
      * at after multiple attempts. This code needs to:
      * 1) Multicast
      * 2) Never fail to deliver an intermediate state to subscribers even if updates are fast or
@@ -52,7 +52,7 @@ class CoroutinesStateStore<S : MvRxState>(
         get() = flow {
             emit(state)
             stateChannel.consumeEach { emit(it) }
-        }.buffer(1).distinctUntilChanged()
+        }.buffer(1)
 
     init {
         setupTriggerFlushQueues(scope)
@@ -102,8 +102,10 @@ class CoroutinesStateStore<S : MvRxState>(
         select<Unit> {
             setStateChannel.onReceive { reducer ->
                 val newState = state.reducer()
-                stateChannel.send(newState)
-                state = newState
+                if (newState != state) {
+                    stateChannel.send(newState)
+                    state = newState
+                }
             }
             withStateChannel.onReceive { block ->
                 block(state)
