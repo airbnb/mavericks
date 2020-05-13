@@ -4,13 +4,9 @@ apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
 
 android {
-    compileSdkVersion versions.compileSdk
-    buildToolsVersion versions.buildTools
 
     defaultConfig {
         applicationId "com.airbnb.mvrx.helloDagger"
-        minSdkVersion versions.minSdk
-        targetSdkVersion versions.targetSdk
         versionCode 1
         versionName "0.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -24,15 +20,6 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-    }
-
     signingConfigs {
         debug {
             storeFile file("debug.keystore")
@@ -43,32 +30,27 @@ android {
     }
 }
 
-androidExtensions {
-    experimental = true
-}
-
 dependencies {
-    kapt annotationProcessors.dagger
-    kapt annotationProcessors.daggerAssisted
+    kapt AnnotationProcessors.dagger
+    kapt AnnotationProcessors.daggerAssisted
 
-    implementation libraries.appcompat
-    implementation libraries.constraintlayout
-    implementation libraries.coreKtx
-    implementation libraries.dagger
-    implementation libraries.daggerAssisted
-    implementation libraries.fragmentKtx
-    implementation libraries.kotlin
-    implementation libraries.rxJava
-    implementation libraries.viewModelKtx
+    implementation Libraries.appcompat
+    implementation Libraries.constraintlayout
+    implementation Libraries.coreKtx
+    implementation Libraries.dagger
+    implementation Libraries.daggerAssisted
+    implementation Libraries.fragmentKtx
+    implementation Libraries.rxJava
+    implementation Libraries.viewModelKtx
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(":mvrx")
 
-    debugImplementation libraries.fragmentTesting
+    debugImplementation Libraries.fragmentTesting
 
-    androidTestImplementation instrumentedTestLibraries.core
-    androidTestImplementation instrumentedTestLibraries.espresso
-    androidTestImplementation instrumentedTestLibraries.junit
+    androidTestImplementation InstrumentedTestLibraries.core
+    androidTestImplementation InstrumentedTestLibraries.espresso
+    androidTestImplementation InstrumentedTestLibraries.junit
 
-    testImplementation testLibraries.junit
-    testImplementation testLibraries.mockk
+    testImplementation TestLibraries.junit
+    testImplementation TestLibraries.mockk
 }
