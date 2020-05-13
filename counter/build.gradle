@@ -3,13 +3,9 @@ apply plugin: "kotlin-android"
 apply plugin: "kotlin-android-extensions"
 
 android {
-    compileSdkVersion versions.compileSdk
-    buildToolsVersion versions.buildTools
 
     defaultConfig {
         applicationId 'com.airbnb.mvrx.counter'
-        minSdkVersion versions.minSdk
-        targetSdkVersion versions.targetSdk
         versionCode 1
         versionName '1.0'
     }
@@ -34,25 +30,15 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-project.pro"
         }
     }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-    }
 }
 
 dependencies {
-    implementation libraries.appcompat
-    implementation libraries.constraintlayout
-    implementation libraries.coreKtx
-    implementation libraries.lifecycleCommon
-    implementation libraries.kotlin
+    implementation Libraries.appcompat
+    implementation Libraries.constraintlayout
+    implementation Libraries.coreKtx
+    implementation Libraries.lifecycleCommon
     implementation project(":mvrx")
 
-    testImplementation testLibraries.junit
+    testImplementation TestLibraries.junit
     testImplementation project(":testing")
 }
