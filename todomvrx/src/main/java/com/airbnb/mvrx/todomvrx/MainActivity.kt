@@ -38,7 +38,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item?.itemId ?: 0) {
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         android.R.id.home -> {
             if (navController.currentDestination?.isDrawerDestination() == true) {
                 drawerLayout.openDrawer(GravityCompat.START)
