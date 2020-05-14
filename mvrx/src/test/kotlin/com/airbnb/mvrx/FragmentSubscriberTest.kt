@@ -581,4 +581,23 @@ class FragmentSubscriberTest : BaseTest() {
         val fragmentWithTarget = FragmentWithTarget()
         parentFragment.childFragmentManager.beginTransaction().add(fragmentWithTarget, "fragment-with-target").commitNow()
     }
+
+    @Test
+    fun testUniqueOnly() {
+        val (controller, fragment) = createFragmentInTestActivity<ViewSubscriberFragment>()
+        fragment.setFoo(1)
+        assertEquals(2, fragment.selectSubscribeUniqueOnlyCallCount)
+
+        controller.pause()
+        controller.stop()
+        fragment.setFoo(2)
+        fragment.setFoo(1)
+        controller.start()
+        controller.resume()
+
+        // In MvRx 1.0, this would have been 3. If the value for a uniqueOnly() subscription changed
+        // and changed back while stopped, it would redeliver the value even though it was the same
+        // as what it received previously.
+        assertEquals(2, fragment.selectSubscribeUniqueOnlyCallCount)
+    }
 }
