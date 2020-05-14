@@ -1,5 +1,3 @@
-import java.util.Properties
-
 repositories {
     google()
     maven(url = "https://plugins.gradle.org/m2/")

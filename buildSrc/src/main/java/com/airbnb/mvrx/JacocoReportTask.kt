@@ -22,10 +22,10 @@ open class JacocoReportTask : JacocoReport() {
         )
         val buildDir = project.buildDir
 
-        val debugTree = project.fileTree("${buildDir}/intermediates/classes/debug") {
+        val debugTree = project.fileTree(buildDir.toString() + "/intermediates/classes/debug") {
             exclude(excludes)
         }
-        val kotlinDebugTree = project.fileTree("${buildDir}/tmp/kotlin-classes/debug") {
+        val kotlinDebugTree = project.fileTree(buildDir.toString() + "/tmp/kotlin-classes/debug") {
             exclude(excludes)
         }
 
@@ -37,4 +37,3 @@ open class JacocoReportTask : JacocoReport() {
         executionData.from("$buildDir/jacoco/testDebugUnitTest.exec")
     }
 }
-
