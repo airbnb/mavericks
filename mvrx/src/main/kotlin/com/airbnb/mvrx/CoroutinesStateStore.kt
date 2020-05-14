@@ -68,12 +68,7 @@ class CoroutinesStateStore<S : MvRxState>(
     private fun setupTriggerFlushQueues(scope: CoroutineScope) {
         if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) return
 
-        val executor = Executors.newSingleThreadExecutor()
-        scope.coroutineContext[Job]!!.invokeOnCompletion {
-            executor.shutdownNow()
-        }
-
-        scope.launch(executor.asCoroutineDispatcher()) {
+        scope.launch(flushDispatcher) {
             while (isActive) {
                 flushQueuesOnce()
             }
@@ -124,5 +119,9 @@ class CoroutinesStateStore<S : MvRxState>(
         if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
             runBlocking { flushQueuesOnce() }
         }
+    }
+
+    companion object {
+        private val flushDispatcher = Executors.newCachedThreadPool().asCoroutineDispatcher()
     }
 }
