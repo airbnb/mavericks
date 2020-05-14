@@ -741,13 +741,13 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     private fun <T> Flow<T>.assertOneActiveSubscription(owner: LifecycleOwner, deliveryMode: UniqueOnly): Flow<T> {
         val observer = object : LifecycleObserver {
             @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-            fun onStart() {
+            fun onCreate() {
                 if (activeSubscriptions.contains(deliveryMode.subscriptionId)) error(duplicateSubscriptionMessage(deliveryMode))
                 activeSubscriptions += deliveryMode.subscriptionId
             }
 
             @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-            fun onStop() {
+            fun onDestroy() {
                 activeSubscriptions.remove(deliveryMode.subscriptionId)
             }
         }
