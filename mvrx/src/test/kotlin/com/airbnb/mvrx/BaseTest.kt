@@ -1,11 +1,17 @@
 // This suppression may be due to a bug in Detekt because this is an abstract class.
 @file:Suppress("UtilityClassWithPublicConstructor")
+
 package com.airbnb.mvrx
 
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Runnable
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import org.junit.AfterClass
 import io.reactivex.Scheduler
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.annotations.NonNull
@@ -22,34 +28,24 @@ import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.android.controller.ActivityController
 import org.robolectric.shadows.ShadowLog
+import kotlin.coroutines.CoroutineContext
 
+@Suppress("EXPERIMENTAL_API_USAGE")
 @RunWith(RobolectricTestRunner::class)
-@Ignore
+@Ignore("Base Class")
 abstract class BaseTest {
     companion object {
         @JvmStatic
         @BeforeClass
         fun classSetUp() {
             ShadowLog.stream = System.out
-            RxAndroidPlugins.reset()
-            RxJavaPlugins.reset()
-            val immediate = object : Scheduler() {
-                // this prevents StackOverflowErrors when scheduling with a delay
-                override fun scheduleDirect(@NonNull run: Runnable, delay: Long, @NonNull unit: TimeUnit): Disposable = super.scheduleDirect(run, 0, unit)
+            MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES = true
+        }
 
-                override fun createWorker(): Worker = ExecutorScheduler.ExecutorWorker(Executor { it.run() }, true)
-            }
-            RxJavaPlugins.setNewThreadSchedulerHandler { immediate }
-            RxJavaPlugins.setComputationSchedulerHandler { immediate }
-            RxJavaPlugins.setInitIoSchedulerHandler { immediate }
-            RxJavaPlugins.setSingleSchedulerHandler { immediate }
-            // This is necessary to prevent rxjava from swallowing errors
-            // https://github.com/ReactiveX/RxJava/issues/5234
-            Thread.setDefaultUncaughtExceptionHandler { _, e ->
-                if (e is CompositeException && e.exceptions.size == 1) throw e.exceptions[0]
-                throw e
-            }
-            RxAndroidPlugins.setInitMainThreadSchedulerHandler { immediate }
+        @JvmStatic
+        @AfterClass
+        fun classTearDown() {
+            MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES = false
         }
     }
 

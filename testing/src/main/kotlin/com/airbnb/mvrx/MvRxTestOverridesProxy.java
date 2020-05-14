@@ -14,6 +14,10 @@ public class MvRxTestOverridesProxy {
         MvRxTestOverrides.FORCE_DEBUG = debug;
     }
 
+    public static void forceSynchronousStateStores(boolean force) {
+        MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES = force;
+    }
+
     public static void forceDisableLifecycleAwareObserver(Boolean disableLifecycleAwareObserver) {
         MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER = disableLifecycleAwareObserver;
     }

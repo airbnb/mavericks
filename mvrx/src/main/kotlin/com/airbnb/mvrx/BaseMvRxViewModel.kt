@@ -4,20 +4,34 @@ import android.util.Log
 import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.lifecycleScope
 import com.airbnb.mvrx.MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
-import io.reactivex.functions.Consumer
-import io.reactivex.schedulers.Schedulers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.dropWhile
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.KProperty1
 
 /**
@@ -28,9 +42,23 @@ import kotlin.reflect.KProperty1
 abstract class BaseMvRxViewModel<S : MvRxState>(
     initialState: S,
     debugMode: Boolean,
-    private val stateStore: MvRxStateStore<S> = RealMvRxStateStore(initialState)
+    /**
+     * Provide an overridden state store. This should only be used for tests and should only
+     * be exposed via a shared base class within your app. If your features extend this
+     * directly, do not override this in the primary constructor of your feature ViewModel.
+     */
+    stateStoreOverride: MvRxStateStore<S>? = null,
+    /**
+     * Provide a default context for viewModelScope. It will be added after [SupervisorJob]
+     * and [Dispatchers.Main.immediate]. This should only be used for tests and should only
+     * be exposed via a shared base class within your app. If your features extend this
+     * directly, do not override this in the primary constructor of your feature ViewModel.
+     */
+    contextOverride: CoroutineContext? = null
 ) : ViewModel() {
     private val debugMode = if (MvRxTestOverrides.FORCE_DEBUG == null) debugMode else MvRxTestOverrides.FORCE_DEBUG
+    protected val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate + contextOverride)
+    private val stateStore = stateStoreOverride ?: CoroutinesStateStore(initialState, viewModelScope)
 
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
@@ -51,23 +79,35 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     private val lifecycleOwner: LifecycleOwner = LifecycleOwner { lifecycleRegistry }
     private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(lifecycleOwner).apply { currentState = Lifecycle.State.RESUMED }
 
+    /**
+     * Synchronous access to state is not exposed externally because there is no guarantee that
+     * all setState reducers have run yet.
+     */
     internal val state: S
         get() = stateStore.state
+
+    /**
+     * Return the current state as a Flow. For certain situations, this may be more convenient
+     * than subscribe and selectSubscribe because it can easily be composed with other
+     * coroutines operations and chained with operators.
+     */
+    val stateFlow: Flow<S>
+        get() = stateStore.flow
 
     init {
         if (this.debugMode) {
             mutableStateChecker = MutableStateChecker(initialState)
 
-            Completable.fromCallable { validateState(initialState) }
-                .subscribeOn(Schedulers.computation()).subscribe()
+            viewModelScope.launch(Dispatchers.Default) {
+                validateState(initialState)
+            }
         }
     }
 
     @CallSuper
     override fun onCleared() {
-        super.onCleared()
+        viewModelScope.cancel()
         disposables.dispose()
-        stateStore.dispose()
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
     }
 
@@ -222,7 +262,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * For ViewModels that want to subscribe to itself.
      */
     protected fun subscribe(subscriber: (S) -> Unit) =
-        stateStore.observable.subscribeLifecycle(null, RedeliverOnStart, subscriber)
+        stateFlow.subscribeLifecycle(null, RedeliverOnStart, subscriber)
 
     /**
      * For ViewModels that want to subscribe to another ViewModel.
@@ -237,7 +277,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun subscribe(owner: LifecycleOwner, deliveryMode: DeliveryMode = RedeliverOnStart, subscriber: (S) -> Unit) =
-        stateStore.observable.subscribeLifecycle(owner, deliveryMode, subscriber)
+        stateFlow.subscribeLifecycle(owner, deliveryMode, subscriber)
 
     /**
      * Subscribe to state changes for only a single property.
@@ -272,7 +312,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop1: KProperty1<S, A>,
         deliveryMode: DeliveryMode,
         subscriber: (A) -> Unit
-    ) = stateStore.observable
+    ) = stateFlow
         .map { MvRxTuple1(prop1.get(it)) }
         .distinctUntilChanged()
         .subscribeLifecycle(owner, deliveryMode.appendPropertiesToId(prop1)) { (a) -> subscriber(a) }
@@ -361,7 +401,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop2: KProperty1<S, B>,
         deliveryMode: DeliveryMode,
         subscriber: (A, B) -> Unit
-    ) = stateStore.observable
+    ) = stateFlow
         .map { MvRxTuple2(prop1.get(it), prop2.get(it)) }
         .distinctUntilChanged()
         .subscribeLifecycle(owner, deliveryMode.appendPropertiesToId(prop1, prop2)) { (a, b) -> subscriber(a, b) }
@@ -407,7 +447,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop3: KProperty1<S, C>,
         deliveryMode: DeliveryMode,
         subscriber: (A, B, C) -> Unit
-    ) = stateStore.observable
+    ) = stateFlow
         .map { MvRxTuple3(prop1.get(it), prop2.get(it), prop3.get(it)) }
         .distinctUntilChanged()
         .subscribeLifecycle(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3)) { (a, b, c) ->
@@ -463,7 +503,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop4: KProperty1<S, D>,
         deliveryMode: DeliveryMode,
         subscriber: (A, B, C, D) -> Unit
-    ) = stateStore.observable
+    ) = stateFlow
         .map { MvRxTuple4(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it)) }
         .distinctUntilChanged()
         .subscribeLifecycle(
@@ -520,7 +560,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop5: KProperty1<S, E>,
         deliveryMode: DeliveryMode,
         subscriber: (A, B, C, D, E) -> Unit
-    ) = stateStore.observable
+    ) = stateFlow
         .map { MvRxTuple5(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it)) }
         .distinctUntilChanged()
         .subscribeLifecycle(
@@ -581,7 +621,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop6: KProperty1<S, F>,
         deliveryMode: DeliveryMode,
         subscriber: (A, B, C, D, E, F) -> Unit
-    ) = stateStore.observable
+    ) = stateFlow
         .map { MvRxTuple6(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it), prop6.get(it)) }
         .distinctUntilChanged()
         .subscribeLifecycle(
@@ -646,7 +686,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop7: KProperty1<S, G>,
         deliveryMode: DeliveryMode,
         subscriber: (A, B, C, D, E, F, G) -> Unit
-    ) = stateStore.observable
+    ) = stateFlow
         .map { state ->
             MvRxTuple7(
                 prop1.get(state),
@@ -664,55 +704,71 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4, prop5, prop6, prop7)
         ) { (a, b, c, d, e, f, g) -> subscriber(a, b, c, d, e, f, g) }
 
-    private fun <T : Any> Observable<T>.subscribeLifecycle(
+    private fun <T : Any> Flow<T>.subscribeLifecycle(
         lifecycleOwner: LifecycleOwner? = null,
         deliveryMode: DeliveryMode,
         subscriber: (T) -> Unit
     ): Disposable {
-        return observeOn(AndroidSchedulers.mainThread())
-            .resolveSubscription(lifecycleOwner, deliveryMode, subscriber)
+        return resolveSubscription(lifecycleOwner, deliveryMode, subscriber)
+            .toDisposable()
             .disposeOnClear()
     }
 
-    private fun <T : Any> Observable<T>.resolveSubscription(
+    private fun <T : Any> Flow<T>.resolveSubscription(
         lifecycleOwner: LifecycleOwner? = null,
         deliveryMode: DeliveryMode,
         subscriber: (T) -> Unit
-    ): Disposable = if (lifecycleOwner == null || FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER) {
-        this.subscribe(subscriber)
-    } else {
-        this.subscribeWith(
-            MvRxLifecycleAwareObserver(
-                lifecycleOwner,
-                deliveryMode = deliveryMode,
-                lastDeliveredValue = if (deliveryMode is UniqueOnly) {
-                    if (activeSubscriptions.contains(deliveryMode.subscriptionId)) {
-                        throw IllegalStateException(
-                            "Subscribing with a duplicate subscription id: ${deliveryMode.subscriptionId}. " +
-                                "If you have multiple uniqueOnly subscriptions in a MvRx view that listen to the same properties " +
-                                "you must use a custom subscription id. If you are using a custom MvRxView, make sure you are using the proper" +
-                                "lifecycle owner. See BaseMvRxFragment for an example."
-                        )
-                    }
-                    activeSubscriptions.add(deliveryMode.subscriptionId)
-                    lastDeliveredStates[deliveryMode.subscriptionId] as? T
-                } else {
-                    null
-                },
-                onNext = Consumer { value ->
-                    if (deliveryMode is UniqueOnly) {
-                        lastDeliveredStates[deliveryMode.subscriptionId] = value
-                    }
-                    subscriber(value)
-                },
-                onDispose = {
-                    if (deliveryMode is UniqueOnly) {
-                        activeSubscriptions.remove(deliveryMode.subscriptionId)
-                    }
-                }
-            )
-        )
+    ): Job {
+        val flow = if (lifecycleOwner == null || FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER) {
+            this
+        } else if (deliveryMode is UniqueOnly) {
+            val lastDeliveredValue: T? = lastDeliveredValue(deliveryMode)
+            this
+                .assertOneActiveSubscription(lifecycleOwner, deliveryMode)
+                .dropWhile { it == lastDeliveredValue }
+                .flowWhenStarted(lifecycleOwner)
+                .distinctUntilChanged()
+                .onEach { lastDeliveredStates[deliveryMode.subscriptionId] = it }
+        } else {
+            flowWhenStarted(lifecycleOwner)
+        }
+        return flow
+            .onEach { subscriber(it) }
+            .launchIn(lifecycleOwner?.lifecycleScope ?: viewModelScope)
     }
+
+    @Suppress("EXPERIMENTAL_API_USAGE")
+    private fun <T> Flow<T>.assertOneActiveSubscription(owner: LifecycleOwner, deliveryMode: UniqueOnly): Flow<T> {
+        val observer = object : LifecycleObserver {
+            @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+            fun onCreate() {
+                if (activeSubscriptions.contains(deliveryMode.subscriptionId)) error(duplicateSubscriptionMessage(deliveryMode))
+                activeSubscriptions += deliveryMode.subscriptionId
+            }
+
+            @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+            fun onDestroy() {
+                activeSubscriptions.remove(deliveryMode.subscriptionId)
+            }
+        }
+
+        owner.lifecycle.addObserver(observer)
+        return onCompletion {
+            owner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    private fun <T> lastDeliveredValue(deliveryMode: UniqueOnly): T? {
+        @Suppress("UNCHECKED_CAST")
+        return lastDeliveredStates[deliveryMode.subscriptionId] as T?
+    }
+
+    private fun duplicateSubscriptionMessage(deliveryMode: UniqueOnly) = """
+        Subscribing with a duplicate subscription id: ${deliveryMode.subscriptionId}.
+        If you have multiple uniqueOnly subscriptions in a MvRx view that listen to the same properties
+        you must use a custom subscription id. If you are using a custom MvRxView, make sure you are using the proper
+        lifecycle owner. See BaseMvRxFragment for an example.
+    """.trimIndent()
 
     protected fun Disposable.disposeOnClear(): Disposable {
         disposables.add(this)
@@ -724,6 +780,8 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             "This method is for subscribing to other view models. Please pass a different instance as the argument."
         }
     }
+
+    private operator fun CoroutineContext.plus(other: CoroutineContext?) = if (other == null) this else this + other
 
     override fun toString(): String = "${this::class.java.simpleName} $state"
 }

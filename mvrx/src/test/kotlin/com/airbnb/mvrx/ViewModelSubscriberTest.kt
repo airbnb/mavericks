@@ -1,11 +1,18 @@
 package com.airbnb.mvrx
 
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -201,6 +208,7 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewMod
     }
 }
 
+@ExperimentalCoroutinesApi
 class ViewModelSubscriberTest : BaseTest() {
 
     private lateinit var viewModel: ViewModelTestViewModel
@@ -694,6 +702,20 @@ class ViewModelSubscriberTest : BaseTest() {
     }
 
     @Test
+    fun testStopsSubscriptionWhenCancelled() {
+        var callCount = 0
+        viewModel.subscribe(owner) {
+            callCount++
+        }
+        viewModel.set { copy(list = list + 1) }
+        assertEquals(2, callCount)
+
+        owner.lifecycleScope.cancel()
+        viewModel.set { copy(list = list + 1) }
+        assertEquals(2, callCount)
+    }
+
+    @Test
     fun testReplace() {
         var callCount = 0
         viewModel.subscribe(owner) {
@@ -733,5 +755,20 @@ class ViewModelSubscriberTest : BaseTest() {
 
         viewModel.set { copy() }
         assertEquals(1, callCount)
+    }
+
+    @Test
+    fun testStateFlowReceivesAllStates() = runBlockingTest {
+        val receivedValues = mutableListOf<Int>()
+        val subscribeJob = viewModel.stateFlow.onEach {
+            receivedValues += it.foo
+            delay(1000)
+        }.launchIn(this)
+        (1..6).forEach {
+            viewModel.set { copy(foo = it) }
+        }
+        delay(6000)
+        assertEquals(listOf(0, 1, 2, 3, 4, 5), receivedValues)
+        subscribeJob.cancel()
     }
 }

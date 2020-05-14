@@ -1,5 +1,6 @@
+import com.airbnb.mvrx.AndroidMetaModulePlugin
+
 buildscript {
-    apply from: rootProject.file("dependencies.gradle")
 
     repositories {
         google()
@@ -7,9 +8,9 @@ buildscript {
         maven { url "https://oss.sonatype.org/service/local/repositories/snapshots/content/" }
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:${versions.gradlePlugin}"
-        classpath "org.jetbrains.kotlin:kotlin-android-extensions:${versions.kotlin}"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
+        classpath "com.android.tools.build:gradle:${Versions.gradlePlugin}"
+        classpath "org.jetbrains.kotlin:kotlin-android-extensions:${Versions.kotlin}"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
 
         // Upload with:
         // ./gradlew clean assemble androidSourcesJar androidJavadocsJar uploadArchives --no-daemon --no-parallel
@@ -24,6 +25,8 @@ buildscript {
     }
 }
 
+plugins.apply(AndroidMetaModulePlugin.class)
+
 allprojects {
     version = VERSION_NAME
     group = GROUP
@@ -32,5 +35,16 @@ allprojects {
         google()
         jcenter()
         maven { url "https://jitpack.io" }
+    }
+
+    tasks.whenTaskAdded { task ->
+        if (task.name.startsWith("lint")) {
+            task.doFirst {
+                android.lintOptions.abortOnError true
+                android.lintOptions.textReport true
+                android.lintOptions.textOutput "stdout"
+                android.lintOptions.lintConfig = file("../lint.xml")
+            }
+        }
     }
 }

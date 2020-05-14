@@ -11,7 +11,7 @@ class RxSetupTest : BaseTest() {
         class RxSetupViewModel(initialState: RxSetupState) : TestMvRxViewModel<RxSetupState>(initialState) {
             fun throwInWithState() {
                 withState {
-                    throw IllegalArgumentException()
+                    throw IllegalArgumentException("Intentional Exception")
                 }
             }
         }

@@ -5,46 +5,18 @@ apply plugin: "kotlin-kapt"
 apply plugin: "com.vanniktech.maven.publish"
 
 android {
-    compileSdkVersion versions.compileSdk
-    buildToolsVersion versions.buildTools
     resourcePrefix "mvrx_"
 
     defaultConfig {
-        minSdkVersion versions.minSdk
-        targetSdkVersion versions.targetSdk
         consumerProguardFiles "proguard-rules.pro"
     }
-
-    lintOptions {
-        abortOnError true
-        textReport true
-        textOutput "stdout"
-    }
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-    }
-
-    sourceSets {
-        main.java.srcDirs += "src/main/kotlin"
-        test.java.srcDirs += "src/test/kotlin"
-    }
-}
-
-androidExtensions {
-    experimental = true
 }
 
 dependencies {
-    implementation libraries.appcompat
-    implementation libraries.junit
-    implementation libraries.kotlin
-    implementation libraries.kotlinReflect
-    implementation libraries.rxAndroid
+    implementation Libraries.appcompat
+    implementation Libraries.junit
+    implementation Libraries.kotlinReflect
+    implementation Libraries.rxAndroid
+    implementation TestLibraries.kotlinCoroutinesTest
     implementation project(":mvrx")
 }

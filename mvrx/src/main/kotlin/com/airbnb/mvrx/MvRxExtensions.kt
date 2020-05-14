@@ -4,6 +4,8 @@ import androidx.annotation.RestrictTo
 import androidx.annotation.RestrictTo.Scope.LIBRARY
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import io.reactivex.disposables.Disposables
+import kotlinx.coroutines.Job
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
@@ -174,3 +176,7 @@ fun <V : Any> args() = object : ReadOnlyProperty<Fragment, V> {
  * For example: [1,2,3].appendAt([4], 1) == [1,4]]
  */
 fun <T : Any> List<T>.appendAt(other: List<T>?, offset: Int) = subList(0, offset.coerceIn(0, size)) + (other ?: emptyList())
+
+internal fun Job.toDisposable() = Disposables.fromAction {
+    cancel()
+}

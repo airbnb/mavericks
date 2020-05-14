@@ -4,55 +4,38 @@ apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
 
 android {
-    compileSdkVersion versions.compileSdk
-    buildToolsVersion versions.buildTools
 
     defaultConfig {
         applicationId "com.airbnb.mvrx.todoapp"
-        minSdkVersion versions.minSdk
-        targetSdkVersion versions.targetSdk
         versionCode 1
         versionName "0.0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-    }
 }
 
-androidExtensions {
-    experimental = true
-}
 
 dependencies {
-    kapt annotationProcessors.epoxy
-    kapt annotationProcessors.room
+    kapt AnnotationProcessors.epoxy
+    kapt AnnotationProcessors.room
 
-    implementation libraries.appcompat
-    implementation libraries.constraintlayout
-    implementation (libraries.epoxy) { exclude group: "com.android.support" }
-    implementation libraries.espressoIdlingResource
-    implementation libraries.kotlin
-    implementation libraries.lifecycleCommon
-    implementation libraries.navigationFragmentKtx
-    implementation libraries.navigationUiKtx
-    implementation libraries.recyclerview
-    implementation libraries.roomRuntime
-    implementation libraries.roomRxJava
-    implementation libraries.rxAndroid
-    implementation libraries.rxJava
+    implementation Libraries.appcompat
+    implementation Libraries.constraintlayout
+    implementation (Libraries.epoxy) { exclude group: "com.android.support" }
+    implementation Libraries.espressoIdlingResource
+    implementation Libraries.lifecycleCommon
+    implementation Libraries.navigationFragmentKtx
+    implementation Libraries.navigationUiKtx
+    implementation Libraries.recyclerview
+    implementation Libraries.roomRuntime
+    implementation Libraries.roomRxJava
+    implementation Libraries.rxAndroid
+    implementation Libraries.rxJava
     implementation project(":mvrx")
 
-    debugImplementation libraries.debugDb
+    debugImplementation Libraries.debugDb
 
-    testImplementation testLibraries.junit
-    testImplementation testLibraries.mockitoKotlin
+    testImplementation TestLibraries.junit
+    testImplementation TestLibraries.mockitoKotlin
     testImplementation project(":testing")
 }
