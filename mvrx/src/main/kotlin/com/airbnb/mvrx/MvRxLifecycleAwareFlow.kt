@@ -2,10 +2,8 @@
 
 package com.airbnb.mvrx
 
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.OnLifecycleEvent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combineTransform
@@ -16,14 +14,12 @@ import kotlinx.coroutines.flow.combineTransform
  */
 fun <T : Any> Flow<T>.flowWhenStarted(owner: LifecycleOwner): Flow<T> {
     val startedFlow = MutableStateFlow(false)
-    owner.lifecycle.addObserver(object : LifecycleObserver {
-        @OnLifecycleEvent(Lifecycle.Event.ON_START)
-        fun onStart() {
+    owner.lifecycle.addObserver(object : DefaultLifecycleObserver {
+        override fun onStart(owner: LifecycleOwner) {
             startedFlow.value = true
         }
 
-        @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-        fun onStop() {
+        override fun onStop(owner: LifecycleOwner) {
             startedFlow.value = false
         }
     })
