@@ -9,10 +9,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.airbnb.epoxy.EpoxyRecyclerView
-import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.MvRx
+import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.todomvrx.TasksState
 import com.airbnb.mvrx.todomvrx.TasksViewModel
@@ -22,7 +23,7 @@ import com.airbnb.mvrx.todomvrx.todoapp.R
 import com.airbnb.mvrx.todomvrx.util.ToDoEpoxyController
 import com.airbnb.mvrx.todomvrx.util.showLongSnackbar
 
-abstract class BaseFragment : BaseMvRxFragment() {
+abstract class BaseFragment : Fragment(), MvRxView {
 
     protected val viewModel by activityViewModel(TasksViewModel::class)
 

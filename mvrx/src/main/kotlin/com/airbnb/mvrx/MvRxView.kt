@@ -3,8 +3,11 @@ package com.airbnb.mvrx
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStoreOwner
 import kotlin.reflect.KProperty1
 
 // Set of MvRxView identity hash codes that have a pending invalidate.
@@ -29,10 +32,12 @@ interface MvRxView : LifecycleOwner {
      * a lifecycle event (e.g. rotation) you should assign a consistent id. Likely this means you should save the id
      * in onSaveInstance state. The viewId will not be accessed until a subscribe method is called.
      * Accessing mvrxViewId before calling super.onCreate() will cause a crash.
-     *
-     * For an example implementation see [BaseMvRxFragment].
      */
-    val mvrxViewId: String
+    val mvrxViewId: String get() = when (this) {
+        is ViewModelStoreOwner -> ViewModelProvider(this).get(MvRxViewIdViewModel::class.java).mvrxViewId
+        else -> error("If your MvRxView is not a ViewModelStoreOwner, you must implement mvrxViewId " +
+                "and return a string that is unique to this view and persistant across its entire lifecycle.")
+    }
 
     /**
      * Override this to handle any state changes from MvRxViewModels created through MvRx Fragment delegates.
@@ -54,7 +59,7 @@ interface MvRxView : LifecycleOwner {
      * By default [subscriptionLifecycleOwner] is the same as the MvRxView's standard lifecycle owner.
      */
     val subscriptionLifecycleOwner: LifecycleOwner
-        get() = this
+        get() = (this as? Fragment)?.viewLifecycleOwnerLiveData?.value ?: this
 
     fun postInvalidate() {
         if (pendingInvalidates.add(System.identityHashCode(this@MvRxView))) {

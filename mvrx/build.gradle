@@ -38,6 +38,9 @@ dependencies {
     api Libraries.kotlinCoroutines
 
     implementation Libraries.appcompat
+    implementation Libraries.fragment
+    implementation Libraries.viewModelSavedState
+    implementation Libraries.lifecycleCommon
     implementation Libraries.viewModelKtx
     implementation Libraries.runtimeKtx
 

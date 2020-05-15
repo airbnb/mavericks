@@ -4,10 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
-import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.core.MvRxViewModel
@@ -20,7 +21,7 @@ class CounterViewModel(state: CounterState) : MvRxViewModel<CounterState>(state)
     fun incrementCount() = setState { copy(count = count + 1) }
 }
 
-class ParentFragment : BaseMvRxFragment() {
+class ParentFragment : Fragment(), MvRxView {
 
     private val viewModel: CounterViewModel by fragmentViewModel()
 

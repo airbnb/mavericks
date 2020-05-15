@@ -1,17 +1,22 @@
 package com.airbnb.mvrx.sample.features.helloworld
 
 import android.os.Bundle
-import androidx.appcompat.widget.Toolbar
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
-import com.airbnb.mvrx.BaseMvRxFragment
+import com.airbnb.mvrx.MvRxView
+import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.views.Marquee
+import com.airbnb.mvrx.withState
 
-class HelloWorldFragment : BaseMvRxFragment() {
+class HelloWorldFragment : Fragment(), MvRxView {
+    private val viewModel: HelloWorldViewModel by fragmentViewModel()
+
     private lateinit var marquee: Marquee
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? =
@@ -20,7 +25,7 @@ class HelloWorldFragment : BaseMvRxFragment() {
             marquee = findViewById(R.id.marquee)
         }
 
-    override fun invalidate() {
-        marquee.setTitle("Hello World")
+    override fun invalidate() = withState (viewModel) { state ->
+        marquee.setTitle(state.title)
     }
 }

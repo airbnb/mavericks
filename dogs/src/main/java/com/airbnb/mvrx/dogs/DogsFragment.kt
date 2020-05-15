@@ -4,15 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.airbnb.mvrx.BaseMvRxFragment
+import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.dogs.data.Dog
 import com.airbnb.mvrx.dogs.databinding.DogsFragmentBinding
 import com.airbnb.mvrx.dogs.views.DogsFragmentHandler
 import com.airbnb.mvrx.withState
 
-class DogsFragment : BaseMvRxFragment(), DogsFragmentHandler {
+class DogsFragment : Fragment(), MvRxView, DogsFragmentHandler {
 
     private val viewModel: DogViewModel by activityViewModel()
     private lateinit var bindings: DogsFragmentBinding

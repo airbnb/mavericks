@@ -754,6 +754,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 
         owner.lifecycle.addObserver(observer)
         return onCompletion {
+            activeSubscriptions.remove(deliveryMode.subscriptionId)
             owner.lifecycle.removeObserver(observer)
         }
     }
