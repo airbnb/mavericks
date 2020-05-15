@@ -3,11 +3,10 @@ package com.airbnb.mvrx
 import android.util.Log
 import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
-import androidx.lifecycle.OnLifecycleEvent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.lifecycleScope
 import com.airbnb.mvrx.MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER
@@ -739,15 +738,13 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 
     @Suppress("EXPERIMENTAL_API_USAGE")
     private fun <T> Flow<T>.assertOneActiveSubscription(owner: LifecycleOwner, deliveryMode: UniqueOnly): Flow<T> {
-        val observer = object : LifecycleObserver {
-            @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-            fun onCreate() {
+        val observer = object : DefaultLifecycleObserver {
+            override fun onCreate(owner: LifecycleOwner) {
                 if (activeSubscriptions.contains(deliveryMode.subscriptionId)) error(duplicateSubscriptionMessage(deliveryMode))
                 activeSubscriptions += deliveryMode.subscriptionId
             }
 
-            @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-            fun onDestroy() {
+            override fun onDestroy(owner: LifecycleOwner) {
                 activeSubscriptions.remove(deliveryMode.subscriptionId)
             }
         }

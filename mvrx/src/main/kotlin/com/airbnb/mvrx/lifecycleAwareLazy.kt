@@ -3,10 +3,8 @@
 package com.airbnb.mvrx
 
 import androidx.annotation.RestrictTo
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.OnLifecycleEvent
 import java.io.Serializable
 
 private object UninitializedValue
@@ -25,9 +23,8 @@ class lifecycleAwareLazy<out T>(private val owner: LifecycleOwner, initializer: 
     private val lock = this
 
     init {
-        owner.lifecycle.addObserver(object : LifecycleObserver {
-            @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
-            fun onStart() {
+        owner.lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onCreate(owner: LifecycleOwner) {
                 if (!isInitialized()) value
                 owner.lifecycle.removeObserver(this)
             }
