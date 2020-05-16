@@ -793,7 +793,8 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
  */
 sealed class DeliveryMode {
 
-    internal fun appendPropertiesToId(vararg properties: KProperty1<*, *>): DeliveryMode {
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    fun appendPropertiesToId(vararg properties: KProperty1<*, *>): DeliveryMode {
         return when (this) {
             is RedeliverOnStart -> RedeliverOnStart
             is UniqueOnly -> UniqueOnly(subscriptionId + "_" + properties.joinToString(",") { it.name })
