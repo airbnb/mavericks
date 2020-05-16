@@ -118,15 +118,6 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activ
 }
 
 /**
- * For internal use only. Public for inline.
- *
- * Looks for [MvRx.KEY_ARG] on the arguments of the fragments.
- */
-@Suppress("FunctionName")
-@RestrictTo(LIBRARY)
-fun <T : Fragment> T._fragmentArgsProvider(): Any? = arguments?.get(MvRx.KEY_ARG)
-
-/**
  * [fragmentViewModel] except scoped to the current Activity. Use this to share state between different Fragments.
  */
 inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.viewModel(
