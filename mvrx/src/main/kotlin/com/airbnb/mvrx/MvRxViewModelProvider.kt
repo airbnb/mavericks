@@ -15,7 +15,7 @@ import java.io.Serializable
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 object MvRxViewModelProvider {
     /**
-     * MvRx specific ViewModelProvider used for creating a _root_ide_package_.com.airbnb.mvrx.BaseMavericksViewModel scoped to either a [Fragment] or [FragmentActivity].
+     * MvRx specific ViewModelProvider used for creating a BaseMavericksViewModel scoped to either a [Fragment] or [FragmentActivity].
      * If this is in a [Fragment], it cannot be called before the Fragment has been added to an Activity or wrapped in a [Lazy] call.
      *
      * @param viewModelClass The class of the ViewModel you would like an instance of.

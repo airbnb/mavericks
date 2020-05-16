@@ -9,5 +9,5 @@ import androidx.fragment.app.Fragment
  * Looks for [MvRx.KEY_ARG] on the arguments of the fragments.
  */
 @Suppress("FunctionName")
-@RestrictTo(RestrictTo.Scope.LIBRARY)
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 fun <T : Fragment> T._fragmentArgsProvider(): Any? = arguments?.get(MvRx.KEY_ARG)
