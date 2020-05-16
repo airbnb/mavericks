@@ -43,7 +43,7 @@ dependencies {
     implementation Libraries.rxJava
     implementation Libraries.viewModelKtx
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation project(":mvrx")
+    implementation project(":mvrx-rxjava2")
 
     debugImplementation Libraries.fragmentTesting
 

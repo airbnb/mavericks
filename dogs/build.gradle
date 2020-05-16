@@ -26,7 +26,7 @@ dependencies {
     implementation Libraries.navigationFragmentKtx
     implementation Libraries.navigationUiKtx
     implementation Libraries.picasso
-    implementation project(":mvrx")
+    implementation project(":mvrx-rxjava2")
 
     testImplementation TestLibraries.junit
     testImplementation project(":testing")

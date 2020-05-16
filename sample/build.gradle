@@ -44,7 +44,7 @@ dependencies {
     implementation Libraries.retrofitRxJava
     implementation Libraries.rxAndroid
     implementation Libraries.rxJava
-    implementation project(":mvrx")
+    implementation project(":mvrx-rxjava2")
 
     testImplementation TestLibraries.junit
 }
