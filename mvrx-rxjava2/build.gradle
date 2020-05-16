@@ -33,7 +33,10 @@ dependencies {
     implementation Libraries.lifecycleCommon
     implementation Libraries.runtimeKtx
 
+    testImplementation project(':testing')
     testImplementation TestLibraries.junit
+    testImplementation Libraries.appcompat
+    testImplementation TestLibraries.kotlinCoroutinesTest
     testImplementation TestLibraries.mockito
     testImplementation TestLibraries.roboeletric
 }
