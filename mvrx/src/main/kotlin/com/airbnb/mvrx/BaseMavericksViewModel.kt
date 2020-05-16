@@ -13,9 +13,15 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.KProperty1
 
 /**
- * To use MvRx, create your own base MvRxViewModel that extends this one and sets debugMode.
+ * To use Mavericks, make a class MavericksViewModel or YourCompanyViewModel that extends BaseMavericksViewModel and set debugMode.
  *
- * All subsequent ViewModels in your app should use that one.
+ * Most of the time, debugMode should be set to `BuildConfig.DEBUG`. When debug mode is enabled, Mavericks will run a series of checks on
+ * your state and reducers to ensure that you are using Mavericks safely and will catch numerous common errors and mistakes.
+ *
+ * Most base classes will look like:
+ * ```
+ * abstract class MavericksViewModel<S : MvRxState>(state: S) : BaseMavericksViewModel<S>(state, debugMode = BuildConfig.DEBUG)
+ * ```
  */
 abstract class BaseMavericksViewModel<S : MvRxState>(
     initialState: S,
