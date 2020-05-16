@@ -1,0 +1,52 @@
+import com.airbnb.mvrx.JacocoReportTask
+
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-android-extensions"
+apply plugin: "jacoco"
+apply plugin: "com.vanniktech.maven.publish"
+
+android {
+    resourcePrefix "mvrx_"
+
+    defaultConfig {
+        consumerProguardFiles "proguard-rules.pro"
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+            all {
+                jacoco {
+                    includeNoLocationClasses = true
+                }
+            }
+        }
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.2"
+}
+
+dependencies {
+    api Libraries.rxAndroid
+    api Libraries.rxJava
+    api Libraries.kotlinCoroutines
+
+    implementation Libraries.appcompat
+    implementation Libraries.fragment
+    implementation Libraries.viewModelSavedState
+    implementation Libraries.lifecycleCommon
+    implementation Libraries.viewModelKtx
+    implementation Libraries.runtimeKtx
+
+    testImplementation TestLibraries.junit
+    testImplementation TestLibraries.kotlinCoroutinesTest
+    testImplementation TestLibraries.mockito
+    testImplementation TestLibraries.roboeletric
+}
+
+tasks.register("coverage", JacocoReportTask.class) {
+    coverage.dependsOn("testDebugUnitTest")
+}
