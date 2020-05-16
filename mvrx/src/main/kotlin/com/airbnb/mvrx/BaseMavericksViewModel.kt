@@ -78,6 +78,8 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
      * Return the current state as a Flow. For certain situations, this may be more convenient
      * than subscribe and selectSubscribe because it can easily be composed with other
      * coroutines operations and chained with operators.
+     *
+     * This WILL emit the current state followed by all subsequent state updates.
      */
     val stateFlow: Flow<S>
         get() = stateStore.flow
