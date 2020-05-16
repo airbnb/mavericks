@@ -144,11 +144,9 @@ fun <V : Any> args() = object : ReadOnlyProperty<Fragment, V> {
 
     override fun getValue(thisRef: Fragment, property: KProperty<*>): V {
         if (value == null) {
-            val args = thisRef.arguments
-                ?: throw IllegalArgumentException("There are no fragment arguments!")
+            val args = thisRef.arguments ?: throw IllegalArgumentException("There are no fragment arguments!")
             val argUntyped = args.get(MvRx.KEY_ARG)
-            argUntyped
-                ?: throw IllegalArgumentException("MvRx arguments not found at key MvRx.KEY_ARG!")
+            argUntyped ?: throw IllegalArgumentException("MvRx arguments not found at key MvRx.KEY_ARG!")
             @Suppress("UNCHECKED_CAST")
             value = argUntyped as V
         }
@@ -164,5 +162,4 @@ fun <V : Any> args() = object : ReadOnlyProperty<Fragment, V> {
  * This will replace *all contents* starting at the offset with the new list.
  * For example: [1,2,3].appendAt([4], 1) == [1,4]]
  */
-fun <T : Any> List<T>.appendAt(other: List<T>?, offset: Int) = subList(0, offset.coerceIn(0, size)) + (other
-    ?: emptyList())
+fun <T : Any> List<T>.appendAt(other: List<T>?, offset: Int) = subList(0, offset.coerceIn(0, size)) + (other ?: emptyList())
