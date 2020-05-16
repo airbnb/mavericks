@@ -7,10 +7,10 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.airbnb.mvrx.test.MvRxTestRule
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Runnable
-import kotlinx.coroutines.test.TestCoroutineDispatcher
 import org.junit.AfterClass
 import io.reactivex.Scheduler
 import io.reactivex.android.plugins.RxAndroidPlugins
@@ -22,7 +22,9 @@ import io.reactivex.plugins.RxJavaPlugins
 import java.util.concurrent.Executor
 import java.util.concurrent.TimeUnit
 import org.junit.BeforeClass
+import org.junit.ClassRule
 import org.junit.Ignore
+import org.junit.Rule
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
@@ -34,20 +36,9 @@ import kotlin.coroutines.CoroutineContext
 @RunWith(RobolectricTestRunner::class)
 @Ignore("Base Class")
 abstract class BaseTest {
-    companion object {
-        @JvmStatic
-        @BeforeClass
-        fun classSetUp() {
-            ShadowLog.stream = System.out
-            MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES = true
-        }
 
-        @JvmStatic
-        @AfterClass
-        fun classTearDown() {
-            MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES = false
-        }
-    }
+    @get:Rule
+    val mvrxRule = MvRxTestRule(setForceDisableLifecycleAwareObserver = false)
 
     protected inline fun <reified F : Fragment, reified A : AppCompatActivity> createFragment(
         savedInstanceState: Bundle? = null,

@@ -23,6 +23,13 @@ enum class DebugMode(internal val value: Boolean?) {
     Unset(null)
 }
 
+/**
+ * To use this in your test class, add
+ * ```
+ * @get:Rule
+ * val mvrxRule = MvRxTestRule()
+ * ```
+ */
 class MvRxTestRule(
         /**
          * Forces MvRx to be in debug mode or not.
