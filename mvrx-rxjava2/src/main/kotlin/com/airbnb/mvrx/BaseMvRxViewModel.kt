@@ -15,11 +15,9 @@ import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.disposables.Disposables
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.dropWhile
@@ -27,7 +25,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
@@ -54,7 +51,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * directly, do not override this in the primary constructor of your feature ViewModel.
      */
     contextOverride: CoroutineContext? = null
-) : BaseMavericksViewModel<S>(initialState, debugMode, stateStoreOverride, contextOverride){
+) : BaseMavericksViewModel<S>(initialState, debugMode, stateStoreOverride, contextOverride) {
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
     private val lastDeliveredStates = ConcurrentHashMap<String, Any>()
@@ -72,7 +69,6 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      */
     private val lifecycleOwner: LifecycleOwner = LifecycleOwner { lifecycleRegistry }
     private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(lifecycleOwner).apply { currentState = Lifecycle.State.RESUMED }
-
 
     override fun onCleared() {
         super.onCleared()
