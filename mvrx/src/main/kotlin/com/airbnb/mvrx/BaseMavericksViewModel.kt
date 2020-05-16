@@ -37,7 +37,7 @@ import kotlin.reflect.KProperty1
  *
  * All subsequent ViewModels in your app should use that one.
  */
-abstract class BaseMvRxViewModel<S : MvRxState>(
+abstract class BaseMavericksViewModel<S : MvRxState>(
     initialState: S,
     debugMode: Boolean,
     /**
@@ -67,7 +67,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     private val activeSubscriptions = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
     /**
-     * Define a [LifecycleOwner] to control subscriptions between [BaseMvRxViewModel]s. This only
+     * Define a [LifecycleOwner] to control subscriptions between [BaseMavericksViewModel]s. This only
      * provides two states, [Lifecycle.State.RESUMED] and [Lifecycle.State.DESTROYED] as it follows
      * the [ViewModel] object lifecycle. That is, when instantiated the lifecycle will be
      * [Lifecycle.State.RESUMED] and when [ViewModel.onCleared] is called the lifecycle will be
@@ -139,14 +139,14 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
                         }
                     if (changedProp != null) {
                         throw IllegalArgumentException(
-                            "Impure reducer set on ${this@BaseMvRxViewModel::class.java.simpleName}! " +
+                            "Impure reducer set on ${this@BaseMavericksViewModel::class.java.simpleName}! " +
                                 "${changedProp.name} changed from ${changedProp.get(firstState)} " +
                                 "to ${changedProp.get(secondState)}. " +
                                 "Ensure that your state properties properly implement hashCode."
                         )
                     } else {
                         throw IllegalArgumentException(
-                            "Impure reducer set on ${this@BaseMvRxViewModel::class.java.simpleName}! Differing states were provided by the same reducer." +
+                            "Impure reducer set on ${this@BaseMavericksViewModel::class.java.simpleName}! Differing states were provided by the same reducer." +
                                 "Ensure that your state properties properly implement hashCode. First state: $firstState -> Second state: $secondState"
                         )
                     }
@@ -265,7 +265,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * For ViewModels that want to subscribe to another ViewModel.
      */
     protected fun <S : MvRxState> subscribe(
-        viewModel: BaseMvRxViewModel<S>,
+        viewModel: BaseMavericksViewModel<S>,
         subscriber: (S) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
@@ -288,7 +288,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * Subscribe to state changes for only a single property in a different ViewModel.
      */
     protected fun <A, S : MvRxState> selectSubscribe(
-        viewModel: BaseMvRxViewModel<S>,
+        viewModel: BaseMavericksViewModel<S>,
         prop1: KProperty1<S, A>,
         subscriber: (A) -> Unit
     ) {
@@ -329,7 +329,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * for onSuccess and onFail which automatically unwrap the value or error.
      */
     protected fun <T, S : MvRxState> asyncSubscribe(
-        viewModel: BaseMvRxViewModel<S>,
+        viewModel: BaseMavericksViewModel<S>,
         asyncProp: KProperty1<S, Async<T>>,
         onFail: ((Throwable) -> Unit)? = null,
         onSuccess: ((T) -> Unit)? = null
@@ -374,7 +374,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * Subscribe to state changes for two properties in a different ViewModel.
      */
     protected fun <A, B, S : MvRxState> selectSubscribe(
-        viewModel: BaseMvRxViewModel<S>,
+        viewModel: BaseMavericksViewModel<S>,
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         subscriber: (A, B) -> Unit
@@ -417,7 +417,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * Subscribe to state changes for three properties in a different ViewModel.
      */
     protected fun <A, B, C, S : MvRxState> selectSubscribe(
-        viewModel: BaseMvRxViewModel<S>,
+        viewModel: BaseMavericksViewModel<S>,
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
@@ -470,7 +470,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * Subscribe to state changes for four properties in a different ViewModel.
      */
     protected fun <A, B, C, D, S : MvRxState> selectSubscribe(
-        viewModel: BaseMvRxViewModel<S>,
+        viewModel: BaseMavericksViewModel<S>,
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
@@ -524,7 +524,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * Subscribe to state changes for five properties in a different ViewModel.
      */
     protected fun <A, B, C, D, E, S : MvRxState> selectSubscribe(
-        viewModel: BaseMvRxViewModel<S>,
+        viewModel: BaseMavericksViewModel<S>,
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
@@ -582,7 +582,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * Subscribe to state changes for six properties in a different ViewModel.
      */
     protected fun <A, B, C, D, E, F, S : MvRxState> selectSubscribe(
-        viewModel: BaseMvRxViewModel<S>,
+        viewModel: BaseMavericksViewModel<S>,
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
@@ -644,7 +644,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * Subscribe to state changes for seven properties in a different ViewModel.
      */
     protected fun <A, B, C, D, E, F, G, S : MvRxState> selectSubscribe(
-        viewModel: BaseMvRxViewModel<S>,
+        viewModel: BaseMavericksViewModel<S>,
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
@@ -771,7 +771,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         return this
     }
 
-    private fun <S : MvRxState> assertSubscribeToDifferentViewModel(viewModel: BaseMvRxViewModel<S>) {
+    private fun <S : MvRxState> assertSubscribeToDifferentViewModel(viewModel: BaseMavericksViewModel<S>) {
         require(this != viewModel) {
             "This method is for subscribing to other view models. Please pass a different instance as the argument."
         }

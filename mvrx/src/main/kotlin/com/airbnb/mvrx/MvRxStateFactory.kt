@@ -4,7 +4,7 @@ import androidx.annotation.RestrictTo
 import java.lang.reflect.Modifier
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-interface MvRxStateFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> {
+interface MvRxStateFactory<VM : BaseMavericksViewModel<S>, S : MvRxState> {
 
     fun createInitialState(
         viewModelClass: Class<out VM>,
@@ -14,7 +14,7 @@ interface MvRxStateFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> {
     ): S
 }
 
-internal class RealMvRxStateFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> : MvRxStateFactory<VM, S> {
+internal class RealMvRxStateFactory<VM : BaseMavericksViewModel<S>, S : MvRxState> : MvRxStateFactory<VM, S> {
 
     override fun createInitialState(
         viewModelClass: Class<out VM>,
@@ -35,7 +35,7 @@ internal class RealMvRxStateFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> : 
  * If no such function exists, null is returned.
  */
 @Suppress("UNCHECKED_CAST")
-internal fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createStateFromCompanionFactory(
+internal fun <VM : BaseMavericksViewModel<S>, S : MvRxState> createStateFromCompanionFactory(
     viewModelClass: Class<out VM>,
     viewModelContext: ViewModelContext
 ): S? {
@@ -55,7 +55,7 @@ internal fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createStateFromCompanion
  * Searches [stateClass] for a single argument constructor matching the type of [args]. If [args] is null, then
  * no arg constructor is invoked.
  */
-internal fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createStateFromConstructor(
+internal fun <VM : BaseMavericksViewModel<S>, S : MvRxState> createStateFromConstructor(
     viewModelClass: Class<out VM>,
     stateClass: Class<out S>,
     args: Any?

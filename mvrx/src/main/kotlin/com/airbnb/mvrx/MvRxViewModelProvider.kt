@@ -15,7 +15,7 @@ import java.io.Serializable
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 object MvRxViewModelProvider {
     /**
-     * MvRx specific ViewModelProvider used for creating a BaseMvRxViewModel scoped to either a [Fragment] or [FragmentActivity].
+     * MvRx specific ViewModelProvider used for creating a _root_ide_package_.com.airbnb.mvrx.BaseMavericksViewModel scoped to either a [Fragment] or [FragmentActivity].
      * If this is in a [Fragment], it cannot be called before the Fragment has been added to an Activity or wrapped in a [Lazy] call.
      *
      * @param viewModelClass The class of the ViewModel you would like an instance of.
@@ -29,7 +29,7 @@ object MvRxViewModelProvider {
      * @param initialStateFactory A way to specify how to create the initial state, can be mocked out for testing.
      *
      */
-    fun <VM : BaseMvRxViewModel<S>, S : MvRxState> get(
+    fun <VM : BaseMavericksViewModel<S>, S : MvRxState> get(
         viewModelClass: Class<out VM>,
         stateClass: Class<out S>,
         viewModelContext: ViewModelContext,
@@ -77,7 +77,7 @@ object MvRxViewModelProvider {
         return viewModel.viewModel
     }
 
-    private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> VM.getSavedStateBundle(
+    private fun <VM : BaseMavericksViewModel<S>, S : MvRxState> VM.getSavedStateBundle(
         initialArgs: Any?
     ) = withState(this) { state ->
         Bundle().apply {
@@ -112,7 +112,7 @@ object MvRxViewModelProvider {
 /**
  * Return the [Class] of the companion [MvRxViewModelFactory] for a given ViewModel class, if it exists.
  */
-internal fun <VM : BaseMvRxViewModel<*>> Class<VM>.factoryCompanion(): Class<out MvRxViewModelFactory<VM, *>>? {
+internal fun <VM : BaseMavericksViewModel<*>> Class<VM>.factoryCompanion(): Class<out MvRxViewModelFactory<VM, *>>? {
     return declaredClasses.firstOrNull {
         MvRxViewModelFactory::class.java.isAssignableFrom(it)
     }?.let { klass ->
