@@ -9,7 +9,7 @@ import org.junit.Test
 import java.util.concurrent.ConcurrentLinkedQueue
 
 data class OrderingState(val count: Int = 0) : MvRxState
-class SetStateWithStateOrderingTest : BaseMvRxViewModel<OrderingState>(OrderingState(), debugMode = false) {
+class SetStateWithStateOrderingTest : BaseMavericksViewModel<OrderingState>(OrderingState(), debugMode = false) {
     @Test
     fun test1() = runBlocking {
         val calls = mutableListOf<String>()
