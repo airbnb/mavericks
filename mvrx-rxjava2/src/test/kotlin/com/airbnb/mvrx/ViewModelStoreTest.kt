@@ -32,6 +32,7 @@ class ViewModelStoreActivity : TestActivity() {
     }
 }
 
+@Suppress("DEPRECATION")
 class ViewModelStoreTestFragment : BaseMvRxFragment() {
     val viewModelFragment: ViewModelStoreTestViewModel by fragmentViewModel()
     val viewModelActivity: ViewModelStoreTestViewModel by activityViewModel()

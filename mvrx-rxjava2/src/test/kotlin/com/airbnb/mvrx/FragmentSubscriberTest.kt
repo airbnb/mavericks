@@ -16,6 +16,7 @@ class ViewSubscriberViewModel(initialState: ViewSubscriberState) : TestMvRxViewM
     fun setFoo(foo: Int) = setState { copy(foo = foo) }
 }
 
+@Suppress("DEPRECATION")
 open class ViewSubscriberFragment : BaseMvRxFragment() {
     private val viewModel: ViewSubscriberViewModel by fragmentViewModel()
 
@@ -447,6 +448,7 @@ class FragmentSubscriberTest : BaseTest() {
         assertEquals(2, fragment.invalidateCallCount)
     }
 
+    @Suppress("DEPRECATION")
     class DuplicateUniqueSubscriberFragment : BaseMvRxFragment() {
         private val viewModel: ViewSubscriberViewModel by fragmentViewModel()
 
@@ -464,6 +466,7 @@ class FragmentSubscriberTest : BaseTest() {
         createFragment<DuplicateUniqueSubscriberFragment, TestActivity>(containerId = CONTAINER_ID)
     }
 
+    @Suppress("DEPRECATION")
     class ParentFragment : BaseMvRxFragment() {
 
         val viewModel: ViewSubscriberViewModel by fragmentViewModel()
@@ -474,6 +477,7 @@ class FragmentSubscriberTest : BaseTest() {
         }
     }
 
+    @Suppress("DEPRECATION")
     class ChildFragmentWithParentViewModel : BaseMvRxFragment() {
 
         val viewModel: ViewSubscriberViewModel by parentFragmentViewModel()
@@ -490,6 +494,7 @@ class FragmentSubscriberTest : BaseTest() {
         assertEquals(parentFragment.viewModel, childFragment.viewModel)
     }
 
+    @Suppress("DEPRECATION")
     class ParentFragmentWithoutViewModel : BaseMvRxFragment() {
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = FrameLayout(requireContext())
@@ -515,6 +520,7 @@ class FragmentSubscriberTest : BaseTest() {
         assertEquals(childFragment1.viewModel, childFragment2.viewModel)
     }
 
+    @Suppress("DEPRECATION")
     class EmptyMvRxFragment : BaseMvRxFragment() {
         override fun invalidate() {
         }
@@ -534,6 +540,7 @@ class FragmentSubscriberTest : BaseTest() {
         assertEquals(childFragment1.viewModel, childFragment2.viewModel)
     }
 
+    @Suppress("DEPRECATION")
     class FragmentWithTarget : BaseMvRxFragment() {
         val viewModel: ViewSubscriberViewModel by targetFragmentViewModel()
 
