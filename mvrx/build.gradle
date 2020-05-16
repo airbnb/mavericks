@@ -31,7 +31,6 @@ jacoco {
 
 dependencies {
     api Libraries.rxAndroid
-    api Libraries.rxJava
     api Libraries.kotlinCoroutines
 
     implementation Libraries.appcompat

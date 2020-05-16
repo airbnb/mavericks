@@ -2,7 +2,6 @@ package com.airbnb.mvrx
 
 import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
-import io.reactivex.disposables.CompositeDisposable
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -48,7 +47,6 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
     private val stateStore = stateStoreOverride ?: CoroutinesStateStore(initialState, viewModelScope)
 
     private val tag by lazy { javaClass.simpleName }
-    private val disposables = CompositeDisposable()
     private val mutableStateChecker = if (debugMode) MutableStateChecker(initialState) else null
 
     /**
@@ -79,7 +77,6 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
     @CallSuper
     open fun onCleared() {
         viewModelScope.cancel()
-        disposables.dispose()
     }
 
     /**
