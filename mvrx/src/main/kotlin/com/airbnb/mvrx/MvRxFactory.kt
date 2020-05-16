@@ -86,7 +86,8 @@ private fun <VM : BaseMavericksViewModel<S>, S : MvRxState> createDefaultViewMod
     return null
 }
 
-internal class ViewModelDoesNotExistException(
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+class ViewModelDoesNotExistException(
     viewModelClass: Class<*>,
     viewModelContext: ViewModelContext,
     key: String
