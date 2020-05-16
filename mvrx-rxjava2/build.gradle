@@ -30,9 +30,8 @@ jacoco {
 }
 
 dependencies {
-    api Libraries.rxAndroid
+    api project(':mvrx')
     api Libraries.rxJava
-    api Libraries.kotlinCoroutines
 
     implementation Libraries.appcompat
     implementation Libraries.fragment
