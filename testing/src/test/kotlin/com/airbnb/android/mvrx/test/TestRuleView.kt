@@ -1,3 +1,4 @@
+@file:Suppress("DEPRECATION")
 package com.airbnb.android.mvrx.test
 
 import com.airbnb.mvrx.BaseMvRxFragment
