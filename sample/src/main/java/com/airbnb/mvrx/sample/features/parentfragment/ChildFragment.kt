@@ -4,13 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.airbnb.mvrx.BaseMvRxFragment
+import androidx.fragment.app.Fragment
+import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.parentFragmentViewModel
 import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.withState
 import kotlinx.android.synthetic.main.fragment_parent.textView
 
-class ChildFragment : BaseMvRxFragment() {
+class ChildFragment : Fragment(), MvRxView {
 
     private val viewModel: CounterViewModel by parentFragmentViewModel()
 

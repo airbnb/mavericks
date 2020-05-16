@@ -11,7 +11,7 @@ class HelloWorldEpoxyFragment : BaseFragment() {
     override fun epoxyController() = simpleController(viewModel) { state ->
         marquee {
             id("marquee")
-            title(state.title.value)
+            title(state.title)
         }
     }
 }

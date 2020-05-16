@@ -105,6 +105,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 
     @CallSuper
     override fun onCleared() {
+        super.onCleared()
         viewModelScope.cancel()
         disposables.dispose()
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
@@ -751,6 +752,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 
         owner.lifecycle.addObserver(observer)
         return onCompletion {
+            activeSubscriptions.remove(deliveryMode.subscriptionId)
             owner.lifecycle.removeObserver(observer)
         }
     }

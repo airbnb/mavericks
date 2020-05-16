@@ -67,6 +67,7 @@ object Libraries {
     const val debugDb = "com.amitshekhar.android:debug-db:${Versions.debugDb}"
     const val epoxy = "com.airbnb.android:epoxy:${Versions.epoxy}"
     const val espressoIdlingResource = "androidx.test.espresso:espresso-idling-resource:${Versions.espresso}"
+    const val fragment = "androidx.fragment:fragment:${Versions.fragment}"
     const val fragmentKtx = "androidx.fragment:fragment-ktx:${Versions.fragment}"
     const val fragmentTesting = "androidx.fragment:fragment-testing:${Versions.fragment}"
     const val junit = "junit:junit:${Versions.junit}"
@@ -90,6 +91,7 @@ object Libraries {
     const val roomRuntime = "androidx.room:room-runtime:${Versions.room}"
     const val rxAndroid = "io.reactivex.rxjava2:rxandroid:${Versions.rxAndroid}"
     const val rxJava = "io.reactivex.rxjava2:rxjava:${Versions.rxJava}"
+    const val viewModelSavedState = "androidx.lifecycle:lifecycle-viewmodel-savedstate:${Versions.lifecycle}"
     const val viewModelKtx = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycle}"
     const val runtimeKtx = "androidx.lifecycle:lifecycle-runtime-ktx:${Versions.lifecycle}"
 }

@@ -6,14 +6,15 @@ import android.view.View
 import androidx.annotation.IdRes
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.airbnb.epoxy.EpoxyRecyclerView
-import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.MvRx
+import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.sample.R
 
-abstract class BaseFragment : BaseMvRxFragment(R.layout.fragment_base_mvrx) {
+abstract class BaseFragment : Fragment(R.layout.fragment_base_mvrx), MvRxView {
 
     protected lateinit var recyclerView: EpoxyRecyclerView
     protected lateinit var toolbar: Toolbar
@@ -30,7 +31,7 @@ abstract class BaseFragment : BaseMvRxFragment(R.layout.fragment_base_mvrx) {
         toolbar = view.findViewById(R.id.toolbar)
         coordinatorLayout = view.findViewById(R.id.coordinator_layout)
 
-        recyclerView.setController(epoxyController)
+        recyclerView.setControllerAndBuildModels(epoxyController)
 
         toolbar.setupWithNavController(findNavController())
     }

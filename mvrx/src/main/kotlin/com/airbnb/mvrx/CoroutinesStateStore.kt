@@ -80,12 +80,12 @@ class CoroutinesStateStore<S : MvRxState>(
      * All pending setState reducers will be run prior to every single withState lambda.
      * This ensures that situations such as the following will work correctly:
      *
-     * Sitaution 1
+     * Situation 1
      *
      * setState { ... }
      * withState { ... }
      *
-     * Sitaution 2
+     * Situation 2
      *
      * withState {
      *     setState { ... }

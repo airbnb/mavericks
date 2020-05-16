@@ -4,12 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.airbnb.mvrx.BaseMvRxFragment
+import androidx.fragment.app.Fragment
+import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.dogs.databinding.AdoptionFragmentBinding
 import com.airbnb.mvrx.withState
 
-class AdoptionFragment : BaseMvRxFragment() {
+class AdoptionFragment : Fragment(), MvRxView {
     private val viewModel: DogViewModel by activityViewModel()
     private lateinit var binding: AdoptionFragmentBinding
 
