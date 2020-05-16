@@ -14,6 +14,7 @@ import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
+import io.reactivex.disposables.Disposables
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -769,6 +770,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     protected fun Disposable.disposeOnClear(): Disposable {
         disposables.add(this)
         return this
+    }
+
+    private fun Job.toDisposable() = Disposables.fromAction {
+        cancel()
     }
 
     private fun <S : MvRxState> assertSubscribeToDifferentViewModel(viewModel: BaseMvRxViewModel<S>) {

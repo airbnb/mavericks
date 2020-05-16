@@ -1,5 +1,6 @@
 package com.airbnb.mvrx
 
+import androidx.annotation.RestrictTo
 import java.util.Arrays
 
 /**
@@ -54,11 +55,12 @@ data class Success<out T>(private val value: T) : Async<T>(complete = true, shou
      * you could map a network request to just the data you need in the value, but your base layers could
      * keep metadata about the request, like timing, for logging.
      *
-     * @see BaseMvRxViewModel.execute
+     * @see BaseMavericksViewModel.execute
      * @see Async.setMetadata
      * @see Async.getMetadata
      */
-    internal var metadata: Any? = null
+    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    var metadata: Any? = null
 }
 
 data class Fail<out T>(val error: Throwable, private val value: T? = null) : Async<T>(complete = true, shouldLoad = true, value = value) {
