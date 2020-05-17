@@ -1,13 +1,5 @@
 package com.airbnb.mvrx
 
-import android.os.Handler
-import android.os.Looper
-import android.os.Message
-import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.ViewModelStoreOwner
 import kotlin.reflect.KProperty1
 
 /**
@@ -50,7 +42,7 @@ interface MvRxView : MavericksView {
         prop1: KProperty1<S, A>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A) -> Unit
-    ) = onEach(this@MvRxView.subscriptionLifecycleOwner, prop1, deliveryMode, subscriber)
+    ) = onEach1Internal(this@MvRxView.subscriptionLifecycleOwner, prop1, deliveryMode, subscriber)
 
     /**
      * Subscribe to changes in an async property. There are optional parameters for onSuccess

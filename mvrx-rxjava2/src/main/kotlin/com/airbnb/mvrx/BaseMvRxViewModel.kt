@@ -184,7 +184,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (A) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.onEach(lifecycleOwner, prop1, RedeliverOnStart, subscriber).toDisposable()
+        viewModel.onEach1Internal(lifecycleOwner, prop1, RedeliverOnStart, subscriber).toDisposable()
     }
 
     private fun <A> selectSubscribeInternal(
@@ -192,7 +192,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         prop1: KProperty1<S, A>,
         deliveryMode: DeliveryMode,
         subscriber: (A) -> Unit
-    ) = onEach(owner, prop1, deliveryMode, subscriber).toDisposable()
+    ) = onEach1Internal(owner, prop1, deliveryMode, subscriber).toDisposable()
 
     /**
      * Subscribe to changes in an async property. There are optional parameters for onSuccess
@@ -233,13 +233,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         deliveryMode: DeliveryMode,
         onFail: ((Throwable) -> Unit)? = null,
         onSuccess: ((T) -> Unit)? = null
-    ) = selectSubscribeInternal(owner, asyncProp, deliveryMode.appendPropertiesToId(asyncProp)) { asyncValue ->
-        if (onSuccess != null && asyncValue is Success) {
-            onSuccess(asyncValue())
-        } else if (onFail != null && asyncValue is Fail) {
-            onFail(asyncValue.error)
-        }
-    }
+    ) = onAsyncInternal(owner, asyncProp, deliveryMode, onFail, onSuccess)
 
     /**
      * Subscribe to state changes for two properties.

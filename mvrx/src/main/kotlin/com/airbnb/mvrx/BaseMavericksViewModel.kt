@@ -177,22 +177,40 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
     ) = onEach1Internal(null, prop1, RedeliverOnStart, subscriber)
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
-    fun <A> onEach(
+    fun <A> onEach1Internal(
         owner: LifecycleOwner?,
         prop1: KProperty1<S, A>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
-        subscriber: (A) -> Unit
-    ) = onEach1Internal(owner, prop1, deliveryMode, subscriber)
-
-    private fun <A> onEach1Internal(
-        owner: LifecycleOwner?,
-        prop1: KProperty1<S, A>,
-        deliveryMode: DeliveryMode,
         subscriber: (A) -> Unit
     ) = stateFlow
         .map { MvRxTuple1(prop1.get(it)) }
         .distinctUntilChanged()
         .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1)) { (a) -> subscriber(a) }
+
+    /**
+     * Subscribe to changes in an async property. There are optional parameters for onSuccess
+     * and onFail which automatically unwrap the value or error.
+     */
+    protected fun <T> onAsync(
+        asyncProp: KProperty1<S, Async<T>>,
+        onFail: ((Throwable) -> Unit)? = null,
+        onSuccess: ((T) -> Unit)? = null
+    ) = onAsyncInternal(null, asyncProp, RedeliverOnStart, onFail, onSuccess)
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun <T> onAsyncInternal(
+        owner: LifecycleOwner?,
+        asyncProp: KProperty1<S, Async<T>>,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
+        onFail: ((Throwable) -> Unit)? = null,
+        onSuccess: ((T) -> Unit)? = null
+    ) = onEach1Internal(owner, asyncProp, deliveryMode.appendPropertiesToId(asyncProp)) { asyncValue ->
+        if (onSuccess != null && asyncValue is Success) {
+            onSuccess(asyncValue())
+        } else if (onFail != null && asyncValue is Fail) {
+            onFail(asyncValue.error)
+        }
+    }
 
     private fun <T : Any> Flow<T>.resolveSubscription(
         lifecycleOwner: LifecycleOwner? = null,
