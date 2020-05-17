@@ -18,10 +18,10 @@ import kotlin.reflect.KProperty
  *
  * Use [keyFactory] if you have multiple ViewModels of the same class in the same scope.
  */
-inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragmentViewModel(
+inline fun <T, reified VM : BaseMavericksViewModel<S>, reified S : MvRxState> T.fragmentViewModel(
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
-) where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
+) where T : Fragment, T : MavericksView = lifecycleAwareLazy(this) {
     MvRxViewModelProvider.get(
         viewModelClass.java,
         S::class.java,
@@ -35,10 +35,10 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragm
  * until it finds a Fragment that can provide the correct ViewModel. If no parent fragments can provide the ViewModel,
  * a new one will be created in top-most parent Fragment.
  */
-inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.parentFragmentViewModel(
+inline fun <T, reified VM : BaseMavericksViewModel<S>, reified S : MvRxState> T.parentFragmentViewModel(
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
-): Lazy<VM> where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
+): Lazy<VM> where T : Fragment, T : MavericksView = lifecycleAwareLazy(this) {
     requireNotNull(parentFragment) { "There is no parent fragment for ${this::class.java.simpleName}!" }
     var fragment: Fragment? = parentFragment
     val key = keyFactory()
@@ -69,10 +69,10 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.paren
 /**
  * Gets or creates a ViewModel scoped to a target fragment. Throws [IllegalStateException] if there is no target fragment.
  */
-inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.targetFragmentViewModel(
+inline fun <T, reified VM : BaseMavericksViewModel<S>, reified S : MvRxState> T.targetFragmentViewModel(
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
-): Lazy<VM> where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
+): Lazy<VM> where T : Fragment, T : MavericksView = lifecycleAwareLazy(this) {
     val targetFragment = requireNotNull(targetFragment) { "There is no target fragment for ${this::class.java.simpleName}!" }
     MvRxViewModelProvider.get(
         viewModelClass.java,
@@ -87,10 +87,10 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.targe
  * [activityViewModel] except it will throw [IllegalStateException] if the ViewModel doesn't already exist.
  * Use this for screens in the middle of a flow that cannot reasonably be an entrypoint to the flow.
  */
-inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.existingViewModel(
+inline fun <T, reified VM : BaseMavericksViewModel<S>, reified S : MvRxState> T.existingViewModel(
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
-) where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
+) where T : Fragment, T : MavericksView = lifecycleAwareLazy(this) {
     MvRxViewModelProvider.get(
         viewModelClass.java,
         S::class.java,
@@ -103,10 +103,10 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.exist
 /**
  * [fragmentViewModel] except scoped to the current Activity. Use this to share state between different Fragments.
  */
-inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activityViewModel(
+inline fun <T, reified VM : BaseMavericksViewModel<S>, reified S : MvRxState> T.activityViewModel(
     viewModelClass: KClass<VM> = VM::class,
     noinline keyFactory: () -> String = { viewModelClass.java.name }
-) where T : Fragment, T : MvRxView = lifecycleAwareLazy(this) {
+) where T : Fragment, T : MavericksView = lifecycleAwareLazy(this) {
     MvRxViewModelProvider.get(
         viewModelClass.java,
         S::class.java,
@@ -118,7 +118,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activ
 /**
  * [fragmentViewModel] except scoped to the current Activity. Use this to share state between different Fragments.
  */
-inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.viewModel(
+inline fun <T, reified VM : BaseMavericksViewModel<S>, reified S : MvRxState> T.viewModel(
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : FragmentActivity = lifecycleAwareLazy(this) {
