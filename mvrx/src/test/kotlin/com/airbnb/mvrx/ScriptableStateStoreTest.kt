@@ -34,7 +34,7 @@ class ScriptableStateStoreTest : BaseTest() {
     private class TestViewModel(
         initialState: TestState = TestState(),
         val stateStore: ScriptableMvRxStateStore<TestState> = ScriptableMvRxStateStore(initialState)
-    ) : BaseMvRxViewModel<TestState>(
+    ) : BaseMavericksViewModel<TestState>(
         initialState,
         debugMode = true,
         stateStoreOverride = stateStore

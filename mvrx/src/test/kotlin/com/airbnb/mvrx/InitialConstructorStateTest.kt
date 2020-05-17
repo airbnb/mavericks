@@ -83,7 +83,7 @@ data class TestState(
     constructor() : this("empty", 2)
 }
 
-private class TestViewModel(state: TestState) : BaseMvRxViewModel<TestState>(initialState = state, debugMode = false)
+private class TestViewModel(state: TestState) : BaseMavericksViewModel<TestState>(initialState = state, debugMode = false)
 
 @Parcelize
 class ParcelableArgs(val str: String) : Parcelable

@@ -7,7 +7,7 @@ import java.lang.IllegalStateException
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 
-class MvRxFactory<VM : BaseMvRxViewModel<S>, S : MvRxState>(
+class MvRxFactory<VM : BaseMavericksViewModel<S>, S : MvRxState>(
     private val viewModelClass: Class<out VM>,
     private val stateClass: Class<out S>,
     private val viewModelContext: ViewModelContext,
@@ -35,7 +35,7 @@ class MvRxFactory<VM : BaseMvRxViewModel<S>, S : MvRxState>(
 }
 
 @Suppress("UNCHECKED_CAST")
-private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModel(
+private fun <VM : BaseMavericksViewModel<S>, S : MvRxState> createViewModel(
     viewModelClass: Class<out VM>,
     stateClass: Class<out S>,
     viewModelContext: ViewModelContext,
@@ -67,7 +67,7 @@ private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModel(
 }
 
 @Suppress("UNCHECKED_CAST", "NestedBlockDepth")
-private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createDefaultViewModel(viewModelClass: Class<VM>, state: S): VM? {
+private fun <VM : BaseMavericksViewModel<S>, S : MvRxState> createDefaultViewModel(viewModelClass: Class<VM>, state: S): VM? {
     // If we are checking for a default ViewModel, we expect only a single default constructor. Any other case
     // is a misconfiguration and we will throw an appropriate error under further inspection.
     if (viewModelClass.constructors.size == 1) {
@@ -86,7 +86,8 @@ private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createDefaultViewModel(vi
     return null
 }
 
-internal class ViewModelDoesNotExistException(
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+class ViewModelDoesNotExistException(
     viewModelClass: Class<*>,
     viewModelContext: ViewModelContext,
     key: String

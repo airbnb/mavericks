@@ -9,10 +9,6 @@ apply plugin: "com.vanniktech.maven.publish"
 android {
     resourcePrefix "mvrx_"
 
-    defaultConfig {
-        consumerProguardFiles "proguard-rules.pro"
-    }
-
     testOptions {
         unitTests {
             includeAndroidResources = true
@@ -30,17 +26,16 @@ jacoco {
 }
 
 dependencies {
-    api Libraries.rxAndroid
-    api Libraries.kotlinCoroutines
+    api project(':mvrx')
+    api Libraries.rxJava
 
-    implementation Libraries.appcompat
     implementation Libraries.fragment
-    implementation Libraries.viewModelSavedState
     implementation Libraries.lifecycleCommon
-    implementation Libraries.viewModelKtx
     implementation Libraries.runtimeKtx
 
+    testImplementation project(':testing')
     testImplementation TestLibraries.junit
+    testImplementation Libraries.appcompat
     testImplementation TestLibraries.kotlinCoroutinesTest
     testImplementation TestLibraries.mockito
     testImplementation TestLibraries.roboeletric

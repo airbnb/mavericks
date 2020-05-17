@@ -1,11 +1,7 @@
 package com.airbnb.mvrx
 
-import androidx.annotation.RestrictTo
-import androidx.annotation.RestrictTo.Scope.LIBRARY
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import io.reactivex.disposables.Disposables
-import kotlinx.coroutines.Job
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
@@ -120,15 +116,6 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activ
 }
 
 /**
- * For internal use only. Public for inline.
- *
- * Looks for [MvRx.KEY_ARG] on the arguments of the fragments.
- */
-@Suppress("FunctionName")
-@RestrictTo(LIBRARY)
-fun <T : Fragment> T._fragmentArgsProvider(): Any? = arguments?.get(MvRx.KEY_ARG)
-
-/**
  * [fragmentViewModel] except scoped to the current Activity. Use this to share state between different Fragments.
  */
 inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.viewModel(
@@ -176,7 +163,3 @@ fun <V : Any> args() = object : ReadOnlyProperty<Fragment, V> {
  * For example: [1,2,3].appendAt([4], 1) == [1,4]]
  */
 fun <T : Any> List<T>.appendAt(other: List<T>?, offset: Int) = subList(0, offset.coerceIn(0, size)) + (other ?: emptyList())
-
-internal fun Job.toDisposable() = Disposables.fromAction {
-    cancel()
-}
