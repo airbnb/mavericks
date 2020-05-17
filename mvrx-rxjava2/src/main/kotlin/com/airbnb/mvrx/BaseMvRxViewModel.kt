@@ -19,12 +19,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
@@ -588,7 +590,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     private fun <T : Any> Flow<T>.resolveSubscription(
         lifecycleOwner: LifecycleOwner? = null,
         deliveryMode: DeliveryMode,
-        subscriber: (T) -> Unit
+        action: (T) -> Unit
     ): Job {
         val flow = if (lifecycleOwner == null || FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER) {
             this
@@ -603,9 +605,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         } else {
             flowWhenStarted(lifecycleOwner)
         }
-        return flow
-            .onEach { subscriber(it) }
-            .launchIn(lifecycleOwner?.lifecycleScope ?: viewModelScope)
+        val scope = lifecycleOwner?.lifecycleScope ?: viewModelScope
+        return scope.launch {
+            flow.collectLatest { action(it) }
+        }
     }
 
     @Suppress("EXPERIMENTAL_API_USAGE")
