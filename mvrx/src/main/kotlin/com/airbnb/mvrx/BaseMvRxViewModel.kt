@@ -1,7 +1,6 @@
 package com.airbnb.mvrx
 
 import android.util.Log
-import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
@@ -54,14 +53,16 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * directly, do not override this in the primary constructor of your feature ViewModel.
      */
     contextOverride: CoroutineContext? = null
-) : ViewModel() {
+) {
     private val debugMode = if (MvRxTestOverrides.FORCE_DEBUG == null) debugMode else MvRxTestOverrides.FORCE_DEBUG
-    protected val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate + contextOverride)
+
+    val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate + contextOverride)
+
     private val stateStore = stateStoreOverride ?: CoroutinesStateStore(initialState, viewModelScope)
 
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
-    private lateinit var mutableStateChecker: MutableStateChecker<S>
+    private val mutableStateChecker = if (debugMode) MutableStateChecker(initialState) else null
     private val lastDeliveredStates = ConcurrentHashMap<String, Any>()
     private val activeSubscriptions = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
@@ -95,17 +96,13 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 
     init {
         if (this.debugMode) {
-            mutableStateChecker = MutableStateChecker(initialState)
-
             viewModelScope.launch(Dispatchers.Default) {
                 validateState(initialState)
             }
         }
     }
 
-    @CallSuper
-    override fun onCleared() {
-        super.onCleared()
+    fun onCleared() {
         viewModelScope.cancel()
         disposables.dispose()
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
@@ -154,7 +151,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
                         )
                     }
                 }
-                mutableStateChecker.onStateChanged(firstState)
+                mutableStateChecker?.onStateChanged(firstState)
 
                 firstState
             }

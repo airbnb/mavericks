@@ -41,7 +41,7 @@ private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModel(
     viewModelContext: ViewModelContext,
     stateRestorer: (S) -> S,
     initialStateFactory: MvRxStateFactory<VM, S>
-): VM {
+): MvRxViewModelWrapper<VM, S> {
     val initialState = initialStateFactory.createInitialState(viewModelClass, stateClass, viewModelContext, stateRestorer)
     val factoryViewModel = viewModelClass.factoryCompanion()?.let { factoryClass ->
         try {
@@ -53,8 +53,7 @@ private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModel(
                 .invoke(null, viewModelContext, initialState) as VM?
         }
     }
-    val viewModel = factoryViewModel ?: createDefaultViewModel(viewModelClass, initialState)
-    return requireNotNull(viewModel) {
+    val viewModel = requireNotNull(factoryViewModel ?: createDefaultViewModel(viewModelClass, initialState)) {
         if (viewModelClass.constructors.firstOrNull()?.parameterTypes?.size?.let { it > 1 } == true) {
             "${viewModelClass.simpleName} takes dependencies other than initialState. " +
                 "It must have companion object implementing ${MvRxViewModelFactory::class.java.simpleName} " +
@@ -64,6 +63,7 @@ private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createViewModel(
                 "single non-optional parameter that takes initial state of ${stateClass.simpleName}."
         }
     }
+    return MvRxViewModelWrapper(viewModel)
 }
 
 @Suppress("UNCHECKED_CAST", "NestedBlockDepth")
