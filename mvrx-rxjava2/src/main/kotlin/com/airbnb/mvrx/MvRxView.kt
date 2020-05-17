@@ -31,7 +31,7 @@ interface MvRxView : MavericksView {
      * Default: [RedeliverOnStart].
      */
     fun <S : MvRxState> BaseMvRxViewModel<S>.subscribe(deliveryMode: DeliveryMode = RedeliverOnStart, subscriber: (S) -> Unit) =
-        subscribe(this@MvRxView.subscriptionLifecycleOwner, deliveryMode, subscriber)
+        onEach(this@MvRxView.subscriptionLifecycleOwner, deliveryMode, subscriber)
 
     /**
      * Subscribes to state changes for only a specific property and calls the subscribe with

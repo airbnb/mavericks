@@ -167,10 +167,6 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         viewModel.onEach(viewModel.lifecycleOwner, action = subscriber)
     }
 
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    fun subscribe(owner: LifecycleOwner, deliveryMode: DeliveryMode = RedeliverOnStart, subscriber: (S) -> Unit) =
-        stateFlow.subscribeLifecycle(owner, deliveryMode, subscriber)
-
     /**
      * Subscribe to state changes for only a single property.
      */
