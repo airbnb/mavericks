@@ -38,5 +38,6 @@ dependencies {
     implementation("com.airbnb.android:epoxy:$epoxyVersion") { exclude group: 'com.android.support' }
     kapt "com.airbnb.android:epoxy-processor:$epoxyVersion"
     implementation project(':mvrx')
+    implementation project(':mvrx-mocking')
     testImplementation 'junit:junit:4.12'
 }

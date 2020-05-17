@@ -7,10 +7,10 @@ import androidx.lifecycle.OnLifecycleEvent
 import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.MvRxViewModelConfig
-import com.airbnb.mvrx.mock.MockBehavior
-import com.airbnb.mvrx.mock.MockableMvRxViewModelConfig
-import com.airbnb.mvrx.mock.MockedView
-import com.airbnb.mvrx.mock.MockedViewProvider
+import com.airbnb.mvrx.mocking.MockBehavior
+import com.airbnb.mvrx.mocking.MockableMvRxViewModelConfig
+import com.airbnb.mvrx.mocking.MockedView
+import com.airbnb.mvrx.mocking.MockedViewProvider
 import kotlin.reflect.KProperty1
 
 /**
@@ -22,8 +22,8 @@ import kotlin.reflect.KProperty1
  * Finally, it cleans up the mocked state that was stored in the MockStateHolder.
  */
 class ViewModelEnabler(
-    private val mockedView: MockedView<*>,
-    private val mock: MockedViewProvider<*>
+        private val mockedView: MockedView<*>,
+        private val mock: MockedViewProvider<*>
 ) : LifecycleObserver {
 
     @Suppress("unused")
@@ -36,20 +36,20 @@ class ViewModelEnabler(
         // triggered, which we don't want overriding the mock state.
         Handler().postDelayed({
             mock.mock
-                .states
-                .map {
-                    @Suppress("UNCHECKED_CAST")
-                    (it.viewModelProperty as KProperty1<MvRxView, BaseMvRxViewModel<*>>)
-                        .get(view)
-                }
-                .forEach { viewModel ->
-                    MockableMvRxViewModelConfig.access(viewModel).pushBehaviorOverride(
-                        MockBehavior(
-                            blockExecutions = MvRxViewModelConfig.BlockExecutions.No,
-                            stateStoreBehavior = MockBehavior.StateStoreBehavior.Normal
+                    .states
+                    .map {
+                        @Suppress("UNCHECKED_CAST")
+                        (it.viewModelProperty as KProperty1<MvRxView, BaseMvRxViewModel<*>>)
+                                .get(view)
+                    }
+                    .forEach { viewModel ->
+                        MockableMvRxViewModelConfig.access(viewModel).pushBehaviorOverride(
+                                MockBehavior(
+                                        blockExecutions = MvRxViewModelConfig.BlockExecutions.No,
+                                        stateStoreBehavior = MockBehavior.StateStoreBehavior.Normal
+                                )
                         )
-                    )
-                }
+                    }
 
             mockedView.cleanupMockState()
         }, delayTime)

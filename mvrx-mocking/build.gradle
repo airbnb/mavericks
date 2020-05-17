@@ -1,0 +1,52 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: "com.vanniktech.maven.publish"
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    compileSdkVersion 28
+    resourcePrefix 'mvrx_'
+
+    defaultConfig {
+        minSdkVersion 16
+        targetSdkVersion 28
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+    buildToolsVersion "$buildToolsVersion"
+    lintOptions {
+        abortOnError true
+        textReport true
+        textOutput 'stdout'
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
+}
+
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+    implementation "androidx.appcompat:appcompat:$appCompatVersion"
+    implementation project(':mvrx')
+
+    testImplementation "org.mockito:mockito-core:2.25.1"
+    testImplementation 'junit:junit:4.12'
+    testImplementation "org.robolectric:robolectric:$robolectricVersion"
+
+    // Including autovalue just for the AutoValue type printer test
+    testImplementation "com.google.auto.value:auto-value-annotations:1.6.6"
+    kaptTest "com.google.auto.value:auto-value:1.6.6"
+}

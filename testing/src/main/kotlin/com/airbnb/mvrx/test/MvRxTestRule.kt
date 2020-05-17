@@ -2,8 +2,8 @@ package com.airbnb.mvrx.test
 
 import com.airbnb.mvrx.MvRxTestOverridesProxy
 import com.airbnb.mvrx.MvRxViewModelConfigFactory
-import com.airbnb.mvrx.mock.MockBehavior
-import com.airbnb.mvrx.mock.MvRxMocks
+import com.airbnb.mvrx.mocking.MockBehavior
+import com.airbnb.mvrx.mocking.MvRxMocks
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.exceptions.CompositeException
 import io.reactivex.plugins.RxJavaPlugins
@@ -11,18 +11,18 @@ import io.reactivex.schedulers.Schedulers
 import org.junit.rules.ExternalResource
 
 class MvRxTestRule(
-    /**
+        /**
      * Sets up all Rx schedulers to use an immediate scheduler. This will cause all MvRx
      * operations including setState reducers to run synchronously so you can test them.
      */
     private val setRxImmediateSchedulers: Boolean = true,
-    /**
+        /**
      * If true, any subscriptions made to a MvRx view model will NOT be made lifecycle aware.
      * This can make it easier to test subscriptions because you won't have to move the test targets to a
      * STARTED state before they can receive subscriptions.
      */
     private val setForceDisableLifecycleAwareObserver: Boolean = true,
-    /**
+        /**
      * If provided, MvRx mocking will be enabled via [MvRxMocks.install] and this will be set as
      * the mocking behavior. The default behavior simply puts the ViewModel in a configuration
      * where state changes happen synchronously, which is often necessary for tests.
@@ -33,9 +33,9 @@ class MvRxTestRule(
      * If null is given then mock behavior is disabled via [MvRxMocks.install].
      */
     private val viewModelMockBehavior: MockBehavior? = MockBehavior(
-        stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
-    ),
-    /**
+                stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
+        ),
+        /**
      * Changes whether the [MvRxViewModelConfigFactory] is initialized with debug mode or not.
      * By default debug mode is not used so that viewmodels don't all have to run the debug checks
      * each time they are created for Unit tests. This also prevents the need for Robolectric,

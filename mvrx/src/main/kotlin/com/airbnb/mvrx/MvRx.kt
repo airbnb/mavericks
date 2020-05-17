@@ -42,6 +42,3 @@ object MvRx {
         }
 
 }
-
-internal val Context.isDebuggable: Boolean
-    get() = 0 != (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE)

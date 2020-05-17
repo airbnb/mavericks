@@ -6,8 +6,7 @@ import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.Uninitialized
 import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.fragmentViewModel
-import com.airbnb.mvrx.mock.MockableMvRxView
-import com.airbnb.mvrx.mock.mockSingleViewModel
+import com.airbnb.mvrx.mocking.mockSingleViewModel
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.core.MvRxViewModel
 import com.airbnb.mvrx.sample.core.simpleController

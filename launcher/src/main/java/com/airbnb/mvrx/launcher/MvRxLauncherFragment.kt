@@ -16,7 +16,7 @@ import com.airbnb.mvrx.launcher.utils.toastShort
 import com.airbnb.mvrx.launcher.views.loadingRow
 import com.airbnb.mvrx.launcher.views.marquee
 import com.airbnb.mvrx.launcher.views.textRow
-import com.airbnb.mvrx.mock.MockedViewProvider
+import com.airbnb.mvrx.mocking.MockedViewProvider
 import com.airbnb.mvrx.withState
 
 

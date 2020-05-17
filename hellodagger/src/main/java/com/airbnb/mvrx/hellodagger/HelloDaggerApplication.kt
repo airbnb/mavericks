@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.fragment.app.FragmentActivity
 import com.airbnb.mvrx.hellodagger.di.AppComponent
 import com.airbnb.mvrx.hellodagger.di.DaggerAppComponent
-import com.airbnb.mvrx.mock.MvRxMocks
+import com.airbnb.mvrx.mocking.MvRxMocks
 
 class HelloDaggerApplication : Application() {
 
@@ -13,7 +13,7 @@ class HelloDaggerApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         appComponent = DaggerAppComponent.create()
-        MvRxMocks.install(this)
+        com.airbnb.mvrx.mocking.MvRxMocks.install(this)
     }
 }
 

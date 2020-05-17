@@ -11,10 +11,10 @@ import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.MvRxViewModelConfig
 import com.airbnb.mvrx.launcher.utils.toastLong
-import com.airbnb.mvrx.mock.MockBehavior
-import com.airbnb.mvrx.mock.MockedView
-import com.airbnb.mvrx.mock.MockedViewProvider
-import com.airbnb.mvrx.mock.MvRxMock
+import com.airbnb.mvrx.mocking.MockBehavior
+import com.airbnb.mvrx.mocking.MockedView
+import com.airbnb.mvrx.mocking.MockedViewProvider
+import com.airbnb.mvrx.mocking.MvRxMock
 import kotlin.reflect.KClass
 
 /**
@@ -73,9 +73,9 @@ class MvRxLauncherMockActivity : MvRxBaseLauncherActivity() {
          * and verified that it didn't crash. This is for automated testing purposes.
          */
         fun intent(
-            context: Context,
-            mock: MockedViewProvider<*>,
-            finishAfterLaunch: Boolean = false
+                context: Context,
+                mock: MockedViewProvider<*>,
+                finishAfterLaunch: Boolean = false
         ): Intent {
             Log.d(
                 tag,
@@ -179,17 +179,17 @@ class MvRxLauncherMockActivity : MvRxBaseLauncherActivity() {
                 // For process recreation we only mock the initial state provided to the viewmodel constructor,
                 // but then it should run it's normal code paths using that initial state
                 mock.forInitialization || mock.isForProcessRecreation -> MockBehavior(
-                    initialStateMocking = MockBehavior.InitialStateMocking.Partial,
-                    stateStoreBehavior = MockBehavior.StateStoreBehavior.Normal,
-                    blockExecutions = MvRxViewModelConfig.BlockExecutions.No
+                        initialStateMocking = MockBehavior.InitialStateMocking.Partial,
+                        stateStoreBehavior = MockBehavior.StateStoreBehavior.Normal,
+                        blockExecutions = MvRxViewModelConfig.BlockExecutions.No
                 )
                 // The Fragment is fully mocked out and we prevent initialization code from overriding the mock.
                 // However, our ViewModelEnabler will later toggle executions to be allowed, once initialization is over,
                 // so that the fragment is functional from the state we set it up in.
                 else -> MockBehavior(
-                    initialStateMocking = MockBehavior.InitialStateMocking.Full,
-                    stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable,
-                    blockExecutions = MvRxViewModelConfig.BlockExecutions.Completely
+                        initialStateMocking = MockBehavior.InitialStateMocking.Full,
+                        stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable,
+                        blockExecutions = MvRxViewModelConfig.BlockExecutions.Completely
                 )
             }
         }

@@ -1,5 +1,7 @@
 package com.airbnb.mvrx
 
+import androidx.annotation.RestrictTo
+
 /**
  * Provides configuration for a [BaseMvRxViewModel].
  *
@@ -9,7 +11,7 @@ package com.airbnb.mvrx
  */
 abstract class MvRxViewModelConfig<S : Any>(
     val debugMode: Boolean,
-    @PublishedApi internal val stateStore: MvRxStateStore<S>
+    @RestrictTo(RestrictTo.Scope.LIBRARY) val stateStore: MvRxStateStore<S>
 ) {
     /**
      * Called each time a [BaseMvRxViewModel.execute] function is invoked. This allows

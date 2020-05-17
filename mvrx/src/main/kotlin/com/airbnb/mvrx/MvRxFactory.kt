@@ -86,7 +86,8 @@ private fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createDefaultViewModel(vi
     return null
 }
 
-internal class ViewModelDoesNotExistException(
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+class ViewModelDoesNotExistException(
     viewModelClass: Class<*>,
     viewModelContext: ViewModelContext,
     key: String

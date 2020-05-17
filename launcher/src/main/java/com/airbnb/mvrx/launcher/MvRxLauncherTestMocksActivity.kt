@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import com.airbnb.mvrx.mock.MockedViewProvider
+import com.airbnb.mvrx.mocking.MockedViewProvider
 import java.util.LinkedList
 
 /**

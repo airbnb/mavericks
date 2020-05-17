@@ -37,6 +37,7 @@ android {
 
 dependencies {
     implementation project(':mvrx')
+    implementation project(':mvrx-mocking')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
     implementation "androidx.appcompat:appcompat:$appCompatVersion"
     implementation "androidx.core:core-ktx:$androidXCoreKtxVersion"

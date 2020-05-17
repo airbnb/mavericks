@@ -1,6 +1,8 @@
 package com.airbnb.mvrx
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
+import androidx.annotation.RestrictTo
 
 /**
  * Factory for providing the [MvRxViewModelConfig] for each new ViewModel that is created.
@@ -20,15 +22,15 @@ open class MvRxViewModelConfigFactory(val debugMode: Boolean) {
     /**
      * Sets [debugMode] depending on whether the app was built with the Debuggable flag enabled.
      */
-    constructor(context: Context) : this(context.isDebuggable)
+    constructor(context: Context) : this(context.isDebuggable())
 
     private val onConfigProvidedListener =
-        mutableListOf<(BaseMvRxViewModel<*>, MvRxViewModelConfig<*>) -> Unit>()
+            mutableListOf<(BaseMvRxViewModel<*>, MvRxViewModelConfig<*>) -> Unit>()
 
 
     internal fun <S : MvRxState> provideConfig(
-        viewModel: BaseMvRxViewModel<S>,
-        initialState: S
+            viewModel: BaseMvRxViewModel<S>,
+            initialState: S
     ): MvRxViewModelConfig<S> {
         return buildConfig(viewModel, initialState).also { config ->
             onConfigProvidedListener.forEach { callback -> callback(viewModel, config) }
@@ -40,8 +42,8 @@ open class MvRxViewModelConfigFactory(val debugMode: Boolean) {
      * This can be overridden to customize the config.
      */
     open fun <S : MvRxState> buildConfig(
-        viewModel: BaseMvRxViewModel<S>,
-        initialState: S
+            viewModel: BaseMvRxViewModel<S>,
+            initialState: S
     ): MvRxViewModelConfig<S> {
         return object : MvRxViewModelConfig<S>(debugMode, RealMvRxStateStore(initialState)) {
             override fun <S : MvRxState> onExecute(viewModel: BaseMvRxViewModel<S>): BlockExecutions {
@@ -66,3 +68,7 @@ open class MvRxViewModelConfigFactory(val debugMode: Boolean) {
         onConfigProvidedListener.remove(callback)
     }
 }
+
+
+@RestrictTo(RestrictTo.Scope.LIBRARY)
+fun Context.isDebuggable(): Boolean = (0 != (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE))

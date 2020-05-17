@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import androidx.appcompat.app.AppCompatActivity
-import com.airbnb.mvrx.mock.MvRxMocks
 import io.reactivex.Scheduler
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.annotations.NonNull
@@ -59,11 +58,12 @@ abstract class BaseTest {
         }
     }
 
+
     @Before
     @After
     fun resetConfigurationDefaults() {
         // Use a null context since we don't need mock printing during tests
-        MvRxMocks.install(debugMode = true, mocksEnabled = true, context = null)
+        MvRx.viewModelConfigFactory = MvRxViewModelConfigFactory(true)
     }
 
     protected inline fun <reified F : Fragment, reified A : AppCompatActivity> createFragment(

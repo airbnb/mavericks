@@ -29,8 +29,8 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 ) : ViewModel() {
 
     @Suppress("LeakingThis")
-    @PublishedApi
-    internal val config: MvRxViewModelConfig<S> = MvRx.nonNullViewModelConfigFactory.provideConfig(
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    val config: MvRxViewModelConfig<S> = MvRx.nonNullViewModelConfigFactory.provideConfig(
         this,
         initialState
     )

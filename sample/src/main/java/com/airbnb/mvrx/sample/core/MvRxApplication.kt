@@ -2,7 +2,7 @@ package com.airbnb.mvrx.sample.core
 
 import android.app.Application
 import com.airbnb.mvrx.launcher.MvRxLauncherMockActivity
-import com.airbnb.mvrx.mock.MvRxMocks
+import com.airbnb.mvrx.mocking.MvRxMocks
 import com.airbnb.mvrx.sample.LauncherActivity
 import com.airbnb.mvrx.sample.network.DadJokeService
 import com.squareup.moshi.Moshi

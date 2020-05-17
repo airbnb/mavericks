@@ -60,10 +60,6 @@ dependencies {
     testImplementation "org.mockito:mockito-core:2.25.1"
     testImplementation 'junit:junit:4.12'
     testImplementation "org.robolectric:robolectric:$robolectricVersion"
-
-    // Including autovalue just for the AutoValue type printer test
-    testImplementation "com.google.auto.value:auto-value-annotations:1.6.6"
-    kaptTest "com.google.auto.value:auto-value:1.6.6"
 }
 
 task coverage(type: JacocoReport, dependsOn: "testDebugUnitTest") {
