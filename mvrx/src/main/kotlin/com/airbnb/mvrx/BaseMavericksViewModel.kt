@@ -7,7 +7,6 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
@@ -15,9 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.dropWhile
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -167,17 +164,85 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         stateStore.get(block)
     }
 
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    fun onEachInternal(owner: LifecycleOwner?, deliveryMode: DeliveryMode = RedeliverOnStart, action: suspend (S) -> Unit) =
-        stateFlow.resolveSubscription(owner, deliveryMode, action)
+    /**
+     * Subscribe to state changes for only a single property.
+     */
+    protected fun onEach(
+        action: suspend (S) -> Unit
+    ) = onEachInternal(null, RedeliverOnStart, action)
 
     /**
      * Subscribe to state changes for only a single property.
      */
     protected fun <A> onEach(
         prop1: KProperty1<S, A>,
-        subscriber: suspend (A) -> Unit
-    ) = onEach1Internal(null, prop1, RedeliverOnStart, subscriber)
+        action: suspend (A) -> Unit
+    ) = onEach1Internal(null, prop1, RedeliverOnStart, action)
+
+    protected fun <A, B> onEach(
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        action: suspend (A, B) -> Unit
+    ) = onEach2Internal(null, prop1, prop2, RedeliverOnStart, action)
+
+    protected fun <A, B, C> onEach(
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        prop3: KProperty1<S, C>,
+        action: suspend (A, B, C) -> Unit
+    ) = onEach3Internal(null, prop1, prop2, prop3, RedeliverOnStart, action)
+
+    protected fun <A, B, C, D> onEach(
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        prop3: KProperty1<S, C>,
+        prop4: KProperty1<S, D>,
+        action: suspend (A, B, C, D) -> Unit
+    ) = onEach4Internal(null, prop1, prop2, prop3, prop4, RedeliverOnStart, action)
+
+    protected fun <A, B, C, D, E> onEach(
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        prop3: KProperty1<S, C>,
+        prop4: KProperty1<S, D>,
+        prop5: KProperty1<S, E>,
+        action: suspend (A, B, C, D, E) -> Unit
+    ) = onEach5Internal(null, prop1, prop2, prop3, prop4, prop5, RedeliverOnStart, action)
+
+    protected fun <A, B, C, D, E, F> onEach(
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        prop3: KProperty1<S, C>,
+        prop4: KProperty1<S, D>,
+        prop5: KProperty1<S, E>,
+        prop6: KProperty1<S, F>,
+        action: suspend (A, B, C, D, E, F) -> Unit
+    ) = onEach6Internal(null, prop1, prop2, prop3, prop4, prop5, prop6, RedeliverOnStart, action)
+
+    protected fun <A, B, C, D, E, F, G> onEach(
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        prop3: KProperty1<S, C>,
+        prop4: KProperty1<S, D>,
+        prop5: KProperty1<S, E>,
+        prop6: KProperty1<S, F>,
+        prop7: KProperty1<S, G>,
+        action: suspend (A, B, C, D, E, F, G) -> Unit
+    ) = onEach7Internal(null, prop1, prop2, prop3, prop4, prop5, prop6, prop7, RedeliverOnStart, action)
+
+    /**
+     * Subscribe to changes in an async property. There are optional parameters for onSuccess
+     * and onFail which automatically unwrap the value or error.
+     */
+    protected fun <T> onAsync(
+        asyncProp: KProperty1<S, Async<T>>,
+        onFail: (suspend (Throwable) -> Unit)? = null,
+        onSuccess: (suspend (T) -> Unit)? = null
+    ) = onAsyncInternal(null, asyncProp, RedeliverOnStart, onFail, onSuccess)
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun onEachInternal(owner: LifecycleOwner?, deliveryMode: DeliveryMode = RedeliverOnStart, action: suspend (S) -> Unit) =
+        stateFlow.resolveSubscription(owner, deliveryMode, action)
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun <A> onEach1Internal(
@@ -192,37 +257,6 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
             (a) -> action(a)
         }
 
-    /**
-     * Subscribe to changes in an async property. There are optional parameters for onSuccess
-     * and onFail which automatically unwrap the value or error.
-     */
-    protected fun <T> onAsync(
-        asyncProp: KProperty1<S, Async<T>>,
-        onFail: (suspend (Throwable) -> Unit)? = null,
-        onSuccess: (suspend (T) -> Unit)? = null
-    ) = onAsyncInternal(null, asyncProp, RedeliverOnStart, onFail, onSuccess)
-
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    fun <T> onAsyncInternal(
-        owner: LifecycleOwner?,
-        asyncProp: KProperty1<S, Async<T>>,
-        deliveryMode: DeliveryMode = RedeliverOnStart,
-        onFail: (suspend (Throwable) -> Unit)? = null,
-        onSuccess: (suspend (T) -> Unit)? = null
-    ) = onEach1Internal(owner, asyncProp, deliveryMode.appendPropertiesToId(asyncProp)) { asyncValue ->
-        if (onSuccess != null && asyncValue is Success) {
-            onSuccess(asyncValue())
-        } else if (onFail != null && asyncValue is Fail) {
-            onFail(asyncValue.error)
-        }
-    }
-
-    protected fun <A, B> onEach(
-        prop1: KProperty1<S, A>,
-        prop2: KProperty1<S, B>,
-        subscriber: suspend (A, B) -> Unit
-    ) = onEach2Internal(null, prop1, prop2, RedeliverOnStart, subscriber)
-
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun <A, B> onEach2Internal(
         owner: LifecycleOwner?,
@@ -236,13 +270,6 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2)) {
             (a, b) -> action(a, b)
         }
-
-    protected fun <A, B, C> onEach(
-        prop1: KProperty1<S, A>,
-        prop2: KProperty1<S, B>,
-        prop3: KProperty1<S, C>,
-        action: suspend (A, B, C) -> Unit
-    ) = onEach3Internal(null, prop1, prop2, prop3, RedeliverOnStart, action)
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun <A, B, C> onEach3Internal(
@@ -259,14 +286,6 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
             (a, b, c) -> action(a, b, c)
         }
 
-    protected fun <A, B, C, D> onEach(
-        prop1: KProperty1<S, A>,
-        prop2: KProperty1<S, B>,
-        prop3: KProperty1<S, C>,
-        prop4: KProperty1<S, D>,
-        action: suspend (A, B, C, D) -> Unit
-    ) = onEach4Internal(null, prop1, prop2, prop3, prop4, RedeliverOnStart, action)
-
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun <A, B, C, D> onEach4Internal(
         owner: LifecycleOwner?,
@@ -282,15 +301,6 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4)) {
             (a, b, c, d) -> action(a, b, c, d)
         }
-
-    protected fun <A, B, C, D, E> onEach(
-        prop1: KProperty1<S, A>,
-        prop2: KProperty1<S, B>,
-        prop3: KProperty1<S, C>,
-        prop4: KProperty1<S, D>,
-        prop5: KProperty1<S, E>,
-        action: suspend (A, B, C, D, E) -> Unit
-    ) = onEach5Internal(null, prop1, prop2, prop3, prop4, prop5, RedeliverOnStart, action)
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun <A, B, C, D, E> onEach5Internal(
@@ -309,15 +319,6 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
             (a, b, c, d, e) -> action(a, b, c, d, e)
         }
 
-    protected fun <A, B, C, D, E, F> onEach(
-        prop1: KProperty1<S, A>,
-        prop2: KProperty1<S, B>,
-        prop3: KProperty1<S, C>,
-        prop4: KProperty1<S, D>,
-        prop5: KProperty1<S, E>,
-        prop6: KProperty1<S, F>,
-        action: suspend (A, B, C, D, E, F) -> Unit
-    ) = onEach6Internal(null, prop1, prop2, prop3, prop4, prop5, prop6, RedeliverOnStart, action)
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun <A, B, C, D, E, F> onEach6Internal(
@@ -337,17 +338,6 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
             (a, b, c, d, e, f) -> action(a, b, c, d, e, f)
         }
 
-    protected fun <A, B, C, D, E, F, G> onEach(
-        prop1: KProperty1<S, A>,
-        prop2: KProperty1<S, B>,
-        prop3: KProperty1<S, C>,
-        prop4: KProperty1<S, D>,
-        prop5: KProperty1<S, E>,
-        prop6: KProperty1<S, F>,
-        prop7: KProperty1<S, G>,
-        action: suspend (A, B, C, D, E, F, G) -> Unit
-    ) = onEach7Internal(null, prop1, prop2, prop3, prop4, prop5, prop6, prop7, RedeliverOnStart, action)
-
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun <A, B, C, D, E, F, G> onEach7Internal(
         owner: LifecycleOwner?,
@@ -366,6 +356,21 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4, prop5, prop6, prop7)) {
             (a, b, c, d, e, f, g) -> action(a, b, c, d, e, f, g)
         }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun <T> onAsyncInternal(
+        owner: LifecycleOwner?,
+        asyncProp: KProperty1<S, Async<T>>,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
+        onFail: (suspend (Throwable) -> Unit)? = null,
+        onSuccess: (suspend (T) -> Unit)? = null
+    ) = onEach1Internal(owner, asyncProp, deliveryMode.appendPropertiesToId(asyncProp)) { asyncValue ->
+        if (onSuccess != null && asyncValue is Success) {
+            onSuccess(asyncValue())
+        } else if (onFail != null && asyncValue is Fail) {
+            onFail(asyncValue.error)
+        }
+    }
 
     private fun <T : Any> Flow<T>.resolveSubscription(
         lifecycleOwner: LifecycleOwner? = null,
@@ -430,7 +435,6 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
             "This method is for subscribing to other view models. Please pass a different instance as the argument."
         }
     }
-
 
     override fun toString(): String = "${this::class.java.simpleName} $state"
 }
