@@ -1,5 +1,7 @@
 package com.airbnb.mvrx
 
+import io.reactivex.disposables.Disposables
+import kotlinx.coroutines.Job
 import kotlin.reflect.KProperty1
 
 /**
@@ -23,7 +25,7 @@ interface MvRxView : MavericksView {
      * Default: [RedeliverOnStart].
      */
     fun <S : MvRxState> BaseMvRxViewModel<S>.subscribe(deliveryMode: DeliveryMode = RedeliverOnStart, subscriber: (S) -> Unit) =
-        onEachInternal(subscriptionLifecycleOwner, deliveryMode, { subscriber(it) })
+        onEachInternal(subscriptionLifecycleOwner, deliveryMode, { subscriber(it) }).toDisposable()
 
     /**
      * Subscribes to state changes for only a specific property and calls the subscribe with
@@ -42,7 +44,7 @@ interface MvRxView : MavericksView {
         prop1: KProperty1<S, A>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A) -> Unit
-    ) = onEach1Internal(subscriptionLifecycleOwner, prop1, deliveryMode, { subscriber(it) })
+    ) = onEach1Internal(subscriptionLifecycleOwner, prop1, deliveryMode, { subscriber(it) }).toDisposable()
 
     /**
      * Subscribe to changes in an async property. There are optional parameters for onSuccess
@@ -62,7 +64,7 @@ interface MvRxView : MavericksView {
         deliveryMode: DeliveryMode = RedeliverOnStart,
         onFail: ((Throwable) -> Unit)? = null,
         onSuccess: ((T) -> Unit)? = null
-    ) = onAsyncInternal(subscriptionLifecycleOwner, asyncProp, deliveryMode, { onFail?.invoke(it) }, { onSuccess?.invoke(it) })
+    ) = onAsyncInternal(subscriptionLifecycleOwner, asyncProp, deliveryMode, { onFail?.invoke(it) }, { onSuccess?.invoke(it) }).toDisposable()
 
     /**
      * Subscribes to state changes for two properties.
@@ -81,7 +83,7 @@ interface MvRxView : MavericksView {
         prop2: KProperty1<S, B>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A, B) -> Unit
-    ) = onEach2Internal(subscriptionLifecycleOwner, prop1, prop2, deliveryMode, { a, b -> subscriber(a, b) })
+    ) = onEach2Internal(subscriptionLifecycleOwner, prop1, prop2, deliveryMode, { a, b -> subscriber(a, b) }).toDisposable()
 
     /**
      * Subscribes to state changes for three properties.
@@ -101,7 +103,7 @@ interface MvRxView : MavericksView {
         prop3: KProperty1<S, C>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A, B, C) -> Unit
-    ) = onEach3Internal(subscriptionLifecycleOwner, prop1, prop2, prop3, deliveryMode, { a, b, c -> subscriber(a, b, c) })
+    ) = onEach3Internal(subscriptionLifecycleOwner, prop1, prop2, prop3, deliveryMode, { a, b, c -> subscriber(a, b, c) }).toDisposable()
 
     /**
      * Subscribes to state changes for four properties.
@@ -122,7 +124,7 @@ interface MvRxView : MavericksView {
         prop4: KProperty1<S, D>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A, B, C, D) -> Unit
-    ) = onEach4Internal(subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, deliveryMode, { a, b, c, d -> subscriber(a, b, c, d) })
+    ) = onEach4Internal(subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, deliveryMode, { a, b, c, d -> subscriber(a, b, c, d) }).toDisposable()
 
     /**
      * Subscribes to state changes for five properties.
@@ -146,7 +148,7 @@ interface MvRxView : MavericksView {
         subscriber: (A, B, C, D, E) -> Unit
     ) = onEach5Internal(subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, prop5, deliveryMode, { a, b, c, d, e ->
         subscriber(a, b, c, d, e)
-    })
+    }).toDisposable()
 
     /**
      * Subscribes to state changes for six properties.
@@ -171,7 +173,7 @@ interface MvRxView : MavericksView {
         subscriber: (A, B, C, D, E, F) -> Unit
     ) = onEach6Internal(subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, prop5, prop6, deliveryMode, { a, b, c, d, e, f ->
         subscriber(a, b, c, d, e, f)
-    })
+    }).toDisposable()
 
     /**
      * Subscribes to state changes for seven properties.
@@ -197,5 +199,9 @@ interface MvRxView : MavericksView {
         subscriber: (A, B, C, D, E, F, G) -> Unit
     ) = onEach7Internal(subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, prop5, prop6, prop7, deliveryMode, { a, b, c, d, e, f, g ->
         subscriber(a, b, c, d, e, f, g)
-    })
+    }).toDisposable()
+}
+
+private fun Job.toDisposable() = Disposables.fromAction {
+    cancel()
 }

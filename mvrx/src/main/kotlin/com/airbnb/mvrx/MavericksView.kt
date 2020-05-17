@@ -248,7 +248,7 @@ interface MavericksView : LifecycleOwner {
      *
      * Default: [RedeliverOnStart].
      */
-    fun <S : MvRxState, T> BaseMavericksViewModel<S>.asyncSubscribe(
+    fun <S : MvRxState, T> BaseMavericksViewModel<S>.onAsync(
         asyncProp: KProperty1<S, Async<T>>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         onFail: (suspend (Throwable) -> Unit)? = null,
