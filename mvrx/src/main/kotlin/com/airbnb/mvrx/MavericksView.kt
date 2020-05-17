@@ -83,12 +83,14 @@ interface MavericksView : LifecycleOwner {
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
      * Default: [RedeliverOnStart].
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
      */
     fun <S : MvRxState> BaseMavericksViewModel<S>.onEach(deliveryMode: DeliveryMode = RedeliverOnStart, action: suspend (S) -> Unit) =
         onEachInternal(subscriptionLifecycleOwner, deliveryMode, action)
 
     /**
-     * Subscribes to state changes for only a specific property and calls the subscribe with
+     * Subscribes to state changes for only a specific property and calls the action with
      * only that single property.
      *
      * @param deliveryMode If [UniqueOnly], when this MvRxView goes from a stopped to start lifecycle a state value
@@ -99,12 +101,14 @@ interface MavericksView : LifecycleOwner {
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
      * Default: [RedeliverOnStart].
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
      */
     fun <S : MvRxState, A> BaseMavericksViewModel<S>.onEach(
         prop1: KProperty1<S, A>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         action: suspend (A) -> Unit
-    ) = onEach1Internal(subscriptionLifecycleOwner, prop1, deliveryMode, { action(it) })
+    ) = onEach1Internal(subscriptionLifecycleOwner, prop1, deliveryMode, action)
 
     /**
      * Subscribes to state changes for two properties.
@@ -116,7 +120,9 @@ interface MavericksView : LifecycleOwner {
      *
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
-     * Default: [RedeliverOnStart].
+     * Default: [RedeliverOnStart]
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted..
      */
     fun <S : MvRxState, A, B> BaseMavericksViewModel<S>.onEach(
         prop1: KProperty1<S, A>,
@@ -136,6 +142,8 @@ interface MavericksView : LifecycleOwner {
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
      * Default: [RedeliverOnStart].
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
      */
     fun <S : MvRxState, A, B, C> BaseMavericksViewModel<S>.onEach(
         prop1: KProperty1<S, A>,
@@ -156,6 +164,8 @@ interface MavericksView : LifecycleOwner {
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
      * Default: [RedeliverOnStart].
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
      */
     fun <S : MvRxState, A, B, C, D> BaseMavericksViewModel<S>.onEach(
         prop1: KProperty1<S, A>,
@@ -177,6 +187,8 @@ interface MavericksView : LifecycleOwner {
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
      * Default: [RedeliverOnStart].
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
      */
     fun <S : MvRxState, A, B, C, D, E> BaseMavericksViewModel<S>.onEach(
         prop1: KProperty1<S, A>,
@@ -199,6 +211,8 @@ interface MavericksView : LifecycleOwner {
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
      * Default: [RedeliverOnStart].
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
      */
     fun <S : MvRxState, A, B, C, D, E, F> BaseMavericksViewModel<S>.onEach(
         prop1: KProperty1<S, A>,
@@ -222,6 +236,8 @@ interface MavericksView : LifecycleOwner {
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
      * Default: [RedeliverOnStart].
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
      */
     fun <S : MvRxState, A, B, C, D, E, F, G> BaseMavericksViewModel<S>.onEach(
         prop1: KProperty1<S, A>,
@@ -247,6 +263,8 @@ interface MavericksView : LifecycleOwner {
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
      * Default: [RedeliverOnStart].
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
      */
     fun <S : MvRxState, T> BaseMavericksViewModel<S>.onAsync(
         asyncProp: KProperty1<S, Async<T>>,

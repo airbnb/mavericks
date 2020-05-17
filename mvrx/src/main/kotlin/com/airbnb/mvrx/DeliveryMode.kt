@@ -13,7 +13,7 @@ sealed class DeliveryMode {
     fun appendPropertiesToId(vararg properties: KProperty1<*, *>): DeliveryMode {
         return when (this) {
             is RedeliverOnStart -> RedeliverOnStart
-            is UniqueOnly -> UniqueOnly(subscriptionId + "_" + properties.joinToString(",") { it.name })
+            is UniqueOnly -> UniqueOnly(properties.joinToString(",", prefix = subscriptionId + "_") { it.name })
         }
     }
 }

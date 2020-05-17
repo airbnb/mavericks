@@ -160,31 +160,53 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
      * Access the current ViewModel state. Takes a block of code that will be run after all current pending state
      * updates are processed.
      */
-    protected fun withState(block: (state: S) -> Unit) {
-        stateStore.get(block)
+    protected fun withState(action: suspend (state: S) -> Unit) {
+        stateStore.get { state ->
+            viewModelScope.launch {
+                action(state)
+            }
+        }
     }
 
     /**
      * Subscribe to state changes for only a single property.
+     *
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
      */
     protected fun onEach(
         action: suspend (S) -> Unit
     ) = onEachInternal(null, RedeliverOnStart, action)
 
     /**
-     * Subscribe to state changes for only a single property.
+     * Subscribe to state changes for a single property.
+     *
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
      */
     protected fun <A> onEach(
         prop1: KProperty1<S, A>,
         action: suspend (A) -> Unit
     ) = onEach1Internal(null, prop1, action = action)
 
+    /**
+     * Subscribe to state changes for two properties.
+     *
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
+     */
     protected fun <A, B> onEach(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         action: suspend (A, B) -> Unit
     ) = onEach2Internal(null, prop1, prop2, action = action)
 
+    /**
+     * Subscribe to state changes for three properties.
+     *
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
+     */
     protected fun <A, B, C> onEach(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
@@ -192,6 +214,12 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         action: suspend (A, B, C) -> Unit
     ) = onEach3Internal(null, prop1, prop2, prop3, action = action)
 
+    /**
+     * Subscribe to state changes for four properties.
+     *
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
+     */
     protected fun <A, B, C, D> onEach(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
@@ -200,6 +228,12 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         action: suspend (A, B, C, D) -> Unit
     ) = onEach4Internal(null, prop1, prop2, prop3, prop4, action = action)
 
+    /**
+     * Subscribe to state changes for five properties.
+     *
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
+     */
     protected fun <A, B, C, D, E> onEach(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
@@ -209,6 +243,12 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         action: suspend (A, B, C, D, E) -> Unit
     ) = onEach5Internal(null, prop1, prop2, prop3, prop4, prop5, action = action)
 
+    /**
+     * Subscribe to state changes for six properties.
+     *
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
+     */
     protected fun <A, B, C, D, E, F> onEach(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
@@ -219,6 +259,12 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         action: suspend (A, B, C, D, E, F) -> Unit
     ) = onEach6Internal(null, prop1, prop2, prop3, prop4, prop5, prop6, action = action)
 
+    /**
+     * Subscribe to state changes for seven properties.
+     *
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
+     */
     protected fun <A, B, C, D, E, F, G> onEach(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
@@ -233,6 +279,9 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
     /**
      * Subscribe to changes in an async property. There are optional parameters for onSuccess
      * and onFail which automatically unwrap the value or error.
+     *
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
      */
     protected fun <T> onAsync(
         asyncProp: KProperty1<S, Async<T>>,
