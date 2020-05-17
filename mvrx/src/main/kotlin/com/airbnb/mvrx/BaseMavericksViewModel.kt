@@ -14,12 +14,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
+import kotlin.reflect.KProperty1
 
 /**
  * To use Mavericks, make a class MavericksViewModel or YourCompanyViewModel that extends BaseMavericksViewModel and set debugMode.
@@ -166,6 +168,32 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
     fun onEach(owner: LifecycleOwner?, deliveryMode: DeliveryMode = RedeliverOnStart, action: (S) -> Unit) =
         stateFlow.resolveSubscription(owner, deliveryMode, action)
 
+    /**
+     * Subscribe to state changes for only a single property.
+     */
+    protected fun <A> onEach(
+        prop1: KProperty1<S, A>,
+        subscriber: (A) -> Unit
+    ) = onEach1Internal(null, prop1, RedeliverOnStart, subscriber)
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun <A> onEach(
+        owner: LifecycleOwner?,
+        prop1: KProperty1<S, A>,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
+        subscriber: (A) -> Unit
+    ) = onEach1Internal(owner, prop1, deliveryMode, subscriber)
+
+    private fun <A> onEach1Internal(
+        owner: LifecycleOwner?,
+        prop1: KProperty1<S, A>,
+        deliveryMode: DeliveryMode,
+        subscriber: (A) -> Unit
+    ) = stateFlow
+        .map { MvRxTuple1(prop1.get(it)) }
+        .distinctUntilChanged()
+        .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1)) { (a) -> subscriber(a) }
+
     private fun <T : Any> Flow<T>.resolveSubscription(
         lifecycleOwner: LifecycleOwner? = null,
         deliveryMode: DeliveryMode,
@@ -222,6 +250,13 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
     """.trimIndent()
 
     private operator fun CoroutineContext.plus(other: CoroutineContext?) = if (other == null) this else this + other
+
+    private fun <S : MvRxState> assertSubscribeToDifferentViewModel(viewModel: BaseMavericksViewModel<S>) {
+        require(this != viewModel) {
+            "This method is for subscribing to other view models. Please pass a different instance as the argument."
+        }
+    }
+
 
     override fun toString(): String = "${this::class.java.simpleName} $state"
 }

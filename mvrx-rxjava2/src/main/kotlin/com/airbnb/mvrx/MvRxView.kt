@@ -50,7 +50,7 @@ interface MvRxView : MavericksView {
         prop1: KProperty1<S, A>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A) -> Unit
-    ) = selectSubscribe(this@MvRxView.subscriptionLifecycleOwner, prop1, deliveryMode, subscriber)
+    ) = onEach(this@MvRxView.subscriptionLifecycleOwner, prop1, deliveryMode, subscriber)
 
     /**
      * Subscribe to changes in an async property. There are optional parameters for onSuccess

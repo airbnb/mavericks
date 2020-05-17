@@ -184,26 +184,15 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (A) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.selectSubscribeInternal(lifecycleOwner, prop1, RedeliverOnStart, subscriber)
+        viewModel.onEach(lifecycleOwner, prop1, RedeliverOnStart, subscriber).toDisposable()
     }
-
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    fun <A> selectSubscribe(
-        owner: LifecycleOwner,
-        prop1: KProperty1<S, A>,
-        deliveryMode: DeliveryMode = RedeliverOnStart,
-        subscriber: (A) -> Unit
-    ) = selectSubscribeInternal(owner, prop1, deliveryMode, subscriber)
 
     private fun <A> selectSubscribeInternal(
         owner: LifecycleOwner?,
         prop1: KProperty1<S, A>,
         deliveryMode: DeliveryMode,
         subscriber: (A) -> Unit
-    ) = stateFlow
-        .map { MvRxTuple1(prop1.get(it)) }
-        .distinctUntilChanged()
-        .subscribeLifecycle(owner, deliveryMode.appendPropertiesToId(prop1)) { (a) -> subscriber(a) }
+    ) = onEach(owner, prop1, deliveryMode, subscriber).toDisposable()
 
     /**
      * Subscribe to changes in an async property. There are optional parameters for onSuccess
