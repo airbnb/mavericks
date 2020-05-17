@@ -8,7 +8,7 @@ class RxSetupTest : BaseTest() {
 
     @Test(expected = IllegalArgumentException::class)
     fun ensureExceptionsThrownInRxJavaAreCaught() {
-        class RxSetupViewModel(initialState: RxSetupState) : TestMvRxViewModel<RxSetupState>(initialState) {
+        class RxSetupViewModel(initialState: RxSetupState) : TestMavericksViewModel<RxSetupState>(initialState) {
             fun throwInWithState() {
                 withState {
                     throw IllegalArgumentException("Intentional Exception")

@@ -10,7 +10,7 @@ class MutableStateValidationTest : BaseTest() {
     @Test(expected = IllegalArgumentException::class)
     fun mutableStateShouldFail() {
         class ViewModel(initialState: StateWithMutableMap) :
-            TestMvRxViewModel<StateWithMutableMap>(initialState) {
+            TestMavericksViewModel<StateWithMutableMap>(initialState) {
 
             fun addKeyToMap() {
                 val myMap = withState(this) { it.map }
@@ -25,7 +25,7 @@ class MutableStateValidationTest : BaseTest() {
     @Test
     fun immutableStateShouldNotFail() {
         class ViewModel(initialState: StateWithImmutableMap) :
-            TestMvRxViewModel<StateWithImmutableMap>(initialState) {
+            TestMavericksViewModel<StateWithImmutableMap>(initialState) {
 
             fun addKeyToMap() {
                 val myMap = withState(this) { it.map }.toMutableMap()

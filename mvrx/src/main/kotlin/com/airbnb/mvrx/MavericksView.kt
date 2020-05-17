@@ -72,9 +72,6 @@ interface MavericksView : LifecycleOwner {
         return UniqueOnly(listOfNotNull(mvrxViewId, customId).joinToString("_"))
     }
 
-    fun <S : MvRxState> BaseMavericksViewModel<S>.onEach(deliveryMode: DeliveryMode = RedeliverOnStart, action: suspend (S) -> Unit) =
-        onEachInternal(this@MavericksView.subscriptionLifecycleOwner, deliveryMode, action)
-
     /**
      * Subscribes to all state updates for the given viewModel.
      *
@@ -87,8 +84,8 @@ interface MavericksView : LifecycleOwner {
      *
      * Default: [RedeliverOnStart].
      */
-    fun <S : MvRxState> BaseMavericksViewModel<S>.onEach(deliveryMode: DeliveryMode = RedeliverOnStart, action: (S) -> Unit) =
-        onEachInternal(subscriptionLifecycleOwner, deliveryMode, { action(it) })
+    fun <S : MvRxState> BaseMavericksViewModel<S>.onEach(deliveryMode: DeliveryMode = RedeliverOnStart, action: suspend (S) -> Unit) =
+        onEachInternal(subscriptionLifecycleOwner, deliveryMode, action)
 
     /**
      * Subscribes to state changes for only a specific property and calls the subscribe with

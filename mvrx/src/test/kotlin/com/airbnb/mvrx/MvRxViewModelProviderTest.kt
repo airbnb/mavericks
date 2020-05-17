@@ -23,7 +23,7 @@ data class MvRxTestState(
     constructor(args: MvRxTestArgs) : this(persistedCount = args.initialCount, notPersistedCount = args.initialCount)
 }
 
-class MyViewModel(initialState: MvRxTestState) : TestMvRxViewModel<MvRxTestState>(initialState) {
+class MyViewModel(initialState: MvRxTestState) : TestMavericksViewModel<MvRxTestState>(initialState) {
     fun setCount(count: Int) = setState { copy(persistedCount = count, notPersistedCount = count) }
 }
 
@@ -33,7 +33,7 @@ data class InvalidState(val count: Int = 0) : MvRxState {
     constructor(args: InvalidArgs) : this(count = args.initialCount)
 }
 
-class InvalidViewModel(initialState: InvalidState) : TestMvRxViewModel<InvalidState>(initialState)
+class InvalidViewModel(initialState: InvalidState) : TestMavericksViewModel<InvalidState>(initialState)
 
 class MvRxViewModelProviderTest : BaseTest() {
     @get:Rule val thrown: ExpectedException = ExpectedException.none()
