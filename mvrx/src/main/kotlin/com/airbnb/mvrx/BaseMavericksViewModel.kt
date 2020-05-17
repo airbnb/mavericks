@@ -2,12 +2,23 @@ package com.airbnb.mvrx
 
 import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.dropWhile
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.util.Collections
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 
 /**
@@ -44,6 +55,8 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
     val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate + contextOverride)
 
     private val stateStore = stateStoreOverride ?: CoroutinesStateStore(initialState, viewModelScope)
+    private val lastDeliveredStates = ConcurrentHashMap<String, Any>()
+    private val activeSubscriptions = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
     private val tag by lazy { javaClass.simpleName }
     private val mutableStateChecker = if (debugMode) MutableStateChecker(initialState) else null
@@ -148,6 +161,65 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
     protected fun withState(block: (state: S) -> Unit) {
         stateStore.get(block)
     }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun onEach(owner: LifecycleOwner?, deliveryMode: DeliveryMode = RedeliverOnStart, action: (S) -> Unit) =
+        stateFlow.resolveSubscription(owner, deliveryMode, action)
+
+    private fun <T : Any> Flow<T>.resolveSubscription(
+        lifecycleOwner: LifecycleOwner? = null,
+        deliveryMode: DeliveryMode,
+        action: (T) -> Unit
+    ): Job {
+        val flow = if (lifecycleOwner == null || MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER) {
+            this
+        } else if (deliveryMode is UniqueOnly) {
+            val lastDeliveredValue: T? = lastDeliveredValue(deliveryMode)
+            this
+                .assertOneActiveSubscription(lifecycleOwner, deliveryMode)
+                .dropWhile { it == lastDeliveredValue }
+                .flowWhenStarted(lifecycleOwner)
+                .distinctUntilChanged()
+                .onEach { lastDeliveredStates[deliveryMode.subscriptionId] = it }
+        } else {
+            flowWhenStarted(lifecycleOwner)
+        }
+        return flow
+            .onEach { action(it) }
+            .launchIn(lifecycleOwner?.lifecycleScope ?: viewModelScope)
+    }
+
+    @Suppress("EXPERIMENTAL_API_USAGE")
+    private fun <T> Flow<T>.assertOneActiveSubscription(owner: LifecycleOwner, deliveryMode: UniqueOnly): Flow<T> {
+        val observer = object : DefaultLifecycleObserver {
+            override fun onCreate(owner: LifecycleOwner) {
+                if (activeSubscriptions.contains(deliveryMode.subscriptionId)) error(duplicateSubscriptionMessage(deliveryMode))
+                activeSubscriptions += deliveryMode.subscriptionId
+            }
+
+            override fun onDestroy(owner: LifecycleOwner) {
+                activeSubscriptions.remove(deliveryMode.subscriptionId)
+            }
+        }
+
+        owner.lifecycle.addObserver(observer)
+        return onCompletion {
+            activeSubscriptions.remove(deliveryMode.subscriptionId)
+            owner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    private fun <T> lastDeliveredValue(deliveryMode: UniqueOnly): T? {
+        @Suppress("UNCHECKED_CAST")
+        return lastDeliveredStates[deliveryMode.subscriptionId] as T?
+    }
+
+    private fun duplicateSubscriptionMessage(deliveryMode: UniqueOnly) = """
+        Subscribing with a duplicate subscription id: ${deliveryMode.subscriptionId}.
+        If you have multiple uniqueOnly subscriptions in a MvRx view that listen to the same properties
+        you must use a custom subscription id. If you are using a custom MvRxView, make sure you are using the proper
+        lifecycle owner. See BaseMvRxFragment for an example.
+    """.trimIndent()
 
     private operator fun CoroutineContext.plus(other: CoroutineContext?) = if (other == null) this else this + other
 

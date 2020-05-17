@@ -154,8 +154,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
     /**
      * For ViewModels that want to subscribe to itself.
      */
-    protected fun subscribe(subscriber: (S) -> Unit) =
-        stateFlow.subscribeLifecycle(null, RedeliverOnStart, subscriber)
+    protected fun subscribe(subscriber: (S) -> Unit) = onEach(null, action = subscriber).toDisposable()
 
     /**
      * For ViewModels that want to subscribe to another ViewModel.
@@ -165,7 +164,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (S) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.subscribe(lifecycleOwner, RedeliverOnStart, subscriber)
+        viewModel.onEach(viewModel.lifecycleOwner, action = subscriber)
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
