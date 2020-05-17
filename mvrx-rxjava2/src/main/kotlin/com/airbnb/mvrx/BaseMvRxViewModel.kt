@@ -1,14 +1,10 @@
 package com.airbnb.mvrx
 
 import android.util.Log
-import androidx.annotation.RestrictTo
-import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.lifecycleScope
-import com.airbnb.mvrx.MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -18,14 +14,6 @@ import io.reactivex.disposables.Disposables
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.dropWhile
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
@@ -262,7 +250,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (A, B, C) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.onEach3Internal(lifecycleOwner, prop1, prop2, prop3, action = { a, b, c -> subscriber(a, b, c)})
+        viewModel.onEach3Internal(lifecycleOwner, prop1, prop2, prop3, action = { a, b, c -> subscriber(a, b, c) })
     }
 
     /**

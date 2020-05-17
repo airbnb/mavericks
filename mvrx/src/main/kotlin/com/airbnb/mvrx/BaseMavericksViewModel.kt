@@ -318,7 +318,7 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4, prop5)) {
             (a, b, c, d, e) -> action(a, b, c, d, e)
         }
-
+=
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun <A, B, C, D, E, F> onEach6Internal(
@@ -438,4 +438,3 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
 
     override fun toString(): String = "${this::class.java.simpleName} $state"
 }
-
