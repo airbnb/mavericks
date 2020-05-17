@@ -1,5 +1,7 @@
 package com.airbnb.mvrx.sample
 
+import android.content.Intent
+import com.airbnb.mvrx.launcher.MvRxLauncherActivity
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.core.simpleController
 import com.airbnb.mvrx.sample.views.basicRow
@@ -26,6 +28,15 @@ class MainFragment : BaseFragment() {
             title("Hello World (Epoxy)")
             subtitle(demonstrates("Simple MvRx usage", "Epoxy integration"))
             clickListener { _ -> navigateTo(R.id.action_main_to_helloWorldEpoxyFragment) }
+        }
+
+        basicRow {
+            id("launcher")
+            title("Launcher")
+            subtitle(demonstrates("MvRx Launcher"))
+            clickListener { _ ->
+                startActivity(Intent(requireActivity(), MvRxLauncherActivity::class.java))
+            }
         }
 
         basicRow {

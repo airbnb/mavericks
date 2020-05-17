@@ -10,7 +10,8 @@ import androidx.lifecycle.LifecycleOwner
  *
  * This is necessary for the view model delegates and persistence to work correctly.
  */
-abstract class BaseMvRxFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(contentLayoutId), MvRxView {
+abstract class BaseMvRxFragment(@LayoutRes contentLayoutId: Int = 0) : Fragment(contentLayoutId),
+    MvRxView {
 
     private val mvrxViewIdProperty = MvRxViewId()
     final override val mvrxViewId: String by mvrxViewIdProperty

@@ -14,7 +14,7 @@ interface MvRxStateFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> {
     ): S
 }
 
-internal class RealMvRxStateFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> : MvRxStateFactory<VM, S> {
+class RealMvRxStateFactory<VM : BaseMvRxViewModel<S>, S : MvRxState> : MvRxStateFactory<VM, S> {
 
     override fun createInitialState(
         viewModelClass: Class<out VM>,
@@ -63,7 +63,10 @@ internal fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createStateFromConstruct
     val argsConstructor = args?.let { arg ->
         val argType = arg::class.java
         stateClass.constructors.firstOrNull { constructor ->
-            constructor.parameterTypes.size == 1 && isAssignableTo(argType, constructor.parameterTypes[0])
+            constructor.parameterTypes.size == 1 && isAssignableTo(
+                argType,
+                constructor.parameterTypes[0]
+            )
         }
     }
 
@@ -85,9 +88,10 @@ internal fun <VM : BaseMvRxViewModel<S>, S : MvRxState> createStateFromConstruct
         // Throw this exception if we don't know which method to use to create the initial state.
         ?: throw IllegalStateException(
             "Attempt to create the MvRx state class ${stateClass.simpleName} has failed. One of the following must be true:" +
-                "\n 1) The state class has default values for every constructor property." +
-                "\n 2) The state class has a secondary constructor for ${args?.javaClass?.simpleName ?: "a fragment argument"}." +
-                "\n 3) ${viewModelClass.simpleName} must have a companion object implementing MvRxFactory with an initialState function " +
-                "that does not return null. "
+                    "\n 1) The state class has default values for every constructor property." +
+                    "\n 2) The state class has a secondary constructor for ${args?.javaClass?.simpleName
+                        ?: "a fragment argument"}." +
+                    "\n 3) ${viewModelClass.simpleName} must have a companion object implementing MvRxFactory with an initialState function " +
+                    "that does not return null. "
         )
 }

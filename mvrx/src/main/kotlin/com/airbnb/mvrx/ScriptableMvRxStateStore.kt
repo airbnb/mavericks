@@ -9,7 +9,7 @@ import io.reactivex.subjects.BehaviorSubject
  * how your UI code reacts to different ViewModel states. This is not as useful for unit testing your view model,
  * as business logic in state reducers will not be used.
  */
-class ScriptableMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
+class ScriptableMvRxStateStore<S : Any>(initialState: S) : ScriptableStateStore<S> {
 
     private val subject: BehaviorSubject<S> = BehaviorSubject.createDefault(initialState)
 
@@ -26,9 +26,14 @@ class ScriptableMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
         // No-op set the state via next
     }
 
-    fun next(state: S) = subject.onNext(state)
+    override fun next(state: S) = subject.onNext(state)
 
     override fun isDisposed() = false
 
     override fun dispose() {}
+}
+
+interface ScriptableStateStore<S : Any> : MvRxStateStore<S> {
+    /** Force the current state to be moved to the given value immediately. */
+    fun next(state: S)
 }

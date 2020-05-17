@@ -11,9 +11,10 @@ import androidx.navigation.ui.setupWithNavController
 import com.airbnb.epoxy.EpoxyRecyclerView
 import com.airbnb.mvrx.BaseMvRxFragment
 import com.airbnb.mvrx.MvRx
+import com.airbnb.mvrx.mock.MockableMvRxView
 import com.airbnb.mvrx.sample.R
 
-abstract class BaseFragment : BaseMvRxFragment(R.layout.fragment_base_mvrx) {
+abstract class BaseFragment : BaseMvRxFragment(R.layout.fragment_base_mvrx), MockableMvRxView {
 
     protected lateinit var recyclerView: EpoxyRecyclerView
     protected lateinit var toolbar: Toolbar
@@ -23,6 +24,7 @@ abstract class BaseFragment : BaseMvRxFragment(R.layout.fragment_base_mvrx) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         epoxyController.onRestoreInstanceState(savedInstanceState)
+        registerMockPrinter()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.annotation.VisibleForTesting
 import java.io.Serializable
-import java.lang.reflect.Method
+import java.lang.reflect.Constructor
 
 /**
  * Annotate a field in your MvRxViewModel state with [PersistState] to have it automatically persisted when Android kills your process
@@ -31,12 +31,12 @@ annotation class PersistState
 internal fun <T : MvRxState> T.persistState(validation: Boolean = false): Bundle {
     val jvmClass = this::class.java
     // Find the first constructor that has parameters annotated with @PersistState or return.
-    val constructor = jvmClass.constructors.firstOrNull { it.parameterAnnotations.any { it.any { it is PersistState } } } ?: return Bundle()
+    val constructor = jvmClass.primaryConstructor() ?: return Bundle()
 
     val bundle = Bundle()
     constructor.parameterAnnotations.forEachIndexed { i, p ->
         if (p.none { it is PersistState }) return@forEachIndexed
-        // For each parameter in the constructor, there is a componentN function becasuse state is a data class.
+        // For each parameter in the constructor, there is a componentN function because state is a data class.
         // We can rely on this to be true because the MvRxMutabilityHelpers asserts that the state class is a data class.
         // See MvRxMutabilityHelper Class<*>.isData
         val getter = jvmClass.getDeclaredMethod("component${i + 1}").also { it.isAccessible = true }
@@ -45,6 +45,16 @@ internal fun <T : MvRxState> T.persistState(validation: Boolean = false): Bundle
         bundle.putAny(i.toString(), value)
     }
     return bundle
+}
+
+private fun <T : MvRxState> Class<out T>.primaryConstructor(): Constructor<*>? {
+    // Assumes that only the primary constructor has PersistState annotations.
+    // TODO - potentially throw if multiple constructors have PersistState as that is not supported.
+    return constructors.firstOrNull { constructor ->
+        constructor.parameterAnnotations.any { paramAnnotations ->
+            paramAnnotations.any { it is PersistState }
+        }
+    }
 }
 
 private fun assertCollectionPersistability(value: Any?) {
@@ -63,7 +73,7 @@ private fun assertCollectionPersistability(value: Any?) {
 }
 
 private fun assertPersistable(item: Any) {
-    if (item !is Serializable && item !is Parcelable) throw IllegalStateException("Cannot parcel ${item::class.java.simpleName}")
+    if (item !is Serializable && item !is Parcelable) error("Cannot parcel ${item::class.java.simpleName}")
 }
 
 private fun <T : Any?> Bundle.putAny(key: String?, value: T): Bundle {
@@ -79,15 +89,18 @@ private fun <T : Any?> Bundle.putAny(key: String?, value: T): Bundle {
 /**
  * Updates the initial state object given state persisted with [PersistState] in a [Bundle].
  */
-internal fun <T : MvRxState> Bundle.restorePersistedState(initialState: T, validation: Boolean = false): T {
+internal fun <T : MvRxState> Bundle.restorePersistedState(
+    initialState: T,
+    validation: Boolean = false
+): T {
     val jvmClass = initialState::class.java
-    val constructor = jvmClass.constructors.firstOrNull { it.parameterAnnotations.any { it.any { it is PersistState } } } ?: return initialState
+    val constructor = jvmClass.primaryConstructor() ?: return initialState
 
     // If we don't set the correct class loader, when the bundle is restored in a new process, it will have the system class loader which
     // can't unmarshal any custom classes.
     classLoader = jvmClass.classLoader
 
-    // For data classes, Kotlin generates a static functionc called copy$default.
+    // For data classes, Kotlin generates a static function called copy$default.
     // The first parameter is the object to copy from.
     // The next parameters are all of parameters to copy (it's jvm bytecode/java so there are no optional parameters in the generated method).
     // The next parameter(s) are a bitmask. Each parameter index corresponds to one bit in the int.
@@ -102,7 +115,7 @@ internal fun <T : MvRxState> Bundle.restorePersistedState(initialState: T, valid
     val parameterBitMasks = IntArray(fieldCount / 32 + 1) { 0 }
     val parameters = arrayOfNulls<Any?>(fieldCount)
     parameters[0] = initialState
-    for (i in 0..(fieldCount - 1)) {
+    for (i in 0 until fieldCount) {
         val bundleKey = i.toString()
         if (containsKey(bundleKey)) {
             // Copy the persisted value into the parameter array.
@@ -123,15 +136,13 @@ internal fun <T : MvRxState> Bundle.restorePersistedState(initialState: T, valid
 
     // See the comment above for information on the parameters here.
     @Suppress("UNCHECKED_CAST")
-    return copyFunction.invoke(null, *arrayOf(initialState, *parameters, *parameterBitMasks.toTypedArray(), null)) as T
-}
-
-private fun <T, R> Array<T>.firstNotEmptyOrNull(mapper: (T) -> List<R>?): List<R>? {
-    forEach { v ->
-        val listOrNull = mapper(v)
-        if (listOrNull?.isNotEmpty() == true) return listOrNull
-    }
-    return null
+    return copyFunction.invoke(
+        null,
+        initialState,
+        *parameters,
+        *parameterBitMasks.toTypedArray(),
+        null
+    ) as T
 }
 
 /**
@@ -141,14 +152,12 @@ private fun <T, R> Array<T>.firstNotEmptyOrNull(mapper: (T) -> List<R>?): List<R
 @VisibleForTesting
 object PersistStateTestHelpers {
     fun <T : MvRxState> persistState(state: T) = state.persistState(validation = true)
-    fun <T : MvRxState> restorePersistedState(bundle: Bundle, initialState: T, validation: Boolean = false) = bundle.restorePersistedState(initialState, validation)
+    fun <T : MvRxState> restorePersistedState(
+        bundle: Bundle,
+        initialState: T,
+        validation: Boolean = false
+    ) = bundle.restorePersistedState(initialState, validation)
 }
-
-/**
- * Throws [NoSuchElementException] if there is no method.
- */
-@Suppress("UNCHECKED_CAST")
-private fun <T : Any> Class<T>.copyMethod(): Method = this.declaredMethods.first { it.name == "copy\$default" }
 
 private val Class<*>.defaultParameterValue: Any?
     get() = when (this) {

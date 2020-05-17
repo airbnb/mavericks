@@ -1,5 +1,7 @@
 package com.airbnb.mvrx.counter
 
+import com.airbnb.mvrx.MvRxViewModelConfig
+import com.airbnb.mvrx.mock.MockBehavior
 import com.airbnb.mvrx.test.MvRxTestRule
 import com.airbnb.mvrx.withState
 import org.junit.Assert.*
@@ -20,6 +22,6 @@ class CounterViewModelTest {
     companion object {
         @JvmField
         @ClassRule
-        val mvrxTestRule = MvRxTestRule()
+        val mvrxTestRule = MvRxTestRule(viewModelMockBehavior =  MockBehavior(blockExecutions = MvRxViewModelConfig.BlockExecutions.WithLoading))
     }
 }
