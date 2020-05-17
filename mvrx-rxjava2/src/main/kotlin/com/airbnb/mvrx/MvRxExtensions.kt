@@ -27,7 +27,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.fragm
         S::class.java,
         FragmentViewModelContext(this.requireActivity(), _fragmentArgsProvider(), this),
         keyFactory()
-    ).apply { onEach(this@fragmentViewModel, action = { postInvalidate() }) }
+    ).apply { onEachInternal(this@fragmentViewModel, action = { postInvalidate() }) }
 }
 
 /**
@@ -50,7 +50,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.paren
                 FragmentViewModelContext(this.requireActivity(), _fragmentArgsProvider(), fragment),
                 key,
                 forExistingViewModel = true
-            ).apply { onEach(this@parentFragmentViewModel, action = { postInvalidate() }) }
+            ).apply { onEachInternal(this@parentFragmentViewModel, action = { postInvalidate() }) }
         } catch (e: ViewModelDoesNotExistException) {
             fragment = fragment.parentFragment
         }
@@ -63,7 +63,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.paren
     }
     val viewModelContext = FragmentViewModelContext(this.requireActivity(), _fragmentArgsProvider(), topParentFragment!!)
     return@lifecycleAwareLazy MvRxViewModelProvider.get(viewModelClass.java, S::class.java, viewModelContext, keyFactory())
-        .apply { onEach(this@parentFragmentViewModel, action = { postInvalidate() }) }
+        .apply { onEachInternal(this@parentFragmentViewModel, action = { postInvalidate() }) }
 }
 
 /**
@@ -80,7 +80,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.targe
         FragmentViewModelContext(this.requireActivity(), targetFragment._fragmentArgsProvider(), targetFragment),
         keyFactory()
     )
-        .apply { onEach(this@targetFragmentViewModel, action = { postInvalidate() }) }
+        .apply { onEachInternal(this@targetFragmentViewModel, action = { postInvalidate() }) }
 }
 
 /**
@@ -97,7 +97,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.exist
         ActivityViewModelContext(requireActivity(), _fragmentArgsProvider()),
         keyFactory(),
         forExistingViewModel = true
-    ).apply { onEach(this@existingViewModel, action = { postInvalidate() }) }
+    ).apply { onEachInternal(this@existingViewModel, action = { postInvalidate() }) }
 }
 
 /**
@@ -112,7 +112,7 @@ inline fun <T, reified VM : BaseMvRxViewModel<S>, reified S : MvRxState> T.activ
         S::class.java,
         ActivityViewModelContext(requireActivity(), _fragmentArgsProvider()),
         keyFactory()
-    ).apply { onEach(this@activityViewModel, action = { postInvalidate() }) }
+    ).apply { onEachInternal(this@activityViewModel, action = { postInvalidate() }) }
 }
 
 /**

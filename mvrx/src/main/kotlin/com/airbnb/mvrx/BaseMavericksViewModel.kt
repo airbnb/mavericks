@@ -168,7 +168,7 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
     }
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
-    fun onEach(owner: LifecycleOwner?, deliveryMode: DeliveryMode = RedeliverOnStart, action: suspend (S) -> Unit) =
+    fun onEachInternal(owner: LifecycleOwner?, deliveryMode: DeliveryMode = RedeliverOnStart, action: suspend (S) -> Unit) =
         stateFlow.resolveSubscription(owner, deliveryMode, action)
 
     /**

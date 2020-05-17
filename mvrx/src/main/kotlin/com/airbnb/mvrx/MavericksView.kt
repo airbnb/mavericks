@@ -71,6 +71,6 @@ interface MavericksView : LifecycleOwner {
         return UniqueOnly(listOfNotNull(mvrxViewId, customId).joinToString("_"))
     }
 
-    fun <S : MvRxState> BaseMavericksViewModel<S>.onEach(deliveryMode: DeliveryMode = RedeliverOnStart, subscriber: (S) -> Unit) =
-        onEach(this@MavericksView.subscriptionLifecycleOwner, deliveryMode, subscriber)
+    fun <S : MvRxState> BaseMavericksViewModel<S>.onEach(deliveryMode: DeliveryMode = RedeliverOnStart, action: suspend (S) -> Unit) =
+        onEachInternal(this@MavericksView.subscriptionLifecycleOwner, deliveryMode, action)
 }
