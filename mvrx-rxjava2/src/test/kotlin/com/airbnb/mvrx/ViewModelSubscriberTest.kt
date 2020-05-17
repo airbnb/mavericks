@@ -42,11 +42,11 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewMod
     var onFailCalled = 0
 
     init {
-        subscribe { _ -> subscribeCallCount++ }
-        selectSubscribe(ViewModelTestState::foo) { selectSubscribe1Called++ }
-        selectSubscribe(ViewModelTestState::foo, ViewModelTestState::bar) { _, _ -> selectSubscribe2Called++ }
-        selectSubscribe(ViewModelTestState::foo, ViewModelTestState::bar, ViewModelTestState::bam) { _, _, _ -> selectSubscribe3Called++ }
-        asyncSubscribe(ViewModelTestState::async, { onFailCalled++ }) { onSuccessCalled++ }
+        onEach { _ -> subscribeCallCount++ }
+        onEach(ViewModelTestState::foo) { selectSubscribe1Called++ }
+        onEach(ViewModelTestState::foo, ViewModelTestState::bar) { _, _ -> selectSubscribe2Called++ }
+        onEach(ViewModelTestState::foo, ViewModelTestState::bar, ViewModelTestState::bam) { _, _, _ -> selectSubscribe3Called++ }
+        onAsync(ViewModelTestState::async, { onFailCalled++ }) { onSuccessCalled++ }
     }
 
     fun setFoo(foo: Int) = setState { copy(foo = foo) }
@@ -73,7 +73,7 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewMod
 
     fun testCompletableSuccess() {
         var callCount = 0
-        selectSubscribe(ViewModelTestState::asyncUnit) {
+        onEach(ViewModelTestState::asyncUnit) {
             callCount++
             assertEquals(when (callCount) {
                 1 -> Uninitialized
@@ -91,7 +91,7 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewMod
     fun testCompletableFail() {
         var callCount = 0
         val error = IllegalStateException("Fail")
-        selectSubscribe(ViewModelTestState::asyncUnit) {
+        onEach(ViewModelTestState::asyncUnit) {
             callCount++
             assertEquals(when (callCount) {
                 1 -> Uninitialized
@@ -108,7 +108,7 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewMod
 
     fun testSingleSuccess() {
         var callCount = 0
-        selectSubscribe(ViewModelTestState::async) {
+        onEach(ViewModelTestState::async) {
             callCount++
             assertEquals(when (callCount) {
                 1 -> Uninitialized
@@ -126,7 +126,7 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewMod
     fun testSingleFail() {
         var callCount = 0
         val error = IllegalStateException("Fail")
-        selectSubscribe(ViewModelTestState::async) {
+        onEach(ViewModelTestState::async) {
             callCount++
             assertEquals(when (callCount) {
                 1 -> Uninitialized
@@ -143,7 +143,7 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewMod
 
     fun testObservableSuccess() {
         var callCount = 0
-        selectSubscribe(ViewModelTestState::async) {
+        onEach(ViewModelTestState::async) {
             callCount++
             assertEquals(when (callCount) {
                 1 -> Uninitialized
@@ -159,7 +159,7 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewMod
     fun testSequentialSetStatesWithinWithStateBlock() {
         var callCount = 0
         withState {
-            selectSubscribe(ViewModelTestState::foo) {
+            onEach(ViewModelTestState::foo) {
                 callCount++
                 assertEquals(when (callCount) {
                     1 -> 0
@@ -177,7 +177,7 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewMod
     fun testObservableFail() {
         var callCount = 0
         val error = IllegalStateException("Fail")
-        selectSubscribe(ViewModelTestState::async) {
+        onEach(ViewModelTestState::async) {
             callCount++
             assertEquals(when (callCount) {
                 1 -> Uninitialized
@@ -194,7 +194,7 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewMod
 
     fun testObservableWithMapper() {
         var callCount = 0
-        selectSubscribe(ViewModelTestState::async) {
+        onEach(ViewModelTestState::async) {
             callCount++
             assertEquals(when (callCount) {
                 1 -> Uninitialized
@@ -755,6 +755,20 @@ class ViewModelSubscriberTest : BaseTest() {
 
         viewModel.set { copy() }
         assertEquals(1, callCount)
+    }
+
+    @Test
+    fun testCancelledIfOwnerDestroyed() {
+        val job = viewModel.onEachInternal(owner) {}
+        owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+        assertTrue(job.isCancelled)
+    }
+
+    @Test
+    fun testCancelledIfViewModelCleared() {
+        val job = viewModel.onEachInternal(owner) {}
+        viewModel.triggerCleared()
+        assertTrue(job.isCancelled)
     }
 
     @Test

@@ -153,7 +153,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (S) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.onEachInternal(viewModel.lifecycleOwner, action = { subscriber(it) }).toDisposable().disposeOnClear()
+        viewModel.onEachInternal(viewModel.lifecycleOwner, action = { subscriber(it) }).toDisposable()
     }
 
     /**
@@ -173,7 +173,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (A) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.onEach1Internal(lifecycleOwner, prop1, action = { subscriber(it) }).toDisposable().disposeOnClear()
+        viewModel.onEach1Internal(lifecycleOwner, prop1, action = { subscriber(it) }).toDisposable()
     }
 
     private fun <A> selectSubscribeInternal(
@@ -206,7 +206,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         assertSubscribeToDifferentViewModel(viewModel)
         viewModel.onAsyncInternal(lifecycleOwner, asyncProp, onFail = { onFail?.invoke(it) }, onSuccess = { onSuccess?.invoke(it) })
             .toDisposable()
-            .disposeOnClear()
+
     }
 
     /**
@@ -228,7 +228,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (A, B) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.onEach2Internal(lifecycleOwner, prop1, prop2, action = { a, b -> subscriber(a, b) }).toDisposable().disposeOnClear()
+        viewModel.onEach2Internal(lifecycleOwner, prop1, prop2, action = { a, b -> subscriber(a, b) }).toDisposable()
     }
 
     /**
@@ -252,7 +252,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (A, B, C) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.onEach3Internal(lifecycleOwner, prop1, prop2, prop3, action = { a, b, c -> subscriber(a, b, c) }).toDisposable().disposeOnClear()
+        viewModel.onEach3Internal(lifecycleOwner, prop1, prop2, prop3, action = { a, b, c -> subscriber(a, b, c) }).toDisposable()
     }
 
     /**
@@ -280,7 +280,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         assertSubscribeToDifferentViewModel(viewModel)
         viewModel.onEach4Internal(lifecycleOwner, prop1, prop2, prop3, prop4, RedeliverOnStart, { a, b, c, d -> subscriber(a, b, c, d) })
             .toDisposable()
-            .disposeOnClear()
+
     }
 
     /**
@@ -312,7 +312,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         assertSubscribeToDifferentViewModel(viewModel)
         viewModel.onEach5Internal(lifecycleOwner, prop1, prop2, prop3, prop4, prop5, RedeliverOnStart, { a, b, c, d, e -> subscriber(a, b, c, d, e) })
             .toDisposable()
-            .disposeOnClear()
+
     }
 
     /**
@@ -346,7 +346,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         assertSubscribeToDifferentViewModel(viewModel)
         viewModel.onEach6Internal(lifecycleOwner, prop1, prop2, prop3, prop4, prop5, prop6, RedeliverOnStart, { a, b, c, d, e, f ->
             subscriber(a, b, c, d, e, f)
-        }).toDisposable().disposeOnClear()
+        }).toDisposable()
     }
 
     /**
@@ -382,7 +382,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         assertSubscribeToDifferentViewModel(viewModel)
         viewModel.onEach7Internal(lifecycleOwner, prop1, prop2, prop3, prop4, prop5, prop6, prop7, RedeliverOnStart, { a, b, c, d, e, f, g ->
             subscriber(a, b, c, d, e, f, g)
-        }).toDisposable().disposeOnClear()
+        }).toDisposable()
     }
 
     protected fun Disposable.disposeOnClear(): Disposable {

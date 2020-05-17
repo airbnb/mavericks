@@ -392,7 +392,7 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         val scope = lifecycleOwner?.lifecycleScope ?: viewModelScope
         return scope.launch {
             flow.collectLatest { action(it) }
-        }
+        }.cancelOnClear()
     }
 
     @Suppress("EXPERIMENTAL_API_USAGE")
@@ -433,6 +433,13 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         require(this != viewModel) {
             "This method is for subscribing to other view models. Please pass a different instance as the argument."
         }
+    }
+
+    private fun Job.cancelOnClear(): Job {
+        viewModelScope.coroutineContext[Job]?.invokeOnCompletion {
+            cancel()
+        }
+        return this
     }
 
     override fun toString(): String = "${this::class.java.simpleName} $state"
