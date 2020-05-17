@@ -177,20 +177,20 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
     protected fun <A> onEach(
         prop1: KProperty1<S, A>,
         action: suspend (A) -> Unit
-    ) = onEach1Internal(null, prop1, RedeliverOnStart, action)
+    ) = onEach1Internal(null, prop1, action = action)
 
     protected fun <A, B> onEach(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         action: suspend (A, B) -> Unit
-    ) = onEach2Internal(null, prop1, prop2, RedeliverOnStart, action)
+    ) = onEach2Internal(null, prop1, prop2, action = action)
 
     protected fun <A, B, C> onEach(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
         action: suspend (A, B, C) -> Unit
-    ) = onEach3Internal(null, prop1, prop2, prop3, RedeliverOnStart, action)
+    ) = onEach3Internal(null, prop1, prop2, prop3, action = action)
 
     protected fun <A, B, C, D> onEach(
         prop1: KProperty1<S, A>,
@@ -198,7 +198,7 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         prop3: KProperty1<S, C>,
         prop4: KProperty1<S, D>,
         action: suspend (A, B, C, D) -> Unit
-    ) = onEach4Internal(null, prop1, prop2, prop3, prop4, RedeliverOnStart, action)
+    ) = onEach4Internal(null, prop1, prop2, prop3, prop4, action = action)
 
     protected fun <A, B, C, D, E> onEach(
         prop1: KProperty1<S, A>,
@@ -207,7 +207,7 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         prop4: KProperty1<S, D>,
         prop5: KProperty1<S, E>,
         action: suspend (A, B, C, D, E) -> Unit
-    ) = onEach5Internal(null, prop1, prop2, prop3, prop4, prop5, RedeliverOnStart, action)
+    ) = onEach5Internal(null, prop1, prop2, prop3, prop4, prop5, action = action)
 
     protected fun <A, B, C, D, E, F> onEach(
         prop1: KProperty1<S, A>,
@@ -217,7 +217,7 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         prop5: KProperty1<S, E>,
         prop6: KProperty1<S, F>,
         action: suspend (A, B, C, D, E, F) -> Unit
-    ) = onEach6Internal(null, prop1, prop2, prop3, prop4, prop5, prop6, RedeliverOnStart, action)
+    ) = onEach6Internal(null, prop1, prop2, prop3, prop4, prop5, prop6, action = action)
 
     protected fun <A, B, C, D, E, F, G> onEach(
         prop1: KProperty1<S, A>,
@@ -228,7 +228,7 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         prop6: KProperty1<S, F>,
         prop7: KProperty1<S, G>,
         action: suspend (A, B, C, D, E, F, G) -> Unit
-    ) = onEach7Internal(null, prop1, prop2, prop3, prop4, prop5, prop6, prop7, RedeliverOnStart, action)
+    ) = onEach7Internal(null, prop1, prop2, prop3, prop4, prop5, prop6, prop7, action = action)
 
     /**
      * Subscribe to changes in an async property. There are optional parameters for onSuccess
@@ -241,8 +241,11 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
     ) = onAsyncInternal(null, asyncProp, RedeliverOnStart, onFail, onSuccess)
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
-    fun onEachInternal(owner: LifecycleOwner?, deliveryMode: DeliveryMode = RedeliverOnStart, action: suspend (S) -> Unit) =
-        stateFlow.resolveSubscription(owner, deliveryMode, action)
+    fun onEachInternal(
+        owner: LifecycleOwner?,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
+        action: suspend (S) -> Unit
+    ) = stateFlow.resolveSubscription(owner, deliveryMode, action)
 
     @RestrictTo(RestrictTo.Scope.LIBRARY)
     fun <A> onEach1Internal(
