@@ -56,9 +56,7 @@ class CoroutinesStateStore<S : MvRxState>(
     init {
         setupTriggerFlushQueues(scope)
         scope.coroutineContext[Job]!!.invokeOnCompletion {
-            stateChannel.close()
-            setStateChannel.close()
-            withStateChannel.close()
+            closeChannels()
         }
     }
 
@@ -70,10 +68,23 @@ class CoroutinesStateStore<S : MvRxState>(
         if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) return
 
         scope.launch(flushDispatcher) {
-            while (isActive) {
-                flushQueuesOnce()
+            try {
+                while (isActive) {
+                    flushQueuesOnce()
+                }
+            } finally {
+                closeChannels()
             }
         }
+    }
+
+    /**
+     * Close all channels. It will complete state flow as well.
+     */
+    private fun closeChannels() {
+        stateChannel.close()
+        setStateChannel.close()
+        withStateChannel.close()
     }
 
     /**
