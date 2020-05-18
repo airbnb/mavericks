@@ -483,8 +483,7 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
     }
 
     private fun Job.cancelOnClear(scope: CoroutineScope?): Job {
-        scope ?: return this
-        scope.coroutineContext[Job]?.invokeOnCompletion {
+        scope?.coroutineContext?.get(Job)?.invokeOnCompletion {
             cancel()
         }
         return this
