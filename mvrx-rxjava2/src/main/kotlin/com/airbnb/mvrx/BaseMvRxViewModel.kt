@@ -73,7 +73,6 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
 
     override fun onCleared() {
         super.onCleared()
-        println("MvRxViewModel onCleared")
         disposables.dispose()
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
     }

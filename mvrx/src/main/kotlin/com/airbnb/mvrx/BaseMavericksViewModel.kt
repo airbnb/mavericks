@@ -160,12 +160,8 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
      * Access the current ViewModel state. Takes a block of code that will be run after all current pending state
      * updates are processed.
      */
-    protected fun withState(action: suspend (state: S) -> Unit) {
-        stateStore.get { state ->
-            viewModelScope.launch {
-                action(state)
-            }
-        }
+    protected fun withState(action: (state: S) -> Unit) {
+        stateStore.get(action)
     }
 
     /**
