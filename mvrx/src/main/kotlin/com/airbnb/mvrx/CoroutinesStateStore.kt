@@ -1,7 +1,6 @@
 package com.airbnb.mvrx
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
@@ -55,10 +54,6 @@ class CoroutinesStateStore<S : MvRxState>(
 
     init {
         setupTriggerFlushQueues(scope)
-        scope.coroutineContext[Job]?.invokeOnCompletion {
-            setStateChannel.close()
-            withStateChannel.close()
-        }
     }
 
     /**
@@ -69,8 +64,14 @@ class CoroutinesStateStore<S : MvRxState>(
         if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) return
 
         scope.launch(flushDispatcher) {
-            while (isActive) {
-                flushQueuesOnce()
+            try {
+                while (isActive) {
+                    flushQueuesOnce()
+                }
+            } finally {
+                stateChannel.close()
+                setStateChannel.close()
+                withStateChannel.close()
             }
         }
     }
