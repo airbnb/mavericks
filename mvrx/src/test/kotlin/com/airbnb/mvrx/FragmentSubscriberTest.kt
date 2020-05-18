@@ -12,12 +12,12 @@ import org.junit.Test
 
 data class ViewSubscriberState(val foo: Int = 0) : MvRxState
 
-class ViewSubscriberViewModel(initialState: ViewSubscriberState) : TestMvRxViewModel<ViewSubscriberState>(initialState) {
+class ViewSubscriberViewModel(initialState: ViewSubscriberState) : TestMavericksViewModel<ViewSubscriberState>(initialState) {
     fun setFoo(foo: Int) = setState { copy(foo = foo) }
 }
 
 @Suppress("DEPRECATION")
-open class ViewSubscriberFragment : BaseMvRxFragment() {
+open class ViewSubscriberFragment : Fragment(), MavericksView {
     private val viewModel: ViewSubscriberViewModel by fragmentViewModel()
 
     var subscribeCallCount = 0
@@ -36,14 +36,14 @@ open class ViewSubscriberFragment : BaseMvRxFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.subscribe { _ -> subscribeCallCount++ }
-        viewModel.subscribe(deliveryMode = uniqueOnly("onCreate")) { _ -> subscribeUniqueOnlyCallCount++ }
+        viewModel.onEach { _ -> subscribeCallCount++ }
+        viewModel.onEach(uniqueOnly("onCreate")) { _ -> subscribeUniqueOnlyCallCount++ }
 
-        viewModel.selectSubscribe(ViewSubscriberState::foo) {
+        viewModel.onEach(ViewSubscriberState::foo) {
             selectSubscribeValue = it
             selectSubscribeCallCount++
         }
-        viewModel.selectSubscribe(ViewSubscriberState::foo, deliveryMode = uniqueOnly("onCreate")) {
+        viewModel.onEach(ViewSubscriberState::foo, uniqueOnly("onCreate")) {
             selectSubscribeUniqueOnlyValue = it
             selectSubscribeUniqueOnlyCallCount++
         }
@@ -56,8 +56,8 @@ open class ViewSubscriberFragment : BaseMvRxFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.subscribe { _ -> viewCreatedSubscribeCallCount ++ }
-        viewModel.subscribe(deliveryMode = uniqueOnly("onCreateView")) { _ -> viewCreatedUniqueOnlyCallCount ++ }
+        viewModel.onEach { _ -> viewCreatedSubscribeCallCount ++ }
+        viewModel.onEach(uniqueOnly("onCreateView")) { _ -> viewCreatedUniqueOnlyCallCount ++ }
     }
 
     fun setFoo(foo: Int) = viewModel.setFoo(foo)
@@ -449,13 +449,13 @@ class FragmentSubscriberTest : BaseTest() {
     }
 
     @Suppress("DEPRECATION")
-    class DuplicateUniqueSubscriberFragment : BaseMvRxFragment() {
+    class DuplicateUniqueSubscriberFragment : Fragment(), MavericksView {
         private val viewModel: ViewSubscriberViewModel by fragmentViewModel()
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-            viewModel.subscribe(deliveryMode = uniqueOnly()) { }
-            viewModel.subscribe(deliveryMode = uniqueOnly()) { }
+            viewModel.onEach(uniqueOnly()) { }
+            viewModel.onEach(uniqueOnly()) { }
         }
 
         override fun invalidate() { }
@@ -467,7 +467,7 @@ class FragmentSubscriberTest : BaseTest() {
     }
 
     @Suppress("DEPRECATION")
-    class ParentFragment : BaseMvRxFragment() {
+    class ParentFragment : Fragment(), MavericksView {
 
         val viewModel: ViewSubscriberViewModel by fragmentViewModel()
 
@@ -478,7 +478,7 @@ class FragmentSubscriberTest : BaseTest() {
     }
 
     @Suppress("DEPRECATION")
-    class ChildFragmentWithParentViewModel : BaseMvRxFragment() {
+    class ChildFragmentWithParentViewModel : Fragment(), MavericksView {
 
         val viewModel: ViewSubscriberViewModel by parentFragmentViewModel()
 
@@ -495,7 +495,7 @@ class FragmentSubscriberTest : BaseTest() {
     }
 
     @Suppress("DEPRECATION")
-    class ParentFragmentWithoutViewModel : BaseMvRxFragment() {
+    class ParentFragmentWithoutViewModel : Fragment(), MavericksView {
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = FrameLayout(requireContext())
 
@@ -521,7 +521,7 @@ class FragmentSubscriberTest : BaseTest() {
     }
 
     @Suppress("DEPRECATION")
-    class EmptyMvRxFragment : BaseMvRxFragment() {
+    class EmptyMvRxFragment : Fragment(), MavericksView {
         override fun invalidate() {
         }
     }
@@ -541,7 +541,7 @@ class FragmentSubscriberTest : BaseTest() {
     }
 
     @Suppress("DEPRECATION")
-    class FragmentWithTarget : BaseMvRxFragment() {
+    class FragmentWithTarget : Fragment(), MavericksView {
         val viewModel: ViewSubscriberViewModel by targetFragmentViewModel()
 
         var invalidateCount = 0

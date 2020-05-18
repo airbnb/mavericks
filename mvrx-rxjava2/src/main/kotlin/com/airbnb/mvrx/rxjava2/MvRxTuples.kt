@@ -1,4 +1,4 @@
-package com.airbnb.mvrx
+package com.airbnb.mvrx.rxjava2
 
 internal data class MvRxTuple1<A>(val a: A)
 internal data class MvRxTuple2<A, B>(val a: A, val b: B)

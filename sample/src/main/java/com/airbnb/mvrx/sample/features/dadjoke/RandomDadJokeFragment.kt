@@ -15,7 +15,6 @@ import com.airbnb.mvrx.sample.views.basicRow
 import com.airbnb.mvrx.sample.views.loadingRow
 import com.airbnb.mvrx.sample.views.marquee
 import io.reactivex.schedulers.Schedulers
-import kotlinx.android.synthetic.main.fragment_hello_world.*
 import org.koin.android.ext.android.inject
 
 data class RandomDadJokeState(val joke: Async<Joke> = Uninitialized) : MvRxState

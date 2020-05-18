@@ -2,12 +2,24 @@ package com.airbnb.mvrx
 
 import androidx.annotation.CallSuper
 import androidx.annotation.RestrictTo
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.dropWhile
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.util.Collections
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.KProperty1
 
@@ -45,6 +57,8 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
     val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate + contextOverride)
 
     private val stateStore = stateStoreOverride ?: CoroutinesStateStore(initialState, viewModelScope)
+    private val lastDeliveredStates = ConcurrentHashMap<String, Any>()
+    private val activeSubscriptions = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
     private val tag by lazy { javaClass.simpleName }
     private val mutableStateChecker = if (debugMode) MutableStateChecker(initialState) else null
@@ -146,46 +160,328 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
      * Access the current ViewModel state. Takes a block of code that will be run after all current pending state
      * updates are processed.
      */
-    protected fun withState(block: (state: S) -> Unit) {
-        stateStore.get(block)
+    protected fun withState(action: (state: S) -> Unit) {
+        stateStore.get(action)
     }
+
+    /**
+     * Subscribe to state changes for only a single property.
+     *
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
+     */
+    protected fun onEach(
+        action: suspend (S) -> Unit
+    ) = onEachInternal(null, RedeliverOnStart, action)
+
+    /**
+     * Subscribe to state changes for a single property.
+     *
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
+     */
+    protected fun <A> onEach(
+        prop1: KProperty1<S, A>,
+        action: suspend (A) -> Unit
+    ) = onEach1Internal(null, prop1, action = action)
+
+    /**
+     * Subscribe to state changes for two properties.
+     *
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
+     */
+    protected fun <A, B> onEach(
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        action: suspend (A, B) -> Unit
+    ) = onEach2Internal(null, prop1, prop2, action = action)
+
+    /**
+     * Subscribe to state changes for three properties.
+     *
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
+     */
+    protected fun <A, B, C> onEach(
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        prop3: KProperty1<S, C>,
+        action: suspend (A, B, C) -> Unit
+    ) = onEach3Internal(null, prop1, prop2, prop3, action = action)
+
+    /**
+     * Subscribe to state changes for four properties.
+     *
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
+     */
+    protected fun <A, B, C, D> onEach(
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        prop3: KProperty1<S, C>,
+        prop4: KProperty1<S, D>,
+        action: suspend (A, B, C, D) -> Unit
+    ) = onEach4Internal(null, prop1, prop2, prop3, prop4, action = action)
+
+    /**
+     * Subscribe to state changes for five properties.
+     *
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
+     */
+    protected fun <A, B, C, D, E> onEach(
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        prop3: KProperty1<S, C>,
+        prop4: KProperty1<S, D>,
+        prop5: KProperty1<S, E>,
+        action: suspend (A, B, C, D, E) -> Unit
+    ) = onEach5Internal(null, prop1, prop2, prop3, prop4, prop5, action = action)
+
+    /**
+     * Subscribe to state changes for six properties.
+     *
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
+     */
+    protected fun <A, B, C, D, E, F> onEach(
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        prop3: KProperty1<S, C>,
+        prop4: KProperty1<S, D>,
+        prop5: KProperty1<S, E>,
+        prop6: KProperty1<S, F>,
+        action: suspend (A, B, C, D, E, F) -> Unit
+    ) = onEach6Internal(null, prop1, prop2, prop3, prop4, prop5, prop6, action = action)
+
+    /**
+     * Subscribe to state changes for seven properties.
+     *
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
+     */
+    protected fun <A, B, C, D, E, F, G> onEach(
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        prop3: KProperty1<S, C>,
+        prop4: KProperty1<S, D>,
+        prop5: KProperty1<S, E>,
+        prop6: KProperty1<S, F>,
+        prop7: KProperty1<S, G>,
+        action: suspend (A, B, C, D, E, F, G) -> Unit
+    ) = onEach7Internal(null, prop1, prop2, prop3, prop4, prop5, prop6, prop7, action = action)
+
+    /**
+     * Subscribe to changes in an async property. There are optional parameters for onSuccess
+     * and onFail which automatically unwrap the value or error.
+     *
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
+     */
+    protected fun <T> onAsync(
+        asyncProp: KProperty1<S, Async<T>>,
+        onFail: (suspend (Throwable) -> Unit)? = null,
+        onSuccess: (suspend (T) -> Unit)? = null
+    ) = onAsyncInternal(null, asyncProp, RedeliverOnStart, onFail, onSuccess)
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun onEachInternal(
+        owner: LifecycleOwner?,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
+        action: suspend (S) -> Unit
+    ) = stateFlow.resolveSubscription(owner, deliveryMode, action)
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun <A> onEach1Internal(
+        owner: LifecycleOwner?,
+        prop1: KProperty1<S, A>,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
+        action: suspend (A) -> Unit
+    ) = stateFlow
+        .map { MvRxTuple1(prop1.get(it)) }
+        .distinctUntilChanged()
+        .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1)) { (a) ->
+            action(a)
+        }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun <A, B> onEach2Internal(
+        owner: LifecycleOwner?,
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
+        action: suspend (A, B) -> Unit
+    ) = stateFlow
+        .map { MvRxTuple2(prop1.get(it), prop2.get(it)) }
+        .distinctUntilChanged()
+        .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2)) { (a, b) ->
+            action(a, b)
+        }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun <A, B, C> onEach3Internal(
+        owner: LifecycleOwner?,
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        prop3: KProperty1<S, C>,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
+        action: suspend (A, B, C) -> Unit
+    ) = stateFlow
+        .map { MvRxTuple3(prop1.get(it), prop2.get(it), prop3.get(it)) }
+        .distinctUntilChanged()
+        .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3)) { (a, b, c) ->
+            action(a, b, c)
+        }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun <A, B, C, D> onEach4Internal(
+        owner: LifecycleOwner?,
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        prop3: KProperty1<S, C>,
+        prop4: KProperty1<S, D>,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
+        action: suspend (A, B, C, D) -> Unit
+    ) = stateFlow
+        .map { MvRxTuple4(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it)) }
+        .distinctUntilChanged()
+        .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4)) { (a, b, c, d) ->
+            action(a, b, c, d)
+        }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun <A, B, C, D, E> onEach5Internal(
+        owner: LifecycleOwner?,
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        prop3: KProperty1<S, C>,
+        prop4: KProperty1<S, D>,
+        prop5: KProperty1<S, E>,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
+        action: suspend (A, B, C, D, E) -> Unit
+    ) = stateFlow
+        .map { MvRxTuple5(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it)) }
+        .distinctUntilChanged()
+        .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4, prop5)) { (a, b, c, d, e) ->
+            action(a, b, c, d, e)
+        }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun <A, B, C, D, E, F> onEach6Internal(
+        owner: LifecycleOwner?,
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        prop3: KProperty1<S, C>,
+        prop4: KProperty1<S, D>,
+        prop5: KProperty1<S, E>,
+        prop6: KProperty1<S, F>,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
+        action: suspend (A, B, C, D, E, F) -> Unit
+    ) = stateFlow
+        .map { MvRxTuple6(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it), prop6.get(it)) }
+        .distinctUntilChanged()
+        .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4, prop5, prop6)) { (a, b, c, d, e, f) ->
+            action(a, b, c, d, e, f)
+        }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun <A, B, C, D, E, F, G> onEach7Internal(
+        owner: LifecycleOwner?,
+        prop1: KProperty1<S, A>,
+        prop2: KProperty1<S, B>,
+        prop3: KProperty1<S, C>,
+        prop4: KProperty1<S, D>,
+        prop5: KProperty1<S, E>,
+        prop6: KProperty1<S, F>,
+        prop7: KProperty1<S, G>,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
+        action: suspend (A, B, C, D, E, F, G) -> Unit
+    ) = stateFlow
+        .map { MvRxTuple7(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it), prop6.get(it), prop7.get(it)) }
+        .distinctUntilChanged()
+        .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4, prop5, prop6, prop7)) { (a, b, c, d, e, f, g) ->
+            action(a, b, c, d, e, f, g)
+        }
+
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun <T> onAsyncInternal(
+        owner: LifecycleOwner?,
+        asyncProp: KProperty1<S, Async<T>>,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
+        onFail: (suspend (Throwable) -> Unit)? = null,
+        onSuccess: (suspend (T) -> Unit)? = null
+    ) = onEach1Internal(owner, asyncProp, deliveryMode.appendPropertiesToId(asyncProp)) { asyncValue ->
+        if (onSuccess != null && asyncValue is Success) {
+            onSuccess(asyncValue())
+        } else if (onFail != null && asyncValue is Fail) {
+            onFail(asyncValue.error)
+        }
+    }
+
+    private fun <T : Any> Flow<T>.resolveSubscription(
+        lifecycleOwner: LifecycleOwner? = null,
+        deliveryMode: DeliveryMode,
+        action: suspend (T) -> Unit
+    ): Job {
+        val flow = if (lifecycleOwner == null || MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER) {
+            this
+        } else if (deliveryMode is UniqueOnly) {
+            val lastDeliveredValue: T? = lastDeliveredValue(deliveryMode)
+            this
+                .assertOneActiveSubscription(lifecycleOwner, deliveryMode)
+                .dropWhile { it == lastDeliveredValue }
+                .flowWhenStarted(lifecycleOwner)
+                .distinctUntilChanged()
+                .onEach { lastDeliveredStates[deliveryMode.subscriptionId] = it }
+        } else {
+            flowWhenStarted(lifecycleOwner)
+        }
+        val scope = lifecycleOwner?.lifecycleScope ?: viewModelScope
+        return scope.launch {
+            flow.collectLatest(action)
+        }
+    }
+
+    @Suppress("EXPERIMENTAL_API_USAGE")
+    private fun <T> Flow<T>.assertOneActiveSubscription(owner: LifecycleOwner, deliveryMode: UniqueOnly): Flow<T> {
+        val observer = object : DefaultLifecycleObserver {
+            override fun onCreate(owner: LifecycleOwner) {
+                if (activeSubscriptions.contains(deliveryMode.subscriptionId)) error(duplicateSubscriptionMessage(deliveryMode))
+                activeSubscriptions += deliveryMode.subscriptionId
+            }
+
+            override fun onDestroy(owner: LifecycleOwner) {
+                activeSubscriptions.remove(deliveryMode.subscriptionId)
+            }
+        }
+
+        owner.lifecycle.addObserver(observer)
+        return onCompletion {
+            activeSubscriptions.remove(deliveryMode.subscriptionId)
+            owner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    private fun <T> lastDeliveredValue(deliveryMode: UniqueOnly): T? {
+        @Suppress("UNCHECKED_CAST")
+        return lastDeliveredStates[deliveryMode.subscriptionId] as T?
+    }
+
+    private fun duplicateSubscriptionMessage(deliveryMode: UniqueOnly) = """
+        Subscribing with a duplicate subscription id: ${deliveryMode.subscriptionId}.
+        If you have multiple uniqueOnly subscriptions in a MvRx view that listen to the same properties
+        you must use a custom subscription id. If you are using a custom MvRxView, make sure you are using the proper
+        lifecycle owner. See BaseMvRxFragment for an example.
+    """.trimIndent()
 
     private operator fun CoroutineContext.plus(other: CoroutineContext?) = if (other == null) this else this + other
 
-    override fun toString(): String = "${this::class.java.simpleName} $state"
-}
-
-/**
- * Defines what updates a subscription should receive.
- * See: [RedeliverOnStart], [UniqueOnly].
- */
-sealed class DeliveryMode {
-
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    fun appendPropertiesToId(vararg properties: KProperty1<*, *>): DeliveryMode {
-        return when (this) {
-            is RedeliverOnStart -> RedeliverOnStart
-            is UniqueOnly -> UniqueOnly(subscriptionId + "_" + properties.joinToString(",") { it.name })
+    private fun <S : MvRxState> assertSubscribeToDifferentViewModel(viewModel: BaseMavericksViewModel<S>) {
+        require(this != viewModel) {
+            "This method is for subscribing to other view models. Please pass a different instance as the argument."
         }
     }
+
+    override fun toString(): String = "${this::class.java.simpleName} $state"
 }
-
-/**
- * The subscription will receive the most recent state update when transitioning from locked to unlocked states (stopped -> started),
- * even if the state has not changed while locked.
- *
- * Likewise, when a MvRxView resubscribes after a configuration change the most recent update will always be emitted.
- */
-object RedeliverOnStart : DeliveryMode()
-
-/**
- * The subscription will receive the most recent state update when transitioning from locked to unlocked states (stopped -> started),
- * only if the state has changed while locked.
- *
- * Likewise, when a MvRxView resubscribes after a configuration change the most recent update will only be emitted
- * if the state has changed while locked.
- *
- * @param subscriptionId A uniqueIdentifier for this subscription. It is an error for two unique only subscriptions to
- * have the same id.
- */
-class UniqueOnly(val subscriptionId: String) : DeliveryMode()

@@ -38,7 +38,7 @@ dependencies {
     implementation Libraries.constraintlayout
     implementation Libraries.coreKtx
     implementation Libraries.lifecycleCommon
-    implementation project(":mvrx-rxjava2")
+    implementation project(":mvrx")
 
     testImplementation TestLibraries.junit
     testImplementation project(":testing")

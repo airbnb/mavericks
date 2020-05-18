@@ -55,7 +55,8 @@ class CoroutinesStateStore<S : MvRxState>(
 
     init {
         setupTriggerFlushQueues(scope)
-        scope.coroutineContext[Job]?.invokeOnCompletion {
+        scope.coroutineContext[Job]!!.invokeOnCompletion {
+            stateChannel.close()
             setStateChannel.close()
             withStateChannel.close()
         }

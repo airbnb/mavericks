@@ -5,8 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.PersistState
 import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.withState
@@ -14,12 +14,12 @@ import kotlinx.android.synthetic.main.fragment_counter.counterText
 
 data class CounterState(@PersistState val count: Int = 0) : MvRxState
 
-class CounterViewModel(state: CounterState) : MvRxViewModel<CounterState>(state) {
+class CounterViewModel(state: CounterState) : MavericksViewModel<CounterState>(state) {
 
     fun incrementCount() = setState { copy(count = count + 1) }
 }
 
-class CounterFragment : Fragment(), MvRxView {
+class CounterFragment : Fragment(), MavericksView {
 
     private val viewModel: CounterViewModel by activityViewModel()
 

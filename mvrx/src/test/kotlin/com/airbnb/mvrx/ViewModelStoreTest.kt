@@ -4,6 +4,7 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.fragment.app.Fragment
 import kotlinx.android.parcel.Parcelize
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -11,14 +12,11 @@ import org.junit.Test
 import org.robolectric.Robolectric
 import org.robolectric.annotation.Config
 
-@Parcelize
-data class ViewModelStoreTestArgs(val count: Int = 2) : Parcelable
-
 data class ViewModelStoreTestState(val notPersistedCount: Int = 1, @PersistState val persistedCount: Int = 1) : MvRxState {
     constructor(args: ViewModelStoreTestArgs) : this(args.count, args.count)
 }
 
-class ViewModelStoreTestViewModel(initialState: ViewModelStoreTestState) : TestMvRxViewModel<ViewModelStoreTestState>(initialState) {
+class ViewModelStoreTestViewModel(initialState: ViewModelStoreTestState) : TestMavericksViewModel<ViewModelStoreTestState>(initialState) {
     fun setCount(count: Int) = setState { copy(persistedCount = count, notPersistedCount = count) }
 }
 
@@ -33,7 +31,7 @@ class ViewModelStoreActivity : TestActivity() {
 }
 
 @Suppress("DEPRECATION")
-class ViewModelStoreTestFragment : BaseMvRxFragment() {
+class ViewModelStoreTestFragment : Fragment(), MavericksView {
     val viewModelFragment: ViewModelStoreTestViewModel by fragmentViewModel()
     val viewModelActivity: ViewModelStoreTestViewModel by activityViewModel()
 

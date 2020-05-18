@@ -1,15 +1,41 @@
+@file:Suppress("EXPERIMENTAL_API_USAGE")
+
 package com.airbnb.mvrx
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.setMain
+import org.junit.After
+import org.junit.AfterClass
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
+import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Test
 import java.util.concurrent.ConcurrentLinkedQueue
 
 data class OrderingState(val count: Int = 0) : MvRxState
 class SetStateWithStateOrderingTest : BaseMavericksViewModel<OrderingState>(OrderingState(), debugMode = false) {
+
+    companion object {
+        @BeforeClass
+        @JvmStatic
+        fun setup() {
+            // We need to set main but don't want a synchronous state store to make sure that the real ordering is correct
+            Dispatchers.setMain(TestCoroutineDispatcher())
+        }
+
+        @AfterClass
+        @JvmStatic
+        fun cleanup() {
+            Dispatchers.resetMain()
+        }
+    }
+
     @Test
     fun test1() = runBlocking {
         val calls = mutableListOf<String>()

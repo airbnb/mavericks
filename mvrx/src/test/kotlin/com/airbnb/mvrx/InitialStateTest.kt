@@ -8,8 +8,8 @@ import org.junit.Test
 @Parcelize
 data class ViewModelStoreTestArgs(val count: Int = 2) : Parcelable
 data class DefaultParamState(val foo: String = "") : MvRxState
-class DefaultParamViewModel(initialState: DefaultParamState = DefaultParamState()) : TestMvRxViewModel<DefaultParamState>(initialState)
-class NonDefaultParamViewModel(initialState: DefaultParamState) : TestMvRxViewModel<DefaultParamState>(initialState)
+class DefaultParamViewModel(initialState: DefaultParamState = DefaultParamState()) : TestMavericksViewModel<DefaultParamState>(initialState)
+class NonDefaultParamViewModel(initialState: DefaultParamState) : TestMavericksViewModel<DefaultParamState>(initialState)
 
 class InitialStateTest : BaseTest() {
     @Test(expected = IllegalArgumentException::class)
