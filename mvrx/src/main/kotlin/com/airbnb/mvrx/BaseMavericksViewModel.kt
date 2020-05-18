@@ -441,10 +441,9 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         } else {
             flowWhenStarted(lifecycleOwner)
         }
-        val scope = lifecycleOwner?.lifecycleScope ?: viewModelScope
-        return scope.launch {
-            flow.collectLatest { action(it) }
-        }.cancelOnClear()
+        return viewModelScope.launch {
+            flow.collectLatest(action)
+        }.cancelOnClear(lifecycleOwner?.lifecycleScope)
     }
 
     @Suppress("EXPERIMENTAL_API_USAGE")
@@ -487,8 +486,9 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         }
     }
 
-    private fun Job.cancelOnClear(): Job {
-        viewModelScope.coroutineContext[Job]?.invokeOnCompletion {
+    private fun Job.cancelOnClear(scope: CoroutineScope?): Job {
+        scope ?: return this
+        scope.coroutineContext[Job]?.invokeOnCompletion {
             cancel()
         }
         return this

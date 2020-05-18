@@ -1,3 +1,5 @@
+@file:Suppress("EXPERIMENTAL_API_USAGE")
+
 package com.airbnb.mvrx
 
 import kotlinx.coroutines.Dispatchers

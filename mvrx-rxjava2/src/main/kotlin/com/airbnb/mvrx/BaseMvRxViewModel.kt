@@ -5,15 +5,27 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModel
+import com.airbnb.mvrx.rxjava2.MvRxTuple1
+import com.airbnb.mvrx.rxjava2.MvRxTuple2
+import com.airbnb.mvrx.rxjava2.MvRxTuple3
+import com.airbnb.mvrx.rxjava2.MvRxTuple4
+import com.airbnb.mvrx.rxjava2.MvRxTuple5
+import com.airbnb.mvrx.rxjava2.MvRxTuple6
+import com.airbnb.mvrx.rxjava2.MvRxTuple7
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.disposables.Disposables
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
@@ -57,10 +69,11 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * between two view models.
      */
     private val lifecycleOwner: LifecycleOwner = LifecycleOwner { lifecycleRegistry }
-    private val lifecycleRegistry: LifecycleRegistry = LifecycleRegistry(lifecycleOwner).apply { currentState = Lifecycle.State.RESUMED }
+    private val lifecycleRegistry = LifecycleRegistry(lifecycleOwner).apply { currentState = Lifecycle.State.RESUMED }
 
     override fun onCleared() {
         super.onCleared()
+        println("MvRxViewModel onCleared")
         disposables.dispose()
         lifecycleRegistry.currentState = Lifecycle.State.DESTROYED
     }
@@ -153,7 +166,10 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (S) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.onEachInternal(viewModel.lifecycleOwner, action = { subscriber(it) }).toDisposable()
+        viewModel.stateFlow
+            .onEach { subscriber(it) }
+            .launchIn(viewModelScope)
+            .cancelOnClear(viewModel.viewModelScope)
     }
 
     /**
@@ -173,7 +189,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (A) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.onEach1Internal(lifecycleOwner, prop1, action = { subscriber(it) }).toDisposable()
+        viewModel.stateFlow
+            .map { MvRxTuple1(prop1.get(it)) }
+            .distinctUntilChanged()
+            .onEach { (a) -> subscriber(a) }
+            .launchIn(viewModelScope)
+            .cancelOnClear(viewModel.viewModelScope)
     }
 
     private fun <A> selectSubscribeInternal(
@@ -204,8 +225,18 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         onSuccess: ((T) -> Unit)? = null
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.onAsyncInternal(lifecycleOwner, asyncProp, onFail = { onFail?.invoke(it) }, onSuccess = { onSuccess?.invoke(it) })
-            .toDisposable()
+        viewModel.stateFlow
+            .map { MvRxTuple1(asyncProp.get(it)) }
+            .distinctUntilChanged()
+            .onEach { (asyncValue) ->
+                if (onSuccess != null && asyncValue is Success) {
+                    onSuccess(asyncValue())
+                } else if (onFail != null && asyncValue is Fail) {
+                    onFail(asyncValue.error)
+                }
+            }
+            .launchIn(viewModelScope)
+            .cancelOnClear(viewModel.viewModelScope)
     }
 
     /**
@@ -227,7 +258,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (A, B) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.onEach2Internal(lifecycleOwner, prop1, prop2, action = { a, b -> subscriber(a, b) }).toDisposable()
+        viewModel.stateFlow
+            .map { MvRxTuple2(prop1.get(it), prop2.get(it)) }
+            .distinctUntilChanged()
+            .onEach { (a, b) -> subscriber(a, b) }
+            .launchIn(viewModelScope)
+            .cancelOnClear(viewModel.viewModelScope)
     }
 
     /**
@@ -251,7 +287,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (A, B, C) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.onEach3Internal(lifecycleOwner, prop1, prop2, prop3, action = { a, b, c -> subscriber(a, b, c) }).toDisposable()
+        viewModel.stateFlow
+            .map { MvRxTuple3(prop1.get(it), prop2.get(it), prop3.get(it)) }
+            .distinctUntilChanged()
+            .onEach { (a, b, c) -> subscriber(a, b, c) }
+            .launchIn(viewModelScope)
+            .cancelOnClear(viewModel.viewModelScope)
     }
 
     /**
@@ -277,8 +318,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (A, B, C, D) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.onEach4Internal(lifecycleOwner, prop1, prop2, prop3, prop4, RedeliverOnStart, { a, b, c, d -> subscriber(a, b, c, d) })
-            .toDisposable()
+        viewModel.stateFlow
+            .map { MvRxTuple4(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it)) }
+            .distinctUntilChanged()
+            .onEach { (a, b, c, d) -> subscriber(a, b, c, d) }
+            .launchIn(viewModelScope)
+            .cancelOnClear(viewModel.viewModelScope)
     }
 
     /**
@@ -308,8 +353,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (A, B, C, D, E) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.onEach5Internal(lifecycleOwner, prop1, prop2, prop3, prop4, prop5, RedeliverOnStart, { a, b, c, d, e -> subscriber(a, b, c, d, e) })
-            .toDisposable()
+        viewModel.stateFlow
+            .map { MvRxTuple5(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it)) }
+            .distinctUntilChanged()
+            .onEach { (a, b, c, d, e) -> subscriber(a, b, c, d, e) }
+            .launchIn(viewModelScope)
+            .cancelOnClear(viewModel.viewModelScope)
     }
 
     /**
@@ -341,9 +390,12 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (A, B, C, D, E, F) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.onEach6Internal(lifecycleOwner, prop1, prop2, prop3, prop4, prop5, prop6, RedeliverOnStart, { a, b, c, d, e, f ->
-            subscriber(a, b, c, d, e, f)
-        }).toDisposable()
+        viewModel.stateFlow
+            .map { MvRxTuple6(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it), prop6.get(it)) }
+            .distinctUntilChanged()
+            .onEach { (a, b, c, d, e, f) -> subscriber(a, b, c, d, e, f) }
+            .launchIn(viewModelScope)
+            .cancelOnClear(viewModel.viewModelScope)
     }
 
     /**
@@ -377,9 +429,19 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         subscriber: (A, B, C, D, E, F, G) -> Unit
     ) {
         assertSubscribeToDifferentViewModel(viewModel)
-        viewModel.onEach7Internal(lifecycleOwner, prop1, prop2, prop3, prop4, prop5, prop6, prop7, RedeliverOnStart, { a, b, c, d, e, f, g ->
-            subscriber(a, b, c, d, e, f, g)
-        }).toDisposable()
+        viewModel.stateFlow
+            .map { MvRxTuple7(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it), prop6.get(it), prop7.get(it)) }
+            .distinctUntilChanged()
+            .onEach { (a, b, c, d, e, f, g) -> subscriber(a, b, c, d, e, f, g) }
+            .launchIn(viewModelScope)
+            .cancelOnClear(viewModel.viewModelScope)
+    }
+
+    private fun Job.cancelOnClear(scope: CoroutineScope): Job {
+        scope.coroutineContext[Job]?.invokeOnCompletion {
+            cancel()
+        }
+        return this
     }
 
     protected fun Disposable.disposeOnClear(): Disposable {
@@ -396,6 +458,4 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
             "This method is for subscribing to other view models. Please pass a different instance as the argument."
         }
     }
-
-    private operator fun CoroutineContext.plus(other: CoroutineContext?) = if (other == null) this else this + other
 }
