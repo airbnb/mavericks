@@ -24,6 +24,10 @@ android {
             }
         }
     }
+
+    defaultConfig {
+        testInstrumentationRunner "androidx.benchmark.junit4.AndroidBenchmarkRunner"
+    }
 }
 
 jacoco {
@@ -42,6 +46,9 @@ dependencies {
     testImplementation TestLibraries.junit
     testImplementation TestLibraries.mockito
     testImplementation TestLibraries.roboeletric
+
+    androidTestImplementation TestLibraries.benchmark
+    androidTestImplementation InstrumentedTestLibraries.junit
 }
 
 tasks.register("coverage", JacocoReportTask.class) {
