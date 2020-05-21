@@ -5,7 +5,10 @@ import androidx.annotation.RestrictTo
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
@@ -14,10 +17,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.dropWhile
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.plus
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.CoroutineContext
@@ -162,6 +167,84 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
      */
     protected fun withState(action: (state: S) -> Unit) {
         stateStore.get(action)
+    }
+
+    /**
+     * Run a coroutine and wrap its progression with [Async] property reduced to the global state.
+     *
+     * @param dispatcher The coroutine dispatcher that the coroutine will run on. Defaults to [Dispatchers.Main.immediate].
+     * @param retainValue A state property that, when set, will be called to retrieve an optional existing data value that will be retained across
+     *                    subsequent Loading and Fail states. This is useful if you want to display the previously succcessful data when
+     *                    refreshing.
+     * @param reducer A reducer that is applied to the current state and should return the new state. Because the state is the receiver
+     *                and it likely a data class, an implementation may look like: `{ copy(response = it) }`.
+     */
+    fun <T : Any?> Deferred<T>.execute(
+        dispatcher: CoroutineDispatcher = Dispatchers.Main.immediate,
+        retainValue: KProperty1<S, Async<T>>? = null,
+        reducer: S.(Async<T>) -> S
+    ) = suspend { await() }.execute(dispatcher, retainValue, reducer)
+
+    /**
+     * Run a coroutine and wrap its progression with [Async] property reduced to the global state.
+     *
+     * @param dispatcher The coroutine dispatcher that the coroutine will run on. Defaults to [Dispatchers.Main.immediate].
+     * @param retainValue A state property that, when set, will be called to retrieve an optional existing data value that will be retained across
+     *                    subsequent Loading and Fail states. This is useful if you want to display the previously succcessful data when
+     *                    refreshing.
+     * @param reducer A reducer that is applied to the current state and should return the new state. Because the state is the receiver
+     *                and it likely a data class, an implementation may look like: `{ copy(response = it) }`.
+     */
+    fun <T : Any?> (suspend () -> T).execute(
+        dispatcher: CoroutineDispatcher = Dispatchers.Main.immediate,
+        retainValue: KProperty1<S, Async<T>>? = null,
+        reducer: S.(Async<T>) -> S
+    ): Job {
+        setState { reducer(Loading(value = retainValue?.get(this)?.invoke())) }
+        return viewModelScope.launch(dispatcher) {
+            try {
+                val result = invoke()
+                setState { reducer(Success(result)) }
+            } catch (e: CancellationException) {
+                @Suppress("RethrowCaughtException")
+                throw e
+            } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+                setState { reducer(Fail(e, value = retainValue?.get(this)?.invoke())) }
+            }
+        }
+    }
+
+    /**
+     * Collect a Flow and wrap its progression with [Async] property reduced to the global state.
+     *
+     * @param dispatcher The coroutine dispatcher that the coroutine will run on. Defaults to [Dispatchers.Main.immediate].
+     * @param reducer A reducer that is applied to the current state and should return the new state. Because the state is the receiver
+     *                and it likely a data class, an implementation may look like: `{ copy(response = it) }`.
+     */
+    fun <T> Flow<T>.execute(
+        dispatcher: CoroutineDispatcher = Dispatchers.Main.immediate,
+        reducer: S.(Async<T>) -> S
+    ): Job {
+        setState { reducer(Loading<T>()) }
+        return onEach {
+            setState { reducer(Success(it)) }
+        }.launchIn(viewModelScope + dispatcher)
+    }
+
+    /**
+     * Collect a Flow and update state each time it emits a value. This is functionally the same as wrapping onEach with a setState call.
+     *
+     * @param dispatcher The coroutine dispatcher that the coroutine will run on. Defaults to [Dispatchers.Main.immediate].
+     * @param reducer A reducer that is applied to the current state and should return the new state. Because the state is the receiver
+     *                and it likely a data class, an implementation may look like: `{ copy(response = it) }`.
+     */
+    fun <T> Flow<T>.setOnEach(
+        dispatcher: CoroutineDispatcher = Dispatchers.Main.immediate,
+        reducer: S.(T) -> S
+    ): Job {
+        return onEach {
+            setState { reducer(it) }
+        }.launchIn(viewModelScope + dispatcher)
     }
 
     /**
