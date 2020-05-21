@@ -61,6 +61,9 @@ class AndroidMetaModulePlugin : Plugin<Project> {
                             getByName("test").java.apply {
                                 setSrcDirs(srcDirs + file("src/test/kotlin"))
                             }
+                            getByName("androidTest").java.apply {
+                                setSrcDirs(srcDirs + file("src/androidTest/kotlin"))
+                            }
                         }
                     }
                 }

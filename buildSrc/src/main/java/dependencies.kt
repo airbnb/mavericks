@@ -45,6 +45,7 @@ object Versions {
     const val mockitoKotlin = "2.2.0"
     const val mockk = "1.9.3"
     const val robolectric = "4.3.1"
+    const val benchmark = "1.0.0"
     const val testCore = "1.2.0"
 }
 
@@ -109,4 +110,5 @@ object TestLibraries {
     const val mockitoKotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:${Versions.mockitoKotlin}"
     const val mockk = "io.mockk:mockk:${Versions.mockk}"
     const val roboeletric = "org.robolectric:robolectric:${Versions.robolectric}"
+    const val benchmark = "androidx.benchmark:benchmark-junit4:${Versions.benchmark}"
 }
