@@ -27,6 +27,7 @@
         android:paddingTop="8dp"
         android:textColor="@color/text_color"
         android:textSize="14sp"
+        android:visibility="gone"
         tools:text="Subtitle"/>
 
     <Space
