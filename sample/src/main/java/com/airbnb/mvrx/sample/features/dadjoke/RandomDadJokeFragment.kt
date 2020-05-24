@@ -1,20 +1,27 @@
 package com.airbnb.mvrx.sample.features.dadjoke
 
+import android.os.Bundle
+import android.view.View
+import androidx.core.view.isVisible
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.setupWithNavController
 import com.airbnb.mvrx.Async
+import com.airbnb.mvrx.Loading
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxViewModelFactory
+import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.Uninitialized
 import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.fragmentViewModel
+import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.core.MvRxViewModel
-import com.airbnb.mvrx.sample.core.simpleController
+import com.airbnb.mvrx.sample.databinding.RandomDadJokeFragmentBinding
 import com.airbnb.mvrx.sample.models.Joke
 import com.airbnb.mvrx.sample.network.DadJokeService
-import com.airbnb.mvrx.sample.views.basicRow
-import com.airbnb.mvrx.sample.views.loadingRow
-import com.airbnb.mvrx.sample.views.marquee
-import io.reactivex.schedulers.Schedulers
+import com.airbnb.mvrx.sample.utils.viewBinding
+import com.airbnb.mvrx.withState
+import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.android.inject
 
 data class RandomDadJokeState(val joke: Async<Joke> = Uninitialized) : MvRxState
@@ -28,7 +35,9 @@ class RandomDadJokeViewModel(
     }
 
     fun fetchRandomJoke() {
-        dadJokeService.random().subscribeOn(Schedulers.io()).execute { copy(joke = it) }
+        suspend {
+            dadJokeService.random()
+        }.execute(Dispatchers.IO) { copy(joke = it) }
     }
 
     companion object : MvRxViewModelFactory<RandomDadJokeViewModel, RandomDadJokeState> {
@@ -40,31 +49,20 @@ class RandomDadJokeViewModel(
     }
 }
 
-class RandomDadJokeFragment : BaseFragment() {
+class RandomDadJokeFragment : BaseFragment(R.layout.random_dad_joke_fragment) {
+    private val binding: RandomDadJokeFragmentBinding by viewBinding()
     private val viewModel: RandomDadJokeViewModel by fragmentViewModel()
 
-    override fun epoxyController() = simpleController(viewModel) { state ->
-        marquee {
-            id("marquee")
-            title("Dad Joke")
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        binding.toolbar.setupWithNavController(findNavController())
+        binding.randomizeButton.setOnClickListener {
+            viewModel.fetchRandomJoke()
         }
+    }
 
-        /**
-         * Async overrides the invoke operator so we can just call it. It will return the value if
-         * it is Success or null otherwise.
-         */
-        val joke = state.joke()
-        if (joke == null) {
-            loadingRow {
-                id("loading")
-            }
-            return@simpleController
-        }
-
-        basicRow {
-            id("joke")
-            title(joke.joke)
-            clickListener { _ -> viewModel.fetchRandomJoke() }
-        }
+    override fun invalidate() = withState(viewModel) { state ->
+        binding.loader.isVisible = state.joke is Loading
+        binding.row.isVisible = state.joke is Success
+        binding.row.setTitle(state.joke()?.joke)
     }
 }

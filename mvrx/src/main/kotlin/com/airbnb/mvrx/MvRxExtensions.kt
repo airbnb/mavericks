@@ -1,7 +1,10 @@
 package com.airbnb.mvrx
 
+import android.os.Bundle
+import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import java.io.Serializable
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
@@ -153,6 +156,22 @@ fun <V : Any> args() = object : ReadOnlyProperty<Fragment, V> {
         return value ?: throw IllegalArgumentException("")
     }
 }
+
+/**
+ * Takes anything that is serializable and creates a MvRx Fragment argument [Bundle].
+ *
+ * Set this as your Fragment's arguments and you can use the [args] property delegate in your Fragment
+ * to easily retrieve it.
+ */
+fun Serializable.asMvRxArgs() = Bundle().apply { putSerializable(MvRx.KEY_ARG, this@asMvRxArgs) }
+
+/**
+ * Takes anything that is [Parcelable] and creates a MvRx Fragment argument [Bundle].
+ *
+ * Set this as your Fragment's arguments and you can use the [args] property delegate in your Fragment
+ * to easily retrieve it.
+ */
+fun Parcelable.asMvRxArgs() = Bundle().apply { putParcelable(MvRx.KEY_ARG, this@asMvRxArgs) }
 
 /**
  * Helper to handle pagination. Use this when you want to append a list of results at a given offset.

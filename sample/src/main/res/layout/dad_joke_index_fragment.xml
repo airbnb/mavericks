@@ -8,18 +8,12 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        app:navigationIcon="@drawable/ic_arrow_back"
-        />
-    <TextView
-        android:id="@+id/textView"
+        android:background="@android:color/white"
+        android:elevation="8dp"
+        app:navigationIcon="@drawable/ic_arrow_back" />
+    <com.airbnb.epoxy.EpoxyRecyclerView
+        android:id="@+id/recycler_view"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:gravity="center"
         android:layout_weight="1" />
-
-    <FrameLayout
-        android:id="@+id/childContainer"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="4" />
 </LinearLayout>
