@@ -158,7 +158,7 @@ fun <V : Any> args() = object : ReadOnlyProperty<Fragment, V> {
 }
 
 /**
- * Takes anything that is [Parcelable] and creates a MvRx Fragment argument [Bundle].
+ * Takes anything that is serializable and creates a MvRx Fragment argument [Bundle].
  *
  * Set this as your Fragment's arguments and you can use the [args] property delegate in your Fragment
  * to easily retrieve it.
@@ -166,7 +166,7 @@ fun <V : Any> args() = object : ReadOnlyProperty<Fragment, V> {
 fun Serializable.asMvRxArgs() = Bundle().apply { putSerializable(MvRx.KEY_ARG, this@asMvRxArgs) }
 
 /**
- * Takes anything that is serializable and creates a MvRx Fragment argument [Bundle].
+ * Takes anything that is [Parcelable] and creates a MvRx Fragment argument [Bundle].
  *
  * Set this as your Fragment's arguments and you can use the [args] property delegate in your Fragment
  * to easily retrieve it.
