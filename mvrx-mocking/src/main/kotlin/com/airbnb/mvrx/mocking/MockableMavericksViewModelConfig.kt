@@ -10,17 +10,19 @@ import com.airbnb.mvrx.MavericksViewModelConfig
 import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.mocking.printer.ViewModelStatePrinter
+import kotlinx.coroutines.CoroutineScope
 import java.util.LinkedList
 
 class MockableMavericksViewModelConfig<S : MvRxState>(
-        private val mockableStateStore: MockableMvRxStateStore<S>,
-        private val initialMockBehavior: MockBehavior,
-        debugMode: Boolean
-) : MavericksViewModelConfig<S>(debugMode = debugMode, stateStore = mockableStateStore) {
-
+    private val mockableStateStore: MockableMvRxStateStore<S>,
+    private val initialMockBehavior: MockBehavior,
+    coroutineScope: CoroutineScope,
+    debugMode: Boolean
+) : MavericksViewModelConfig<S>(debugMode = debugMode, stateStore = mockableStateStore, coroutineScope = coroutineScope) {
 
     val currentMockBehavior: MockBehavior
         get() = mockBehaviorOverrides.peek() ?: initialMockBehavior
+
     private val mockBehaviorOverrides = LinkedList<MockBehavior>()
 
     fun pushBehaviorOverride(mockBehavior: MockBehavior) {
@@ -53,6 +55,7 @@ class MockableMavericksViewModelConfig<S : MvRxState>(
             return viewModel.config as MockableMavericksViewModelConfig
         }
     }
+
     override fun <S : MvRxState> onExecute(viewModel: BaseMavericksViewModel<S>): BlockExecutions {
         val blockExecutions = currentMockBehavior.blockExecutions
 
@@ -83,6 +86,7 @@ data class MockBehavior(
     enum class InitialStateMocking {
         /** No mocked state is applied. The ViewModel initializes itself through normal means. */
         None,
+
         /**
          * Generally uses the same behavior as [None], however, if an 'existingViewModel' is accessed and no previous instance exists
          * this will take the default mock state off of the Fragment for that ViewModel and initialize the ViewModel with that state.
@@ -92,11 +96,13 @@ data class MockBehavior(
          * that doesn't represent normal screen flow).
          */
         ForceMockExistingViewModel,
+
         /**
          * Initial view model state is taken from [MockStateHolder] and used in ViewModel creation,
          * but that mocked state may be overridden either in the [MvRxViewModelFactory] or constructor of the ViewModel.
          */
         Partial,
+
         /**
          * Initial view model state is taken from [MockStateHolder] and used in ViewModel creation.
          * Additionally, any changes to state during ViewModel initialization are forcibly overridden by the mocked state.
@@ -109,11 +115,13 @@ data class MockBehavior(
          * Uses RealMvRxStateStore
          */
         Normal,
+
         /**
          * An implementation of [ScriptableStateStore] that blocks any calls to [MvRxStateStore.set],
          * and instead allows immediate state updates via [ScriptableStateStore.next]
          */
         Scriptable,
+
         /**
          * A fully functional [MvRxStateStore] implementation that makes all updates synchronously.
          */
@@ -139,9 +147,9 @@ open class MockMavericksViewModelConfigFactory(context: Context?, debugMode: Boo
      * A value can also be set directly here if you want to change the global default.
      */
     var mockBehavior: MockBehavior = MockBehavior(
-            initialStateMocking = MockBehavior.InitialStateMocking.None,
-            blockExecutions = MavericksViewModelConfig.BlockExecutions.No,
-            stateStoreBehavior = MockBehavior.StateStoreBehavior.Normal
+        initialStateMocking = MockBehavior.InitialStateMocking.None,
+        blockExecutions = MavericksViewModelConfig.BlockExecutions.No,
+        stateStoreBehavior = MockBehavior.StateStoreBehavior.Normal
     )
 
     /**
@@ -155,8 +163,8 @@ open class MockMavericksViewModelConfigFactory(context: Context?, debugMode: Boo
      * If not null, the [MockableMvRxStateStore] will be created with the options declared in the [MockBehavior]
      */
     fun <R> withMockBehavior(
-            mockBehavior: MockBehavior = this.mockBehavior,
-            block: () -> R
+        mockBehavior: MockBehavior = this.mockBehavior,
+        block: () -> R
     ): R {
         // This function is not inlined so that the caller cannot return early,
         // which would skip setting back the original value!
@@ -178,16 +186,19 @@ open class MockMavericksViewModelConfigFactory(context: Context?, debugMode: Boo
 
     override fun <S : MvRxState> buildConfig(viewModel: BaseMavericksViewModel<S>, initialState: S): MavericksViewModelConfig<S> {
         val mockBehavior = mockBehavior
+        val coroutineScope = coroutineScope()
 
         val stateStore = MockableMvRxStateStore(
-                initialState = initialState,
-                mockBehavior = mockBehavior
+            initialState = initialState,
+            mockBehavior = mockBehavior,
+            coroutineScope = coroutineScope
         )
 
         return MockableMavericksViewModelConfig(
-                mockableStateStore = stateStore,
-                initialMockBehavior = mockBehavior,
-                debugMode = debugMode
+            mockableStateStore = stateStore,
+            initialMockBehavior = mockBehavior,
+            debugMode = debugMode,
+            coroutineScope = coroutineScope
         ).also { config ->
             // Since this is an easy place to hook into all viewmodel creation and clearing
             // we use it as an opportunity to register the mock printer on all view models.

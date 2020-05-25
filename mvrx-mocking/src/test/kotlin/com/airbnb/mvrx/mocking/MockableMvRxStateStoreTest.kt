@@ -172,12 +172,13 @@ class MockableMvRxStateStoreTest : BaseTest() {
         storeBehavior: StateStoreBehavior = StateStoreBehavior.Scriptable
     ): MockableMvRxStateStore<TestState> {
         return MockableMvRxStateStore(
-                TestState(),
-                MockBehavior(
-                        initialStateMocking = InitialStateMocking.None,
-                        blockExecutions = MavericksViewModelConfig.BlockExecutions.No,
-                        stateStoreBehavior = storeBehavior
-                )
+            TestState(),
+            MockBehavior(
+                    initialStateMocking = InitialStateMocking.None,
+                    blockExecutions = MavericksViewModelConfig.BlockExecutions.No,
+                    stateStoreBehavior = storeBehavior
+            ),
+            coroutineScope
         )
     }
 

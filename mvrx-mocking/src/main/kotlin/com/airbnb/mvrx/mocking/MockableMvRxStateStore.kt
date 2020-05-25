@@ -5,8 +5,11 @@ import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.ScriptableMvRxStateStore
 import com.airbnb.mvrx.ScriptableStateStore
 import com.airbnb.mvrx.mocking.MockBehavior.StateStoreBehavior
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.isActive
 
 interface MockableStateStore<S : Any> : ScriptableStateStore<S> {
     var mockBehavior: MockBehavior
@@ -24,11 +27,12 @@ interface MockableStateStore<S : Any> : ScriptableStateStore<S> {
  */
 class MockableMvRxStateStore<S : MvRxState>(
     initialState: S,
-    override var mockBehavior: MockBehavior
+    override var mockBehavior: MockBehavior,
+    val coroutineScope: CoroutineScope
 ) : MockableStateStore<S> {
     private val scriptableStore = ScriptableMvRxStateStore(initialState)
-    private val realStore = CoroutinesStateStore(initialState, GlobalScope) // TODO: Scope
-    private val realImmediateStore = SynchronousMvRxStateStore(initialState)
+    private val realStore = CoroutinesStateStore(initialState, coroutineScope)
+    private val realImmediateStore = SynchronousMvRxStateStore(initialState, coroutineScope)
 
     private val onStateSetListeners = mutableListOf<(previousState: S, newState: S) -> Unit>()
     private val onDisposeListeners = mutableListOf<(MockableMvRxStateStore<*>) -> Unit>()
@@ -40,22 +44,8 @@ class MockableMvRxStateStore<S : MvRxState>(
             StateStoreBehavior.Synchronous -> realImmediateStore
         }
 
-//    // Using "trampoline" scheduler so that updates are processed synchronously.
-//    // This allows changes to be dispatched in a more controllable way for testing,
-//    // to reduce flakiness in accounting for changes in screenshot tests.
-//    override val observable: Observable<S>
-//        get() = currentStore.observable.observeOn(Schedulers.trampoline())
-
     override val state: S
         get() = currentStore.state
-
-//    override fun dispose() {
-//        realStore.dispose()
-//        realImmediateStore.dispose()
-//        scriptableStore.dispose()
-//        onDisposeListeners.forEach { it(this) }
-//        onDisposeListeners.clear()
-//    }
 
     override fun next(state: S) {
         check(mockBehavior.stateStoreBehavior == StateStoreBehavior.Scriptable) {
@@ -71,10 +61,6 @@ class MockableMvRxStateStore<S : MvRxState>(
     override fun get(block: (S) -> Unit) {
         currentStore.get(block)
     }
-//
-//    override fun isDisposed(): Boolean {
-//        return realStore.isDisposed
-//    }
 
     override fun set(stateReducer: S.() -> S) {
         val newState = state.stateReducer()
@@ -104,15 +90,18 @@ class MockableMvRxStateStore<S : MvRxState>(
         onStateSetListeners.remove(callback)
     }
 
+    // TODO: Different naming besides dispose?
     fun addOnDisposeListener(callback: (MockableMvRxStateStore<*>) -> Unit) {
-        // TODO
-//        if (isDisposed) {
-//            callback(this)
-//        } else {
-//            onDisposeListeners.add(callback)
-//        }
+        if (!coroutineScope.isActive) {
+            callback(this)
+        } else {
+            coroutineScope.coroutineContext[Job]!!.invokeOnCompletion {
+                onDisposeListeners.add(callback)
+            }
+        }
     }
 
     override val flow: Flow<S>
-        get() = TODO("Not yet implemented")
+        // TODO: Make flow synchronous with runBlocking when needed
+        get() = currentStore.flow
 }

@@ -3,7 +3,10 @@ package com.airbnb.mvrx
 import android.content.Context
 import android.content.pm.ApplicationInfo
 import androidx.annotation.RestrictTo
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Factory for providing the [MavericksViewModelConfig] for each new ViewModel that is created.
@@ -12,13 +15,21 @@ import kotlinx.coroutines.GlobalScope
  *
  * A custom subclass of this may be used to allow you to override [buildConfig], but this should
  * generally not be necessary.
- *
- * @param debugMode True if debug checks should be run. Should be false for production builds.
- * When true, certain validations are applied to the ViewModel. These can be slow and should
- * not be used in production! However, they do help to catch common issues so it is highly
- * recommended that you enable debug when applicable.
  */
-open class MavericksViewModelConfigFactory(val debugMode: Boolean) {
+open class MavericksViewModelConfigFactory(
+    /**
+     * True if debug checks should be run. Should be false for production builds.
+     * When true, certain validations are applied to the ViewModel. These can be slow and should
+     * not be used in production! However, they do help to catch common issues so it is highly
+     * recommended that you enable debug when applicable.
+     */
+    val debugMode: Boolean,
+    /**
+     * Provide a default context for viewModelScope. It will be added after [SupervisorJob]
+     * and [Dispatchers.Main.immediate].
+     */
+    val contextOverride: CoroutineContext? = null
+) {
 
     /**
      * Sets [debugMode] depending on whether the app was built with the Debuggable flag enabled.
@@ -26,12 +37,15 @@ open class MavericksViewModelConfigFactory(val debugMode: Boolean) {
     constructor(context: Context) : this(context.isDebuggable())
 
     private val onConfigProvidedListener =
-            mutableListOf<(BaseMavericksViewModel<*>, MavericksViewModelConfig<*>) -> Unit>()
+        mutableListOf<(BaseMavericksViewModel<*>, MavericksViewModelConfig<*>) -> Unit>()
 
+    open fun coroutineScope(): CoroutineScope {
+        return CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate + contextOverride)
+    }
 
     internal fun <S : MvRxState> provideConfig(
-            viewModel: BaseMavericksViewModel<S>,
-            initialState: S
+        viewModel: BaseMavericksViewModel<S>,
+        initialState: S
     ): MavericksViewModelConfig<S> {
         return buildConfig(viewModel, initialState).also { config ->
             onConfigProvidedListener.forEach { callback -> callback(viewModel, config) }
@@ -43,11 +57,10 @@ open class MavericksViewModelConfigFactory(val debugMode: Boolean) {
      * This can be overridden to customize the config.
      */
     open fun <S : MvRxState> buildConfig(
-            viewModel: BaseMavericksViewModel<S>,
-            initialState: S
+        viewModel: BaseMavericksViewModel<S>,
+        initialState: S
     ): MavericksViewModelConfig<S> {
-        // TODO: Pass scope
-        return object : MavericksViewModelConfig<S>(debugMode, CoroutinesStateStore(initialState, GlobalScope)) {
+        return object : MavericksViewModelConfig<S>(debugMode, CoroutinesStateStore(initialState, coroutineScope()), coroutineScope()) {
             override fun <S : MvRxState> onExecute(viewModel: BaseMavericksViewModel<S>): BlockExecutions {
                 return BlockExecutions.No
             }
@@ -69,6 +82,9 @@ open class MavericksViewModelConfigFactory(val debugMode: Boolean) {
     fun removeOnConfigProvidedListener(callback: (BaseMavericksViewModel<*>, MavericksViewModelConfig<*>) -> Unit) {
         onConfigProvidedListener.remove(callback)
     }
+
+
+    protected operator fun CoroutineContext.plus(other: CoroutineContext?) = if (other == null) this else this + other
 }
 
 

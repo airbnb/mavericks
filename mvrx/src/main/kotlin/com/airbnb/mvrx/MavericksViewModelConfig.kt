@@ -1,6 +1,7 @@
 package com.airbnb.mvrx
 
 import androidx.annotation.RestrictTo
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlin.coroutines.CoroutineContext
@@ -18,13 +19,7 @@ abstract class MavericksViewModelConfig<S : Any>(
      * The state store instance that will control the state of the ViewModel
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY) val stateStore: MvRxStateStore<S>,
-    /**
-     * Provide a default context for viewModelScope. It will be added after [SupervisorJob]
-     * and [Dispatchers.Main.immediate]. This should only be used for tests and should only
-     * be exposed via a shared base class within your app. If your features extend this
-     * directly, do not override this in the primary constructor of your feature ViewModel.
-     */
-    val contextOverride: CoroutineContext? = null
+    val coroutineScope: CoroutineScope
 ) {
     /**
      * Called each time a [BaseMavericksViewModel.execute] function is invoked. This allows

@@ -1,17 +1,19 @@
 package com.airbnb.mvrx.mocking
 
 import com.airbnb.mvrx.MvRxStateStore
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 /**
  * This acts as a functional state store, but all updates happen synchronously.
  * The intention of this is to allow state changes in tests to be tracked
  * synchronously.
  */
-internal class SynchronousMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
+internal class SynchronousMvRxStateStore<S : Any>(initialState: S, val coroutineScope: CoroutineScope) : MvRxStateStore<S> {
 
     private val flowEmitters = mutableListOf<suspend (S) -> Unit>()
 
@@ -26,9 +28,12 @@ internal class SynchronousMvRxStateStore<S : Any>(initialState: S) : MvRxStateSt
 
     override fun set(stateReducer: S.() -> S) {
         state = state.stateReducer()
-        // TODO: Neeed coroutineScope to emit to flow
-        GlobalScope.launch {
-            flowEmitters.forEach { it(state) }
+
+        // TODO: Is this right?
+        runBlocking {
+            coroutineScope.launch {
+                flowEmitters.forEach { it(state) }
+            }
         }
     }
 

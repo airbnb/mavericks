@@ -19,6 +19,7 @@ class ScriptableMvRxStateStore<S : Any>(initialState: S) : ScriptableStateStore<
 
     private val stateChannel = BroadcastChannel<S>(capacity = Channel.BUFFERED)
     override var state = initialState
+
     override val flow: Flow<S>
         get() = flow {
             emit(state)

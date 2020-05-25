@@ -7,11 +7,9 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
@@ -25,7 +23,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.KProperty1
 
 /**
@@ -50,7 +47,7 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         initialState
     )
 
-    val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate + config.contextOverride)
+    val viewModelScope = config.coroutineScope
 
     private val stateStore = config.stateStore
     private val lastDeliveredStates = ConcurrentHashMap<String, Any>()
@@ -175,6 +172,7 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         retainValue: KProperty1<S, Async<T>>? = null,
         reducer: S.(Async<T>) -> S
     ) = suspend { await() }.execute(dispatcher, retainValue, reducer)
+    // TODO: block executions if config specifies
 
     /**
      * Run a coroutine and wrap its progression with [Async] property reduced to the global state.
@@ -548,8 +546,6 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         you must use a custom subscription id. If you are using a custom MvRxView, make sure you are using the proper
         lifecycle owner. See BaseMvRxFragment for an example.
     """.trimIndent()
-
-    private operator fun CoroutineContext.plus(other: CoroutineContext?) = if (other == null) this else this + other
 
     private fun <S : MvRxState> assertSubscribeToDifferentViewModel(viewModel: BaseMavericksViewModel<S>) {
         require(this != viewModel) {
