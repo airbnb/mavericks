@@ -1,43 +1,36 @@
 [![Build Status](https://travis-ci.com/airbnb/MvRx.svg?branch=master)](https://travis-ci.com/github/airbnb/MvRx)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx)
 
-# MvRx: Android on Autopilot
+# Mavericks
 
-## For full documentation, check out the [wiki](https://github.com/airbnb/MvRx/wiki)
+Mavericks is an Android MVI framework that is both easy to learn yet powerful enough for the most complex flows at Airbnb and other large apps.
 
-MvRx (pronounced mavericks) is the Android framework from Airbnb that we use for nearly all product development at Airbnb.
-
-When we began creating MvRx, our goal was not to create yet another architecture pattern for Airbnb, it was to make building products easier, faster, and more fun. All of our decisions have built on that. We believe that for MvRx to be successful, it must be effective for building everything from the simplest of screens to the most complex in our app.
+When we began creating Mavericks, our goal was not to create yet another architecture pattern for Airbnb, it was to make building products easier, faster, and more fun. All of our decisions have built on that. We believe that for Mavericks to be successful, it must be effective for building everything from the simplest of screens to the most complex..
 
 This is what it looks like:
 ```kotlin
+data class CounterState(@PersistState val count: Int = 0) : MvRxState
 
-data class HelloWorldState(val title: String = "Hello World") : MvRxState
-
-/**
- * Refer to the wiki for how to set up your base ViewModel.
- */
-class HelloWorldViewModel(initialState: HelloWorldState) : MyBaseMvRxViewModel<HelloWorldState>(initialState, debugMode = BuildConfig.DEBUG) {
-    fun getMoreExcited() = setState { copy(title = "$title!") }
+class CounterViewModel(state: CounterState) : MavericksViewModel<CounterState>(state) {
+    fun incrementCount() = setState { copy(count = count + 1) }
 }
 
-class HelloWorldFragment : BaseFragment() {
-    private val viewModel: HelloWorldViewModel by fragmentViewModel()
+class CounterFragment : Fragment(R.layout.fragment_counter), MavericksView {
+    private val viewModel: CounterViewModel by activityViewModel()
 
-    override fun EpoxyController.buildModels() = withState(viewModel) { state ->
-        header {
-            title(state.title)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        counterText.setOnClickListener {
+            viewModel.incrementCount()
         }
-        basicRow {
-            onClick { viewModel.getMoreExcited() }
-        }
+    }
+
+    override fun invalidate() = withState(viewModel) { state ->
+        counterText.text = "Count: ${state.count}"
     }
 }
 ```
 
 ## Installation
-
-Gradle is the only supported build configuration, so just add the dependency to your project `build.gradle` file:
 
 ```groovy
 dependencies {
@@ -45,5 +38,3 @@ dependencies {
 }
 ```
 The latest version of mvrx is [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx)
-
-## For full documentation, check out the [wiki](https://github.com/airbnb/MvRx/wiki)
