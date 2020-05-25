@@ -24,7 +24,7 @@ object Versions {
     const val dagger = "2.27"
     const val daggerAssisted = "0.5.2"
     const val debugDb = "1.0.4"
-    const val epoxy = "3.9.0"
+    const val epoxy = "4.0.0-beta1"
     const val koin = "2.0.1"
     const val lottie = "3.4.0"
     const val moshi = "1.9.2"

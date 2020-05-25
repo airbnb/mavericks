@@ -40,33 +40,24 @@ import kotlin.reflect.KProperty1
  * ```
  */
 abstract class BaseMavericksViewModel<S : MvRxState>(
-    initialState: S,
-    debugMode: Boolean,
-    /**
-     * Provide an overridden state store. This should only be used for tests and should only
-     * be exposed via a shared base class within your app. If your features extend this
-     * directly, do not override this in the primary constructor of your feature ViewModel.
-     */
-    stateStoreOverride: MvRxStateStore<S>? = null,
-    /**
-     * Provide a default context for viewModelScope. It will be added after [SupervisorJob]
-     * and [Dispatchers.Main.immediate]. This should only be used for tests and should only
-     * be exposed via a shared base class within your app. If your features extend this
-     * directly, do not override this in the primary constructor of your feature ViewModel.
-     */
-    contextOverride: CoroutineContext? = null
+    initialState: S
 ) {
+
+    @Suppress("LeakingThis")
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    protected val debugMode = if (MvRxTestOverrides.FORCE_DEBUG == null) debugMode else MvRxTestOverrides.FORCE_DEBUG
+    val config: MavericksViewModelConfig<S> = MvRx.nonNullViewModelConfigFactory.provideConfig(
+        this,
+        initialState
+    )
 
-    val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate + contextOverride)
+    val viewModelScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate + config.contextOverride)
 
-    private val stateStore = stateStoreOverride ?: CoroutinesStateStore(initialState, viewModelScope)
+    private val stateStore = config.stateStore
     private val lastDeliveredStates = ConcurrentHashMap<String, Any>()
     private val activeSubscriptions = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
     private val tag by lazy { javaClass.simpleName }
-    private val mutableStateChecker = if (debugMode) MutableStateChecker(initialState) else null
+    private val mutableStateChecker = if (config.debugMode) MutableStateChecker(initialState) else null
 
     /**
      * Synchronous access to state is not exposed externally because there is no guarantee that
@@ -86,7 +77,7 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         get() = stateStore.flow
 
     init {
-        if (this.debugMode) {
+        if (config.debugMode) {
             viewModelScope.launch(Dispatchers.Default) {
                 validateState(initialState)
             }
@@ -119,7 +110,7 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
      *    mutable variables or properties from outside the lambda or else it may crash.
      */
     protected fun setState(reducer: S.() -> S) {
-        if (debugMode) {
+        if (config.debugMode) {
             // Must use `set` to ensure the validated state is the same as the actual state used in reducer
             // Do not use `get` since `getState` queue has lower priority and the validated state would be the state after reduced
             stateStore.set {

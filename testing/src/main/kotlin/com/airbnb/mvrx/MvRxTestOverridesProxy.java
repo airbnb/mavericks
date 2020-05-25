@@ -10,13 +10,6 @@ import com.airbnb.mvrx.test.MvRxTestRule;
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 public class MvRxTestOverridesProxy {
-    public static void forceMvRxDebug(Boolean debug) {
-        MvRxTestOverrides.FORCE_DEBUG = debug;
-    }
-
-    public static void forceSynchronousStateStores(boolean force) {
-        MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES = force;
-    }
 
     public static void forceDisableLifecycleAwareObserver(Boolean disableLifecycleAwareObserver) {
         MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER = disableLifecycleAwareObserver;

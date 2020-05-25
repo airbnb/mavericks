@@ -4,4 +4,4 @@ import com.airbnb.mvrx.BaseMavericksViewModel
 import com.airbnb.mvrx.BuildConfig
 import com.airbnb.mvrx.MvRxState
 
-abstract class MvRxViewModel<S : MvRxState>(initialState: S) : BaseMavericksViewModel<S>(initialState, debugMode = BuildConfig.DEBUG)
+abstract class MvRxViewModel<S : MvRxState>(initialState: S) : BaseMavericksViewModel<S>(initialState)

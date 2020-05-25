@@ -39,6 +39,7 @@ dependencies {
     implementation Libraries.coreKtx
     implementation Libraries.lifecycleCommon
     implementation project(":mvrx")
+    implementation project(':mvrx-mocking')
 
     testImplementation TestLibraries.junit
     testImplementation project(":testing")

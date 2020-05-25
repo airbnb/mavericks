@@ -12,9 +12,9 @@ private object UninitializedValue
 /**
  * This was copied from SynchronizedLazyImpl but modified to automatically initialize in ON_CREATE.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY)
 @SuppressWarnings("Detekt.ClassNaming")
-class lifecycleAwareLazy<out T>(private val owner: LifecycleOwner, initializer: () -> T) : Lazy<T>, Serializable {
+class lifecycleAwareLazy<out T>(private val owner: LifecycleOwner, initializer: () -> T) : Lazy<T>,
+    Serializable {
     private var initializer: (() -> T)? = initializer
     @Volatile
     @SuppressWarnings("Detekt.VariableNaming")

@@ -6,6 +6,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.sample.databinding.MainFragmentBinding
 import com.airbnb.mvrx.sample.utils.viewBinding
+import android.content.Intent
+import com.airbnb.mvrx.launcher.MvRxLauncherActivity
 import com.airbnb.mvrx.sample.views.basicRow
 import com.airbnb.mvrx.sample.views.marquee
 
@@ -39,6 +41,15 @@ class MainFragment : Fragment(R.layout.main_fragment) {
                 title("Random Dad Joke")
                 subtitle(demonstrates("fragmentViewModel", "Network requests", "Dependency Injection"))
                 clickListener { _ -> findNavController().navigate(R.id.action_main_to_randomDadJokeFragment) }
+            }
+
+            basicRow {
+                id("launcher")
+                title("Launcher")
+                subtitle(demonstrates("MvRx Launcher"))
+                clickListener { _ ->
+                    startActivity(Intent(requireActivity(), MvRxLauncherActivity::class.java))
+                }
             }
 
             basicRow {

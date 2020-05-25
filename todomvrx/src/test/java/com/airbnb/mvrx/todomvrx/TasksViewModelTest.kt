@@ -6,6 +6,7 @@ import com.airbnb.mvrx.test.MvRxTestRule
 import com.airbnb.mvrx.todomvrx.data.Task
 import com.airbnb.mvrx.todomvrx.data.source.TasksDataSource
 import com.airbnb.mvrx.withState
+import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -225,7 +226,7 @@ class TasksViewModelTest {
         }
 
         // verify the data source has cleared completed tasks
-        verify(dataSource).clearCompletedTasks()
+        verify(dataSource, atLeastOnce()).clearCompletedTasks()
     }
 
     @Test fun deleteTask() {

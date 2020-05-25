@@ -19,6 +19,21 @@ private val handler = Handler(Looper.getMainLooper(), Handler.Callback { message
     true
 })
 
+/**
+ * If any callbacks to run [MavericksView.invalidate] have been posted with [MavericksView.postInvalidate]
+ * then this cancels them.
+ *
+ * This may be useful if you have manually run [MavericksView.invalidate] and want to avoid the overhead
+ * of having it run again on the next frame.
+ */
+fun MavericksView.cancelPendingInvalidates() {
+    val viewHashCode = System.identityHashCode(this)
+    if (pendingInvalidates.remove(viewHashCode)) {
+        // the hashcode is used as the "what" in the message
+        handler.removeMessages(viewHashCode)
+    }
+}
+
 interface MavericksView : LifecycleOwner {
     /**
      * Override this to supply a globally unique id for this MvRxView. If your MvRxView is being recreated due to

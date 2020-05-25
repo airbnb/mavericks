@@ -10,4 +10,4 @@ import com.airbnb.mvrx.hellodagger.BuildConfig
  * This class sets the 'Debug' mode in a [BaseMvRxViewModel] to the corresponding parameter
  * in the [BuildConfig] class.
  */
-abstract class BaseViewModel<S : MvRxState>(initialState: S) : BaseMvRxViewModel<S>(initialState, BuildConfig.DEBUG)
+abstract class BaseViewModel<S : MvRxState>(initialState: S) : BaseMvRxViewModel<S>(initialState)

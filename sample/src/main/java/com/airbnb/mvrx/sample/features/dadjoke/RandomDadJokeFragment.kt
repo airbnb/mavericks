@@ -17,6 +17,8 @@ import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.core.MvRxViewModel
 import com.airbnb.mvrx.sample.databinding.RandomDadJokeFragmentBinding
+import com.airbnb.mvrx.mocking.mockSingleViewModel
+import com.airbnb.mvrx.sample.features.dadjoke.mocks.mockRandomDadJokeState
 import com.airbnb.mvrx.sample.models.Joke
 import com.airbnb.mvrx.sample.network.DadJokeService
 import com.airbnb.mvrx.sample.utils.viewBinding
@@ -42,7 +44,10 @@ class RandomDadJokeViewModel(
 
     companion object : MvRxViewModelFactory<RandomDadJokeViewModel, RandomDadJokeState> {
 
-        override fun create(viewModelContext: ViewModelContext, state: RandomDadJokeState): RandomDadJokeViewModel {
+        override fun create(
+            viewModelContext: ViewModelContext,
+            state: RandomDadJokeState
+        ): RandomDadJokeViewModel {
             val service: DadJokeService by viewModelContext.activity.inject()
             return RandomDadJokeViewModel(state, service)
         }
@@ -64,5 +69,13 @@ class RandomDadJokeFragment : BaseFragment(R.layout.random_dad_joke_fragment) {
         binding.loader.isVisible = state.joke is Loading
         binding.row.isVisible = state.joke is Success
         binding.row.setTitle(state.joke()?.joke)
+    }
+
+    override fun provideMocks() = mockSingleViewModel(
+        viewModelReference = RandomDadJokeFragment::viewModel,
+        defaultState = mockRandomDadJokeState,
+        defaultArgs = null
+    ) {
+        stateForLoadingAndFailure { ::joke }
     }
 }
