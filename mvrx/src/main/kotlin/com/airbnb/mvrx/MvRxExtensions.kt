@@ -163,7 +163,7 @@ fun <V : Any> args() = object : ReadOnlyProperty<Fragment, V> {
  * Set this as your Fragment's arguments and you can use the [args] property delegate in your Fragment
  * to easily retrieve it.
  */
-fun Serializable.asMvRxArgs() = Bundle().apply { putSerializable(MvRx.KEY_ARG, this@asMvRxArgs) }
+fun Serializable.asMavericksArgs() = Bundle().apply { putSerializable(MvRx.KEY_ARG, this@asMavericksArgs) }
 
 /**
  * Takes anything that is [Parcelable] and creates a MvRx Fragment argument [Bundle].
@@ -171,7 +171,7 @@ fun Serializable.asMvRxArgs() = Bundle().apply { putSerializable(MvRx.KEY_ARG, t
  * Set this as your Fragment's arguments and you can use the [args] property delegate in your Fragment
  * to easily retrieve it.
  */
-fun Parcelable.asMvRxArgs() = Bundle().apply { putParcelable(MvRx.KEY_ARG, this@asMvRxArgs) }
+fun Parcelable.asMavericksArgs() = Bundle().apply { putParcelable(MvRx.KEY_ARG, this@asMavericksArgs) }
 
 /**
  * Helper to handle pagination. Use this when you want to append a list of results at a given offset.
