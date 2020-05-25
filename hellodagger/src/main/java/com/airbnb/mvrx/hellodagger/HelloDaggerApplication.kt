@@ -12,6 +12,7 @@ class HelloDaggerApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         appComponent = DaggerAppComponent.create()
+        com.airbnb.mvrx.mocking.MavericksMocks.install(this)
     }
 }
 

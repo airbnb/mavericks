@@ -1,5 +1,7 @@
-package com.airbnb.mvrx
+package com.airbnb.mvrx.mocking
 
+import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.withState
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Test
@@ -10,12 +12,16 @@ class ScriptableStateStoreTest : BaseTest() {
 
     @Before
     fun setup() {
-        viewModel = TestViewModel()
+        MavericksMocks.mockConfigFactory.withMockBehavior(
+                MockBehavior(stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable)
+        ) {
+            viewModel = TestViewModel()
+        }
     }
 
     @Test
     fun testSetStateCallsIgnored() {
-        viewModel.attemptToChageState(2)
+        viewModel.attemptToChangeState(2)
         withState(viewModel) {
             Assert.assertEquals(1, it.foo)
         }
@@ -23,7 +29,7 @@ class ScriptableStateStoreTest : BaseTest() {
 
     @Test
     fun testCanScriptState() {
-        viewModel.stateStore.next(TestState(foo = 2))
+        MavericksMocks.setScriptableState(viewModel, TestState(foo = 2))
         withState(viewModel) {
             Assert.assertEquals(2, it.foo)
         }
@@ -33,14 +39,13 @@ class ScriptableStateStoreTest : BaseTest() {
 
     private class TestViewModel(
         initialState: TestState = TestState(),
-        val stateStore: ScriptableMvRxStateStore<TestState> = ScriptableMvRxStateStore(initialState)
     ) : BaseMavericksViewModel<TestState>(
         initialState,
         debugMode = true,
         stateStoreOverride = stateStore
     ) {
 
-        fun attemptToChageState(newFoo: Int) {
+        fun attemptToChangeState(newFoo: Int) {
             setState { copy(foo = newFoo) }
         }
     }

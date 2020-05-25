@@ -37,22 +37,8 @@ import kotlin.reflect.KProperty1
  * All subsequent ViewModels in your app should use that one.
  */
 abstract class BaseMvRxViewModel<S : MvRxState>(
-    initialState: S,
-    debugMode: Boolean,
-    /**
-     * Provide an overridden state store. This should only be used for tests and should only
-     * be exposed via a shared base class within your app. If your features extend this
-     * directly, do not override this in the primary constructor of your feature ViewModel.
-     */
-    stateStoreOverride: MvRxStateStore<S>? = null,
-    /**
-     * Provide a default context for viewModelScope. It will be added after [SupervisorJob]
-     * and [Dispatchers.Main.immediate]. This should only be used for tests and should only
-     * be exposed via a shared base class within your app. If your features extend this
-     * directly, do not override this in the primary constructor of your feature ViewModel.
-     */
-    contextOverride: CoroutineContext? = null
-) : BaseMavericksViewModel<S>(initialState, debugMode, stateStoreOverride, contextOverride) {
+    initialState: S
+) : BaseMavericksViewModel<S>(initialState) {
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
     private val lastDeliveredStates = ConcurrentHashMap<String, Any>()
@@ -148,7 +134,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * Output all state changes to logcat.
      */
     fun logStateChanges() {
-        if (!debugMode) return
+        if (!config.debugMode) return
         subscribe { Log.d(tag, "New State: $it") }
     }
 

@@ -1,11 +1,9 @@
 import com.airbnb.mvrx.AndroidMetaModulePlugin
 
 buildscript {
-
     repositories {
         google()
         jcenter()
-        maven { url "https://oss.sonatype.org/service/local/repositories/snapshots/content/" }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:${Versions.gradlePlugin}"
@@ -13,7 +11,7 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
 
         // Upload with:
-        // ./gradlew clean assemble androidSourcesJar androidJavadocsJar uploadArchives --no-daemon --no-parallel
+        // ./gradlew clean uploadArchives --no-daemon --no-parallel
         classpath "com.vanniktech:gradle-maven-publish-plugin:0.11.1"
     }
 

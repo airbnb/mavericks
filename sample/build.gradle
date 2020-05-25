@@ -45,6 +45,9 @@ dependencies {
     implementation Libraries.rxAndroid
     implementation Libraries.rxJava
     implementation project(":mvrx-rxjava2")
+    implementation project(':mvrx-mocking')
+    // In real apps this should be debugImplementation so that the launcher isn't included in production!
+    implementation project(':launcher')
 
     testImplementation TestLibraries.junit
 }

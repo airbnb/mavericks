@@ -1,13 +1,18 @@
 package com.airbnb.mvrx.hellodagger
 
+import com.airbnb.mvrx.test.MvRxTestRule
 import com.airbnb.mvrx.withState
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.reactivex.Observable
+import org.junit.Rule
 import org.junit.Test
 
 internal class HelloViewModelTest {
+
+    @get:Rule
+    val mvrxRule = MvRxTestRule()
 
     private val repo = mockk<HelloRepository> {
         every { sayHello() } returns Observable.just("Hello!")
