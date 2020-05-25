@@ -33,7 +33,7 @@ dependencies {
     implementation Libraries.rxAndroid
     implementation Libraries.rxJava
     implementation Libraries.multidex
-    implementation project(":mvrx-rxjava2")
+    implementation project(":mvrx")
 
     debugImplementation Libraries.debugDb
 

@@ -40,6 +40,8 @@ dependencies {
     implementation Libraries.viewModelKtx
     implementation Libraries.runtimeKtx
 
+    kapt AnnotationProcessors.lifecycle
+
     testImplementation TestLibraries.junit
     testImplementation TestLibraries.kotlinCoroutinesTest
     testImplementation TestLibraries.mockito
