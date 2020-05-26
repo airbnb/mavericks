@@ -27,14 +27,21 @@ abstract class BaseTest {
         @BeforeClass
         fun classSetUp() {
             ShadowLog.stream = System.out
+            MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES = true
+        }
+
+        @JvmStatic
+        @AfterClass
+        fun classTearDown() {
+            MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES = false
         }
     }
 
     @Before
     @After
     fun resetConfigurationDefaults() {
-        // Use a null context since we don't need mock printing during tests
-        MvRx.viewModelConfigFactory = MavericksViewModelConfigFactory(true)
+        // TODO: Use default?
+        MvRx.viewModelConfigFactory = MavericksViewModelConfigFactory(false)
     }
 
     protected inline fun <reified F : Fragment, reified A : AppCompatActivity> createFragment(

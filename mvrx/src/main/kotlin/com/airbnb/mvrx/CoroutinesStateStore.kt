@@ -65,7 +65,9 @@ class CoroutinesStateStore<S : MvRxState>(
      * Poll [withStateChannel] and [setStateChannel] to respond to set/get state requests.
      */
     private fun setupTriggerFlushQueues(scope: CoroutineScope) {
-        scope.launch(flushDispatcherOverride ?: flushDispatcher) {
+        if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) return
+
+        scope.launch(flushDispatcher) {
             try {
                 while (isActive) {
                     flushQueuesOnce()
@@ -119,14 +121,19 @@ class CoroutinesStateStore<S : MvRxState>(
 
     override fun get(block: (S) -> Unit) {
         withStateChannel.offer(block)
+        if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
+            runBlocking { flushQueuesOnce() }
+        }
     }
 
     override fun set(stateReducer: S.() -> S) {
         setStateChannel.offer(stateReducer)
+        if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
+            runBlocking { flushQueuesOnce() }
+        }
     }
 
     companion object {
-        internal var flushDispatcherOverride: CoroutineDispatcher? = null
         private val flushDispatcher = Executors.newCachedThreadPool().asCoroutineDispatcher()
     }
 }

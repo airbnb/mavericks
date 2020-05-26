@@ -11,4 +11,6 @@ public class MvRxTestOverrides {
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     public static Boolean FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER = false;
+
+    static boolean FORCE_SYNCHRONOUS_STATE_STORES = false;
 }
