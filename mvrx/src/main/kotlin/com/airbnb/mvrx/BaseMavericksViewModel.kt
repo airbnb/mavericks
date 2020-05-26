@@ -5,6 +5,7 @@ import androidx.annotation.RestrictTo
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import io.reactivex.disposables.Disposables
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Deferred
@@ -172,7 +173,6 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         retainValue: KProperty1<S, Async<T>>? = null,
         reducer: S.(Async<T>) -> S
     ) = suspend { await() }.execute(dispatcher, retainValue, reducer)
-    // TODO: block executions if config specifies
 
     /**
      * Run a coroutine and wrap its progression with [Async] property reduced to the global state.
@@ -189,6 +189,14 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         retainValue: KProperty1<S, Async<T>>? = null,
         reducer: S.(Async<T>) -> S
     ): Job {
+        val blockExecutions = config.onExecute(this@BaseMavericksViewModel)
+        if (blockExecutions != MavericksViewModelConfig.BlockExecutions.No) {
+            if (blockExecutions == MavericksViewModelConfig.BlockExecutions.WithLoading) {
+                setState { reducer(Loading()) }
+            }
+            return viewModelScope.launch {  }
+        }
+
         setState { reducer(Loading(value = retainValue?.get(this)?.invoke())) }
         return viewModelScope.launch(dispatcher) {
             try {
@@ -214,6 +222,14 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         dispatcher: CoroutineDispatcher = Dispatchers.Main.immediate,
         reducer: S.(Async<T>) -> S
     ): Job {
+        val blockExecutions = config.onExecute(this@BaseMavericksViewModel)
+        if (blockExecutions != MavericksViewModelConfig.BlockExecutions.No) {
+            if (blockExecutions == MavericksViewModelConfig.BlockExecutions.WithLoading) {
+                setState { reducer(Loading()) }
+            }
+            return viewModelScope.launch {  }
+        }
+
         setState { reducer(Loading<T>()) }
         return onEach {
             setState { reducer(Success(it)) }

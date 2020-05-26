@@ -115,6 +115,14 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         successMetaData: ((T) -> Any)? = null,
         stateReducer: S.(Async<V>) -> S
     ): Disposable {
+        val blockExecutions = config.onExecute(this@BaseMvRxViewModel)
+        if (blockExecutions != MavericksViewModelConfig.BlockExecutions.No) {
+            if (blockExecutions == MavericksViewModelConfig.BlockExecutions.WithLoading) {
+                setState { stateReducer(Loading()) }
+            }
+            return Disposables.disposed()
+        }
+
         // Intentionally didn't use RxJava's startWith operator. When withState is called right after execute then the loading reducer won't be enqueued yet if startWith is used.
         setState { stateReducer(Loading()) }
 
