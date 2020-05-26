@@ -5,6 +5,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consume
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
@@ -49,14 +50,12 @@ class CoroutinesStateStore<S : MvRxState>(
      */
     override val flow: Flow<S>
         get() = flow {
-            val (initialState, subscription) =  updateMutex.withLock {
+            val (initialState, subscription) = updateMutex.withLock {
                 state to stateChannel.openSubscription()
             }
-            try {
+            subscription.consume {
                 emit(initialState)
-                emitAll(subscription)
-            } finally {
-                subscription.cancel()
+                emitAll(this)
             }
         }
 

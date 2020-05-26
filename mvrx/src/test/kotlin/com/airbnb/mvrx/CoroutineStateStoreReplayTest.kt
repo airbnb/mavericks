@@ -69,7 +69,7 @@ class CoroutineStateStoreReplayTest {
 
     /**
      * Tests that cancellation during first emit in CoroutinesStateStore.flow doesn't block other collectors forever
-     * Will fail without finally block in
+     * Will fail if stateChannel subscription will be collected without finally block in CoroutinesStateStore.flow builder
      */
     @Test(timeout = 10_000)
     fun testProperCancellation() = runBlocking {
