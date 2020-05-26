@@ -1,11 +1,17 @@
 package com.airbnb.mvrx.mocking
 
+import androidx.annotation.RestrictTo
 import com.airbnb.mvrx.MvRxStateStore
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.channels.BroadcastChannel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
 /**
@@ -13,13 +19,21 @@ import kotlinx.coroutines.runBlocking
  * The intention of this is to allow state changes in tests to be tracked
  * synchronously.
  */
-internal class SynchronousMvRxStateStore<S : Any>(initialState: S, val coroutineScope: CoroutineScope) : MvRxStateStore<S> {
+@Suppress("EXPERIMENTAL_API_USAGE")
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+class SynchronousMvRxStateStore<S : Any>(initialState: S, val coroutineScope: CoroutineScope) : MvRxStateStore<S> {
 
-    private val flowEmitters = mutableListOf<suspend (S) -> Unit>()
+    private val stateChannel = BroadcastChannel<S>(capacity = Channel.BUFFERED)
 
     @Volatile
     override var state: S = initialState
         private set
+
+    init {
+        coroutineScope.coroutineContext[Job]!!.invokeOnCompletion {
+            stateChannel.cancel()
+        }
+    }
 
 
     override fun get(block: (S) -> Unit) {
@@ -31,17 +45,13 @@ internal class SynchronousMvRxStateStore<S : Any>(initialState: S, val coroutine
 
         // TODO: Is this right?
         runBlocking {
-            coroutineScope.launch {
-                flowEmitters.forEach { it(state) }
-            }
+            stateChannel.offer(state)
         }
     }
 
     override val flow: Flow<S>
-        get() {
-            return flow {
-                emit(state)
-                flowEmitters.add { newState -> emit(newState) }
-            }
-        }
+        get() = flow {
+            emit(state)
+            stateChannel.consumeEach { emit(it) }
+        }.buffer(1).distinctUntilChanged()
 }

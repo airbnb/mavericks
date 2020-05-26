@@ -1,6 +1,6 @@
 package com.airbnb.mvrx.mocking
 
-import com.airbnb.mvrx.BaseMvRxViewModel
+import com.airbnb.mvrx.BaseMavericksViewModel
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MavericksViewModelConfig
@@ -57,9 +57,9 @@ class MavericksViewModelConfigTest : BaseTest() {
 
     @Test
     fun testAddOnConfigProvidedListener() {
-        var providedVm: BaseMvRxViewModel<*>? = null
+        var providedVm: BaseMavericksViewModel<*>? = null
         var providedConfig: MavericksViewModelConfig<*>? = null
-        val onConfigProvided = { vm: BaseMvRxViewModel<*>, config: MavericksViewModelConfig<*> ->
+        val onConfigProvided = { vm: BaseMavericksViewModel<*>, config: MavericksViewModelConfig<*> ->
             providedVm = vm
             providedConfig = config
         }
@@ -74,9 +74,9 @@ class MavericksViewModelConfigTest : BaseTest() {
 
     @Test
     fun testRemoveOnConfigProvidedListener() {
-        var providedVm: BaseMvRxViewModel<*>? = null
+        var providedVm: BaseMavericksViewModel<*>? = null
         var providedConfig: MavericksViewModelConfig<*>? = null
-        val onConfigProvided = { vm: BaseMvRxViewModel<*>, config: MavericksViewModelConfig<*> ->
+        val onConfigProvided = { vm: BaseMavericksViewModel<*>, config: MavericksViewModelConfig<*> ->
             providedVm = vm
             providedConfig = config
         }
@@ -122,7 +122,7 @@ class MavericksViewModelConfigTest : BaseTest() {
         )
     }
 
-    class TestViewModel : BaseMvRxViewModel<TestState>(TestState())
+    class TestViewModel : BaseMavericksViewModel<TestState>(TestState())
 
     data class TestState(val num: Int = 0) : MvRxState
 }

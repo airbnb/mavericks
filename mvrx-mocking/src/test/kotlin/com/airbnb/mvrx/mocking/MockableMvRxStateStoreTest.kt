@@ -1,17 +1,28 @@
 package com.airbnb.mvrx.mocking
 
 import com.airbnb.mvrx.MavericksViewModelConfig
-import com.airbnb.mvrx.mocking.MockBehavior.*
-import org.junit.Assert.*
+import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.mocking.MockBehavior.InitialStateMocking
+import com.airbnb.mvrx.mocking.MockBehavior.StateStoreBehavior
+import com.airbnb.mvrx.test.MvRxTestRule
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
+import org.junit.ClassRule
 import org.junit.Test
 
 class MockableMvRxStateStoreTest : BaseTest() {
 
-    @Test
-    fun isDisposed() {
-        val store = createStore()
-        store.dispose()
-        assertTrue(store.isDisposed)
+    companion object {
+        @JvmField
+        @ClassRule
+        val mvrxTestRule = MvRxTestRule()
     }
 
     @Test
@@ -23,15 +34,18 @@ class MockableMvRxStateStoreTest : BaseTest() {
 
         assertTrue(disposedStores.isEmpty())
 
-        store.dispose()
-        assertEquals(setOf(store), disposedStores)
+        store.coroutineScope.coroutineContext[Job]!!.invokeOnCompletion {
+            assertEquals(setOf(store), disposedStores)
+        }
+
+        store.coroutineScope.cancel()
     }
 
     @Test
     fun onDisposedCalledImmediatelyIfAlreadyDisposed() {
         val disposedStores = mutableSetOf<MockableMvRxStateStore<*>>()
         val store = createStore()
-        store.dispose()
+        store.coroutineScope.cancel()
 
         store.addOnDisposeListener { disposedStores.add(it) }
         assertEquals(setOf(store), disposedStores)
@@ -94,13 +108,13 @@ class MockableMvRxStateStoreTest : BaseTest() {
     }
 
     @Test
-    fun nextTriggersObservable() {
+    fun nextTriggersObservable() = runBlocking {
         val store = createStore()
 
         store.next(TestState(5))
 
-        val testObserver = store.observable.firstOrError().test()
-        testObserver.assertValue(TestState(5))
+        val flowValue = store.flow.firstOrNull()
+        assertEquals(TestState(5), flowValue)
     }
 
     @Test(expected = IllegalStateException::class)
@@ -174,13 +188,13 @@ class MockableMvRxStateStoreTest : BaseTest() {
         return MockableMvRxStateStore(
             TestState(),
             MockBehavior(
-                    initialStateMocking = InitialStateMocking.None,
-                    blockExecutions = MavericksViewModelConfig.BlockExecutions.No,
-                    stateStoreBehavior = storeBehavior
+                initialStateMocking = InitialStateMocking.None,
+                blockExecutions = MavericksViewModelConfig.BlockExecutions.No,
+                stateStoreBehavior = storeBehavior
             ),
-            coroutineScope
+            coroutineScope = testCoroutineScope()
         )
     }
 
-    private data class TestState(val num: Int = 0)
+    private data class TestState(val num: Int = 0) : MvRxState
 }

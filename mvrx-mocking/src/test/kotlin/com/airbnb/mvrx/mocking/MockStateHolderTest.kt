@@ -1,7 +1,7 @@
 package com.airbnb.mvrx.mocking
 
-import com.airbnb.mvrx.BaseMvRxFragment
-import com.airbnb.mvrx.BaseMvRxViewModel
+import androidx.fragment.app.Fragment
+import com.airbnb.mvrx.BaseMavericksViewModel
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.fragmentViewModel
 import org.junit.Assert.assertEquals
@@ -149,7 +149,7 @@ class MockStateHolderTest : BaseTest() {
     }
 
 
-    class Frag : BaseMvRxFragment(), MockableMavericksView {
+    class Frag : Fragment(), MockableMavericksView {
         val fragmentVm: FragmentVM by fragmentViewModel()
 
         override fun invalidate() {
@@ -165,7 +165,7 @@ class MockStateHolderTest : BaseTest() {
         }
     }
 
-    class FragWithNoMocks : BaseMvRxFragment(), MockableMavericksView {
+    class FragWithNoMocks : Fragment(), MockableMavericksView {
         val fragmentVm: FragmentVM by fragmentViewModel()
 
         override fun invalidate() {
@@ -174,6 +174,6 @@ class MockStateHolderTest : BaseTest() {
     }
 
     data class TestState(val num: Int = 0) : MvRxState
-    class FragmentVM(initialState: TestState) : BaseMvRxViewModel<TestState>(initialState)
+    class FragmentVM(initialState: TestState) : BaseMavericksViewModel<TestState>(initialState)
 
 }

@@ -19,7 +19,7 @@ import org.junit.Test
 import java.util.concurrent.ConcurrentLinkedQueue
 
 data class OrderingState(val count: Int = 0) : MvRxState
-class SetStateWithStateOrderingTest : BaseMavericksViewModel<OrderingState>(OrderingState(), debugMode = false) {
+class SetStateWithStateOrderingTest : BaseMavericksViewModel<OrderingState>(OrderingState()) {
 
     companion object {
         @BeforeClass

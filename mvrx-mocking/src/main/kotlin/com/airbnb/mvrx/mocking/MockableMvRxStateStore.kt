@@ -35,7 +35,6 @@ class MockableMvRxStateStore<S : MvRxState>(
     private val realImmediateStore = SynchronousMvRxStateStore(initialState, coroutineScope)
 
     private val onStateSetListeners = mutableListOf<(previousState: S, newState: S) -> Unit>()
-    private val onDisposeListeners = mutableListOf<(MockableMvRxStateStore<*>) -> Unit>()
 
     private val currentStore
         get() = when (mockBehavior.stateStoreBehavior) {
@@ -92,16 +91,16 @@ class MockableMvRxStateStore<S : MvRxState>(
 
     // TODO: Different naming besides dispose?
     fun addOnDisposeListener(callback: (MockableMvRxStateStore<*>) -> Unit) {
-        if (!coroutineScope.isActive) {
-            callback(this)
-        } else {
+        if (coroutineScope.isActive) {
             coroutineScope.coroutineContext[Job]!!.invokeOnCompletion {
-                onDisposeListeners.add(callback)
+                callback(this)
             }
+        } else {
+            callback(this)
         }
     }
 
     override val flow: Flow<S>
-        // TODO: Make flow synchronous with runBlocking when needed
+        // TODO: If flow is provided and then state store switches, implementation of provided slow won't retroactively update
         get() = currentStore.flow
 }

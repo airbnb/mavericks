@@ -12,6 +12,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -24,9 +25,9 @@ data class ViewModelTestState(
     val bar: Int = 0,
     val bam: Int = 0,
     val list: List<Int> = emptyList(),
-        // for Single and Observable tests
+    // for Single and Observable tests
     val async: Async<String> = Uninitialized,
-        // for Completable tests
+    // for Completable tests
     val asyncUnit: Async<Unit> = Uninitialized,
     val prop6: Int = 0,
     val prop7: Int = 0
@@ -262,10 +263,10 @@ class ViewModelSubscriberTest : BaseTest() {
     fun testSelectSubscribe3External() {
         var callCount = 0
         viewModel.onEach3Internal(
-                owner,
-                ViewModelTestState::foo,
-                ViewModelTestState::bar,
-                ViewModelTestState::bam
+            owner,
+            ViewModelTestState::foo,
+            ViewModelTestState::bar,
+            ViewModelTestState::bam
         ) { _, _, _ -> callCount++ }
         assertEquals(1, callCount)
         viewModel.setFoo(1)
@@ -280,11 +281,11 @@ class ViewModelSubscriberTest : BaseTest() {
     fun testSelectSubscribe4External() {
         var callCount = 0
         viewModel.onEach4Internal(
-                owner,
-                ViewModelTestState::foo,
-                ViewModelTestState::bar,
-                ViewModelTestState::bam,
-                ViewModelTestState::list
+            owner,
+            ViewModelTestState::foo,
+            ViewModelTestState::bar,
+            ViewModelTestState::bam,
+            ViewModelTestState::list
         ) { _, _, _, _ -> callCount++ }
         assertEquals(1, callCount)
         viewModel.setFoo(1)
@@ -301,12 +302,12 @@ class ViewModelSubscriberTest : BaseTest() {
     fun testSelectSubscribe5External() {
         var callCount = 0
         viewModel.onEach5Internal(
-                owner,
-                ViewModelTestState::foo,
-                ViewModelTestState::bar,
-                ViewModelTestState::bam,
-                ViewModelTestState::list,
-                ViewModelTestState::async
+            owner,
+            ViewModelTestState::foo,
+            ViewModelTestState::bar,
+            ViewModelTestState::bam,
+            ViewModelTestState::list,
+            ViewModelTestState::async
         ) { _, _, _, _, _ -> callCount++ }
         assertEquals(1, callCount)
         viewModel.setFoo(1)
@@ -325,13 +326,13 @@ class ViewModelSubscriberTest : BaseTest() {
     fun testSelectSubscribe6External() {
         var callCount = 0
         viewModel.onEach6Internal(
-                owner,
-                ViewModelTestState::foo,
-                ViewModelTestState::bar,
-                ViewModelTestState::bam,
-                ViewModelTestState::list,
-                ViewModelTestState::async,
-                ViewModelTestState::prop6
+            owner,
+            ViewModelTestState::foo,
+            ViewModelTestState::bar,
+            ViewModelTestState::bam,
+            ViewModelTestState::list,
+            ViewModelTestState::async,
+            ViewModelTestState::prop6
         ) { _, _, _, _, _, _ -> callCount++ }
         assertEquals(1, callCount)
         viewModel.setFoo(1)
@@ -352,14 +353,14 @@ class ViewModelSubscriberTest : BaseTest() {
     fun testSelectSubscribe7External() {
         var callCount = 0
         viewModel.onEach7Internal(
-                owner,
-                ViewModelTestState::foo,
-                ViewModelTestState::bar,
-                ViewModelTestState::bam,
-                ViewModelTestState::list,
-                ViewModelTestState::async,
-                ViewModelTestState::prop6,
-                ViewModelTestState::prop7
+            owner,
+            ViewModelTestState::foo,
+            ViewModelTestState::bar,
+            ViewModelTestState::bam,
+            ViewModelTestState::list,
+            ViewModelTestState::async,
+            ViewModelTestState::prop6,
+            ViewModelTestState::prop7
         ) { _, _, _, _, _, _, _ -> callCount++ }
         assertEquals(1, callCount)
         viewModel.setFoo(1)
@@ -765,9 +766,10 @@ class ViewModelSubscriberTest : BaseTest() {
     }
 
     @Test
-    fun testCancelledIfViewModelCleared() {
+    fun testCancelledIfViewModelCleared() = runBlocking {
         val job = viewModel.onEachInternal(owner) {}
         viewModel.triggerCleared()
+        delay(2000)
         assertTrue(job.isCancelled)
     }
 

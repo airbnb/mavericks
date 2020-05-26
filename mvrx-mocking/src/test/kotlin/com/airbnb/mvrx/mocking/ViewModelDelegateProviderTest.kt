@@ -1,7 +1,7 @@
 package com.airbnb.mvrx.mocking
 
-import com.airbnb.mvrx.BaseMvRxFragment
-import com.airbnb.mvrx.BaseMvRxViewModel
+import androidx.fragment.app.Fragment
+import com.airbnb.mvrx.BaseMavericksViewModel
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.existingViewModel
@@ -11,7 +11,7 @@ import org.junit.Test
 import org.robolectric.android.controller.ActivityController
 
 class ViewModelDelegateProviderTest : BaseTest() {
-    private inline fun <reified T : BaseMvRxFragment> createFragment(
+    private inline fun <reified T : Fragment> createFragment(
         existingController: ActivityController<TestActivity>? = null
     ): Pair<ActivityController<TestActivity>, T> {
         return createFragment(
@@ -72,7 +72,7 @@ class ViewModelDelegateProviderTest : BaseTest() {
         assertEquals(TestState(2), frag.existingVm.state())
     }
 
-    class Frag : BaseMvRxFragment(), MockableMavericksView {
+    class Frag : Fragment(), MockableMavericksView {
         val fragmentVm: FragmentVM by fragmentViewModel()
         val activityVm: ActivityVM by activityViewModel()
 
@@ -91,7 +91,7 @@ class ViewModelDelegateProviderTest : BaseTest() {
         }
     }
 
-    class Frag2 : BaseMvRxFragment(), MockableMavericksView {
+    class Frag2 : Fragment(), MockableMavericksView {
         val existingVm: ActivityVM by existingViewModel()
 
         override fun invalidate() {
@@ -109,8 +109,8 @@ class ViewModelDelegateProviderTest : BaseTest() {
 
     data class TestState(val num: Int = 0) : MvRxState
     class FragmentVM(initialState: TestState) :
-        BaseMvRxViewModel<TestState>(initialState)
+        BaseMavericksViewModel<TestState>(initialState)
 
     class ActivityVM(initialState: TestState) :
-        BaseMvRxViewModel<TestState>(initialState)
+        BaseMavericksViewModel<TestState>(initialState)
 }

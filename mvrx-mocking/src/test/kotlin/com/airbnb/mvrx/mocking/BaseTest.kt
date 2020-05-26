@@ -1,4 +1,5 @@
 @file:Suppress("UtilityClassWithPublicConstructor")
+
 package com.airbnb.mvrx.mocking
 
 
@@ -28,45 +29,22 @@ import java.util.concurrent.TimeUnit
 @RunWith(RobolectricTestRunner::class)
 @Ignore
 abstract class BaseTest {
-    companion object {
-        @JvmStatic
-        @BeforeClass
-        fun classSetUp() {
-            ShadowLog.stream = System.out
-            RxJavaPlugins.reset()
-            val immediate = object : Scheduler() {
-                // this prevents StackOverflowErrors when scheduling with a delay
-                override fun scheduleDirect(@NonNull run: Runnable, delay: Long, @NonNull unit: TimeUnit): Disposable =
-                        super.scheduleDirect(run, 0, unit)
-
-                override fun createWorker(): Worker =
-                        ExecutorScheduler.ExecutorWorker(Executor { it.run() }, true)
-            }
-            RxJavaPlugins.setNewThreadSchedulerHandler { immediate }
-            RxJavaPlugins.setComputationSchedulerHandler { immediate }
-            RxJavaPlugins.setInitIoSchedulerHandler { immediate }
-            RxJavaPlugins.setSingleSchedulerHandler { immediate }
-            // This is necessary to prevent rxjava from swallowing errors
-            // https://github.com/ReactiveX/RxJava/issues/5234
-            Thread.setDefaultUncaughtExceptionHandler { _, e ->
-                if (e is CompositeException && e.exceptions.size == 1) throw e.exceptions[0]
-                throw e
-            }
-        }
-    }
 
     @Before
     @After
     fun resetConfigurationDefaults() {
         // Use a null context since we don't need mock printing during tests
         MavericksMocks.install(debugMode = true, mocksEnabled = true, context = null)
+        MavericksMocks.mockConfigFactory.mockBehavior = MockBehavior(
+            stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
+        )
     }
 
     protected inline fun <reified F : Fragment, reified A : AppCompatActivity> createFragment(
-            savedInstanceState: Bundle? = null,
-            args: Parcelable? = null,
-            containerId: Int? = null,
-            existingController: ActivityController<A>? = null
+        savedInstanceState: Bundle? = null,
+        args: Parcelable? = null,
+        containerId: Int? = null,
+        existingController: ActivityController<A>? = null
     ): Pair<ActivityController<A>, F> {
         val controller = existingController ?: Robolectric.buildActivity(A::class.java)
 
@@ -83,15 +61,15 @@ abstract class BaseTest {
             F::class.java.newInstance().apply {
                 arguments = Bundle().apply { putParcelable(MvRx.KEY_ARG, args) }
                 activity.supportFragmentManager
-                        .beginTransaction()
-                        .also {
-                            if (containerId != null) {
-                                it.add(containerId, this, "TAG")
-                            } else {
-                                it.add(this, "TAG")
-                            }
+                    .beginTransaction()
+                    .also {
+                        if (containerId != null) {
+                            it.add(containerId, this, "TAG")
+                        } else {
+                            it.add(this, "TAG")
                         }
-                        .commitNow()
+                    }
+                    .commitNow()
             }
         } else {
             activity.supportFragmentManager.findFragmentByTag("TAG") as F
@@ -100,8 +78,8 @@ abstract class BaseTest {
     }
 
     protected inline fun <F : Fragment, reified A : AppCompatActivity> F.addToActivity(
-            containerId: Int? = null,
-            existingController: ActivityController<A>? = null
+        containerId: Int? = null,
+        existingController: ActivityController<A>? = null
     ): ActivityController<A> {
         val controller = existingController ?: Robolectric.buildActivity(A::class.java)
 
@@ -112,15 +90,15 @@ abstract class BaseTest {
         val activity = controller.get()
 
         activity.supportFragmentManager
-                .beginTransaction()
-                .also {
-                    if (containerId != null) {
-                        it.add(containerId, this, "TAG")
-                    } else {
-                        it.add(this, "TAG")
-                    }
+            .beginTransaction()
+            .also {
+                if (containerId != null) {
+                    it.add(containerId, this, "TAG")
+                } else {
+                    it.add(this, "TAG")
                 }
-                .commitNow()
+            }
+            .commitNow()
 
 
         return controller

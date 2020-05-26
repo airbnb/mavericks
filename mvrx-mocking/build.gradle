@@ -36,9 +36,11 @@ dependencies {
     implementation Libraries.appcompat
     implementation project(':mvrx')
 
+    testImplementation project(':testing')
     testImplementation TestLibraries.mockito
     testImplementation TestLibraries.junit
     testImplementation TestLibraries.roboeletric
+    testImplementation TestLibraries.kotlinCoroutinesTest
 
     // Including autovalue just for the AutoValue type printer test
     // TODO deps

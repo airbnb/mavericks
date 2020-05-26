@@ -1,5 +1,6 @@
 package com.airbnb.mvrx
 
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
@@ -64,7 +65,7 @@ class CoroutinesStateStore<S : MvRxState>(
      * Poll [withStateChannel] and [setStateChannel] to respond to set/get state requests.
      */
     private fun setupTriggerFlushQueues(scope: CoroutineScope) {
-        scope.launch(flushDispatcher) {
+        scope.launch(flushDispatcherOverride ?: flushDispatcher) {
             try {
                 while (isActive) {
                     flushQueuesOnce()
@@ -125,6 +126,7 @@ class CoroutinesStateStore<S : MvRxState>(
     }
 
     companion object {
+        internal var flushDispatcherOverride: CoroutineDispatcher? = null
         private val flushDispatcher = Executors.newCachedThreadPool().asCoroutineDispatcher()
     }
 }

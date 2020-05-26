@@ -83,8 +83,7 @@ data class TestState(
     constructor() : this("empty", 2)
 }
 
-//TODO: Remove debug mode
-private class TestViewModel(state: TestState) : BaseMavericksViewModel<TestState>(initialState = state, debugMode = false)
+private class TestViewModel(state: TestState) : BaseMavericksViewModel<TestState>(initialState = state)
 
 @Parcelize
 class ParcelableArgs(val str: String) : Parcelable

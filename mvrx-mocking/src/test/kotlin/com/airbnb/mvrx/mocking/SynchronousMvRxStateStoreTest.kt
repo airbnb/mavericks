@@ -1,5 +1,8 @@
 package com.airbnb.mvrx.mocking
 
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.*
 import org.junit.Test
 
@@ -8,7 +11,7 @@ import org.junit.Test
 class SynchronousMvRxStateStoreTest {
     @Test
     fun setAndGetStateSynchronously() {
-        val store = com.airbnb.mvrx.mocking.SynchronousMvRxStateStore(TestState())
+        val store = SynchronousMvRxStateStore(TestState(), testCoroutineScope())
         store.set { TestState(5) }
         store.get { state ->
             assertEquals(5, state.num)
@@ -16,19 +19,12 @@ class SynchronousMvRxStateStoreTest {
     }
 
     @Test
-    fun observableWorks() {
-        val store = com.airbnb.mvrx.mocking.SynchronousMvRxStateStore(TestState())
+    fun flowWorks() = runBlocking {
+        val store = SynchronousMvRxStateStore(TestState(), testCoroutineScope())
         store.set { TestState(5) }
 
-        val testObserver = store.observable.firstOrError().test()
-        testObserver.assertValue(TestState(5))
-    }
-
-    @Test
-    fun dispose() {
-        val store = com.airbnb.mvrx.mocking.SynchronousMvRxStateStore(TestState())
-        store.dispose()
-        assertTrue(store.isDisposed)
+        val flowResult = store.flow.firstOrNull()
+        assertEquals(TestState(5), flowResult)
     }
 
     private data class TestState(

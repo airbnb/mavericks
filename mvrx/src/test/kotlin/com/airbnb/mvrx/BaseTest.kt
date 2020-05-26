@@ -28,9 +28,7 @@ abstract class BaseTest {
         fun classSetUp() {
             ShadowLog.stream = System.out
         }
-
     }
-
 
     @Before
     @After

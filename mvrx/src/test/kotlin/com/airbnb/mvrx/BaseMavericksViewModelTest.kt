@@ -1,29 +1,22 @@
 package com.airbnb.mvrx
 
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import java.lang.IllegalStateException
-import kotlin.math.exp
 
 data class BaseMavericksViewModelTestState(
     val asyncInt: Async<Int> = Uninitialized,
     val int: Int = 0
 ) : MvRxState
 
-class BaseMavericksViewModelTestViewModel : BaseMavericksViewModel<BaseMavericksViewModelTestState>(BaseMavericksViewModelTestState(), debugMode = false) {
+class BaseMavericksViewModelTestViewModel : BaseMavericksViewModel<BaseMavericksViewModelTestState>(BaseMavericksViewModelTestState()) {
     suspend fun runInViewModel(block: suspend BaseMavericksViewModelTestViewModel.() -> Unit) {
         block()
     }

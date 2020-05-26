@@ -3,6 +3,7 @@ package com.airbnb.mvrx.mocking
 
 import android.os.Parcelable
 import android.util.Log
+import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.BaseMavericksViewModel
@@ -107,12 +108,12 @@ fun <V : MockableMavericksView, Args : Parcelable, S : MvRxState> V.mockSingleVi
  * Similar to [mockSingleViewModel], but for the two view model case.
  */
 fun <V : MockableMavericksView,
-        S1 : MvRxState,
-        VM1 : BaseMavericksViewModel<S1>,
-        S2 : MvRxState,
-        VM2 : BaseMavericksViewModel<S2>,
-        Args : Parcelable>
-        V.mockTwoViewModels(
+    S1 : MvRxState,
+    VM1 : BaseMavericksViewModel<S1>,
+    S2 : MvRxState,
+    VM2 : BaseMavericksViewModel<S2>,
+    Args : Parcelable>
+    V.mockTwoViewModels(
     viewModel1Reference: KProperty1<V, VM1>,
     defaultState1: S1,
     viewModel2Reference: KProperty1<V, VM2>,
@@ -120,11 +121,11 @@ fun <V : MockableMavericksView,
     defaultArgs: Args?,
     mockBuilder: TwoViewModelMockBuilder<V, VM1, S1, VM2, S2, Args>.() -> Unit
 ): MockBuilder<V, Args> = TwoViewModelMockBuilder(
-        viewModel1Reference,
-        defaultState1,
-        viewModel2Reference,
-        defaultState2,
-        defaultArgs
+    viewModel1Reference,
+    defaultState1,
+    viewModel2Reference,
+    defaultState2,
+    defaultArgs
 ).apply {
     mockBuilder()
     build(this@mockTwoViewModels)
@@ -135,14 +136,14 @@ fun <V : MockableMavericksView,
  */
 @SuppressWarnings("Detekt.LongParameterList")
 fun <V : MockableMavericksView,
-        S1 : MvRxState,
-        VM1 : BaseMavericksViewModel<S1>,
-        S2 : MvRxState,
-        VM2 : BaseMavericksViewModel<S2>,
-        S3 : MvRxState,
-        VM3 : BaseMavericksViewModel<S3>,
-        Args : Parcelable>
-        V.mockThreeViewModels(
+    S1 : MvRxState,
+    VM1 : BaseMavericksViewModel<S1>,
+    S2 : MvRxState,
+    VM2 : BaseMavericksViewModel<S2>,
+    S3 : MvRxState,
+    VM3 : BaseMavericksViewModel<S3>,
+    Args : Parcelable>
+    V.mockThreeViewModels(
     viewModel1Reference: KProperty1<V, VM1>,
     defaultState1: S1,
     viewModel2Reference: KProperty1<V, VM2>,
@@ -152,13 +153,13 @@ fun <V : MockableMavericksView,
     defaultArgs: Args?,
     mockBuilder: ThreeViewModelMockBuilder<V, VM1, S1, VM2, S2, VM3, S3, Args>.() -> Unit
 ): MockBuilder<V, Args> = ThreeViewModelMockBuilder(
-        viewModel1Reference,
-        defaultState1,
-        viewModel2Reference,
-        defaultState2,
-        viewModel3Reference,
-        defaultState3,
-        defaultArgs
+    viewModel1Reference,
+    defaultState1,
+    viewModel2Reference,
+    defaultState2,
+    viewModel3Reference,
+    defaultState3,
+    defaultArgs
 ).apply {
     mockBuilder()
     build(this@mockThreeViewModels)
@@ -169,16 +170,16 @@ fun <V : MockableMavericksView,
  */
 @SuppressWarnings("Detekt.LongParameterList")
 fun <V : MockableMavericksView,
-        S1 : MvRxState,
-        VM1 : BaseMavericksViewModel<S1>,
-        S2 : MvRxState,
-        VM2 : BaseMavericksViewModel<S2>,
-        S3 : MvRxState,
-        VM3 : BaseMavericksViewModel<S3>,
-        S4 : MvRxState,
-        VM4 : BaseMavericksViewModel<S4>,
-        Args : Parcelable>
-        V.mockFourViewModels(
+    S1 : MvRxState,
+    VM1 : BaseMavericksViewModel<S1>,
+    S2 : MvRxState,
+    VM2 : BaseMavericksViewModel<S2>,
+    S3 : MvRxState,
+    VM3 : BaseMavericksViewModel<S3>,
+    S4 : MvRxState,
+    VM4 : BaseMavericksViewModel<S4>,
+    Args : Parcelable>
+    V.mockFourViewModels(
     viewModel1Reference: KProperty1<V, VM1>,
     defaultState1: S1,
     viewModel2Reference: KProperty1<V, VM2>,
@@ -190,15 +191,15 @@ fun <V : MockableMavericksView,
     defaultArgs: Args?,
     mockBuilder: FourViewModelMockBuilder<V, VM1, S1, VM2, S2, VM3, S3, VM4, S4, Args>.() -> Unit
 ): MockBuilder<V, Args> = FourViewModelMockBuilder(
-        viewModel1Reference,
-        defaultState1,
-        viewModel2Reference,
-        defaultState2,
-        viewModel3Reference,
-        defaultState3,
-        viewModel4Reference,
-        defaultState4,
-        defaultArgs
+    viewModel1Reference,
+    defaultState1,
+    viewModel2Reference,
+    defaultState2,
+    viewModel3Reference,
+    defaultState3,
+    viewModel4Reference,
+    defaultState4,
+    defaultArgs
 ).apply {
     mockBuilder()
     build(this@mockFourViewModels)
@@ -233,22 +234,22 @@ fun <V : MockableMavericksView,
  * 3. Each variant tests a single edge case
  */
 data class MvRxMock<V : MavericksView, Args : Parcelable> internal constructor(
-        val name: String,
-        /**
+    val name: String,
+    /**
      * Returns the arguments that should be used to initialize the MvRx view. If null, the view models will be
      * initialized purely with the mock states instead.
      */
     val args: Args? = null,
-        /**
+    /**
      * The State to set on each ViewModel in the View. There should be a one to one match.
      */
     val states: List<MockState<V, *>> = emptyList(),
-        /**
+    /**
      * If true, this mock tests the view being created either from arguments or with the viewmodels'
      * default constructor (when [args] is null).
      */
     val forInitialization: Boolean = false,
-        val type: Type = Type.Custom
+    val type: Type = Type.Custom
 ) {
 
     /**
@@ -282,13 +283,16 @@ data class MvRxMock<V : MavericksView, Args : Parcelable> internal constructor(
     enum class Type {
         /** Uses view arguments to test the initialization pathway of MvRx. */
         DefaultInitialization,
+
         /** Uses the default state of a mock builder to represent the canonical form of a View. */
         DefaultState,
+
         /** Takes the default state and applies the process used to save and restore state. The output
          * state approximates the State after app process recreation. (This cannot be exact because
          * in practice it may rely on arguments set in a previous Fragment.)
          */
         ProcessRecreation,
+
         /** Any additional mock variant defined by the user. */
         Custom
     }
@@ -376,12 +380,12 @@ private fun <V : MockableMavericksView, S : MvRxState, VM : BaseMavericksViewMod
 }
 
 class TwoViewModelMockBuilder<
-        V : MockableMavericksView,
-        VM1 : BaseMavericksViewModel<S1>,
-        S1 : MvRxState,
-        VM2 : BaseMavericksViewModel<S2>,
-        S2 : MvRxState,
-        Args : Parcelable>
+    V : MockableMavericksView,
+    VM1 : BaseMavericksViewModel<S1>,
+    S1 : MvRxState,
+    VM2 : BaseMavericksViewModel<S2>,
+    S2 : MvRxState,
+    Args : Parcelable>
 internal constructor(
     val vm1: KProperty1<V, VM1>,
     val defaultState1: S1,
@@ -417,10 +421,10 @@ internal constructor(
     ) {
         addState(
             name, evaluateArgsLambda(args), TwoStatesBuilder(
-                vm1,
-                defaultState1,
-                vm2,
-                defaultState2
+            vm1,
+            defaultState1,
+            vm2,
+            defaultState2
         ).apply(statesBuilder).states
         )
     }
@@ -496,11 +500,11 @@ internal constructor(
  * }
  */
 open class TwoStatesBuilder<
-        V : MavericksView,
-        S1 : MvRxState,
-        VM1 : BaseMavericksViewModel<S1>,
-        S2 : MvRxState,
-        VM2 : BaseMavericksViewModel<S2>>
+    V : MavericksView,
+    S1 : MvRxState,
+    VM1 : BaseMavericksViewModel<S1>,
+    S2 : MvRxState,
+    VM2 : BaseMavericksViewModel<S2>>
 internal constructor(
     val vm1: KProperty1<V, VM1>,
     val defaultState1: S1,
@@ -512,8 +516,8 @@ internal constructor(
     internal val states: List<MockState<V, *>>
         get() = stateMap.map {
             MockState(
-                    it.key,
-                    it.value
+                it.key,
+                it.value
             )
         }
 
@@ -549,14 +553,14 @@ internal constructor(
 }
 
 class ThreeViewModelMockBuilder<
-        V : MockableMavericksView,
-        VM1 : BaseMavericksViewModel<S1>,
-        S1 : MvRxState,
-        VM2 : BaseMavericksViewModel<S2>,
-        S2 : MvRxState,
-        VM3 : BaseMavericksViewModel<S3>,
-        S3 : MvRxState,
-        Args : Parcelable>
+    V : MockableMavericksView,
+    VM1 : BaseMavericksViewModel<S1>,
+    S1 : MvRxState,
+    VM2 : BaseMavericksViewModel<S2>,
+    S2 : MvRxState,
+    VM3 : BaseMavericksViewModel<S3>,
+    S3 : MvRxState,
+    Args : Parcelable>
 internal constructor(
     val vm1: KProperty1<V, VM1>,
     val defaultState1: S1,
@@ -588,25 +592,25 @@ internal constructor(
     ) {
         addState(
             name, evaluateArgsLambda(args), ThreeStatesBuilder(
-                vm1,
-                defaultState1,
-                vm2,
-                defaultState2,
-                vm3,
-                defaultState3
+            vm1,
+            defaultState1,
+            vm2,
+            defaultState2,
+            vm3,
+            defaultState3
         ).apply(statesBuilder).states
         )
     }
 }
 
 open class ThreeStatesBuilder<
-        V : MavericksView,
-        S1 : MvRxState,
-        VM1 : BaseMavericksViewModel<S1>,
-        S2 : MvRxState,
-        VM2 : BaseMavericksViewModel<S2>,
-        S3 : MvRxState,
-        VM3 : BaseMavericksViewModel<S3>>
+    V : MavericksView,
+    S1 : MvRxState,
+    VM1 : BaseMavericksViewModel<S1>,
+    S2 : MvRxState,
+    VM2 : BaseMavericksViewModel<S2>,
+    S3 : MvRxState,
+    VM3 : BaseMavericksViewModel<S3>>
 internal constructor(
     vm1: KProperty1<V, VM1>,
     defaultState1: S1,
@@ -631,16 +635,16 @@ internal constructor(
 }
 
 class FourViewModelMockBuilder<
-        V : MockableMavericksView,
-        VM1 : BaseMavericksViewModel<S1>,
-        S1 : MvRxState,
-        VM2 : BaseMavericksViewModel<S2>,
-        S2 : MvRxState,
-        VM3 : BaseMavericksViewModel<S3>,
-        S3 : MvRxState,
-        VM4 : BaseMavericksViewModel<S4>,
-        S4 : MvRxState,
-        Args : Parcelable>
+    V : MockableMavericksView,
+    VM1 : BaseMavericksViewModel<S1>,
+    S1 : MvRxState,
+    VM2 : BaseMavericksViewModel<S2>,
+    S2 : MvRxState,
+    VM3 : BaseMavericksViewModel<S3>,
+    S3 : MvRxState,
+    VM4 : BaseMavericksViewModel<S4>,
+    S4 : MvRxState,
+    Args : Parcelable>
 internal constructor(
     val vm1: KProperty1<V, VM1>,
     val defaultState1: S1,
@@ -677,29 +681,29 @@ internal constructor(
             name,
             evaluateArgsLambda(args),
             FourStatesBuilder(
-                    vm1,
-                    defaultState1,
-                    vm2,
-                    defaultState2,
-                    vm3,
-                    defaultState3,
-                    vm4,
-                    defaultState4
+                vm1,
+                defaultState1,
+                vm2,
+                defaultState2,
+                vm3,
+                defaultState3,
+                vm4,
+                defaultState4
             ).apply(statesBuilder).states
         )
     }
 }
 
 class FourStatesBuilder<
-        V : MavericksView,
-        S1 : MvRxState,
-        VM1 : BaseMavericksViewModel<S1>,
-        S2 : MvRxState,
-        VM2 : BaseMavericksViewModel<S2>,
-        S3 : MvRxState,
-        VM3 : BaseMavericksViewModel<S3>,
-        S4 : MvRxState,
-        VM4 : BaseMavericksViewModel<S4>>
+    V : MavericksView,
+    S1 : MvRxState,
+    VM1 : BaseMavericksViewModel<S1>,
+    S2 : MvRxState,
+    VM2 : BaseMavericksViewModel<S2>,
+    S3 : MvRxState,
+    VM3 : BaseMavericksViewModel<S3>,
+    S4 : MvRxState,
+    VM4 : BaseMavericksViewModel<S4>>
 internal constructor(
     vm1: KProperty1<V, VM1>,
     defaultState1: S1,
@@ -767,7 +771,7 @@ open class MavericksViewMocks<V : MockableMavericksView, Args : Parcelable> @Pub
     init {
         require(allowCreationForTesting || allowCreationOfThisInstance || numAllowedCreationsOfMocks.get() > 0) {
             "Mock creation is not allowed! provideMocks() CANNOT be called directly. " +
-                    "Instead, call MavericksViewMocks#getFrom()"
+                "Instead, call MavericksViewMocks#getFrom()"
         }
     }
 
@@ -794,7 +798,8 @@ open class MavericksViewMocks<V : MockableMavericksView, Args : Parcelable> @Pub
          * Exposed for internal tests to allow us to workaround the requirement that this class
          * can only be created via [getFrom]
          */
-        internal fun <R> allowCreationForTesting(block: () -> R): R {
+        @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+        fun <R> allowCreationForTesting(block: () -> R): R {
             allowCreationForTesting = true
             val result: R = block()
             allowCreationForTesting = false
@@ -905,20 +910,20 @@ open class MockBuilder<V : MockableMavericksView, Args : Parcelable> internal co
     }
 
     protected fun addState(
-            name: String,
-            args: Args? = defaultArgs,
-            states: List<MockState<V, *>>,
-            forInitialization: Boolean = false,
-            type: MvRxMock.Type = MvRxMock.Type.Custom
+        name: String,
+        args: Args? = defaultArgs,
+        states: List<MockState<V, *>>,
+        forInitialization: Boolean = false,
+        type: MvRxMock.Type = MvRxMock.Type.Custom
     ) {
         mocks.add(
-                MvRxMock(
-                        name = name,
-                        args = args,
-                        states = states,
-                        forInitialization = forInitialization,
-                        type = type
-                )
+            MvRxMock(
+                name = name,
+                args = args,
+                states = states,
+                forInitialization = forInitialization,
+                type = type
+            )
         )
     }
 
@@ -942,6 +947,7 @@ open class MockBuilder<V : MockableMavericksView, Args : Parcelable> internal co
             }
             .map { param ->
                 val prop = klass.declaredMemberProperties.single { it.name == param.name }
+
                 @Suppress("UNCHECKED_CAST")
                 val value = (prop as? KProperty1<S, Any?>)?.get(this)
                 param to value

@@ -198,6 +198,7 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         }
 
         setState { reducer(Loading(value = retainValue?.get(this)?.invoke())) }
+
         return viewModelScope.launch(dispatcher) {
             try {
                 val result = invoke()

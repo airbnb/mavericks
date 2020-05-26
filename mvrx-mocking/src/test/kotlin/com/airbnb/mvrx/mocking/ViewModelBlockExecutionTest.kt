@@ -1,12 +1,11 @@
 package com.airbnb.mvrx.mocking
 
 import com.airbnb.mvrx.Async
-import com.airbnb.mvrx.BaseMvRxViewModel
+import com.airbnb.mvrx.BaseMavericksViewModel
 import com.airbnb.mvrx.Loading
-import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MavericksViewModelConfig
+import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.Uninitialized
-import io.reactivex.Observable
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -49,12 +48,14 @@ class ViewModelBlockExecutionTest : BaseTest() {
     data class State(val num: Async<Int> = Uninitialized) : MvRxState
     class ViewModel(
         state: State = State()
-    ) : BaseMvRxViewModel<State>(state) {
+    ) : BaseMavericksViewModel<State>(state) {
         fun setNumAsync(value: Int) {
-            Observable.just(value)
-                .execute { copy(num = it) }
+            // TODO: Test rxjava too
+            suspend { value }.execute {
+                copy(num = it)
+            }
         }
     }
 }
 
-fun <S: MvRxState, VM: BaseMvRxViewModel<S>> VM.state(): S = config.stateStore.state
+fun <S: MvRxState, VM: BaseMavericksViewModel<S>> VM.state(): S = config.stateStore.state

@@ -22,6 +22,6 @@ class CounterViewModelTest {
     companion object {
         @JvmField
         @ClassRule
-        val mvrxTestRule = MvRxTestRule(viewModelMockBehavior = MockBehavior(blockExecutions = MavericksViewModelConfig.BlockExecutions.WithLoading))
+        val mvrxTestRule = MvRxTestRule()
     }
 }
