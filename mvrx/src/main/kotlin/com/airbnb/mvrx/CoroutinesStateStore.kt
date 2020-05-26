@@ -50,7 +50,7 @@ class CoroutinesStateStore<S : MvRxState>(
      */
     override val flow: Flow<S>
         get() = flow {
-            val (initialState, subscription) =  updateMutex.withLock {
+            val (initialState, subscription) = updateMutex.withLock {
                 state to stateChannel.openSubscription()
             }
             subscription.consume {
