@@ -5,14 +5,15 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.Executors
 
 @Suppress("EXPERIMENTAL_API_USAGE")
@@ -39,19 +40,25 @@ class CoroutinesStateStore<S : MvRxState>(
      * A normal Channel can't be used because it isn't multicast.
      */
     private val stateChannel = BroadcastChannel<S>(capacity = Channel.BUFFERED)
+    private val updateMutex = Mutex()
     override var state = initialState
 
     /**
      * Returns a [Flow] for this store's state. It will begin by immediately emitting
      * the latest set value and then continue with all subsequent updates.
-     *
-     * This Flow has a buffer size of 1 to ensure that the channel is subscribed to immediately.
      */
     override val flow: Flow<S>
         get() = flow {
-            emit(state)
-            stateChannel.consumeEach { emit(it) }
-        }.buffer(1)
+            val (initialState, subscription) =  updateMutex.withLock {
+                state to stateChannel.openSubscription()
+            }
+            try {
+                emit(initialState)
+                emitAll(subscription)
+            } finally {
+                subscription.cancel()
+            }
+        }
 
     init {
         setupTriggerFlushQueues(scope)
@@ -109,8 +116,10 @@ class CoroutinesStateStore<S : MvRxState>(
             setStateChannel.onReceive { reducer ->
                 val newState = state.reducer()
                 if (newState != state) {
-                    stateChannel.send(newState)
-                    state = newState
+                    updateMutex.withLock {
+                        state = newState
+                        stateChannel.send(newState)
+                    }
                 }
             }
             withStateChannel.onReceive { block ->
