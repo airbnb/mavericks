@@ -193,7 +193,7 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
             if (blockExecutions == MavericksViewModelConfig.BlockExecutions.WithLoading) {
                 setState { reducer(Loading()) }
             }
-            return viewModelScope.launch {  }
+            return viewModelScope.launch { }
         }
 
         setState { reducer(Loading(value = retainValue?.get(this)?.invoke())) }
@@ -227,7 +227,7 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
             if (blockExecutions == MavericksViewModelConfig.BlockExecutions.WithLoading) {
                 setState { reducer(Loading()) }
             }
-            return viewModelScope.launch {  }
+            return viewModelScope.launch { }
         }
 
         setState { reducer(Loading<T>()) }

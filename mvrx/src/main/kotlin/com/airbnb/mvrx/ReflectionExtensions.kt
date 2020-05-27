@@ -1,6 +1,5 @@
 package com.airbnb.mvrx
 
-
 internal val primitiveWrapperMap = mapOf(
     Boolean::class.javaPrimitiveType to Boolean::class.java,
     Byte::class.javaPrimitiveType to Byte::class.javaObjectType,

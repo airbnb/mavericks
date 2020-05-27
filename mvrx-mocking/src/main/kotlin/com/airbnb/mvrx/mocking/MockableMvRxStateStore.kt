@@ -6,7 +6,6 @@ import com.airbnb.mvrx.ScriptableMvRxStateStore
 import com.airbnb.mvrx.ScriptableStateStore
 import com.airbnb.mvrx.mocking.MockBehavior.StateStoreBehavior
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.isActive

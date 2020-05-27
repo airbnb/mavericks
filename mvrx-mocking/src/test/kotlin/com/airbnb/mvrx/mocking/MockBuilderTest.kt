@@ -403,7 +403,6 @@ class MockBuilderTest : BaseTest() {
         val viewModel3: TestViewModel by fragmentViewModel()
 
         override fun invalidate() {
-
         }
     }
 

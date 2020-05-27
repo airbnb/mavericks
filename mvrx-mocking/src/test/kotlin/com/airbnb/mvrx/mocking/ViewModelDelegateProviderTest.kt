@@ -38,8 +38,8 @@ class ViewModelDelegateProviderTest : BaseTest() {
         val mockVariants = mockVariants<Frag>()
 
         val mockBehavior = MockBehavior(
-                initialStateMocking = MockBehavior.InitialStateMocking.Full,
-                stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
+            initialStateMocking = MockBehavior.InitialStateMocking.Full,
+            stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
         )
 
         val mockedView = mockVariants.forDefaultState().createView(mockBehavior)
@@ -60,8 +60,8 @@ class ViewModelDelegateProviderTest : BaseTest() {
         checkNotNull(mockVariants)
 
         val mockBehavior = MockBehavior(
-                initialStateMocking = MockBehavior.InitialStateMocking.Full,
-                stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
+            initialStateMocking = MockBehavior.InitialStateMocking.Full,
+            stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
         )
 
         val mockedView = mockVariants.first { it.mock.isDefaultState }.createView(mockBehavior)
@@ -77,7 +77,6 @@ class ViewModelDelegateProviderTest : BaseTest() {
         val activityVm: ActivityVM by activityViewModel()
 
         override fun invalidate() {
-
         }
 
         override fun provideMocks() = mockTwoViewModels(
@@ -95,7 +94,6 @@ class ViewModelDelegateProviderTest : BaseTest() {
         val existingVm: ActivityVM by existingViewModel()
 
         override fun invalidate() {
-
         }
 
         override fun provideMocks() = mockSingleViewModel(

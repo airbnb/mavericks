@@ -10,12 +10,13 @@ open class TestActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setTheme(R.style.Theme_AppCompat)
         setContentView(
-                FrameLayout(this).apply {
-                    layoutParams = LinearLayout.LayoutParams(
-                            LinearLayout.LayoutParams.MATCH_PARENT,
-                            LinearLayout.LayoutParams.MATCH_PARENT)
-                    id = CONTAINER_ID
-                }
+            FrameLayout(this).apply {
+                layoutParams = LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.MATCH_PARENT
+                )
+                id = CONTAINER_ID
+            }
         )
     }
 }

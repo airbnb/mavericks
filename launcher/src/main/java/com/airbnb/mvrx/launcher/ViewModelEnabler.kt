@@ -22,8 +22,8 @@ import kotlin.reflect.KProperty1
  * Finally, it cleans up the mocked state that was stored in the MockStateHolder.
  */
 class ViewModelEnabler(
-        private val mockedView: MockedView<*>,
-        private val mock: MockedViewProvider<*>
+    private val mockedView: MockedView<*>,
+    private val mock: MockedViewProvider<*>
 ) : LifecycleObserver {
 
     @Suppress("unused")
@@ -34,25 +34,27 @@ class ViewModelEnabler(
 
         // This is briefly delayed in case any UI initialization causes network events to be
         // triggered, which we don't want overriding the mock state.
-        Handler().postDelayed({
-            mock.mock
+        Handler().postDelayed(
+            {
+                mock.mock
                     .states
-                    .map {
+                    .map { mockState ->
                         @Suppress("UNCHECKED_CAST")
-                        (it.viewModelProperty as KProperty1<MavericksView, BaseMavericksViewModel<*>>)
-                                .get(view)
+                        (mockState.viewModelProperty as KProperty1<MavericksView, BaseMavericksViewModel<*>>)
+                            .get(view)
                     }
                     .forEach { viewModel ->
                         MockableMavericksViewModelConfig.access(viewModel).pushBehaviorOverride(
-                                MockBehavior(
-                                        blockExecutions = MavericksViewModelConfig.BlockExecutions.No,
-                                        stateStoreBehavior = MockBehavior.StateStoreBehavior.Normal
-                                )
+                            MockBehavior(
+                                blockExecutions = MavericksViewModelConfig.BlockExecutions.No,
+                                stateStoreBehavior = MockBehavior.StateStoreBehavior.Normal
+                            )
                         )
                     }
 
-            mockedView.cleanupMockState()
-        }, delayTime)
+                mockedView.cleanupMockState()
+            }, delayTime
+        )
     }
 
     companion object {

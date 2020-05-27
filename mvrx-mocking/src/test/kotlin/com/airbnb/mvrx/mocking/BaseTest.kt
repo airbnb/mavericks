@@ -2,29 +2,18 @@
 
 package com.airbnb.mvrx.mocking
 
-
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.MvRx
-import io.reactivex.Scheduler
-import io.reactivex.annotations.NonNull
-import io.reactivex.disposables.Disposable
-import io.reactivex.exceptions.CompositeException
-import io.reactivex.internal.schedulers.ExecutorScheduler
-import io.reactivex.plugins.RxJavaPlugins
 import org.junit.After
 import org.junit.Before
-import org.junit.BeforeClass
 import org.junit.Ignore
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.android.controller.ActivityController
-import org.robolectric.shadows.ShadowLog
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
 
 @RunWith(RobolectricTestRunner::class)
 @Ignore

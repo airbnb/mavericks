@@ -13,7 +13,7 @@ class ViewModelBlockExecutionTest : BaseTest() {
     @Test
     fun executeNormally() {
         MavericksMocks.mockConfigFactory.mockBehavior = MockBehavior(
-                stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
+            stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
         )
 
         val vm = ViewModel()
@@ -24,8 +24,8 @@ class ViewModelBlockExecutionTest : BaseTest() {
     @Test
     fun executeBlockedCompletely() {
         MavericksMocks.mockConfigFactory.mockBehavior = MockBehavior(
-                blockExecutions = MavericksViewModelConfig.BlockExecutions.Completely,
-                stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
+            blockExecutions = MavericksViewModelConfig.BlockExecutions.Completely,
+            stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
         )
 
         val vm = ViewModel()
@@ -36,8 +36,8 @@ class ViewModelBlockExecutionTest : BaseTest() {
     @Test
     fun executeBlockedWithLoading() {
         MavericksMocks.mockConfigFactory.mockBehavior = MockBehavior(
-                blockExecutions = MavericksViewModelConfig.BlockExecutions.WithLoading,
-                stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
+            blockExecutions = MavericksViewModelConfig.BlockExecutions.WithLoading,
+            stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
         )
 
         val vm = ViewModel()
@@ -58,4 +58,4 @@ class ViewModelBlockExecutionTest : BaseTest() {
     }
 }
 
-fun <S: MvRxState, VM: BaseMavericksViewModel<S>> VM.state(): S = config.stateStore.state
+fun <S : MvRxState, VM : BaseMavericksViewModel<S>> VM.state(): S = config.stateStore.state

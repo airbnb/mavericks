@@ -52,7 +52,6 @@ abstract class MvRxLauncherBaseFragment : Fragment(), MavericksView {
             coordinatorLayout = findViewById(R.id.coordinator_layout)
         }
 
-
         recyclerView.setController(epoxyController)
 
         (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)

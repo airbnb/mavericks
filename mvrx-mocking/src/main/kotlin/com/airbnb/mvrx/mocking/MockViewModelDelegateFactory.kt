@@ -36,7 +36,7 @@ class MockViewModelDelegateFactory(
         stateClass: KClass<S>,
         existingViewModel: Boolean,
         viewModelProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM
-    ): Lazy<VM>  where T : Fragment, T : MavericksView {
+    ): Lazy<VM> where T : Fragment, T : MavericksView {
         check(configFactory == MvRx.viewModelConfigFactory) {
             "Config factory provided in constructor is not the same one as installed on MvRx object."
         }
@@ -81,7 +81,7 @@ class MockViewModelDelegateFactory(
 
                             require(stateStore.mockBehavior.stateStoreBehavior == MockBehavior.StateStoreBehavior.Scriptable) {
                                 "Full mock state requires that the state store be set to scriptable to " +
-                                        "guarantee that state is frozen on the mock and not allowed to be changed by the view."
+                                    "guarantee that state is frozen on the mock and not allowed to be changed by the view."
                             }
 
                             stateStore.next(mockState!!)
@@ -102,7 +102,6 @@ class MockViewModelDelegateFactory(
                     viewModelDelegate = viewModelDelegate
                 )
             }
-
         }
     }
 
@@ -115,7 +114,7 @@ class MockViewModelDelegateFactory(
         stateClass: KClass<S>,
         mockState: S?,
         mockBehavior: MockBehavior
-    ): VM where T : Fragment, T : MavericksView  {
+    ): VM where T : Fragment, T : MavericksView {
         return if (existingViewModel && mockBehavior.initialStateMocking != MockBehavior.InitialStateMocking.None) {
             // When the fragment uses "existingViewModel" normally it should always exist.
             // However, when we are mocking initial state then it is equally valid for it to already exist
@@ -138,7 +137,6 @@ class MockViewModelDelegateFactory(
                             keyFactory()
                         )
                     }
-
                 })
             } catch (e: ViewModelDoesNotExistException) {
                 // When existing view models don't exist it is normally an error, but since
@@ -161,11 +159,11 @@ class MockViewModelDelegateFactory(
     }
 
     private fun <S : MvRxState, T : MavericksView> getMockState(
-            fragment: T,
-            mockBehavior: MockBehavior,
-            viewModelProperty: KProperty<*>,
-            existingViewModel: Boolean,
-            stateClass: KClass<S>
+        fragment: T,
+        mockBehavior: MockBehavior,
+        viewModelProperty: KProperty<*>,
+        existingViewModel: Boolean,
+        stateClass: KClass<S>
     ): S? {
         return if (fragment is MockableMavericksView && mockBehavior.initialStateMocking != MockBehavior.InitialStateMocking.None) {
             MavericksMocks.mockStateHolder.getMockedState(
@@ -179,7 +177,6 @@ class MockViewModelDelegateFactory(
             null
         }
     }
-
 
     private fun <S : MvRxState, VM : BaseMavericksViewModel<S>> stateFactory(
         mockState: S?
@@ -199,6 +196,4 @@ class MockViewModelDelegateFactory(
             }
         }
     }
-
-
 }

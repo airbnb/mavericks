@@ -3,7 +3,6 @@
 
 import java.io.File
 
-
 /**
  * Returns the directory that java application was started from.
  * https://stackoverflow.com/questions/16239130/java-user-dir-property-what-exactly-does-it-mean

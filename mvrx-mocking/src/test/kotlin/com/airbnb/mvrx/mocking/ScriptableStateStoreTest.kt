@@ -14,7 +14,7 @@ class ScriptableStateStoreTest : BaseTest() {
     @Before
     fun setup() {
         MavericksMocks.mockConfigFactory.withMockBehavior(
-                MockBehavior(stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable)
+            MockBehavior(stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable)
         ) {
             viewModel = TestViewModel()
         }

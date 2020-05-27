@@ -20,7 +20,6 @@ import com.airbnb.mvrx.mocking.printer.MavericksMockPrinter.Companion.ACTION_COP
 import com.airbnb.mvrx.withState
 import java.io.File
 
-
 /**
  * This registers a Broadcast receiver on the MavericksView (only in debug mode) that
  * listens for the intent action [ACTION_COPY_MVRX_STATE] to copy mvrx state to files on device.
@@ -75,6 +74,7 @@ class MavericksMockPrinter private constructor(
 
     companion object {
         const val ACTION_COPY_MVRX_STATE = "ACTION_COPY_MVRX_STATE"
+
         /**
          * Tracks which views already have a receiver registered, to prevent registering the same
          * view multiple times. To avoid leaks, the view is removed when it is destroyed.
@@ -100,7 +100,7 @@ class MavericksMockPrinter private constructor(
  * 1. Extract configuration arguments from the Intent
  * 2. Lookup all ViewModel properties defined on the [MavericksView]
  * 3. Get the current State of each ViewModel
- * 4. Use [ConstructorCode] to generate the Kotlin code needed to reconstruct the States
+ * 4. Use [ConstructorCodeGenerator] to generate the Kotlin code needed to reconstruct the States
  * 5. Saves the code to files on the device.
  * 6. Uses logcat to signal where on device the files were saved, and when the process is done
  * 7. A listener can wait for the output signals, and then pull the resulting files off the device.
@@ -134,15 +134,14 @@ internal abstract class MavericksPrintStateBroadcastReceiver : BroadcastReceiver
         // These string extra names are defined in the mock printer kts script, and
         // they allow for configuration in how the mock state is gathered and printed.
         val settings = Settings(
-                includeRegexes = intent.getStringExtra("EXTRA_INCLUDE_REGEXES").parseRegexes(),
-                excludeRegexes = intent.getStringExtra("EXTRA_EXCLUDE_REGEXES").parseRegexes(),
-                stringTruncationThreshold = intent.getIntExtra(
-                        "EXTRA_STRING_TRUNCATION_THRESHOLD",
-                        300
-                ),
-                listTruncationThreshold = intent.getIntExtra("EXTRA_LIST_TRUNCATION_THRESHOLD", 3)
+            includeRegexes = intent.getStringExtra("EXTRA_INCLUDE_REGEXES").parseRegexes(),
+            excludeRegexes = intent.getStringExtra("EXTRA_EXCLUDE_REGEXES").parseRegexes(),
+            stringTruncationThreshold = intent.getIntExtra(
+                "EXTRA_STRING_TRUNCATION_THRESHOLD",
+                300
+            ),
+            listTruncationThreshold = intent.getIntExtra("EXTRA_LIST_TRUNCATION_THRESHOLD", 3)
         )
-
 
         // This is done async since the mock generation reflection can be slow.
         AsyncTask.THREAD_POOL_EXECUTOR.execute {
@@ -152,14 +151,14 @@ internal abstract class MavericksPrintStateBroadcastReceiver : BroadcastReceiver
                     Log.d(INFO_TAG, "$tag - No object to mock")
                 } else {
                     Log.d(
-                            INFO_TAG,
+                        INFO_TAG,
                         "$tag - Starting state printing for ${objectToMock.javaClass.simpleName}. $settings"
                     )
                     writeMock(
-                            context,
-                            objectToMock,
-                            settings.listTruncationThreshold,
-                            settings.stringTruncationThreshold
+                        context,
+                        objectToMock,
+                        settings.listTruncationThreshold,
+                        settings.stringTruncationThreshold
                     )
                 }
             } else {
@@ -228,9 +227,9 @@ private class ViewArgPrinter(val mvrxView: MavericksView) : MavericksPrintStateB
             is android.app.Fragment -> mvrxView.arguments
             else -> {
                 Log.d(
-                        ERROR_TAG,
+                    ERROR_TAG,
                     "Don't know how to get arguments off of view ${mvrxView::class.qualifiedName}. " +
-                            "Only Fragments are currently supported."
+                        "Only Fragments are currently supported."
                 )
                 null
             }
@@ -279,10 +278,10 @@ private fun writeMock(
     try {
         Log.d(INFO_TAG, "Generating state for $objectName")
         printMockFile(
-                context,
-                objectToMock,
-                listTruncationThreshold,
-                stringTruncationThreshold
+            context,
+            objectToMock,
+            listTruncationThreshold,
+            stringTruncationThreshold
         )
     } catch (e: Throwable) {
         Log.e(ERROR_TAG, "Error creating mvrx mock code for $objectName", e)
@@ -304,11 +303,11 @@ private fun <T : Any> printMockFile(
 ) {
     fun Int.maxIfLTEZero() = if (this <= 0) Integer.MAX_VALUE else this
 
-    val code = ConstructorCode(
-            instanceToMock,
-            listTruncationThreshold.maxIfLTEZero(),
-            stringTruncationThreshold.maxIfLTEZero(),
-            MavericksMocks.mockPrinterConfiguration.customTypePrinters
+    val code = ConstructorCodeGenerator(
+        instanceToMock,
+        listTruncationThreshold.maxIfLTEZero(),
+        stringTruncationThreshold.maxIfLTEZero(),
+        MavericksMocks.mockPrinterConfiguration.customTypePrinters
     )
 
     val file = File(context.cacheDir, "${instanceToMock::class.simpleName}Mock.kt")

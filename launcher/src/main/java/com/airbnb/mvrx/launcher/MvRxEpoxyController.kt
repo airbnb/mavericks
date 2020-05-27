@@ -1,3 +1,4 @@
+@file:Suppress("Detekt.ParameterListWrapping")
 package com.airbnb.mvrx.launcher
 
 import com.airbnb.epoxy.AsyncEpoxyController
@@ -65,7 +66,13 @@ fun <A : BaseMavericksViewModel<B>, B : MvRxState, C : BaseMavericksViewModel<D>
  * Create a [MvRxEpoxyController] that builds models with the given callback.
  * When models are built the current state of the viewmodels will be provided.
  */
-fun <A : BaseMavericksViewModel<B>, B : MvRxState, C : BaseMavericksViewModel<D>, D : MvRxState, E : BaseMavericksViewModel<F>, F : MvRxState> MvRxLauncherBaseFragment.simpleController(
+fun <A : BaseMavericksViewModel<B>,
+    B : MvRxState,
+    C : BaseMavericksViewModel<D>,
+    D : MvRxState,
+    E : BaseMavericksViewModel<F>,
+    F : MvRxState>
+    MvRxLauncherBaseFragment.simpleController(
     viewModel1: A,
     viewModel2: C,
     viewModel3: E,

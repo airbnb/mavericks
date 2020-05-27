@@ -44,13 +44,13 @@ class MvRxLauncherMockActivity : MvRxBaseLauncherActivity() {
         }
     }
 
-
     companion object {
         private val tag = MvRxLauncherMockActivity::class.java.simpleName
         private const val FINISH_AFTER_LAUNCH = "EXTRA_FINISH_AFTER_LAUNCH"
 
         var nextMockToShow: MockedViewProvider<*>? = null
             private set
+
         /**
          * Specify which activity should be used to display mocked views when a view is launched
          * from the MvRx launcher.
@@ -73,9 +73,9 @@ class MvRxLauncherMockActivity : MvRxBaseLauncherActivity() {
          * and verified that it didn't crash. This is for automated testing purposes.
          */
         fun intent(
-                context: Context,
-                mock: MockedViewProvider<*>,
-                finishAfterLaunch: Boolean = false
+            context: Context,
+            mock: MockedViewProvider<*>,
+            finishAfterLaunch: Boolean = false
         ): Intent {
             Log.d(
                 tag,
@@ -179,17 +179,17 @@ class MvRxLauncherMockActivity : MvRxBaseLauncherActivity() {
                 // For process recreation we only mock the initial state provided to the viewmodel constructor,
                 // but then it should run it's normal code paths using that initial state
                 mock.forInitialization || mock.isForProcessRecreation -> MockBehavior(
-                        initialStateMocking = MockBehavior.InitialStateMocking.Partial,
-                        stateStoreBehavior = MockBehavior.StateStoreBehavior.Normal,
-                        blockExecutions = MavericksViewModelConfig.BlockExecutions.No
+                    initialStateMocking = MockBehavior.InitialStateMocking.Partial,
+                    stateStoreBehavior = MockBehavior.StateStoreBehavior.Normal,
+                    blockExecutions = MavericksViewModelConfig.BlockExecutions.No
                 )
                 // The Fragment is fully mocked out and we prevent initialization code from overriding the mock.
                 // However, our ViewModelEnabler will later toggle executions to be allowed, once initialization is over,
                 // so that the fragment is functional from the state we set it up in.
                 else -> MockBehavior(
-                        initialStateMocking = MockBehavior.InitialStateMocking.Full,
-                        stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable,
-                        blockExecutions = MavericksViewModelConfig.BlockExecutions.Completely
+                    initialStateMocking = MockBehavior.InitialStateMocking.Full,
+                    stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable,
+                    blockExecutions = MavericksViewModelConfig.BlockExecutions.Completely
                 )
             }
         }

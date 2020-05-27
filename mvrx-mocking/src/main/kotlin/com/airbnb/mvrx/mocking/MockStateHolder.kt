@@ -65,18 +65,18 @@ class MockStateHolder {
         val mockInfo = if (existingViewModel && forceMockExistingViewModel) {
             check(!stateMap.containsKey(view)) {
                 "Expected to force mock existing view model, but mocked state already " +
-                        "exists (${view.javaClass.simpleName}#${viewModelProperty.name})"
+                    "exists (${view.javaClass.simpleName}#${viewModelProperty.name})"
             }
 
             MavericksViewMocks.getFrom(view).mocks
                 .firstOrNull { it.isDefaultState }
-                ?.let {
+                ?.let { mvRxMock ->
                     @Suppress("UNCHECKED_CAST")
-                    it as MvRxMock<MockableMavericksView, *>
+                    mvRxMock as MvRxMock<MockableMavericksView, *>
                 }
                 ?: error(
                     "No mock state found in ${view.javaClass.simpleName} for ViewModel ${viewModelProperty.name}. " +
-                            "A mock state must be provided to support this existing ViewModel."
+                        "A mock state must be provided to support this existing ViewModel."
                 )
         } else {
             stateMap[view] ?: return null

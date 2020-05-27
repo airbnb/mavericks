@@ -30,5 +30,4 @@ internal class HelloViewModelTest {
             assert(state.message() == "Hello!")
         }
     }
-
 }

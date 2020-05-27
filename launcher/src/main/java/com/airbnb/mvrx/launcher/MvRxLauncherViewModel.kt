@@ -4,7 +4,14 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import androidx.core.content.edit
-import com.airbnb.mvrx.*
+import com.airbnb.mvrx.Async
+import com.airbnb.mvrx.BaseMavericksViewModel
+import com.airbnb.mvrx.Incomplete
+import com.airbnb.mvrx.Loading
+import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MvRxViewModelFactory
+import com.airbnb.mvrx.Success
+import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.launcher.MvRxLauncherActivity.Companion.PARAM_VIEW_PATTERN_TO_TEST
 import com.airbnb.mvrx.launcher.MvRxLauncherActivity.Companion.PARAM_VIEW_TO_OPEN
 import com.airbnb.mvrx.mocking.MockedViewProvider
@@ -13,28 +20,28 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 data class MvRxLauncherState(
-        /**
+    /**
      * Mocks that were loaded in previous app sessions will be restored from cache in this property.
      * It will update incrementally as each cache entry is loaded.
      */
     val cachedMocks: Async<List<MockedViewProvider<*>>> = Loading(),
-        /**
+    /**
      * All mocks that were detected in the app. This can be slow to load, so until it is [Success]
      * the [cachedMocks] can be used.
      */
     val allMocks: Async<List<MockedViewProvider<*>>> = Loading(),
-        /** The FQN name of the MvRxView that is currently selected for display. */
+    /** The FQN name of the MvRxView that is currently selected for display. */
     val selectedView: String? = null,
-        /**
+    /**
      * The currently selected mock. This is set when the user clicks into a mock.
      * Additionally, the value is saved and restored when mocks are loaded anew when the viewmodel is initialized.
      */
     val selectedMock: MockedViewProvider<*>? = null,
-        /** Details about the most recently used MvRxViews and mocks. The UI can use this to order information for relevance. */
+    /** Details about the most recently used MvRxViews and mocks. The UI can use this to order information for relevance. */
     val recentUsage: LauncherRecentUsage = LauncherRecentUsage(),
-        /** A pattern to match views, provided by a deeplink, that should be tested once all mocks load. */
+    /** A pattern to match views, provided by a deeplink, that should be tested once all mocks load. */
     val viewNamePatternToTest: String? = null,
-        /** The name of a specific view or mock, provided by a deeplink, that should be opened directly once all mocks load. */
+    /** The name of a specific view or mock, provided by a deeplink, that should be opened directly once all mocks load. */
     val viewNameToOpen: String? = null
 ) : MvRxState {
 
@@ -59,16 +66,16 @@ data class MvRxLauncherState(
                 viewNameToOpen != null -> {
                     // Look for the first View who's simple name contains the deeplink query
                     // We will just use it's default initial args and state
-                    val viewMatch = mocksToCheck.firstOrNull {
-                        it.viewName.simpleName.contains(
+                    val viewMatch = mocksToCheck.firstOrNull { mockedViewProvider ->
+                        mockedViewProvider.viewName.simpleName.contains(
                             viewNameToOpen,
                             ignoreCase = true
-                        ) && it.mock.isDefaultInitialization
+                        ) && mockedViewProvider.mock.isDefaultInitialization
                     }
 
                     // Or if no view name matches we can look for a specific mock by name
-                    val mockMatch = mocksToCheck.firstOrNull {
-                        it.mock.name.contains(
+                    val mockMatch = mocksToCheck.firstOrNull { mockedViewProvider ->
+                        mockedViewProvider.mock.name.contains(
                             viewNameToOpen,
                             ignoreCase = true
                         )

@@ -7,10 +7,8 @@ import com.airbnb.mvrx.mocking.MockBehavior.StateStoreBehavior
 import com.airbnb.mvrx.test.MvRxTestRule
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue

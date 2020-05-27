@@ -1,5 +1,5 @@
+@file:Suppress("Detekt.ParameterListWrapping")
 package com.airbnb.mvrx.mocking
-
 
 import android.os.Parcelable
 import android.util.Log
@@ -19,7 +19,6 @@ import kotlin.reflect.KProperty0
 import kotlin.reflect.KProperty1
 import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.primaryConstructor
-
 
 /**
  * Used with [MockableMavericksView.provideMocks] for mocking a MvRx view that has no view models (eg only static content and arguments).
@@ -134,6 +133,7 @@ fun <V : MockableMavericksView,
 /**
  * Similar to [mockTwoViewModels], but for the three view model case.
  */
+@Suppress("Detekt.ParameterListWrapping")
 @SuppressWarnings("Detekt.LongParameterList")
 fun <V : MockableMavericksView,
     S1 : MvRxState,
@@ -168,6 +168,7 @@ fun <V : MockableMavericksView,
 /**
  * Similar to [mockTwoViewModels], but for the four view model case.
  */
+@Suppress("Detekt.ParameterListWrapping")
 @SuppressWarnings("Detekt.LongParameterList")
 fun <V : MockableMavericksView,
     S1 : MvRxState,
@@ -421,11 +422,11 @@ internal constructor(
     ) {
         addState(
             name, evaluateArgsLambda(args), TwoStatesBuilder(
-            vm1,
-            defaultState1,
-            vm2,
-            defaultState2
-        ).apply(statesBuilder).states
+                vm1,
+                defaultState1,
+                vm2,
+                defaultState2
+            ).apply(statesBuilder).states
         )
     }
 
@@ -514,10 +515,10 @@ internal constructor(
     private val stateMap = mutableMapOf<KProperty1<V, BaseMavericksViewModel<MvRxState>>, MvRxState>()
 
     internal val states: List<MockState<V, *>>
-        get() = stateMap.map {
+        get() = stateMap.map { entry ->
             MockState(
-                it.key,
-                it.value
+                entry.key,
+                entry.value
             )
         }
 
@@ -592,13 +593,13 @@ internal constructor(
     ) {
         addState(
             name, evaluateArgsLambda(args), ThreeStatesBuilder(
-            vm1,
-            defaultState1,
-            vm2,
-            defaultState2,
-            vm3,
-            defaultState3
-        ).apply(statesBuilder).states
+                vm1,
+                defaultState1,
+                vm2,
+                defaultState2,
+                vm3,
+                defaultState3
+            ).apply(statesBuilder).states
         )
     }
 }
@@ -796,7 +797,7 @@ open class MavericksViewMocks<V : MockableMavericksView, Args : Parcelable> @Pub
     companion object {
         /**
          * Exposed for internal tests to allow us to workaround the requirement that this class
-         * can only be created via [getFrom]
+         * can only be created via [getFrom].
          */
         @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
         fun <R> allowCreationForTesting(block: () -> R): R {
@@ -957,5 +958,3 @@ open class MockBuilder<V : MockableMavericksView, Args : Parcelable> internal co
             }
     }
 }
-
-

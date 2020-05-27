@@ -53,6 +53,5 @@ inline fun <reified T : Any> typePrinter(
         override fun modifyImports(imports: List<String>): List<String> {
             return transformImports(imports)
         }
-
     }
 }

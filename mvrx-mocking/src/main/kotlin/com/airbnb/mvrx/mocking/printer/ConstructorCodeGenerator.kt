@@ -21,7 +21,7 @@ import kotlin.reflect.jvm.isAccessible
  * It uses recursion to analyze the given object instance and
  * generates code needed to construct another instance of the object containing the same data.
  */
-class ConstructorCode<T : Any>(
+class ConstructorCodeGenerator<T : Any>(
     objectToCopy: T,
     private val listTruncationThreshold: Int = 300,
     private val stringTruncationThreshold: Int = 3,
@@ -74,10 +74,10 @@ class ConstructorCode<T : Any>(
 
             val customResult = customTypePrinters
                 .firstOrNull { it.acceptsObject(this) }
-                ?.let {
-                    usedTypePrinters.add(it)
+                ?.let { typePrinter ->
+                    usedTypePrinters.add(typePrinter)
                     @Suppress("UNCHECKED_CAST")
-                    it as TypePrinter<Any>
+                    typePrinter as TypePrinter<Any>
                 }
                 ?.generateCode(this) { it.getConstructor() }
 
@@ -94,7 +94,6 @@ class ConstructorCode<T : Any>(
             }
         }
     }
-
 
     /**
      * Returns a list containing this class and then all of its enclosing classes (if any) in order of hierarchy.
@@ -115,8 +114,10 @@ class ConstructorCode<T : Any>(
 
     data class EnclosingClass(val outerClass: Class<*>, val innerClass: Class<*>) {
         fun parent(): EnclosingClass? {
-            return EnclosingClass(outerClass = outerClass.enclosingClass
-                    ?: return null, innerClass = outerClass)
+            return EnclosingClass(
+                outerClass = outerClass.enclosingClass
+                    ?: return null, innerClass = outerClass
+            )
         }
     }
 
@@ -232,9 +233,9 @@ class ConstructorCode<T : Any>(
         // lines of constructor code in large classes that otherwise do
         // nothing.
         return value == null ||
-                value.isPrimitiveDefault() ||
-                (value is Map<*, *> && value.isEmpty()) ||
-                (value is Collection<*> && value.isEmpty())
+            value.isPrimitiveDefault() ||
+            (value is Map<*, *> && value.isEmpty()) ||
+            (value is Collection<*> && value.isEmpty())
     }
 
     private fun Any.isPrimitiveDefault(): Boolean {

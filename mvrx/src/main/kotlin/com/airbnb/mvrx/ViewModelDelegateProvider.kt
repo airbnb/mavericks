@@ -16,7 +16,6 @@ internal inline fun <T, reified VM : BaseMavericksViewModel<S>, reified S : MvRx
 ): MavericksDelegateProvider<T, VM> where T : Fragment, T : MavericksView {
     return object : MavericksDelegateProvider<T, VM>() {
 
-
         override operator fun provideDelegate(
             thisRef: T,
             property: KProperty<*>
@@ -95,5 +94,4 @@ class DefaultViewModelDelegateFactory : ViewModelDelegateFactory {
                 .apply { onEachInternal(fragment, action = { fragment.postInvalidate() }) }
         }
     }
-
 }

@@ -25,7 +25,6 @@ internal class TextBuilder(private val context: Context) {
 
     private val spannableStringBuilder = SpannableStringBuilder()
 
-
     fun append(@StringRes textRes: Int): TextBuilder {
         return append(context.getString(textRes))
     }
@@ -40,7 +39,8 @@ internal class TextBuilder(private val context: Context) {
     }
 
     fun appendQuantityRes(
-        @PluralsRes textRes: Int, quantity: Int,
+        @PluralsRes textRes: Int,
+        quantity: Int,
         vararg formatArgs: Any
     ): TextBuilder {
         return append(context.resources.getQuantityString(textRes, quantity, *formatArgs))
@@ -69,7 +69,6 @@ internal class TextBuilder(private val context: Context) {
         return appendWithSpans(text, ForegroundColorSpan(ContextCompat.getColor(context, colorRes)))
     }
 
-
     /**
      * @param sizeModifier Adjust the size of the text relative to the size of the rest of the TextView.
      * A value of 1.0 will result in the same size, less than 1.0 will make it smaller, and greater than 1.0 will make this text larger.
@@ -77,11 +76,9 @@ internal class TextBuilder(private val context: Context) {
     fun appendWithRelativeSize(text: CharSequence, sizeModifier: Float) =
         appendWithSpans(text, RelativeSizeSpan(sizeModifier))
 
-
     fun appendUnderline(text: CharSequence): TextBuilder {
         return appendWithSpans(text, UnderlineSpan())
     }
-
 
     fun appendItalic(text: CharSequence): TextBuilder {
         return appendWithSpans(text, StyleSpan(Typeface.ITALIC))
@@ -90,7 +87,6 @@ internal class TextBuilder(private val context: Context) {
     fun appendBold(text: CharSequence): TextBuilder {
         return appendWithSpans(text, StyleSpan(BOLD))
     }
-
 
     fun appendStrikeThrough(text: CharSequence): TextBuilder {
         return appendWithSpans(text, StrikethroughSpan())
@@ -101,5 +97,4 @@ internal class TextBuilder(private val context: Context) {
     fun appendSpace(): TextBuilder = append(" ")
 
     fun build(): CharSequence = spannableStringBuilder
-
 }

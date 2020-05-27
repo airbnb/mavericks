@@ -1,4 +1,5 @@
 #!/usr/bin/env kscript
+@file:Suppress("Detekt.SpacingBetweenPackageAndImports")
 @file:Include("ShellAccess.kt")
 @file:Include("DirectoryUtils.kt")
 @file:Include("CommandLineArgs.kt")
@@ -16,10 +17,10 @@ import kotlin.system.exitProcess
     name = "MvRx Mock Printer",
     description = [
         "Generate MvRx mocks. " +
-                "Creates a mock file for each active ViewModel and MvRxView in a connected debug app. " +
-                "The device must have debugging enabled. " +
-                "Mocks are both copied to clipboard and written to temp files. " +
-                "This is intended to be run from the root directory of your project. "
+            "Creates a mock file for each active ViewModel and MvRxView in a connected debug app. " +
+            "The device must have debugging enabled. " +
+            "Mocks are both copied to clipboard and written to temp files. " +
+            "This is intended to be run from the root directory of your project. "
     ]
 )
 class MvrxPrinterApi : CommandLineArgs() {
@@ -28,7 +29,7 @@ class MvrxPrinterApi : CommandLineArgs() {
         names = ["--includeRegexes"],
         description = [
             "A comma separated list of regexes. Any mockable objects (ie views or view models) whose FQN contain a match with one of the regexes" +
-                    " will have their state printed. If no regexes are provided then all STARTED objects will be included."
+                " will have their state printed. If no regexes are provided then all STARTED objects will be included."
         ]
     )
     var includeRegexes: String? = null
@@ -37,7 +38,7 @@ class MvrxPrinterApi : CommandLineArgs() {
         names = ["--excludeRegexes"],
         description = [
             "A comma separated list of regexes. Any mockable objects (ie views or view models) whose FQN contain a match with one of the regexes" +
-                    " will be excluded from state printing have their state printed. A match here trumps a match in includeRegexes."
+                " will be excluded from state printing have their state printed. A match here trumps a match in includeRegexes."
         ]
     )
     var excludeRegexes: String? = null
@@ -46,7 +47,7 @@ class MvrxPrinterApi : CommandLineArgs() {
         names = ["--copyToModule"],
         description = [
             "Pass the module name of the expected MvRxView so that the generated mock files are copied to the same module automatically." +
-                    " The mocks will be copied to the same package as the MvRxView, but nested under a 'mocks' sub package."
+                " The mocks will be copied to the same package as the MvRxView, but nested under a 'mocks' sub package."
         ]
     )
     var copyToModule: String? = null
@@ -55,8 +56,8 @@ class MvrxPrinterApi : CommandLineArgs() {
         names = ["--listTruncationThreshold"],
         description = [
             "Any lists in the state will be truncated to this many items." +
-                    " This helps to reduce bloat and overhead from lists with many redundant items." +
-                    " Pass 0 to not truncate lists."
+                " This helps to reduce bloat and overhead from lists with many redundant items." +
+                " Pass 0 to not truncate lists."
         ],
         defaultValue = "3",
         showDefaultValue = CommandLine.Help.Visibility.ALWAYS
@@ -67,8 +68,8 @@ class MvrxPrinterApi : CommandLineArgs() {
         names = ["--stringTruncationThreshold"],
         description = [
             "Any Strings in the state will be truncated to this many characters." +
-                    " This helps to reduce bloat and overhead from very long text." +
-                    " Pass 0 to not truncate Strings."
+                " This helps to reduce bloat and overhead from very long text." +
+                " Pass 0 to not truncate Strings."
         ],
         defaultValue = "300",
         showDefaultValue = CommandLine.Help.Visibility.ALWAYS

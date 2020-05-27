@@ -1,10 +1,10 @@
 package com.airbnb.mvrx.mocking
 
 import com.airbnb.mvrx.BaseMavericksViewModel
-import com.airbnb.mvrx.MvRx
-import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MavericksViewModelConfig
 import com.airbnb.mvrx.MavericksViewModelConfigFactory
+import com.airbnb.mvrx.MvRx
+import com.airbnb.mvrx.MvRxState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -13,16 +13,15 @@ import org.junit.Test
 
 class MavericksViewModelConfigTest : BaseTest() {
 
-
     @Test
     fun mockBehaviorIsConfigurableInBlock() {
         val provider = MockMavericksViewModelConfigFactory(context = null)
 
         val originalBehavior = provider.mockBehavior
         val newBehavior =
-                MockBehavior(blockExecutions = MavericksViewModelConfig.BlockExecutions.Completely)
+            MockBehavior(blockExecutions = MavericksViewModelConfig.BlockExecutions.Completely)
         val newBehavior2 =
-                MockBehavior(blockExecutions = MavericksViewModelConfig.BlockExecutions.WithLoading)
+            MockBehavior(blockExecutions = MavericksViewModelConfig.BlockExecutions.WithLoading)
 
         val result = provider.withMockBehavior(newBehavior) {
             assertEquals(newBehavior, provider.mockBehavior)
@@ -95,30 +94,30 @@ class MavericksViewModelConfigTest : BaseTest() {
         val vm = TestViewModel()
 
         val newBehavior =
-                originalBehavior.copy(stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous)
+            originalBehavior.copy(stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous)
 
         MavericksMocks.mockConfigFactory.pushMockBehaviorOverride(newBehavior)
 
         assertEquals(
-                newBehavior,
-                (vm.config as MockableMavericksViewModelConfig).currentMockBehavior
+            newBehavior,
+            (vm.config as MockableMavericksViewModelConfig).currentMockBehavior
         )
 
         assertEquals(
-                newBehavior,
-                (vm.config.stateStore as MockableStateStore).mockBehavior
+            newBehavior,
+            (vm.config.stateStore as MockableStateStore).mockBehavior
         )
 
         MavericksMocks.mockConfigFactory.popMockBehaviorOverride()
 
         assertEquals(
-                originalBehavior,
-                vm.config.currentMockBehavior
+            originalBehavior,
+            vm.config.currentMockBehavior
         )
 
         assertEquals(
-                originalBehavior,
-                (vm.config.stateStore as MockableStateStore).mockBehavior
+            originalBehavior,
+            (vm.config.stateStore as MockableStateStore).mockBehavior
         )
     }
 

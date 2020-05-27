@@ -19,7 +19,6 @@ import com.airbnb.mvrx.launcher.views.textRow
 import com.airbnb.mvrx.mocking.MockedViewProvider
 import com.airbnb.mvrx.withState
 
-
 /**
  * Displays all MvRx screens and mocks that are detected in the app.
  *
@@ -90,7 +89,6 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
             return if (selectedView != null) loadedMocks.filter { it.viewName == selectedView } else null
         }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
@@ -160,30 +158,30 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
         }
 
         mocksToShow
-            ?.sortedBy {
+            ?.sortedBy { mockedViewProvider ->
                 val recentIndex =
-                    state.recentUsage.mockIdentifiers.indexOf(LauncherMockIdentifier(it))
+                    state.recentUsage.mockIdentifiers.indexOf(LauncherMockIdentifier(mockedViewProvider))
                 if (recentIndex == -1) {
                     Integer.MAX_VALUE
                 } else {
                     recentIndex
                 }
             }
-            ?.forEach {
+            ?.forEach { mockedViewProvider ->
                 textRow {
-                    id("view", it.viewName, it.mock.name)
-                    title(it.mock.name)
+                    id("view", mockedViewProvider.viewName, mockedViewProvider.mock.name)
+                    title(mockedViewProvider.mock.name)
 
                     subtitle(buildText(context) {
-                        if (LauncherMockIdentifier(it) in state.recentUsage.mockIdentifiers) {
+                        if (LauncherMockIdentifier(mockedViewProvider) in state.recentUsage.mockIdentifiers) {
                             appendWithColor("Recent ", R.color.mvrx_colorPrimary)
                         }
 
-                        if (it.mock.forInitialization) append("[With Arguments]")
+                        if (mockedViewProvider.mock.forInitialization) append("[With Arguments]")
                     })
 
                     onClickListener { _ ->
-                        viewModel.setSelectedMock(it)
+                        viewModel.setSelectedMock(mockedViewProvider)
                     }
                 }
             } ?: run {

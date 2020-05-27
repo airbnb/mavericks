@@ -2,7 +2,11 @@ package com.airbnb.mvrx.mocking
 
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
-import kotlin.reflect.full.*
+import kotlin.reflect.full.extensionReceiverParameter
+import kotlin.reflect.full.functions
+import kotlin.reflect.full.instanceParameter
+import kotlin.reflect.full.isSubclassOf
+import kotlin.reflect.full.memberFunctions
 
 internal val KClass<*>.isEnum: Boolean
     get() {
@@ -53,7 +57,7 @@ internal fun <T> getIfReflectionSupported(block: () -> T): T? {
 
 @Suppress("UNCHECKED_CAST")
 internal fun <T : Any> KClass<T>.copyMethod(): KFunction<T> =
-        this.memberFunctions.first { it.name == "copy" } as KFunction<T>
+    this.memberFunctions.first { it.name == "copy" } as KFunction<T>
 
 /** Call the copy function of the Data Class receiver. The params are a map of parameter name to value. */
 internal fun <T : Any> T.callCopy(vararg params: Pair<String, Any?>): T {
@@ -69,13 +73,13 @@ internal fun <T : Any> T.callCopy(vararg params: Pair<String, Any?>): T {
  * @param extSelf The extension receiver of the function
  */
 internal fun <R> KFunction<R>.callNamed(
-        params: Map<String, Any?>,
-        self: Any? = null,
-        extSelf: Any? = null
+    params: Map<String, Any?>,
+    self: Any? = null,
+    extSelf: Any? = null
 ): R {
     val map = params.mapTo(ArrayList()) { (key, value) ->
         val param = parameters.firstOrNull { it.name == key }
-                ?: throw IllegalStateException("No parameter named '$key' found on copy function for '${this.returnType.classifier}'")
+            ?: throw IllegalStateException("No parameter named '$key' found on copy function for '${this.returnType.classifier}'")
         param to value
     }
 
@@ -87,7 +91,7 @@ internal fun <R> KFunction<R>.callNamed(
 /** Helper to call a function reflectively. */
 internal inline fun <reified T> Any.call(functionName: String, vararg args: Any?): T {
     val function = this::class.functions.find { it.name == functionName }
-            ?: error("No function found with name $functionName in class ${this.javaClass.name}")
+        ?: error("No function found with name $functionName in class ${this.javaClass.name}")
 
     return function.call(this, *args) as T
 }

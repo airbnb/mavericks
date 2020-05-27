@@ -2,8 +2,7 @@ package com.airbnb.mvrx.mocking
 
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 // Not extending BaseTest to avoid making Rx synchronous, since we want to test that this

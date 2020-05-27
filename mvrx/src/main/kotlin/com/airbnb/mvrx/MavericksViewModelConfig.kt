@@ -2,9 +2,6 @@ package com.airbnb.mvrx
 
 import androidx.annotation.RestrictTo
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlin.coroutines.CoroutineContext
 
 /**
  * Provides configuration for a [BaseMavericksViewModel].
@@ -16,7 +13,7 @@ abstract class MavericksViewModelConfig<S : Any>(
      */
     val debugMode: Boolean,
     /**
-     * The state store instance that will control the state of the ViewModel
+     * The state store instance that will control the state of the ViewModel.
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY) val stateStore: MvRxStateStore<S>,
     val coroutineScope: CoroutineScope

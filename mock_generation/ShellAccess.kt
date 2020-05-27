@@ -124,21 +124,23 @@ fun String.execute(
                     stdoutRedirectBehavior.type() == Redirect.Type.PIPE ||
                     stderrRedirectBehavior.type() == Redirect.Type.PIPE
                 ) {
-                    println(listOf(
-                        "Note: Timeout can potentially be due to deadlock when using stdout=PIPE and/or stderr=PIPE",
-                        " and the child process (subpocess running the command) generates enough output to a pipe",
-                        " (~50 KB) such that it blocks waiting for the OS pipe buffer to accept more data.",
-                        "Please consider writing to a stdout/stderr to temp-file instead in such situations!"
-                    ).joinToString(""))
+                    println(
+                        listOf(
+                            "Note: Timeout can potentially be due to deadlock when using stdout=PIPE and/or stderr=PIPE",
+                            " and the child process (subpocess running the command) generates enough output to a pipe",
+                            " (~50 KB) such that it blocks waiting for the OS pipe buffer to accept more data.",
+                            "Please consider writing to a stdout/stderr to temp-file instead in such situations!"
+                        ).joinToString("")
+                    )
                 }
                 timeoutMessage?.let { println(it) }
                 exitProcess(1)
             }
         }
-        .let {
-            val result = ProcessResult(it.exitValue(), it.inputStream.bufferedReader(), it.errorStream.bufferedReader())
+        .let { process ->
+            val result = ProcessResult(process.exitValue(), process.inputStream.bufferedReader(), process.errorStream.bufferedReader())
             check(!(throwOnFailure && result.failed)) {
-                "Command failed with exit-code(${it.exitValue()}): '$commandToLog'"
+                "Command failed with exit-code(${process.exitValue()}): '$commandToLog'"
             }
             result
         }

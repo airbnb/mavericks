@@ -1,6 +1,5 @@
 package com.airbnb.mvrx.mocking
 
-
 import androidx.annotation.VisibleForTesting
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.Fail
@@ -76,8 +75,8 @@ interface DataClassSetDsl {
         val thisValue = requireNotNull(get()) { "The value for '$name' is null, properties on it can't be changed." }
 
         return NestedProperty(
-                this as KProperty0<Type1>,
-                thisValue.block()
+            this as KProperty0<Type1>,
+            thisValue.block()
         )
     }
 
@@ -92,7 +91,7 @@ interface DataClassSetDsl {
      */
     fun <T, Type> Async<T>.success(block: T.() -> KProperty0<Type>): KProperty0<Type> {
         val successValue = this.invoke()
-                ?: error("Async value is not in the success state, it is `${this::class.simpleName}`")
+            ?: error("Async value is not in the success state, it is `${this::class.simpleName}`")
         return successValue.block()
     }
 
@@ -115,11 +114,11 @@ interface DataClassSetDsl {
 
         // The standard way to set a nested value is much longer
         myState.copy(
-                bookingDetails = myState.bookingDetails.copy(
-                        disclaimerInfo = myState.bookingDetails.disclaimerInfo?.copy(
-                                text = "hello world"
-                        )
+            bookingDetails = myState.bookingDetails.copy(
+                disclaimerInfo = myState.bookingDetails.disclaimerInfo?.copy(
+                    text = "hello world"
                 )
+            )
         )
     }
 
@@ -158,7 +157,7 @@ interface DataClassSetDsl {
 
             return propertyChain.fold<KProperty0<Any?>, Any>(dataClass) { data, kProp0 ->
                 val kProp1 = data::class.memberProperties.singleOrNull { it.name == kProp0.name }
-                        ?: error("Could not find property of name ${kProp0.name} on class ${data::class.simpleName}")
+                    ?: error("Could not find property of name ${kProp0.name} on class ${data::class.simpleName}")
 
                 kProp1.call(data) ?: error("kProp1.call(recursiveDataClass) as PropType")
             } as PropType
@@ -170,14 +169,14 @@ interface DataClassSetDsl {
 
             val (recursiveProperty: KProperty0<Any?>, recursiveValue: Any?) = when (property) {
                 is NestedProperty<*, *> -> property.wrapperProperty to ((property.buildSetter() as Setter<Any, Any?>).set(
-                        value
+                    value
                 ))
                 else -> property to value
             }
 
             return if (instance is Success<*>) {
                 val successValue = instance.invoke()
-                        ?: error("Success value is null - cannot set ${property.name}")
+                    ?: error("Success value is null - cannot set ${property.name}")
                 require(successValue::class.isData) { "${successValue::class.simpleName} must be a data class" }
                 val updatedSuccess = successValue.callCopy(recursiveProperty.name to recursiveValue)
                 Success(updatedSuccess) as DataClass
@@ -194,8 +193,8 @@ interface DataClassSetDsl {
      * @property nestedProperty The property that this class represents.
      */
     open class NestedProperty<Type : Any, NestedType>(
-            val wrapperProperty: KProperty0<Type>,
-            val nestedProperty: KProperty0<NestedType>
+        val wrapperProperty: KProperty0<Type>,
+        val nestedProperty: KProperty0<NestedType>
     ) : KProperty0<NestedType> by nestedProperty {
 
         init {

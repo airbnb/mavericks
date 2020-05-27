@@ -42,7 +42,6 @@ class LauncherActivity : AppCompatActivity() {
             }
         }
     }
-
 }
 
 private fun FragmentActivity.showFragmentWithNavigation(view: MavericksView) {

@@ -43,29 +43,29 @@ object MvRxGlobalMockLibrary {
 
 private suspend fun loadMocks(classLoader: BaseDexClassLoader): List<MockedViewProvider<*>> {
     return getDexFiles(classLoader)
-            .asSequence()
-            .flatMap {
-                @Suppress("DEPRECATION")
-                it.entries().asSequence()
-            }
-            .filterNot {
-                // These are optimizations to avoid having to check every class in the dex files.
-                it.startsWith("java.") ||
-                        it.startsWith("android.") ||
-                        it.startsWith("androidx.")
-                // TODO: Allow mvrx configuration to specify package name prefix whitelist, or
-                //  more generally, naming whitelist to identify views, for faster initialization
-            }
-            .map { GlobalScope.async { getMocksForClassName(it, classLoader) } }
-            .toList()
-            .awaitAll()
-            .filterNotNull()
-            .flatten()
+        .asSequence()
+        .flatMap { dexFile ->
+            @Suppress("DEPRECATION")
+            dexFile.entries().asSequence()
+        }
+        .filterNot { dexFileEntry ->
+            // These are optimizations to avoid having to check every class in the dex files.
+            dexFileEntry.startsWith("java.") ||
+                dexFileEntry.startsWith("android.") ||
+                dexFileEntry.startsWith("androidx.")
+            // TODO: Allow mvrx configuration to specify package name prefix whitelist, or
+            //  more generally, naming whitelist to identify views, for faster initialization
+        }
+        .map { GlobalScope.async { getMocksForClassName(it, classLoader) } }
+        .toList()
+        .awaitAll()
+        .filterNotNull()
+        .flatten()
 }
 
 private fun getMocksForClassName(
-        className: String,
-        classLoader: ClassLoader
+    className: String,
+    classLoader: ClassLoader
 ): List<MockedViewProvider<*>>? {
 
     val clazz = try {

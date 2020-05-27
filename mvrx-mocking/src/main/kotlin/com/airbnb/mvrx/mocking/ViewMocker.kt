@@ -4,8 +4,8 @@ import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
-import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MavericksView
+import com.airbnb.mvrx.MvRx
 import kotlin.system.measureTimeMillis
 
 /**
@@ -26,18 +26,15 @@ fun getMockVariants(
         if (view is Fragment) view.arguments = argumentsBundle
         view
     },
-    emptyMockPlaceholder: Pair<String, MavericksViewMocks<MockableMavericksView, Nothing>> = Pair(
-        EmptyMocks::class.java.simpleName,
-            EmptyMocks
-    ),
+    emptyMockPlaceholder: Pair<String, MavericksViewMocks<MockableMavericksView, Nothing>> = EmptyMocks::class.java.simpleName to EmptyMocks,
     mockGroupIndex: Int? = null
 ): List<MockedViewProvider<MockableMavericksView>>? {
     @Suppress("UNCHECKED_CAST")
     return getMockVariants(
-            viewClass = Class.forName(viewClassName) as Class<MockableMavericksView>,
-            viewProvider = viewProvider,
-            emptyMockPlaceholder = emptyMockPlaceholder,
-            mockGroupIndex = mockGroupIndex
+        viewClass = Class.forName(viewClassName) as Class<MockableMavericksView>,
+        viewProvider = viewProvider,
+        emptyMockPlaceholder = emptyMockPlaceholder,
+        mockGroupIndex = mockGroupIndex
     )
 }
 
@@ -48,7 +45,7 @@ fun getMockVariants(
 inline fun <reified T> mockVariants(): List<MockedViewProvider<T>> where T : Fragment, T : MockableMavericksView {
     @Suppress("UNCHECKED_CAST")
     val mocks: List<MockedViewProvider<MockableMavericksView>>? = getMockVariants(
-            viewClass = T::class.java as Class<MockableMavericksView>
+        viewClass = T::class.java as Class<MockableMavericksView>
     )
 
     @Suppress("UNCHECKED_CAST")
@@ -73,7 +70,6 @@ fun <T : MockableMavericksView> List<MockedViewProvider<T>>.forDefaultInitializa
         ?: error("No default initialization mock found")
 }
 
-
 /**
  * See [getMockVariants]
  *
@@ -92,18 +88,15 @@ fun getMockVariants(
         if (view is Fragment) view.arguments = argumentsBundle
         view
     },
-    emptyMockPlaceholder: Pair<String, MavericksViewMocks<MockableMavericksView, Nothing>> = Pair(
-        EmptyMocks::class.java.simpleName,
-            EmptyMocks
-    ),
+    emptyMockPlaceholder: Pair<String, MavericksViewMocks<MockableMavericksView, Nothing>> = EmptyMocks::class.java.simpleName to EmptyMocks,
     mockGroupIndex: Int? = null
 ): List<MockedViewProvider<MockableMavericksView>>? {
     return getMockVariants<MockableMavericksView, Nothing>(
-            viewProvider = { _, argumentsBundle ->
-                viewProvider(viewClass, argumentsBundle)
-            },
-            emptyMockPlaceholder = emptyMockPlaceholder,
-            mockGroupIndex = mockGroupIndex
+        viewProvider = { _, argumentsBundle ->
+            viewProvider(viewClass, argumentsBundle)
+        },
+        emptyMockPlaceholder = emptyMockPlaceholder,
+        mockGroupIndex = mockGroupIndex
     )
 }
 
@@ -127,10 +120,7 @@ fun getMockVariants(
  */
 fun <V : MockableMavericksView, A : Parcelable> getMockVariants(
     viewProvider: (arguments: A?, argumentsBundle: Bundle?) -> V,
-    emptyMockPlaceholder: Pair<String, MavericksViewMocks<MockableMavericksView, Nothing>> = Pair(
-        EmptyMocks::class.java.simpleName,
-            EmptyMocks
-    ),
+    emptyMockPlaceholder: Pair<String, MavericksViewMocks<MockableMavericksView, Nothing>> = EmptyMocks::class.java.simpleName to EmptyMocks,
     mockGroupIndex: Int? = null
 ): List<MockedViewProvider<V>>? {
     val view = viewProvider(null, null)
@@ -161,31 +151,30 @@ fun <V : MockableMavericksView, A : Parcelable> getMockVariants(
         val mockInfo = mvRxFragmentMock as MvRxMock<V, A>
 
         MockedViewProvider(
-                viewName = viewName,
-                createView = { mockBehavior ->
-                    val configProvider = MavericksMocks.mockConfigFactory
+            viewName = viewName,
+            createView = { mockBehavior ->
+                val configProvider = MavericksMocks.mockConfigFactory
 
-                    // Test argument serialization/deserialization
-                    val arguments = mockInfo.args
-                    val bundle = if (arguments != null) argumentsBundle(arguments, viewName) else null
+                // Test argument serialization/deserialization
+                val arguments = mockInfo.args
+                val bundle = if (arguments != null) argumentsBundle(arguments, viewName) else null
 
-                    configProvider.withMockBehavior(mockBehavior) {
-                        viewProvider(arguments, bundle)
-                    }.let { view ->
-                        // Set the view to be initialized with the mocked state when its viewmodels are created
-                        MavericksMocks.mockStateHolder.setMock(view, mockInfo)
-                        MockedView(
-                                viewInstance = view,
-                                viewName = viewName,
-                                mockData = mockInfo,
-                                cleanupMockState = { MavericksMocks.mockStateHolder.clearMock(view) }
-                        )
-                    }
-                },
-                mock = mockInfo
+                configProvider.withMockBehavior(mockBehavior) {
+                    viewProvider(arguments, bundle)
+                }.let { view ->
+                    // Set the view to be initialized with the mocked state when its viewmodels are created
+                    MavericksMocks.mockStateHolder.setMock(view, mockInfo)
+                    MockedView(
+                        viewInstance = view,
+                        viewName = viewName,
+                        mockData = mockInfo,
+                        cleanupMockState = { MavericksMocks.mockStateHolder.clearMock(view) }
+                    )
+                }
+            },
+            mock = mockInfo
         )
     }
-
 }
 
 private fun argumentsBundle(arguments: Parcelable, viewName: String): Bundle {
@@ -197,8 +186,8 @@ private fun argumentsBundle(arguments: Parcelable, viewName: String): Bundle {
     } catch (e: Throwable) {
         throw AssertionError(
             "The arguments class ${arguments::class.simpleName} for view " +
-                    "$viewName failed to be parceled. Make sure it is a valid Parcelable " +
-                    "and all properties on it are valid Parcelables or Serializables.",
+                "$viewName failed to be parceled. Make sure it is a valid Parcelable " +
+                "and all properties on it are valid Parcelables or Serializables.",
             e
         )
     }
@@ -215,17 +204,17 @@ private fun <T : Parcelable> T.makeClone(): T {
 }
 
 data class MockedViewProvider<V : MavericksView>(
-        val viewName: String,
-        val createView: (MockBehavior) -> MockedView<V>,
-        val mock: MvRxMock<V, *>
+    val viewName: String,
+    val createView: (MockBehavior) -> MockedView<V>,
+    val mock: MvRxMock<V, *>
 )
 
 /**
  * @property cleanupMockState Call this when the view is done initializing its viewmodels, so that the global mock state can be cleared.
  */
 class MockedView<V : MavericksView>(
-        val viewInstance: V,
-        val viewName: String,
-        val mockData: MvRxMock<V, *>,
-        val cleanupMockState: () -> Unit
+    val viewInstance: V,
+    val viewName: String,
+    val mockData: MvRxMock<V, *>,
+    val cleanupMockState: () -> Unit
 )

@@ -2,7 +2,6 @@
 
 package com.airbnb.mvrx
 
-import androidx.annotation.RestrictTo
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import java.io.Serializable
@@ -16,9 +15,11 @@ private object UninitializedValue
 class lifecycleAwareLazy<out T>(private val owner: LifecycleOwner, initializer: () -> T) : Lazy<T>,
     Serializable {
     private var initializer: (() -> T)? = initializer
+
     @Volatile
     @SuppressWarnings("Detekt.VariableNaming")
     private var _value: Any? = UninitializedValue
+
     // final field is required to enable safe publication of constructed instance
     private val lock = this
 

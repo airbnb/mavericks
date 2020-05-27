@@ -14,8 +14,8 @@ class MockStateHolderTest : BaseTest() {
     @Before
     fun setup() {
         MavericksMocks.mockConfigFactory.mockBehavior = MockBehavior(
-                initialStateMocking = MockBehavior.InitialStateMocking.Full,
-                stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
+            initialStateMocking = MockBehavior.InitialStateMocking.Full,
+            stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
         )
     }
 
@@ -148,12 +148,10 @@ class MockStateHolderTest : BaseTest() {
         )
     }
 
-
     class Frag : Fragment(), MockableMavericksView {
         val fragmentVm: FragmentVM by fragmentViewModel()
 
         override fun invalidate() {
-
         }
 
         override fun provideMocks() = mockSingleViewModel(
@@ -169,11 +167,9 @@ class MockStateHolderTest : BaseTest() {
         val fragmentVm: FragmentVM by fragmentViewModel()
 
         override fun invalidate() {
-
         }
     }
 
     data class TestState(val num: Int = 0) : MvRxState
     class FragmentVM(initialState: TestState) : BaseMavericksViewModel<TestState>(initialState)
-
 }

@@ -20,7 +20,7 @@ object Versions {
     const val room = "2.2.5"
 
     // Libraries
-    const val kotlinCoroutines = "1.3.6"
+    const val kotlinCoroutines = "1.3.7"
     const val dagger = "2.27"
     const val daggerAssisted = "0.5.2"
     const val debugDb = "1.0.4"

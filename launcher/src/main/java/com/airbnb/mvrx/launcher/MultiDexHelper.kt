@@ -4,7 +4,6 @@
 
 package com.airbnb.mvrx.launcher
 
-
 import dalvik.system.BaseDexClassLoader
 import dalvik.system.DexFile
 import java.lang.reflect.Field
@@ -22,6 +21,7 @@ internal fun getDexFiles(classLoader: BaseDexClassLoader): List<DexFile> {
     val pathList = pathListField.get(classLoader) // Type is DexPathList
 
     val dexElementsField = field("dalvik.system.DexPathList", "dexElements")
+
     @Suppress("UNCHECKED_CAST")
     val dexElements =
         dexElementsField.get(pathList) as Array<Any> // Type is Array<DexPathList.Element>

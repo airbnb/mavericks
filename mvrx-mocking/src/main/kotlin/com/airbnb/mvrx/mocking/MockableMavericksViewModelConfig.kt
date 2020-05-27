@@ -1,14 +1,13 @@
 package com.airbnb.mvrx.mocking
 
-
 import android.content.Context
 import com.airbnb.mvrx.BaseMavericksViewModel
-import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.ScriptableStateStore
-import com.airbnb.mvrx.MvRxStateStore
 import com.airbnb.mvrx.MavericksViewModelConfig
 import com.airbnb.mvrx.MavericksViewModelConfigFactory
+import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MvRxStateStore
 import com.airbnb.mvrx.MvRxViewModelFactory
+import com.airbnb.mvrx.ScriptableStateStore
 import com.airbnb.mvrx.mocking.printer.ViewModelStatePrinter
 import kotlinx.coroutines.CoroutineScope
 import java.util.LinkedList
@@ -112,13 +111,13 @@ data class MockBehavior(
 
     enum class StateStoreBehavior {
         /**
-         * Uses RealMvRxStateStore
+         * Uses RealMvRxStateStore.
          */
         Normal,
 
         /**
          * An implementation of [ScriptableStateStore] that blocks any calls to [MvRxStateStore.set],
-         * and instead allows immediate state updates via [ScriptableStateStore.next]
+         * and instead allows immediate state updates via [ScriptableStateStore.next].
          */
         Scriptable,
 
@@ -204,17 +203,17 @@ open class MockMavericksViewModelConfigFactory(context: Context?, debugMode: Boo
             // we use it as an opportunity to register the mock printer on all view models.
             // This lets us capture singleton viewmodels as well.
             val viewModelStatePrinter = ViewModelStatePrinter(viewModel)
-            applicationContext?.let {
+            applicationContext?.let { context ->
                 if (MavericksMocks.enableMockPrinterBroadcastReceiver) {
-                    viewModelStatePrinter.register(it)
+                    viewModelStatePrinter.register(context)
                 }
             }
 
             mockConfigs[stateStore] = config
             stateStore.addOnDisposeListener { stateStore ->
-                applicationContext?.let {
+                applicationContext?.let { context ->
                     if (MavericksMocks.enableMockPrinterBroadcastReceiver) {
-                        viewModelStatePrinter.unregister(it)
+                        viewModelStatePrinter.unregister(context)
                     }
                 }
                 onMockStoreDisposed(stateStore)
@@ -237,4 +236,3 @@ open class MockMavericksViewModelConfigFactory(context: Context?, debugMode: Boo
         mockConfigs.values.forEach { it.popBehaviorOverride() }
     }
 }
-

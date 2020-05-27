@@ -24,5 +24,4 @@ class MvRxTestRuleNoMockBehaviorTest {
     fun mockingDisabledFromNullBehavior() {
         check(MvRx.viewModelConfigFactory !is com.airbnb.mvrx.mocking.MockMavericksViewModelConfigFactory)
     }
-
 }

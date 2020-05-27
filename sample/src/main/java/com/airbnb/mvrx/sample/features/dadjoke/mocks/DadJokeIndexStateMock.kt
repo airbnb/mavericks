@@ -4,8 +4,6 @@ import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.sample.features.dadjoke.DadJokeIndexState
 import com.airbnb.mvrx.sample.models.Joke
 import com.airbnb.mvrx.sample.models.JokesResponse
-import kotlin.Int
-import kotlin.String
 
 val mockDadJokeIndexState by lazy {
     DadJokeIndexState(

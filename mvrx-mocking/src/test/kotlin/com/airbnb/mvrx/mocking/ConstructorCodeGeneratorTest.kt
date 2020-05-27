@@ -5,14 +5,14 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class ConstructorCodeTest : BaseTest() {
+class ConstructorCodeGeneratorTest : BaseTest() {
 
     @Test
     fun testImports() {
-        val code = com.airbnb.mvrx.mocking.printer.ConstructorCode(
-                State(),
-                Integer.MAX_VALUE,
-                Integer.MAX_VALUE
+        val code = com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(
+            State(),
+            Integer.MAX_VALUE,
+            Integer.MAX_VALUE
         )
 
         assertEquals(
@@ -23,10 +23,10 @@ class ConstructorCodeTest : BaseTest() {
 
     @Test
     fun testConstructor() {
-        val code = com.airbnb.mvrx.mocking.printer.ConstructorCode(
-                State(),
-                Integer.MAX_VALUE,
-                Integer.MAX_VALUE
+        val code = com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(
+            State(),
+            Integer.MAX_VALUE,
+            Integer.MAX_VALUE
         )
 
         assertEquals(
@@ -37,10 +37,10 @@ class ConstructorCodeTest : BaseTest() {
 
     @Test
     fun testJsonObject() {
-        val code = com.airbnb.mvrx.mocking.printer.ConstructorCode(
-                StateWithJsonObject(),
-                Integer.MAX_VALUE,
-                Integer.MAX_VALUE
+        val code = com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(
+            StateWithJsonObject(),
+            Integer.MAX_VALUE,
+            Integer.MAX_VALUE
         )
 
         assertEquals(
@@ -51,10 +51,10 @@ class ConstructorCodeTest : BaseTest() {
 
     @Test
     fun testJsonObjectNotTruncated() {
-        val code = com.airbnb.mvrx.mocking.printer.ConstructorCode(
-                StateWithJsonObject(),
-                Integer.MAX_VALUE,
-                3
+        val code = com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(
+            StateWithJsonObject(),
+            Integer.MAX_VALUE,
+            3
         )
 
         assertEquals(
@@ -65,10 +65,10 @@ class ConstructorCodeTest : BaseTest() {
 
     @Test
     fun testJsonArray() {
-        val code = com.airbnb.mvrx.mocking.printer.ConstructorCode(
-                StateWithJsonArray(),
-                Integer.MAX_VALUE,
-                Integer.MAX_VALUE
+        val code = com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(
+            StateWithJsonArray(),
+            Integer.MAX_VALUE,
+            Integer.MAX_VALUE
         )
 
         assertEquals(
@@ -80,11 +80,11 @@ class ConstructorCodeTest : BaseTest() {
     @Test
     fun testInvalidJson() {
         val code =
-                com.airbnb.mvrx.mocking.printer.ConstructorCode(
-                        StateWithInvalidJsonObject(),
-                        Integer.MAX_VALUE,
-                        Integer.MAX_VALUE
-                )
+            com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(
+                StateWithInvalidJsonObject(),
+                Integer.MAX_VALUE,
+                Integer.MAX_VALUE
+            )
 
         assertEquals(
             "valmockStateWithInvalidJsonObjectbylazy{ConstructorCodeTest.StateWithInvalidJsonObject(json=\"notvalid{\\\"color\\\":\\\"red\\\",\\\"numbers\\\":[{\\\"favorite\\\":7},{\\\"lowest\\\":0}]}\")}",
@@ -94,10 +94,10 @@ class ConstructorCodeTest : BaseTest() {
 
     @Test
     fun testLazy() {
-        val code = com.airbnb.mvrx.mocking.printer.ConstructorCode(
-                StateWithLazy(),
-                Integer.MAX_VALUE,
-                Integer.MAX_VALUE
+        val code = com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(
+            StateWithLazy(),
+            Integer.MAX_VALUE,
+            Integer.MAX_VALUE
         )
 
         assertEquals(
@@ -106,23 +106,22 @@ class ConstructorCodeTest : BaseTest() {
         )
     }
 
-
     @Test
     fun testCustomTypePrinter() {
         data class Test(
             val date: CustomDate = CustomDate.fromString("2000")
         ) : MvRxState
 
-        val result = com.airbnb.mvrx.mocking.printer.ConstructorCode(
-                Test(),
-                Integer.MAX_VALUE,
-                Integer.MAX_VALUE,
-                customTypePrinters = listOf(
-                        com.airbnb.mvrx.mocking.printer.typePrinter<CustomDate>(
-                                transformImports = { it.plus("hello world") },
-                                codeGenerator = { date, _ -> "CustomDate.fromString(\"${date.asString()}\")" }
-                        )
+        val result = com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(
+            Test(),
+            Integer.MAX_VALUE,
+            Integer.MAX_VALUE,
+            customTypePrinters = listOf(
+                com.airbnb.mvrx.mocking.printer.typePrinter<CustomDate>(
+                    transformImports = { it.plus("hello world") },
+                    codeGenerator = { date, _ -> "CustomDate.fromString(\"${date.asString()}\")" }
                 )
+            )
         )
 
         result.expect("ConstructorCodeTest.testCustomTypePrinter\$Test(date=CustomDate.fromString(\"2000\"))")
@@ -136,7 +135,7 @@ class ConstructorCodeTest : BaseTest() {
             val list: List<Int> = listOf(1, 2, 3, 4)
         ) : MvRxState
 
-        com.airbnb.mvrx.mocking.printer.ConstructorCode(Test(), 3, 200).expect("ConstructorCodeTest.listIsTruncated\$Test(list=listOf(1,2,3))")
+        com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200).expect("ConstructorCodeTest.listIsTruncated\$Test(list=listOf(1,2,3))")
     }
 
     @Test
@@ -145,10 +144,10 @@ class ConstructorCodeTest : BaseTest() {
             val list: List<Int> = listOf(1, 2, 3, 4)
         ) : MvRxState
 
-        com.airbnb.mvrx.mocking.printer.ConstructorCode(
-                Test(),
-                Integer.MAX_VALUE,
-                Integer.MAX_VALUE
+        com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(
+            Test(),
+            Integer.MAX_VALUE,
+            Integer.MAX_VALUE
         ).expect("ConstructorCodeTest.listIsNotTruncated\$Test(list=listOf(1,2,3,4))")
     }
 
@@ -158,7 +157,8 @@ class ConstructorCodeTest : BaseTest() {
             val list: List<Any> = listOf(1, 2, 3, "A")
         ) : MvRxState
 
-        com.airbnb.mvrx.mocking.printer.ConstructorCode(Test(), 3, 200).expect("ConstructorCodeTest.listIsNotTruncatedWhenTypesDiffer\$Test(list=listOf(1,2,3,\"A\"))")
+        com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
+            .expect("ConstructorCodeTest.listIsNotTruncatedWhenTypesDiffer\$Test(list=listOf(1,2,3,\"A\"))")
     }
 
     @Test
@@ -167,7 +167,8 @@ class ConstructorCodeTest : BaseTest() {
             val list: List<Int?> = listOf(null, 1, 2, 3)
         ) : MvRxState
 
-        com.airbnb.mvrx.mocking.printer.ConstructorCode(Test(), 3, 200).expect("ConstructorCodeTest.listIsNotTruncatedWhenSomeItemsAreNull\$Test(list=listOf(null,1,2,3))")
+        com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
+            .expect("ConstructorCodeTest.listIsNotTruncatedWhenSomeItemsAreNull\$Test(list=listOf(null,1,2,3))")
     }
 
     @Test
@@ -176,7 +177,8 @@ class ConstructorCodeTest : BaseTest() {
             val list: List<Int?> = listOf(null, null, null, null)
         ) : MvRxState
 
-        com.airbnb.mvrx.mocking.printer.ConstructorCode(Test(), 3, 200).expect("ConstructorCodeTest.listIsTruncatedWhenAllItemsAreNull\$Test(list=listOf(null,null,null))")
+        com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
+            .expect("ConstructorCodeTest.listIsTruncatedWhenAllItemsAreNull\$Test(list=listOf(null,null,null))")
     }
 
     @Suppress("ArrayInDataClass")
@@ -186,7 +188,7 @@ class ConstructorCodeTest : BaseTest() {
             val list: Array<Int> = arrayOf(1, 2, 3, 4)
         ) : MvRxState
 
-        com.airbnb.mvrx.mocking.printer.ConstructorCode(Test(), 3, 200).expect("ConstructorCodeTest.arrayIsTruncated\$Test(list=arrayOf(1,2,3))")
+        com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200).expect("ConstructorCodeTest.arrayIsTruncated\$Test(list=arrayOf(1,2,3))")
     }
 
     @Suppress("ArrayInDataClass")
@@ -196,14 +198,14 @@ class ConstructorCodeTest : BaseTest() {
             val list: Array<Int> = arrayOf(1, 2, 3, 4)
         ) : MvRxState
 
-        com.airbnb.mvrx.mocking.printer.ConstructorCode(
-                Test(),
-                Integer.MAX_VALUE,
-                Integer.MAX_VALUE
+        com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(
+            Test(),
+            Integer.MAX_VALUE,
+            Integer.MAX_VALUE
         ).expect("ConstructorCodeTest.arrayIsNotTruncated\$Test(list=arrayOf(1,2,3,4))")
     }
 
-    private fun <T : MvRxState> com.airbnb.mvrx.mocking.printer.ConstructorCode<T>.expect(expectedCode: String) {
+    private fun <T : MvRxState> com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator<T>.expect(expectedCode: String) {
         assertEquals("valmockTestbylazy{$expectedCode}", lazyPropertyToCreateObject.removeWhiteSpace())
     }
 
