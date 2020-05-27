@@ -7,11 +7,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.channels.sendBlocking
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.runBlocking
 
 /**
  * This acts as a functional state store, but all updates happen synchronously.
@@ -41,10 +41,8 @@ class SynchronousMvRxStateStore<S : Any>(initialState: S, val coroutineScope: Co
     override fun set(stateReducer: S.() -> S) {
         state = state.stateReducer()
 
-        // TODO: Is this right?
-        runBlocking {
-            stateChannel.offer(state)
-        }
+        // TODO: Is this the right/best way to make this synchronous?
+        stateChannel.sendBlocking(state)
     }
 
     override val flow: Flow<S>

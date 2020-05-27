@@ -20,6 +20,7 @@ object Versions {
     const val room = "2.2.5"
 
     // Libraries
+    const val autoValue = "1.6.6"
     const val kotlinCoroutines = "1.3.7"
     const val dagger = "2.27"
     const val daggerAssisted = "0.5.2"
@@ -49,6 +50,7 @@ object Versions {
 }
 
 object AnnotationProcessors {
+    const val autoValue = "com.google.auto.value:auto-value:${Versions.autoValue}"
     const val dagger = "com.google.dagger:dagger-compiler:${Versions.dagger}"
     const val daggerAssisted = "com.squareup.inject:assisted-inject-processor-dagger2:${Versions.daggerAssisted}"
     const val epoxy = "com.airbnb.android:epoxy-processor:${Versions.epoxy}"
@@ -59,6 +61,7 @@ object AnnotationProcessors {
 
 object Libraries {
     const val appcompat = "androidx.appcompat:appcompat:${Versions.jetpack}"
+    const val autoValue = "com.google.auto.value:auto-value-annotations:${Versions.autoValue}"
     const val cardview = "androidx.cardview:cardview:${Versions.cardview}"
     const val constraintlayout = "androidx.constraintlayout:constraintlayout:${Versions.constraintlayout}"
     const val coreKtx = "androidx.core:core-ktx:${Versions.core}"

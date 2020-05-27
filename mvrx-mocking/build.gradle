@@ -30,7 +30,6 @@ jacoco {
     toolVersion = "0.8.2"
 }
 
-
 dependencies {
     implementation Libraries.kotlinReflect
     implementation Libraries.appcompat
@@ -43,11 +42,9 @@ dependencies {
     testImplementation TestLibraries.kotlinCoroutinesTest
 
     // Including autovalue just for the AutoValue type printer test
-    // TODO deps
-    testImplementation "com.google.auto.value:auto-value-annotations:1.6.6"
-    kaptTest "com.google.auto.value:auto-value:1.6.6"
+    testImplementation Libraries.autoValue
+    kaptTest AnnotationProcessors.autoValue
 }
-
 
 tasks.register("coverage", JacocoReportTask.class) {
     coverage.dependsOn("testDebugUnitTest")
