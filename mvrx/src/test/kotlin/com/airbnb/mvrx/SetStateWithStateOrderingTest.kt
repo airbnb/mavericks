@@ -34,7 +34,16 @@ class SetStateWithStateOrderingTest : BaseMavericksViewModel<OrderingState>(Orde
         fun cleanup() {
             Dispatchers.resetMain()
         }
+
+
+        @JvmStatic
+        @BeforeClass
+        @AfterClass
+        fun resetConfigurationDefaults() {
+            MvRx.viewModelConfigFactory = MavericksViewModelConfigFactory(false)
+        }
     }
+
 
     @Test
     fun test1() = runBlocking {

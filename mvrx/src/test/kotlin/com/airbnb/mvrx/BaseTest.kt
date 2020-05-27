@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import kotlinx.coroutines.test.TestCoroutineDispatcher
 import org.junit.AfterClass
 import org.junit.After
 import org.junit.Before
@@ -40,8 +41,7 @@ abstract class BaseTest {
     @Before
     @After
     fun resetConfigurationDefaults() {
-        // TODO: Use default?
-        MvRx.viewModelConfigFactory = MavericksViewModelConfigFactory(false)
+        MvRx.viewModelConfigFactory = MavericksViewModelConfigFactory(true, contextOverride = TestCoroutineDispatcher())
     }
 
     protected inline fun <reified F : Fragment, reified A : AppCompatActivity> createFragment(
