@@ -1,6 +1,6 @@
 # Debug Checks
 
-MvRx has a debug mode that enables some new checks. When you integrate MvRx into your app, you will need to create your own MvRxViewModel that extends BaseMvRxViewModel. One of the required things to override is protected abstract val debugMode: Boolean. You could set it to something like BuildConfig.DEBUG. The checks include:
+MvRx has a debug mode that enables some validation checks. When you integrate MvRx into your app, you will need to create your own MvRxViewModel that extends BaseMvRxViewModel. One of the required things to override is protected abstract val debugMode: Boolean. You could set it to something like BuildConfig.DEBUG. The checks include:
 
 * Running all state reducers twice and ensuring that the resulting state is the same. This ensures that reducers are pure. To understand this better, read the Redux prerequisite concepts.
 * All state properties are immutable vals not vars.

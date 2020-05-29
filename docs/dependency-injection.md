@@ -1,4 +1,4 @@
-# Depenency Injection
+# Dependency Injection
 
 ### Constructor Dependency Injection
 MvRx supports adding dependencies via constructor injection. To leverage this, create a `companion object` in your ViewModel and have it implement ` MvRxViewModelFactory<YourViewModel, YourState>`. That will force you to implement a `create` function. It will pass in the `ViewModelContext` that contains a reference to the activity that hosts the fragment, and a reference to the fragment if the view model was created with a fragment scope. You should use the activity/fragment, if needed, to get or create your dagger/DI component and inject what you need. **DO NOT** pass a reference of your activity to your ViewModel. It will leak your Activity. Pass the application context if you must.

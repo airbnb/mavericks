@@ -21,7 +21,7 @@ data class CounterState(val count: Int = 0) : MavericksState
 ```
 * CounterState contains a single immutable (`val`) property, count, it is an integer, and it defaults to 0.
 * CounterState is a [data class](https://kotlinlang.org/docs/reference/data-classes.html) so that Kotlin creates equals and hashCode automatically.
-* CounterState implements `MavericksState` signals the intention that this class will be used as Mavericks state.
+* CounterState implementation of `MavericksState` signals the intention that this class will be used as Mavericks state.
 
 ## Create CounterViewModel
 
