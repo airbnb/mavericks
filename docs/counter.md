@@ -34,7 +34,7 @@ class CounterViewModel(initialState: CounterState) : MavericksViewModel<CounterS
 }
 ```
 * CounterViewModel takes CounterState as a constructor parameter because Mavericks creates your initial state for you. It does this to handle [saved state](/saved-state.md) across process restoration.
-* incrementCount() calls setState which takes a reducer with the type `S.() -> S`. The receiver of the reducer is the current state when the reducer is run and it returns the updated state. `copy` is the kotlin data class copy function.
+* incrementCount() calls setState which takes a reducer with the type `CounterState.() -> CounterState `. The receiver of the reducer is the current state when the reducer is run and it returns the updated state. `copy` is the kotlin data class copy function.
 
 ## Create CounterFragment
 
