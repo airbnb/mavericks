@@ -82,7 +82,7 @@ When called from within a ViewModel, this will _not_ be run synchronously. It wi
 `MavericksView` is where you actually render your state class to the screen. Most of the time, this will be a Fragment but it doesn't have to be.
 By implementing `MavericksView`, you:
 1. You can get access to a `MavericksViewModel` via any of the view model delegates. Doing so will automatically subscribe to changes and call `invalidate()`.
-1. Override `invalidate()`. It will get called any time the state for any view model accessed by the above delegates changes.
+1. Override the `invalidate()` function. It is called any time the state for any view model accessed by the above delegates changes. `invalidate()` is used to redraw the UI on each state change
 
 #### ViewModel delegates
 1. `activityViewModel()` scopes the ViewModel to the Activity. All Fragments within the Activity that request a ViewModel of this type will receive the same instance. Useful for sharing data between screens.
