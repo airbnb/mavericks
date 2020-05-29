@@ -138,7 +138,7 @@ suspend {
 }.execute { copy(currentTemperature = it) }
 ```
 In this case:
-* `currentTemperature` is of type `Async<Int>` and set to `Uninitialized`
+* `currentTemperature` is of type `Async<Int>` and originally set to `Uninitialized`
 * After calling `execute`, `currentTemperature` is set to `Loading()`
 * If the API call succeeds, `currentTemperature` is set to `Success(temp)`
 * If the API call fails, `currentTemperature` is set to `Fail(e)`
