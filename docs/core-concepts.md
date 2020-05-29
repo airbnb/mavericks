@@ -2,18 +2,21 @@
 Mastering Mavericks only requires using three classes: MavericksState, MavericksViewModel, MavericksView.
 
 # MavericksState
-The first step in creating a Mavericks screen is to model it as a function of state. Modeling a screen as a function of state is a useful concept because it is:
-1. Easy to test
-1. Easy for you and other engineer to reason through
+The first step in creating a Mavericks screen is to model it as a function of state. The MavericksState interface doesn't do anything itself but signals the intention of your class to be used as state.
+
+Modeling a screen as a function of state is a useful concept because it is:
+1. Is thread safe
+1. Easy for you and other engineers to reason through
 1. Renders the same independently of the order of events leading up to it
 1. Powerful enough to render any type of screen
+1. Easy to test
 
 Mavericks will also enforce that your state class:
 1. Is a kotlin data class
 1. Uses only immutable properties
 1. Has default values for every property to ensure that your screen can be rendered immediately
 
-This concept makes reasoning about and testing a screen trivially easy because given a state class, you can have high confidence that you screen will look correct.
+This concept makes reasoning about and testing a screen trivially easy because given a state class, you can have high confidence that your screen will look correct.
 Example
 ```kotlin
 data class UserState(
@@ -46,7 +49,7 @@ Placing logic as a derived property like `pointsUntilHighScore` or `isHighScore`
 
 A ViewModel is responsible for:
 1. Updating state
-2. Exposing a stream of states for other to subscribe to
+2. Exposing a stream of states for other classes to subscribe to (MavericksViewModel.stateFlow)
 
 #### Updating state
 From within a viewModel, you call `setState { copy(yourProp = newValue) }`. If this syntax is unfamiliar:
@@ -58,20 +61,23 @@ From within a viewModel, you call `setState { copy(yourProp = newValue) }`. If t
 You can subscribe to state changes in your ViewModel. You may want to do this for analytics, for example. This usually done in the `init { ... }` block.
 
 ```kotlin
+// Invoked every time state changes
 onEach { state ->
 }
 ```
 
 ```kotlin
+// Invoked whenever propA changes only.
 onEach(YourState::propA) { a ->
 }
+// Invoked whenever propA, propB, or propC changes only.
 onEach(YourState::propA, YourState::propB, YourState::propC) { a, b, c ->
 }
 ```
 If you are calling `setState` from within an `onEach` block, consider using a derived property.
 
 #### stateFlow
-`MavericksViewModel` exposes a `stateFlow` which is a normal Kotlin Flow and can be used however you would like. Helpers such as `onEach` above are just wrappers around it with automatic lifecycle cancellation.
+`MavericksViewModel` exposes a `stateFlow` which is a normal Kotlin Flow that emits the current state as well as any future updates and can be used however you would like. Helpers such as `onEach` above are just wrappers around it with automatic lifecycle cancellation.
 
 #### Accessing state once
 If you just want to retrieve the value of state one time, you can use `withState { state -> ... }`.

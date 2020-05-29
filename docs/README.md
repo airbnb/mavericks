@@ -9,12 +9,15 @@ When we began creating Mavericks, our goal was not to create yet another archite
 
 This is what it looks like:
 ```kotlin
+/** State classes contain all of the data you need to render a screen. */
 data class CounterState(@PersistState val count: Int = 0) : MvRxState
 
+/** ViewModels are where all of your business logic lives. It has a simple lifecycle and is easy to test. */
 class CounterViewModel(state: CounterState) : MavericksViewModel<CounterState>(state) {
     fun incrementCount() = setState { copy(count = count + 1) }
 }
 
+/** Fragments in MvRx are simple and rarely do more than bind your state to views. */
 class CounterFragment : Fragment(R.layout.fragment_counter), MavericksView {
     private val viewModel: CounterViewModel by activityViewModel()
 
