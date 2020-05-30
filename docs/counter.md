@@ -11,7 +11,7 @@ Code for this sample can be found [here](https://github.com/airbnb/MvRx/tree/mas
 
 The first step in creating a Mavericks screen is to model it as a function of state. Modeling a screen as a function of state is a useful concept because it is:
 1. Easy to test
-1. Easy for you and other engineer to reason through
+1. Easy for you and other engineers to reason through
 1. Renders the same independently of the order of events leading up to it
 1. Powerful enough to render any type of screen
 

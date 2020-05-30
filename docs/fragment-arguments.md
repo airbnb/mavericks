@@ -20,7 +20,7 @@ private val args: YourArgsType by args()
 That's it!
 
 ### Using Fragment args in the initial value for `MavericksState`
-Create a secondary constructor that has 1 parameter of the same type as your Fragment arguments. Mavericks will automatically call this instead.
+Create a secondary constructor that has 1 parameter of the same type as your Fragment arguments. Mavericks will automatically get the arguments off your Fragment and call this constructor with them when creating your State.
 ```kotlin
 data class MyState(
   val itemId: String,

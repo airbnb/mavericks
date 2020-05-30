@@ -1,6 +1,6 @@
 # Proguard/Dexguard/R8
 
-The MvRx lib itself has a consumer Proguard file that configures Proguard. As the lib uses Kotlin, Kotlin reflection and RxJava you might have to add rules to handle those to the Proguard rules of your app itself. (If you did not add them for other purposes already). These are not part of the consumer Proguard file, as they are not part of the lib specific Proguard configuration. This is what that part of the configuration looks like for our sample app:
+The Mavericks lib itself has a consumer Proguard file that configures Proguard. As the main lib uses Kotlin, and optional add-on modules use Kotlin reflection and RxJava, you might have to add rules to handle those to the Proguard rules of your app itself. (If you did not add them for other purposes already). These are not part of the consumer Proguard file, as they are not part of the lib specific Proguard configuration. This is what that part of the configuration looks like for our sample app:
 
 ```
 # These classes are used via kotlin reflection and the keep might not be required anymore once Proguard supports

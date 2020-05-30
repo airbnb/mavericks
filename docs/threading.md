@@ -1,6 +1,6 @@
 # Threading
 
-One challenging aspect of Android is that everything happens on the main thread by default. Interacting with views must be there but many other things such as business logic are only there because it is too much work to do so otherwise. One of the core tenants of Mavericks is that it is thread-safe. Everything non-view related in Mavericks can and does run on background threads. Mavericks abstracts away most of the challenges of multi-threading. However, it is important to be aware of this when using Mavericks.
+One challenging aspect of Android is that everything happens on the main thread by default. Interacting with views must be done there but many other things such as business logic are only there because it is too much work to do otherwise. One of the core tenants of Mavericks is that it is thread-safe. Everything non-view related in Mavericks can and does run on background threads. Mavericks abstracts away most of the challenges of multi-threading. However, it is important to be aware of this when using Mavericks.
 
 State updates are not processed synchronously. They are placed on a queue and run on a background thread.
 In other words:
