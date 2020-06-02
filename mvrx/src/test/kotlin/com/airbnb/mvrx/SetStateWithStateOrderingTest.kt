@@ -38,9 +38,13 @@ class SetStateWithStateOrderingTest : BaseMavericksViewModel<OrderingState>(Orde
 
         @JvmStatic
         @BeforeClass
+        fun setupViewModelConfigFactory() {
+            MvRx.viewModelConfigFactory = MavericksViewModelConfigFactory(true, contextOverride = TestCoroutineDispatcher())
+        }
+
         @AfterClass
-        fun resetConfigurationDefaults() {
-            MvRx.viewModelConfigFactory = MavericksViewModelConfigFactory(false)
+        fun resetViewModelConfigFactory() {
+            MvRx.viewModelConfigFactory = null
         }
     }
 

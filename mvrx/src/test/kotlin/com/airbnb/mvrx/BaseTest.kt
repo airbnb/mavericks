@@ -39,9 +39,13 @@ abstract class BaseTest {
     }
 
     @Before
-    @After
-    fun resetConfigurationDefaults() {
+    fun setupViewModelConfigFactory() {
         MvRx.viewModelConfigFactory = MavericksViewModelConfigFactory(true, contextOverride = TestCoroutineDispatcher())
+    }
+
+    @After
+    fun resetViewModelConfigFactory() {
+        MvRx.viewModelConfigFactory = null
     }
 
     protected inline fun <reified F : Fragment, reified A : AppCompatActivity> createFragment(

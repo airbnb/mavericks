@@ -29,9 +29,7 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KProperty1
 
 /**
- * To use MvRx, create your own base MvRxViewModel that extends this one and sets debugMode.
- *
- * All subsequent ViewModels in your app should use that one.
+ * Base ViewModel implementation that all other ViewModels should extend.
  */
 abstract class BaseMvRxViewModel<S : MvRxState>(
     initialState: S

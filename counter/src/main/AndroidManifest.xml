@@ -3,6 +3,7 @@
     package="com.airbnb.mvrx.counter">
 
     <application
+        android:name=".CounterApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"

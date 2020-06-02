@@ -1,5 +1,7 @@
 package com.airbnb.mvrx.test
 
+import com.airbnb.mvrx.DefaultViewModelDelegateFactory
+import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxTestOverridesProxy
 import com.airbnb.mvrx.mocking.MavericksMocks
 import com.airbnb.mvrx.mocking.MockBehavior
@@ -55,14 +57,6 @@ class MvRxTestRule(
         setupMocking()
     }
 
-    @ExperimentalCoroutinesApi
-    override fun after() {
-        Dispatchers.resetMain()
-
-        // This is set up after again to clear any changes or listeners that were set on the plugins
-        setupMocking()
-    }
-
     private fun setupMocking() {
         val mocksEnabled = viewModelMockBehavior != null
         // Use a null context since we don't need mock printing during tests
@@ -72,4 +66,17 @@ class MvRxTestRule(
             MavericksMocks.mockConfigFactory.mockBehavior = viewModelMockBehavior
         }
     }
+
+    @ExperimentalCoroutinesApi
+    override fun after() {
+        Dispatchers.resetMain()
+
+        // clear any changes or listeners that were set on the plugins, and reset defaults
+        MavericksMocks.enableMavericksViewMocking = false
+        MavericksMocks.enableMockPrinterBroadcastReceiver = false
+        MvRx.viewModelDelegateFactory = DefaultViewModelDelegateFactory()
+        MvRx.viewModelConfigFactory = null
+    }
+
+
 }

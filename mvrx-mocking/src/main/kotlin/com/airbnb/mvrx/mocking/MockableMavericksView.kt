@@ -4,7 +4,6 @@ import android.os.Parcelable
 import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.mocking.printer.MavericksMockPrinter
 
-// TODO extend Mavericks view and rename accordingly
 interface MockableMavericksView : MavericksView {
     /**
      * Override this to provide the mock states that should be used for testing this view.

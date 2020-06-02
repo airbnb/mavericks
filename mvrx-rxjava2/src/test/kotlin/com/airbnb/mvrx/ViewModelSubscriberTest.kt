@@ -769,7 +769,6 @@ class ViewModelSubscriberTest : BaseTest() {
     fun testCancelledIfViewModelCleared() = runBlocking {
         val job = viewModel.onEachInternal(owner) {}
         viewModel.triggerCleared()
-        delay(2000)
         assertTrue(job.isCancelled)
     }
 
