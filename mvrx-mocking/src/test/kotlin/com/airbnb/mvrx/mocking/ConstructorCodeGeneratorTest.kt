@@ -16,7 +16,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
         )
 
         assertEquals(
-            "com.airbnb.mvrx.mocking.ConstructorCodeTest, kotlin.Double, kotlin.Float, kotlin.Int, kotlin.String",
+            "com.airbnb.mvrx.mocking.ConstructorCodeGeneratorTest, kotlin.Double, kotlin.Float, kotlin.Int, kotlin.String",
             code.imports.joinToString()
         )
     }
@@ -30,7 +30,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
         )
 
         assertEquals(
-            "valmockStatebylazy{ConstructorCodeTest.State(int=1,float=1.0f,str=\"hello\",charSequence=\"'hi'withnested\\\"quotes\\\"and\\tatab\",double=4.5,map=mutableMapOf(3to\"three\",2to\"two\"),strList=listOf(\"hi\",\"there\"),nestedObject=ConstructorCodeTest.NestedObject(myEnum=ConstructorCodeTest.MyEnum.A),singleTon=ConstructorCodeTest.MySingleton,nestedObjectList=listOf(ConstructorCodeTest.NestedObject(myEnum=ConstructorCodeTest.MyEnum.A)))}",
+            "valmockStatebylazy{ConstructorCodeGeneratorTest.State(int=1,float=1.0f,str=\"hello\",charSequence=\"'hi'withnested\\\"quotes\\\"and\\tatab\",double=4.5,map=mutableMapOf(3to\"three\",2to\"two\"),strList=listOf(\"hi\",\"there\"),nestedObject=ConstructorCodeGeneratorTest.NestedObject(myEnum=ConstructorCodeGeneratorTest.MyEnum.A),singleTon=ConstructorCodeGeneratorTest.MySingleton,nestedObjectList=listOf(ConstructorCodeGeneratorTest.NestedObject(myEnum=ConstructorCodeGeneratorTest.MyEnum.A)))}",
             code.lazyPropertyToCreateObject.removeWhiteSpace()
         )
     }
@@ -44,7 +44,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
         )
 
         assertEquals(
-            "valmockStateWithJsonObjectbylazy{ConstructorCodeTest.StateWithJsonObject(json=\"\"\"{\"color\":\"red\",\"numbers\":[{\"favorite\":7},{\"lowest\":0}]}\"\"\")}",
+            "valmockStateWithJsonObjectbylazy{ConstructorCodeGeneratorTest.StateWithJsonObject(json=\"\"\"{\"color\":\"red\",\"numbers\":[{\"favorite\":7},{\"lowest\":0}]}\"\"\")}",
             code.lazyPropertyToCreateObject.removeWhiteSpace()
         )
     }
@@ -58,7 +58,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
         )
 
         assertEquals(
-            "valmockStateWithJsonObjectbylazy{ConstructorCodeTest.StateWithJsonObject(json=\"\"\"{\"color\":\"red\",\"numbers\":[{\"favorite\":7},{\"lowest\":0}]}\"\"\")}",
+            "valmockStateWithJsonObjectbylazy{ConstructorCodeGeneratorTest.StateWithJsonObject(json=\"\"\"{\"color\":\"red\",\"numbers\":[{\"favorite\":7},{\"lowest\":0}]}\"\"\")}",
             code.lazyPropertyToCreateObject.removeWhiteSpace()
         )
     }
@@ -72,7 +72,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
         )
 
         assertEquals(
-            "valmockStateWithJsonArraybylazy{ConstructorCodeTest.StateWithJsonArray(json=\"\"\"[{\"favorite\":7},{\"lowest\":0}]\"\"\")}",
+            "valmockStateWithJsonArraybylazy{ConstructorCodeGeneratorTest.StateWithJsonArray(json=\"\"\"[{\"favorite\":7},{\"lowest\":0}]\"\"\")}",
             code.lazyPropertyToCreateObject.removeWhiteSpace()
         )
     }
@@ -87,7 +87,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
             )
 
         assertEquals(
-            "valmockStateWithInvalidJsonObjectbylazy{ConstructorCodeTest.StateWithInvalidJsonObject(json=\"notvalid{\\\"color\\\":\\\"red\\\",\\\"numbers\\\":[{\\\"favorite\\\":7},{\\\"lowest\\\":0}]}\")}",
+            "valmockStateWithInvalidJsonObjectbylazy{ConstructorCodeGeneratorTest.StateWithInvalidJsonObject(json=\"notvalid{\\\"color\\\":\\\"red\\\",\\\"numbers\\\":[{\\\"favorite\\\":7},{\\\"lowest\\\":0}]}\")}",
             code.lazyPropertyToCreateObject.removeWhiteSpace()
         )
     }
@@ -101,7 +101,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
         )
 
         assertEquals(
-            "valmockStateWithLazybylazy{ConstructorCodeTest.StateWithLazy(lazyInt=lazy{1})}",
+            "valmockStateWithLazybylazy{ConstructorCodeGeneratorTest.StateWithLazy(lazyInt=lazy{1})}",
             code.lazyPropertyToCreateObject.removeWhiteSpace()
         )
     }
@@ -124,7 +124,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
             )
         )
 
-        result.expect("ConstructorCodeTest.testCustomTypePrinter\$Test(date=CustomDate.fromString(\"2000\"))")
+        result.expect("ConstructorCodeGeneratorTest.testCustomTypePrinter\$Test(date=CustomDate.fromString(\"2000\"))")
 
         assertTrue(result.imports.contains("hello world"))
     }
@@ -135,7 +135,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
             val list: List<Int> = listOf(1, 2, 3, 4)
         ) : MvRxState
 
-        com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200).expect("ConstructorCodeTest.listIsTruncated\$Test(list=listOf(1,2,3))")
+        com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200).expect("ConstructorCodeGeneratorTest.listIsTruncated\$Test(list=listOf(1,2,3))")
     }
 
     @Test
@@ -148,7 +148,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
             Test(),
             Integer.MAX_VALUE,
             Integer.MAX_VALUE
-        ).expect("ConstructorCodeTest.listIsNotTruncated\$Test(list=listOf(1,2,3,4))")
+        ).expect("ConstructorCodeGeneratorTest.listIsNotTruncated\$Test(list=listOf(1,2,3,4))")
     }
 
     @Test
@@ -158,7 +158,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
         ) : MvRxState
 
         com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
-            .expect("ConstructorCodeTest.listIsNotTruncatedWhenTypesDiffer\$Test(list=listOf(1,2,3,\"A\"))")
+            .expect("ConstructorCodeGeneratorTest.listIsNotTruncatedWhenTypesDiffer\$Test(list=listOf(1,2,3,\"A\"))")
     }
 
     @Test
@@ -168,7 +168,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
         ) : MvRxState
 
         com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
-            .expect("ConstructorCodeTest.listIsNotTruncatedWhenSomeItemsAreNull\$Test(list=listOf(null,1,2,3))")
+            .expect("ConstructorCodeGeneratorTest.listIsNotTruncatedWhenSomeItemsAreNull\$Test(list=listOf(null,1,2,3))")
     }
 
     @Test
@@ -178,7 +178,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
         ) : MvRxState
 
         com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
-            .expect("ConstructorCodeTest.listIsTruncatedWhenAllItemsAreNull\$Test(list=listOf(null,null,null))")
+            .expect("ConstructorCodeGeneratorTest.listIsTruncatedWhenAllItemsAreNull\$Test(list=listOf(null,null,null))")
     }
 
     @Suppress("ArrayInDataClass")
@@ -188,7 +188,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
             val list: Array<Int> = arrayOf(1, 2, 3, 4)
         ) : MvRxState
 
-        com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200).expect("ConstructorCodeTest.arrayIsTruncated\$Test(list=arrayOf(1,2,3))")
+        com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200).expect("ConstructorCodeGeneratorTest.arrayIsTruncated\$Test(list=arrayOf(1,2,3))")
     }
 
     @Suppress("ArrayInDataClass")
@@ -202,7 +202,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
             Test(),
             Integer.MAX_VALUE,
             Integer.MAX_VALUE
-        ).expect("ConstructorCodeTest.arrayIsNotTruncated\$Test(list=arrayOf(1,2,3,4))")
+        ).expect("ConstructorCodeGeneratorTest.arrayIsNotTruncated\$Test(list=arrayOf(1,2,3,4))")
     }
 
     private fun <T : MvRxState> com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator<T>.expect(expectedCode: String) {
