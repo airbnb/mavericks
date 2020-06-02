@@ -62,9 +62,7 @@ class MockableMvRxStateStore<S : MvRxState>(
 
     override fun set(stateReducer: S.() -> S) {
         val newState = state.stateReducer()
-        if (onStateSetListeners.isNotEmpty()) {
-            onStateSetListeners.forEach { it.invoke(state, newState) }
-        }
+        onStateSetListeners.forEach { it.invoke(state, newState) }
 
         // Setting state only takes effect is "scriptable" mode is not enabled.
         if (mockBehavior.stateStoreBehavior != StateStoreBehavior.Scriptable) {
@@ -88,8 +86,7 @@ class MockableMvRxStateStore<S : MvRxState>(
         onStateSetListeners.remove(callback)
     }
 
-    // TODO: Different naming besides dispose?
-    fun addOnDisposeListener(callback: (MockableMvRxStateStore<*>) -> Unit) {
+    fun addOnCancelListener(callback: (MockableMvRxStateStore<*>) -> Unit) {
         if (coroutineScope.isActive) {
             coroutineScope.coroutineContext[Job]!!.invokeOnCompletion {
                 callback(this)

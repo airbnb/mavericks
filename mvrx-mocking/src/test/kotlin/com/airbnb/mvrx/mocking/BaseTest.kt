@@ -23,8 +23,8 @@ abstract class BaseTest {
     @After
     fun resetConfigurationDefaults() {
         // Use a null context since we don't need mock printing during tests
-        MavericksMocks.install(debugMode = true, mocksEnabled = true, context = null)
-        MavericksMocks.mockConfigFactory.mockBehavior = MockBehavior(
+        MockableMavericks.install(debugMode = true, mocksEnabled = true, context = null)
+        MockableMavericks.mockConfigFactory.mockBehavior = MockBehavior(
             stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
         )
     }

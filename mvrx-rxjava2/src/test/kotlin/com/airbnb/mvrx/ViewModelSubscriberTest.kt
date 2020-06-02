@@ -33,7 +33,7 @@ data class ViewModelTestState(
     val prop7: Int = 0
 ) : MvRxState
 
-class ViewModelTestViewModel(initialState: ViewModelTestState) : TestMvRxViewModel<ViewModelTestState>(initialState) {
+class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewModel<ViewModelTestState>(initialState) {
 
     var subscribeCallCount = 0
     var selectSubscribe1Called = 0

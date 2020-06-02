@@ -4,7 +4,6 @@ import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MvRxState
 
 internal fun <S : MvRxState> MavericksViewModel<S>.reportExecuteCallToInteractionTest() {
-    // Allow public usage??? might be needed in airbnb
     // TODO (eli_hart 2019-08-09): Report this to the interaction management system
     // For now we'll just print this out
     println("subscribeAndSetState mocked: ${getCallStack()}")

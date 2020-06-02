@@ -11,6 +11,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -193,7 +194,8 @@ abstract class MavericksViewModel<S : MvRxState>(
             if (blockExecutions == MavericksViewModelConfig.BlockExecutions.WithLoading) {
                 setState { reducer(Loading()) }
             }
-            return viewModelScope.launch { }
+            // Simulate infinite loading
+            return viewModelScope.launch { delay(Long.MAX_VALUE) }
         }
 
         setState { reducer(Loading(value = retainValue?.get(this)?.invoke())) }
@@ -227,7 +229,8 @@ abstract class MavericksViewModel<S : MvRxState>(
             if (blockExecutions == MavericksViewModelConfig.BlockExecutions.WithLoading) {
                 setState { reducer(Loading()) }
             }
-            return viewModelScope.launch { }
+            // Simulate infinite loading
+            return viewModelScope.launch { delay(Long.MAX_VALUE) }
         }
 
         setState { reducer(Loading<T>()) }

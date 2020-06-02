@@ -34,7 +34,7 @@ open class MavericksViewModelConfigFactory(
     /**
      * Sets [debugMode] depending on whether the app was built with the Debuggable flag enabled.
      */
-    constructor(context: Context) : this(context.isDebuggable())
+    constructor(context: Context, contextOverride: CoroutineContext? = null) : this(context.isDebuggable(), contextOverride)
 
     private val onConfigProvidedListener =
         mutableListOf<(MavericksViewModel<*>, MavericksViewModelConfig<*>) -> Unit>()
@@ -60,7 +60,8 @@ open class MavericksViewModelConfigFactory(
         viewModel: MavericksViewModel<S>,
         initialState: S
     ): MavericksViewModelConfig<S> {
-        return object : MavericksViewModelConfig<S>(debugMode, CoroutinesStateStore(initialState, coroutineScope()), coroutineScope()) {
+        val scope = coroutineScope()
+        return object : MavericksViewModelConfig<S>(debugMode, CoroutinesStateStore(initialState, scope), scope) {
             override fun <S : MvRxState> onExecute(viewModel: MavericksViewModel<S>): BlockExecutions {
                 return BlockExecutions.No
             }

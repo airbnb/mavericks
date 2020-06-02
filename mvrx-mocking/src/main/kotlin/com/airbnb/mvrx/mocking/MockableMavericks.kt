@@ -13,7 +13,12 @@ import com.airbnb.mvrx.mocking.printer.MavericksMockPrinter
 import com.airbnb.mvrx.mocking.printer.MockPrinterConfiguration
 import com.airbnb.mvrx.mocking.printer.ViewModelStatePrinter
 
-object MavericksMocks {
+/**
+ * Entry point for setting up Mavericks for the app in a mockable way.
+ *
+ * See [install]
+ */
+object MockableMavericks {
     /**
      * This global instance enables mock states to be forced onto ViewModels as they are created.
      * This enable easy testing.
@@ -62,6 +67,8 @@ object MavericksMocks {
         }
 
     /**
+     * Initializes the required [MvRx.viewModelConfigFactory] and sets ViewModel debug and mock behavior for the app.
+     *
      * If the application was built with the debuggable flag enabled in its Android Manifest then
      * this will add plugins to [MvRx] that enable working with mock State. This is useful for
      * both manual and automated testing of development builds.
@@ -88,6 +95,8 @@ object MavericksMocks {
     }
 
     /**
+     * Initializes the required [MvRx.viewModelConfigFactory] and sets ViewModel debug and mock behavior for the app.
+     *
      * Choose whether to enable [MvRx] mocking tools. This is useful for
      * both manual and automated testing of development builds.
      *

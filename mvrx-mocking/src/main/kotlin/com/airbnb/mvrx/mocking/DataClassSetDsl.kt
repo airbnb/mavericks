@@ -125,7 +125,7 @@ interface DataClassSetDsl {
     /**
      * Helper to copy a nested class and update a property on it.
      */
-    class Setter<DataClass : Any, PropType>(val instance: DataClass, val property: KProperty0<PropType>) {
+    class Setter<DataClass : Any, PropType>(private val instance: DataClass, internal val property: KProperty0<PropType>) {
         init {
             val clazz = instance::class
             if (instance is Async<*>) {

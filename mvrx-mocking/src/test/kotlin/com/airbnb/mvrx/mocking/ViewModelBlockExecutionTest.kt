@@ -12,7 +12,7 @@ import org.junit.Test
 class ViewModelBlockExecutionTest : BaseTest() {
     @Test
     fun executeNormally() {
-        MavericksMocks.mockConfigFactory.mockBehavior = MockBehavior(
+        MockableMavericks.mockConfigFactory.mockBehavior = MockBehavior(
             stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
         )
 
@@ -23,7 +23,7 @@ class ViewModelBlockExecutionTest : BaseTest() {
 
     @Test
     fun executeBlockedCompletely() {
-        MavericksMocks.mockConfigFactory.mockBehavior = MockBehavior(
+        MockableMavericks.mockConfigFactory.mockBehavior = MockBehavior(
             blockExecutions = MavericksViewModelConfig.BlockExecutions.Completely,
             stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
         )
@@ -35,7 +35,7 @@ class ViewModelBlockExecutionTest : BaseTest() {
 
     @Test
     fun executeBlockedWithLoading() {
-        MavericksMocks.mockConfigFactory.mockBehavior = MockBehavior(
+        MockableMavericks.mockConfigFactory.mockBehavior = MockBehavior(
             blockExecutions = MavericksViewModelConfig.BlockExecutions.WithLoading,
             stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
         )

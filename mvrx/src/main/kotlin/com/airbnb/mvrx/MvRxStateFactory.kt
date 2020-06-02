@@ -14,6 +14,7 @@ interface MvRxStateFactory<VM : MavericksViewModel<S>, S : MvRxState> {
     ): S
 }
 
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 class RealMvRxStateFactory<VM : MavericksViewModel<S>, S : MvRxState> : MvRxStateFactory<VM, S> {
 
     override fun createInitialState(

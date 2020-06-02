@@ -22,7 +22,7 @@ import kotlin.reflect.KProperty
  * [MockMavericksViewModelConfigFactory.mockBehavior].
  *
  * If a mock behavior is enabled, then when a ViewModel is created this will look for a mock state
- * in [MavericksMocks.mockStateHolder], and if one exists it will be forced onto the ViewModel.
+ * in [MockableMavericks.mockStateHolder], and if one exists it will be forced onto the ViewModel.
  */
 class MockViewModelDelegateFactory(
     val configFactory: MockMavericksViewModelConfigFactory
@@ -95,7 +95,7 @@ class MockViewModelDelegateFactory(
                 // Tracking all view model delegates created for a view allows us to
                 // initialize existing view models first, since Fragment view models
                 // may depend on existing view models.
-                MavericksMocks.mockStateHolder.addViewModelDelegate(
+                MockableMavericks.mockStateHolder.addViewModelDelegate(
                     view = fragment,
                     existingViewModel = existingViewModel,
                     viewModelProperty = viewModelProperty,
@@ -166,7 +166,7 @@ class MockViewModelDelegateFactory(
         stateClass: KClass<S>
     ): S? {
         return if (fragment is MockableMavericksView && mockBehavior.initialStateMocking != MockBehavior.InitialStateMocking.None) {
-            MavericksMocks.mockStateHolder.getMockedState(
+            MockableMavericks.mockStateHolder.getMockedState(
                 view = fragment,
                 viewModelProperty = viewModelProperty,
                 existingViewModel = existingViewModel,

@@ -153,7 +153,7 @@ fun <V : MockableMavericksView, A : Parcelable> getMockVariants(
         MockedViewProvider(
             viewName = viewName,
             createView = { mockBehavior ->
-                val configProvider = MavericksMocks.mockConfigFactory
+                val configProvider = MockableMavericks.mockConfigFactory
 
                 // Test argument serialization/deserialization
                 val arguments = mockInfo.args
@@ -163,12 +163,12 @@ fun <V : MockableMavericksView, A : Parcelable> getMockVariants(
                     viewProvider(arguments, bundle)
                 }.let { view ->
                     // Set the view to be initialized with the mocked state when its viewmodels are created
-                    MavericksMocks.mockStateHolder.setMock(view, mockInfo)
+                    MockableMavericks.mockStateHolder.setMock(view, mockInfo)
                     MockedView(
                         viewInstance = view,
                         viewName = viewName,
                         mockData = mockInfo,
-                        cleanupMockState = { MavericksMocks.mockStateHolder.clearMock(view) }
+                        cleanupMockState = { MockableMavericks.mockStateHolder.clearMock(view) }
                     )
                 }
             },

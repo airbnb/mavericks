@@ -204,15 +204,15 @@ open class MockMavericksViewModelConfigFactory(context: Context?, debugMode: Boo
             // This lets us capture singleton viewmodels as well.
             val viewModelStatePrinter = ViewModelStatePrinter(viewModel)
             applicationContext?.let { context ->
-                if (MavericksMocks.enableMockPrinterBroadcastReceiver) {
+                if (MockableMavericks.enableMockPrinterBroadcastReceiver) {
                     viewModelStatePrinter.register(context)
                 }
             }
 
             mockConfigs[stateStore] = config
-            stateStore.addOnDisposeListener { stateStore ->
+            stateStore.addOnCancelListener { stateStore ->
                 applicationContext?.let { context ->
-                    if (MavericksMocks.enableMockPrinterBroadcastReceiver) {
+                    if (MockableMavericks.enableMockPrinterBroadcastReceiver) {
                         viewModelStatePrinter.unregister(context)
                     }
                 }

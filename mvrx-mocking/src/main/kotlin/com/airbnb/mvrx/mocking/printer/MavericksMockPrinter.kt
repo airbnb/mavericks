@@ -15,7 +15,7 @@ import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.mocking.MavericksMocks
+import com.airbnb.mvrx.mocking.MockableMavericks
 import com.airbnb.mvrx.mocking.printer.MavericksMockPrinter.Companion.ACTION_COPY_MVRX_STATE
 import com.airbnb.mvrx.withState
 import java.io.File
@@ -84,10 +84,10 @@ class MavericksMockPrinter private constructor(
         /**
          * Register the given view to listen for broadcast receiver intents for mock state
          * printing. This is safe to call multiple times for the same [MavericksView], and is a no-op
-         * if [MavericksMocks.enableMockPrinterBroadcastReceiver] is disabled.
+         * if [MockableMavericks.enableMockPrinterBroadcastReceiver] is disabled.
          */
         fun startReceiver(mvrxView: MavericksView) {
-            if (MavericksMocks.enableMockPrinterBroadcastReceiver) {
+            if (MockableMavericks.enableMockPrinterBroadcastReceiver) {
                 MavericksMockPrinter(mvrxView)
             }
         }
@@ -307,13 +307,13 @@ private fun <T : Any> printMockFile(
         instanceToMock,
         listTruncationThreshold.maxIfLTEZero(),
         stringTruncationThreshold.maxIfLTEZero(),
-        MavericksMocks.mockPrinterConfiguration.customTypePrinters
+        MockableMavericks.mockPrinterConfiguration.customTypePrinters
     )
 
     val file = File(context.cacheDir, "${instanceToMock::class.simpleName}Mock.kt")
 
     file.printWriter().use { out ->
-        out.println("package ${MavericksMocks.mockPrinterConfiguration.mockPackage(instanceToMock)}")
+        out.println("package ${MockableMavericks.mockPrinterConfiguration.mockPackage(instanceToMock)}")
         out.println()
 
         code.imports.forEach {

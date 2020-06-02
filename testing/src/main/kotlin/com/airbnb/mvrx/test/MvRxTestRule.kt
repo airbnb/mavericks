@@ -3,7 +3,7 @@ package com.airbnb.mvrx.test
 import com.airbnb.mvrx.DefaultViewModelDelegateFactory
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxTestOverridesProxy
-import com.airbnb.mvrx.mocking.MavericksMocks
+import com.airbnb.mvrx.mocking.MockableMavericks
 import com.airbnb.mvrx.mocking.MockBehavior
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,14 +27,14 @@ class MvRxTestRule(
      */
     private val setForceDisableLifecycleAwareObserver: Boolean = true,
     /**
-     * If provided, MvRx mocking will be enabled via [MavericksMocks.install] and this will be set as
+     * If provided, MvRx mocking will be enabled via [MockableMavericks.install] and this will be set as
      * the mocking behavior. The default behavior simply puts the ViewModel in a configuration
      * where state changes happen synchronously, which is often necessary for tests.
      *
      * You can pass a "Scriptable" state store behavior to prevent state changes while forcing
      * your own state changes.
      *
-     * If null is given then mock behavior is disabled via [MavericksMocks.install].
+     * If null is given then mock behavior is disabled via [MockableMavericks.install].
      */
     private val viewModelMockBehavior: MockBehavior? = MockBehavior(
         stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
@@ -60,10 +60,10 @@ class MvRxTestRule(
     private fun setupMocking() {
         val mocksEnabled = viewModelMockBehavior != null
         // Use a null context since we don't need mock printing during tests
-        MavericksMocks.install(debugMode = debugMode, mocksEnabled = mocksEnabled, context = null)
+        MockableMavericks.install(debugMode = debugMode, mocksEnabled = mocksEnabled, context = null)
 
         if (viewModelMockBehavior != null) {
-            MavericksMocks.mockConfigFactory.mockBehavior = viewModelMockBehavior
+            MockableMavericks.mockConfigFactory.mockBehavior = viewModelMockBehavior
         }
     }
 
@@ -72,8 +72,8 @@ class MvRxTestRule(
         Dispatchers.resetMain()
 
         // clear any changes or listeners that were set on the plugins, and reset defaults
-        MavericksMocks.enableMavericksViewMocking = false
-        MavericksMocks.enableMockPrinterBroadcastReceiver = false
+        MockableMavericks.enableMavericksViewMocking = false
+        MockableMavericks.enableMockPrinterBroadcastReceiver = false
         MvRx.viewModelDelegateFactory = DefaultViewModelDelegateFactory()
         MvRx.viewModelConfigFactory = null
     }

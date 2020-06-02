@@ -823,10 +823,10 @@ open class MavericksViewMocks<V : MockableMavericksView, Args : Parcelable> @Pub
          * reflectively. By only accessing mocks reflectively they are allowed to be stripped
          * by minification for non debug builds.
          *
-         * This returns empty if [MavericksMocks.enableMavericksViewMocking] is disabled.
+         * This returns empty if [MockableMavericks.enableMavericksViewMocking] is disabled.
          */
         fun getFrom(view: MockableMavericksView): MavericksViewMocks<out MockableMavericksView, out Parcelable> {
-            if (!MavericksMocks.enableMavericksViewMocking) {
+            if (!MockableMavericks.enableMavericksViewMocking) {
                 Log.w("MockBuilder", "Mocks accessed in non debug build")
                 return EmptyMocks
             }

@@ -27,7 +27,7 @@ class MockableMvRxStateStoreTest : BaseTest() {
     fun addOnDisposedCallback() {
         val disposedStores = mutableSetOf<MockableMvRxStateStore<*>>()
         val store = createStore().apply {
-            addOnDisposeListener { disposedStores.add(it) }
+            addOnCancelListener { disposedStores.add(it) }
         }
 
         assertTrue(disposedStores.isEmpty())
@@ -45,7 +45,7 @@ class MockableMvRxStateStoreTest : BaseTest() {
         val store = createStore()
         store.coroutineScope.cancel()
 
-        store.addOnDisposeListener { disposedStores.add(it) }
+        store.addOnCancelListener { disposedStores.add(it) }
         assertEquals(setOf(store), disposedStores)
     }
 

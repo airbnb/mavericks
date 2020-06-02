@@ -13,7 +13,7 @@ class ScriptableStateStoreTest : BaseTest() {
 
     @Before
     fun setup() {
-        MavericksMocks.mockConfigFactory.withMockBehavior(
+        MockableMavericks.mockConfigFactory.withMockBehavior(
             MockBehavior(stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable)
         ) {
             viewModel = TestViewModel()
@@ -30,7 +30,7 @@ class ScriptableStateStoreTest : BaseTest() {
 
     @Test
     fun testCanScriptState() {
-        MavericksMocks.setScriptableState(viewModel, TestState(foo = 2))
+        MockableMavericks.setScriptableState(viewModel, TestState(foo = 2))
         withState(viewModel) {
             Assert.assertEquals(2, it.foo)
         }

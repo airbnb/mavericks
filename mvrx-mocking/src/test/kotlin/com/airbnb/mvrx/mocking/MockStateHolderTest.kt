@@ -13,7 +13,7 @@ class MockStateHolderTest : BaseTest() {
 
     @Before
     fun setup() {
-        MavericksMocks.mockConfigFactory.mockBehavior = MockBehavior(
+        MockableMavericks.mockConfigFactory.mockBehavior = MockBehavior(
             initialStateMocking = MockBehavior.InitialStateMocking.Full,
             stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
         )
@@ -21,7 +21,7 @@ class MockStateHolderTest : BaseTest() {
 
     @Test
     fun getDefaultState() {
-        val holder = MavericksMocks.mockStateHolder
+        val holder = MockableMavericks.mockStateHolder
         val frag = Frag()
         val viewMocks = MavericksViewMocks.getFrom(frag)
         val mockToUse = viewMocks.mocks.first { it.isDefaultState }
@@ -40,7 +40,7 @@ class MockStateHolderTest : BaseTest() {
 
     @Test
     fun clearMock() {
-        val holder = MavericksMocks.mockStateHolder
+        val holder = MockableMavericks.mockStateHolder
         val frag = Frag()
         val viewMocks = MavericksViewMocks.getFrom(frag)
         val mockToUse = viewMocks.mocks.first { it.isDefaultState }
@@ -61,7 +61,7 @@ class MockStateHolderTest : BaseTest() {
 
     @Test
     fun clearAllMocks() {
-        val holder = MavericksMocks.mockStateHolder
+        val holder = MockableMavericks.mockStateHolder
         val frag = Frag()
         val viewMocks = MavericksViewMocks.getFrom(frag)
         val mockToUse = viewMocks.mocks.first { it.isDefaultState }
@@ -82,7 +82,7 @@ class MockStateHolderTest : BaseTest() {
 
     @Test
     fun defaultInitializationGivesNullState() {
-        val holder = MavericksMocks.mockStateHolder
+        val holder = MockableMavericks.mockStateHolder
         val frag = Frag()
         val viewMocks = MavericksViewMocks.getFrom(frag)
         val mockToUse = viewMocks.mocks.first { it.isDefaultInitialization }
@@ -101,7 +101,7 @@ class MockStateHolderTest : BaseTest() {
 
     @Test
     fun defaultInitializationForExistingViewModelDoesNotGiveNullState() {
-        val holder = MavericksMocks.mockStateHolder
+        val holder = MockableMavericks.mockStateHolder
         val frag = Frag()
         val viewMocks = MavericksViewMocks.getFrom(frag)
         val mockToUse = viewMocks.mocks.first { it.isDefaultInitialization }
@@ -120,7 +120,7 @@ class MockStateHolderTest : BaseTest() {
 
     @Test
     fun forceMockExistingViewModel() {
-        val holder = MavericksMocks.mockStateHolder
+        val holder = MockableMavericks.mockStateHolder
         val frag = Frag()
 
         val mockedState = holder.getMockedState(
@@ -136,7 +136,7 @@ class MockStateHolderTest : BaseTest() {
 
     @Test(expected = Throwable::class)
     fun forceMockExistingViewModelThrowsIfNoMocks() {
-        val holder = MavericksMocks.mockStateHolder
+        val holder = MockableMavericks.mockStateHolder
         val frag = FragWithNoMocks()
 
         holder.getMockedState(

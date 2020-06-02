@@ -1,7 +1,6 @@
 package com.airbnb.mvrx.dogs
 
 import android.app.Application
-import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.dogs.data.DogRepository
 
@@ -13,6 +12,6 @@ class DogApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        MvRx.viewModelConfigFactory = MavericksViewModelConfigFactory(this)
+        MvRx.install(this)
     }
 }

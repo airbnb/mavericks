@@ -131,10 +131,9 @@ class MavericksViewModelTest : BaseTest() {
 
     private fun runInViewModelBlocking(vararg expectedState: BaseMavericksViewModelTestState, block: suspend MavericksViewModelTestViewModel.() -> Unit) = runBlockingTest {
         val states = mutableListOf<BaseMavericksViewModelTestState>()
-        val job = viewModel.stateFlow.onEach { states += it }.launchIn(this)
+        viewModel.stateFlow.onEach { states += it }.launchIn(this)
         viewModel.runInViewModel(block)
         viewModel.onCleared()
-        job.cancel()
         // We stringify the state list to make all exceptions equal each other. Without it, the stack traces cause tests to fail.
         assertEquals(expectedState.toList().toString(), states.toString())
     }

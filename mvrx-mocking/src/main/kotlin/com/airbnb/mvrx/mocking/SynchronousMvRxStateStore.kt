@@ -9,6 +9,7 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.channels.sendBlocking
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.buffer
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
@@ -20,13 +21,9 @@ import kotlinx.coroutines.flow.flow
  */
 @Suppress("EXPERIMENTAL_API_USAGE")
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-class SynchronousMvRxStateStore<S : Any>(initialState: S, val coroutineScope: CoroutineScope) : MvRxStateStore<S> {
+class SynchronousMvRxStateStore<S : Any>(initialState: S, coroutineScope: CoroutineScope) : MvRxStateStore<S> {
 
     private val stateChannel = BroadcastChannel<S>(capacity = Channel.BUFFERED)
-
-    @Volatile
-    override var state: S = initialState
-        private set
 
     init {
         coroutineScope.coroutineContext[Job]!!.invokeOnCompletion {
@@ -34,14 +31,16 @@ class SynchronousMvRxStateStore<S : Any>(initialState: S, val coroutineScope: Co
         }
     }
 
+    @Volatile
+    override var state: S = initialState
+        private set
+
     override fun get(block: (S) -> Unit) {
         block(state)
     }
 
     override fun set(stateReducer: S.() -> S) {
         state = state.stateReducer()
-
-        // TODO: Is this the right/best way to make this synchronous?
         stateChannel.sendBlocking(state)
     }
 

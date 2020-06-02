@@ -51,7 +51,8 @@ abstract class MavericksViewModelConfig<S : Any>(
         /** Block the execute call from having an impact. */
         Completely,
 
-        /** Block the execute call from having an impact from values returned by the object
+        /**
+         * Block the execute call from having an impact from values returned by the object
          * being executed, but perform one state callback to set the Async property to loading
          * as if the call is actually happening.
          */
