@@ -23,23 +23,13 @@ class SetStateWithStateOrderingTest : MavericksViewModel<OrderingState>(Ordering
         fun setup() {
             // We need to set main but don't want a synchronous state store to make sure that the real ordering is correct
             Dispatchers.setMain(TestCoroutineDispatcher())
+            MvRx.viewModelConfigFactory = MavericksViewModelConfigFactory(false)
         }
 
         @AfterClass
         @JvmStatic
         fun cleanup() {
             Dispatchers.resetMain()
-        }
-
-
-        @JvmStatic
-        @BeforeClass
-        fun setupViewModelConfigFactory() {
-            MvRx.viewModelConfigFactory = MavericksViewModelConfigFactory(true, contextOverride = TestCoroutineDispatcher())
-        }
-
-        @AfterClass
-        fun resetViewModelConfigFactory() {
             MvRx.viewModelConfigFactory = null
         }
     }
