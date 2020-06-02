@@ -37,14 +37,14 @@ open class MavericksViewModelConfigFactory(
     constructor(context: Context) : this(context.isDebuggable())
 
     private val onConfigProvidedListener =
-        mutableListOf<(BaseMavericksViewModel<*>, MavericksViewModelConfig<*>) -> Unit>()
+        mutableListOf<(MavericksViewModel<*>, MavericksViewModelConfig<*>) -> Unit>()
 
     open fun coroutineScope(): CoroutineScope {
         return CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate + contextOverride)
     }
 
     internal fun <S : MvRxState> provideConfig(
-        viewModel: BaseMavericksViewModel<S>,
+        viewModel: MavericksViewModel<S>,
         initialState: S
     ): MavericksViewModelConfig<S> {
         return buildConfig(viewModel, initialState).also { config ->
@@ -57,11 +57,11 @@ open class MavericksViewModelConfigFactory(
      * This can be overridden to customize the config.
      */
     open fun <S : MvRxState> buildConfig(
-        viewModel: BaseMavericksViewModel<S>,
+        viewModel: MavericksViewModel<S>,
         initialState: S
     ): MavericksViewModelConfig<S> {
         return object : MavericksViewModelConfig<S>(debugMode, CoroutinesStateStore(initialState, coroutineScope()), coroutineScope()) {
-            override fun <S : MvRxState> onExecute(viewModel: BaseMavericksViewModel<S>): BlockExecutions {
+            override fun <S : MvRxState> onExecute(viewModel: MavericksViewModel<S>): BlockExecutions {
                 return BlockExecutions.No
             }
         }
@@ -74,11 +74,11 @@ open class MavericksViewModelConfigFactory(
      * The callback includes a reference to the ViewModel that the config was created for, as well
      * as the configuration itself.
      */
-    fun addOnConfigProvidedListener(callback: (BaseMavericksViewModel<*>, MavericksViewModelConfig<*>) -> Unit) {
+    fun addOnConfigProvidedListener(callback: (MavericksViewModel<*>, MavericksViewModelConfig<*>) -> Unit) {
         onConfigProvidedListener.add(callback)
     }
 
-    fun removeOnConfigProvidedListener(callback: (BaseMavericksViewModel<*>, MavericksViewModelConfig<*>) -> Unit) {
+    fun removeOnConfigProvidedListener(callback: (MavericksViewModel<*>, MavericksViewModelConfig<*>) -> Unit) {
         onConfigProvidedListener.remove(callback)
     }
 

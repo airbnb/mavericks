@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import java.lang.IllegalStateException
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-class MvRxFactory<VM : BaseMavericksViewModel<S>, S : MvRxState>(
+class MvRxFactory<VM : MavericksViewModel<S>, S : MvRxState>(
     private val viewModelClass: Class<out VM>,
     private val stateClass: Class<out S>,
     private val viewModelContext: ViewModelContext,
@@ -34,7 +34,7 @@ class MvRxFactory<VM : BaseMavericksViewModel<S>, S : MvRxState>(
 }
 
 @Suppress("UNCHECKED_CAST")
-private fun <VM : BaseMavericksViewModel<S>, S : MvRxState> createViewModel(
+private fun <VM : MavericksViewModel<S>, S : MvRxState> createViewModel(
     viewModelClass: Class<out VM>,
     stateClass: Class<out S>,
     viewModelContext: ViewModelContext,
@@ -66,7 +66,7 @@ private fun <VM : BaseMavericksViewModel<S>, S : MvRxState> createViewModel(
 }
 
 @Suppress("UNCHECKED_CAST", "NestedBlockDepth")
-private fun <VM : BaseMavericksViewModel<S>, S : MvRxState> createDefaultViewModel(viewModelClass: Class<VM>, state: S): VM? {
+private fun <VM : MavericksViewModel<S>, S : MvRxState> createDefaultViewModel(viewModelClass: Class<VM>, state: S): VM? {
     // If we are checking for a default ViewModel, we expect only a single default constructor. Any other case
     // is a misconfiguration and we will throw an appropriate error under further inspection.
     if (viewModelClass.constructors.size == 1) {

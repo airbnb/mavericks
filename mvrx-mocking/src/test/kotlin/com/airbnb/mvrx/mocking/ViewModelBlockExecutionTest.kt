@@ -1,7 +1,7 @@
 package com.airbnb.mvrx.mocking
 
 import com.airbnb.mvrx.Async
-import com.airbnb.mvrx.BaseMavericksViewModel
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.Loading
 import com.airbnb.mvrx.MavericksViewModelConfig
 import com.airbnb.mvrx.MvRxState
@@ -48,7 +48,7 @@ class ViewModelBlockExecutionTest : BaseTest() {
     data class State(val num: Async<Int> = Uninitialized) : MvRxState
     class ViewModel(
         state: State = State()
-    ) : BaseMavericksViewModel<State>(state) {
+    ) : MavericksViewModel<State>(state) {
         fun setNumAsync(value: Int) {
             // TODO: Test rxjava too
             suspend { value }.execute {
@@ -58,4 +58,4 @@ class ViewModelBlockExecutionTest : BaseTest() {
     }
 }
 
-fun <S : MvRxState, VM : BaseMavericksViewModel<S>> VM.state(): S = config.stateStore.state
+fun <S : MvRxState, VM : MavericksViewModel<S>> VM.state(): S = config.stateStore.state

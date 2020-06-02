@@ -11,7 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
-import com.airbnb.mvrx.BaseMavericksViewModel
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
@@ -249,7 +249,7 @@ private class ViewArgPrinter(val mvrxView: MavericksView) : MavericksPrintStateB
  * An instance of [MavericksPrintStateBroadcastReceiver] that prints the state of the given view model.
  */
 internal class ViewModelStatePrinter<S : MvRxState>(
-    val viewModel: BaseMavericksViewModel<S>
+    val viewModel: MavericksViewModel<S>
 ) : MavericksPrintStateBroadcastReceiver() {
 
     private fun currentState(): S {

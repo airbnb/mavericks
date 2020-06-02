@@ -29,7 +29,7 @@ object MvRxViewModelProvider {
      * @param initialStateFactory A way to specify how to create the initial state, can be mocked out for testing.
      *
      */
-    fun <VM : BaseMavericksViewModel<S>, S : MvRxState> get(
+    fun <VM : MavericksViewModel<S>, S : MvRxState> get(
         viewModelClass: Class<out VM>,
         stateClass: Class<out S>,
         viewModelContext: ViewModelContext,
@@ -77,7 +77,7 @@ object MvRxViewModelProvider {
         return viewModel.viewModel
     }
 
-    private fun <VM : BaseMavericksViewModel<S>, S : MvRxState> VM.getSavedStateBundle(
+    private fun <VM : MavericksViewModel<S>, S : MvRxState> VM.getSavedStateBundle(
         initialArgs: Any?
     ) = withState(this) { state ->
         Bundle().apply {
@@ -112,7 +112,7 @@ object MvRxViewModelProvider {
 /**
  * Return the [Class] of the companion [MvRxViewModelFactory] for a given ViewModel class, if it exists.
  */
-internal fun <VM : BaseMavericksViewModel<*>> Class<VM>.factoryCompanion(): Class<out MvRxViewModelFactory<VM, *>>? {
+internal fun <VM : MavericksViewModel<*>> Class<VM>.factoryCompanion(): Class<out MvRxViewModelFactory<VM, *>>? {
     return declaredClasses.firstOrNull {
         MvRxViewModelFactory::class.java.isAssignableFrom(it)
     }?.let { klass ->

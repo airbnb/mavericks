@@ -1,9 +1,9 @@
 package com.airbnb.mvrx.mocking
 
-import com.airbnb.mvrx.BaseMavericksViewModel
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MvRxState
 
-internal fun <S : MvRxState> BaseMavericksViewModel<S>.reportExecuteCallToInteractionTest() {
+internal fun <S : MvRxState> MavericksViewModel<S>.reportExecuteCallToInteractionTest() {
     // Allow public usage??? might be needed in airbnb
     // TODO (eli_hart 2019-08-09): Report this to the interaction management system
     // For now we'll just print this out
@@ -16,7 +16,7 @@ internal fun <S : MvRxState> BaseMavericksViewModel<S>.reportExecuteCallToIntera
  *
  * These calls are joined in a string - "MyViewModel#fooFunction -> MyViewModel#barFunction"
  */
-private fun <S : MvRxState> BaseMavericksViewModel<S>.getCallStack(): String {
+private fun <S : MvRxState> MavericksViewModel<S>.getCallStack(): String {
     return Thread.currentThread().stackTrace
         .filter { traceElement -> this::class.java.simpleName in traceElement.className }
         .asReversed()

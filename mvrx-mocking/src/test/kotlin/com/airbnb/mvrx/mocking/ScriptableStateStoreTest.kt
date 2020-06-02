@@ -1,6 +1,6 @@
 package com.airbnb.mvrx.mocking
 
-import com.airbnb.mvrx.BaseMavericksViewModel
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.withState
 import org.junit.Assert
@@ -40,7 +40,7 @@ class ScriptableStateStoreTest : BaseTest() {
 
     private class TestViewModel(
         initialState: TestState = TestState()
-    ) : BaseMavericksViewModel<TestState>(initialState) {
+    ) : MavericksViewModel<TestState>(initialState) {
 
         fun attemptToChangeState(newFoo: Int) {
             setState { copy(foo = newFoo) }

@@ -4,7 +4,7 @@ import androidx.annotation.RestrictTo
 import kotlinx.coroutines.CoroutineScope
 
 /**
- * Provides configuration for a [BaseMavericksViewModel].
+ * Provides configuration for a [MavericksViewModel].
  */
 abstract class MavericksViewModelConfig<S : Any>(
     /**
@@ -22,7 +22,7 @@ abstract class MavericksViewModelConfig<S : Any>(
     val coroutineScope: CoroutineScope
 ) {
     /**
-     * Called each time a [BaseMavericksViewModel.execute] function is invoked. This allows
+     * Called each time a [MavericksViewModel.execute] function is invoked. This allows
      * the execute function to be skipped, based on the returned [BlockExecutions] value.
      *
      * This is intended to be used to allow the ViewModel to be mocked out for testing.
@@ -38,11 +38,11 @@ abstract class MavericksViewModelConfig<S : Any>(
      * didn't intend to allow operations to change the state.
      */
     abstract fun <S : MvRxState> onExecute(
-        viewModel: BaseMavericksViewModel<S>
+        viewModel: MavericksViewModel<S>
     ): BlockExecutions
 
     /**
-     * Defines whether a [BaseMavericksViewModel.execute] invocation should not be run.
+     * Defines whether a [MavericksViewModel.execute] invocation should not be run.
      */
     enum class BlockExecutions {
         /** Run the execute block normally. */

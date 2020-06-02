@@ -16,20 +16,20 @@ data class BaseMavericksViewModelTestState(
     val int: Int = 0
 ) : MvRxState
 
-class BaseMavericksViewModelTestViewModel : BaseMavericksViewModel<BaseMavericksViewModelTestState>(BaseMavericksViewModelTestState()) {
-    suspend fun runInViewModel(block: suspend BaseMavericksViewModelTestViewModel.() -> Unit) {
+class MavericksViewModelTestViewModel : MavericksViewModel<BaseMavericksViewModelTestState>(BaseMavericksViewModelTestState()) {
+    suspend fun runInViewModel(block: suspend MavericksViewModelTestViewModel.() -> Unit) {
         block()
     }
 }
 
 @ExperimentalCoroutinesApi
-class BaseMavericksViewModelTest : BaseTest() {
+class MavericksViewModelTest : BaseTest() {
 
-    private lateinit var viewModel: BaseMavericksViewModelTestViewModel
+    private lateinit var viewModel: MavericksViewModelTestViewModel
 
     @Before
     fun setup() {
-        viewModel = BaseMavericksViewModelTestViewModel()
+        viewModel = MavericksViewModelTestViewModel()
     }
 
     @Test
@@ -129,7 +129,7 @@ class BaseMavericksViewModelTest : BaseTest() {
         flowOf(1, 2).setOnEach { copy(int = it) }
     }
 
-    private fun runInViewModelBlocking(vararg expectedState: BaseMavericksViewModelTestState, block: suspend BaseMavericksViewModelTestViewModel.() -> Unit) = runBlockingTest {
+    private fun runInViewModelBlocking(vararg expectedState: BaseMavericksViewModelTestState, block: suspend MavericksViewModelTestViewModel.() -> Unit) = runBlockingTest {
         val states = mutableListOf<BaseMavericksViewModelTestState>()
         val job = viewModel.stateFlow.onEach { states += it }.launchIn(this)
         viewModel.runInViewModel(block)

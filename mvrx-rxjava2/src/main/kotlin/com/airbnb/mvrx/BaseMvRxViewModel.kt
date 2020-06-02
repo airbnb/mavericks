@@ -33,7 +33,7 @@ import kotlin.reflect.KProperty1
  */
 abstract class BaseMvRxViewModel<S : MvRxState>(
     initialState: S
-) : BaseMavericksViewModel<S>(initialState) {
+) : MavericksViewModel<S>(initialState) {
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
     private val lastDeliveredStates = ConcurrentHashMap<String, Any>()

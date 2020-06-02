@@ -3,7 +3,7 @@ package com.airbnb.mvrx.launcher
 
 import com.airbnb.epoxy.AsyncEpoxyController
 import com.airbnb.epoxy.EpoxyController
-import com.airbnb.mvrx.BaseMavericksViewModel
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.withState
 
@@ -37,7 +37,7 @@ fun MvRxLauncherBaseFragment.simpleController(
  * Create a [MvRxEpoxyController] that builds models with the given callback.
  * When models are built the current state of the viewmodel will be provided.
  */
-fun <S : MvRxState, A : BaseMavericksViewModel<S>> MvRxLauncherBaseFragment.simpleController(
+fun <S : MvRxState, A : MavericksViewModel<S>> MvRxLauncherBaseFragment.simpleController(
     viewModel: A,
     buildModels: EpoxyController.(state: S) -> Unit
 ): EpoxyController = MvRxEpoxyController {
@@ -51,7 +51,7 @@ fun <S : MvRxState, A : BaseMavericksViewModel<S>> MvRxLauncherBaseFragment.simp
  * Create a [MvRxEpoxyController] that builds models with the given callback.
  * When models are built the current state of the viewmodels will be provided.
  */
-fun <A : BaseMavericksViewModel<B>, B : MvRxState, C : BaseMavericksViewModel<D>, D : MvRxState> MvRxLauncherBaseFragment.simpleController(
+fun <A : MavericksViewModel<B>, B : MvRxState, C : MavericksViewModel<D>, D : MvRxState> MvRxLauncherBaseFragment.simpleController(
     viewModel1: A,
     viewModel2: C,
     buildModels: EpoxyController.(state1: B, state2: D) -> Unit
@@ -66,11 +66,11 @@ fun <A : BaseMavericksViewModel<B>, B : MvRxState, C : BaseMavericksViewModel<D>
  * Create a [MvRxEpoxyController] that builds models with the given callback.
  * When models are built the current state of the viewmodels will be provided.
  */
-fun <A : BaseMavericksViewModel<B>,
+fun <A : MavericksViewModel<B>,
     B : MvRxState,
-    C : BaseMavericksViewModel<D>,
+    C : MavericksViewModel<D>,
     D : MvRxState,
-    E : BaseMavericksViewModel<F>,
+    E : MavericksViewModel<F>,
     F : MvRxState>
     MvRxLauncherBaseFragment.simpleController(
     viewModel1: A,

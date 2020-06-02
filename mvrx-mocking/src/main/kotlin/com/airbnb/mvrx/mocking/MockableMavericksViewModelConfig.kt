@@ -1,7 +1,7 @@
 package com.airbnb.mvrx.mocking
 
 import android.content.Context
-import com.airbnb.mvrx.BaseMavericksViewModel
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksViewModelConfig
 import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.airbnb.mvrx.MvRxState
@@ -50,12 +50,12 @@ class MockableMavericksViewModelConfig<S : MvRxState>(
          *
          * This assumes the viewmodel was created with a mock config applied, and fails otherwise.
          */
-        fun <S : MvRxState> access(viewModel: BaseMavericksViewModel<S>): MockableMavericksViewModelConfig<S> {
+        fun <S : MvRxState> access(viewModel: MavericksViewModel<S>): MockableMavericksViewModelConfig<S> {
             return viewModel.config as MockableMavericksViewModelConfig
         }
     }
 
-    override fun <S : MvRxState> onExecute(viewModel: BaseMavericksViewModel<S>): BlockExecutions {
+    override fun <S : MvRxState> onExecute(viewModel: MavericksViewModel<S>): BlockExecutions {
         val blockExecutions = currentMockBehavior.blockExecutions
 
         if (blockExecutions != BlockExecutions.No) {
@@ -183,7 +183,7 @@ open class MockMavericksViewModelConfigFactory(context: Context?, debugMode: Boo
         mockConfigs.remove(store)
     }
 
-    override fun <S : MvRxState> buildConfig(viewModel: BaseMavericksViewModel<S>, initialState: S): MavericksViewModelConfig<S> {
+    override fun <S : MvRxState> buildConfig(viewModel: MavericksViewModel<S>, initialState: S): MavericksViewModelConfig<S> {
         val mockBehavior = mockBehavior
         val coroutineScope = coroutineScope()
 

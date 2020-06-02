@@ -101,7 +101,7 @@ interface MavericksView : LifecycleOwner {
      * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
      * the next one is emitted.
      */
-    fun <S : MvRxState> BaseMavericksViewModel<S>.onEach(deliveryMode: DeliveryMode = RedeliverOnStart, action: suspend (S) -> Unit) =
+    fun <S : MvRxState> MavericksViewModel<S>.onEach(deliveryMode: DeliveryMode = RedeliverOnStart, action: suspend (S) -> Unit) =
         onEachInternal(subscriptionLifecycleOwner, deliveryMode, action)
 
     /**
@@ -119,7 +119,7 @@ interface MavericksView : LifecycleOwner {
      * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
      * the next one is emitted.
      */
-    fun <S : MvRxState, A> BaseMavericksViewModel<S>.onEach(
+    fun <S : MvRxState, A> MavericksViewModel<S>.onEach(
         prop1: KProperty1<S, A>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         action: suspend (A) -> Unit
@@ -139,7 +139,7 @@ interface MavericksView : LifecycleOwner {
      * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
      * the next one is emitted..
      */
-    fun <S : MvRxState, A, B> BaseMavericksViewModel<S>.onEach(
+    fun <S : MvRxState, A, B> MavericksViewModel<S>.onEach(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
@@ -160,7 +160,7 @@ interface MavericksView : LifecycleOwner {
      * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
      * the next one is emitted.
      */
-    fun <S : MvRxState, A, B, C> BaseMavericksViewModel<S>.onEach(
+    fun <S : MvRxState, A, B, C> MavericksViewModel<S>.onEach(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
@@ -182,7 +182,7 @@ interface MavericksView : LifecycleOwner {
      * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
      * the next one is emitted.
      */
-    fun <S : MvRxState, A, B, C, D> BaseMavericksViewModel<S>.onEach(
+    fun <S : MvRxState, A, B, C, D> MavericksViewModel<S>.onEach(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
@@ -205,7 +205,7 @@ interface MavericksView : LifecycleOwner {
      * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
      * the next one is emitted.
      */
-    fun <S : MvRxState, A, B, C, D, E> BaseMavericksViewModel<S>.onEach(
+    fun <S : MvRxState, A, B, C, D, E> MavericksViewModel<S>.onEach(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
@@ -229,7 +229,7 @@ interface MavericksView : LifecycleOwner {
      * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
      * the next one is emitted.
      */
-    fun <S : MvRxState, A, B, C, D, E, F> BaseMavericksViewModel<S>.onEach(
+    fun <S : MvRxState, A, B, C, D, E, F> MavericksViewModel<S>.onEach(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
@@ -254,7 +254,7 @@ interface MavericksView : LifecycleOwner {
      * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
      * the next one is emitted.
      */
-    fun <S : MvRxState, A, B, C, D, E, F, G> BaseMavericksViewModel<S>.onEach(
+    fun <S : MvRxState, A, B, C, D, E, F, G> MavericksViewModel<S>.onEach(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
@@ -281,7 +281,7 @@ interface MavericksView : LifecycleOwner {
      * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
      * the next one is emitted.
      */
-    fun <S : MvRxState, T> BaseMavericksViewModel<S>.onAsync(
+    fun <S : MvRxState, T> MavericksViewModel<S>.onAsync(
         asyncProp: KProperty1<S, Async<T>>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         onFail: (suspend (Throwable) -> Unit)? = null,

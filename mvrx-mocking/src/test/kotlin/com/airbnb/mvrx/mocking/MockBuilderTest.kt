@@ -3,7 +3,7 @@ package com.airbnb.mvrx.mocking
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.Async
-import com.airbnb.mvrx.BaseMavericksViewModel
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.Uninitialized
@@ -406,7 +406,7 @@ class MockBuilderTest : BaseTest() {
         }
     }
 
-    class TestViewModel : BaseMavericksViewModel<State>(baseState)
+    class TestViewModel : MavericksViewModel<State>(baseState)
 
     @Parcelize
     class Args(val num: Int) : Parcelable

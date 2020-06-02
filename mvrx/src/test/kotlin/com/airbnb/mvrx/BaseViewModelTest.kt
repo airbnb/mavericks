@@ -6,7 +6,7 @@ import org.junit.Test
 
 class BaseViewModelTest : BaseTest() {
     data class TestState(val foo: Int = 5) : MvRxState
-    class TestViewModel : BaseMavericksViewModel<TestState>(TestState()) {
+    class TestViewModel : MavericksViewModel<TestState>(TestState()) {
         // Make viewModelScope public
         val scope = viewModelScope
     }

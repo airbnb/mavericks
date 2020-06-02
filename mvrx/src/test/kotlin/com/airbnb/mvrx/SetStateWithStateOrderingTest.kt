@@ -7,19 +7,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.setMain
-import org.junit.After
 import org.junit.AfterClass
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
 import java.util.concurrent.ConcurrentLinkedQueue
 
 data class OrderingState(val count: Int = 0) : MvRxState
-class SetStateWithStateOrderingTest : BaseMavericksViewModel<OrderingState>(OrderingState()) {
+class SetStateWithStateOrderingTest : MavericksViewModel<OrderingState>(OrderingState()) {
 
     companion object {
         @BeforeClass

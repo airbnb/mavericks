@@ -5,7 +5,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.core.content.edit
 import com.airbnb.mvrx.Async
-import com.airbnb.mvrx.BaseMavericksViewModel
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.Incomplete
 import com.airbnb.mvrx.Loading
 import com.airbnb.mvrx.MvRxState
@@ -161,7 +161,7 @@ data class LauncherMockIdentifier(val viewName: String, val mockName: String) {
 class MvRxLauncherViewModel(
     private val initialState: MvRxLauncherState,
     private val sharedPrefs: SharedPreferences
-) : BaseMavericksViewModel<MvRxLauncherState>(initialState) {
+) : MavericksViewModel<MvRxLauncherState>(initialState) {
 
     init {
         loadViewsFromCache(initialState)

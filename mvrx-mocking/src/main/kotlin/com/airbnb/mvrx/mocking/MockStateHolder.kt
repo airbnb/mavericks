@@ -1,7 +1,7 @@
 package com.airbnb.mvrx.mocking
 
 import android.os.Parcelable
-import com.airbnb.mvrx.BaseMavericksViewModel
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.lifecycleAwareLazy
 import kotlin.reflect.KProperty
@@ -114,7 +114,7 @@ class MockStateHolder {
         }
     }
 
-    fun <VM : BaseMavericksViewModel<S>, S : MvRxState> addViewModelDelegate(
+    fun <VM : MavericksViewModel<S>, S : MvRxState> addViewModelDelegate(
         view: MockableMavericksView,
         existingViewModel: Boolean,
         viewModelProperty: KProperty<*>,
@@ -130,7 +130,7 @@ class MockStateHolder {
             .add(ViewModelDelegateInfo(existingViewModel, viewModelProperty, viewModelDelegate))
     }
 
-    data class ViewModelDelegateInfo<VM : BaseMavericksViewModel<S>, S : MvRxState>(
+    data class ViewModelDelegateInfo<VM : MavericksViewModel<S>, S : MvRxState>(
         val existingViewModel: Boolean,
         val viewModelProperty: KProperty<*>,
         val viewModelDelegate: lifecycleAwareLazy<VM>

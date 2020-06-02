@@ -36,7 +36,7 @@ import kotlin.reflect.KProperty1
  * abstract class MavericksViewModel<S : MvRxState>(state: S) : BaseMavericksViewModel<S>(state, debugMode = BuildConfig.DEBUG)
  * ```
  */
-abstract class BaseMavericksViewModel<S : MvRxState>(
+abstract class MavericksViewModel<S : MvRxState>(
     initialState: S
 ) {
 
@@ -128,14 +128,14 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
                         }
                     if (changedProp != null) {
                         throw IllegalArgumentException(
-                            "Impure reducer set on ${this@BaseMavericksViewModel::class.java.simpleName}! " +
+                            "Impure reducer set on ${this@MavericksViewModel::class.java.simpleName}! " +
                                 "${changedProp.name} changed from ${changedProp.get(firstState)} " +
                                 "to ${changedProp.get(secondState)}. " +
                                 "Ensure that your state properties properly implement hashCode."
                         )
                     } else {
                         throw IllegalArgumentException(
-                            "Impure reducer set on ${this@BaseMavericksViewModel::class.java.simpleName}! Differing states were provided by the same reducer." +
+                            "Impure reducer set on ${this@MavericksViewModel::class.java.simpleName}! Differing states were provided by the same reducer." +
                                 "Ensure that your state properties properly implement hashCode. First state: $firstState -> Second state: $secondState"
                         )
                     }
@@ -188,7 +188,7 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         retainValue: KProperty1<S, Async<T>>? = null,
         reducer: S.(Async<T>) -> S
     ): Job {
-        val blockExecutions = config.onExecute(this@BaseMavericksViewModel)
+        val blockExecutions = config.onExecute(this@MavericksViewModel)
         if (blockExecutions != MavericksViewModelConfig.BlockExecutions.No) {
             if (blockExecutions == MavericksViewModelConfig.BlockExecutions.WithLoading) {
                 setState { reducer(Loading()) }
@@ -222,7 +222,7 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         dispatcher: CoroutineDispatcher = Dispatchers.Main.immediate,
         reducer: S.(Async<T>) -> S
     ): Job {
-        val blockExecutions = config.onExecute(this@BaseMavericksViewModel)
+        val blockExecutions = config.onExecute(this@MavericksViewModel)
         if (blockExecutions != MavericksViewModelConfig.BlockExecutions.No) {
             if (blockExecutions == MavericksViewModelConfig.BlockExecutions.WithLoading) {
                 setState { reducer(Loading()) }
@@ -563,7 +563,7 @@ abstract class BaseMavericksViewModel<S : MvRxState>(
         lifecycle owner. See BaseMvRxFragment for an example.
     """.trimIndent()
 
-    private fun <S : MvRxState> assertSubscribeToDifferentViewModel(viewModel: BaseMavericksViewModel<S>) {
+    private fun <S : MvRxState> assertSubscribeToDifferentViewModel(viewModel: MavericksViewModel<S>) {
         require(this != viewModel) {
             "This method is for subscribing to other view models. Please pass a different instance as the argument."
         }

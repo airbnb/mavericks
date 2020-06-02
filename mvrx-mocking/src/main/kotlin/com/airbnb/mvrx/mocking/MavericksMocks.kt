@@ -1,7 +1,7 @@
 package com.airbnb.mvrx.mocking
 
 import android.content.Context
-import com.airbnb.mvrx.BaseMavericksViewModel
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.DefaultViewModelDelegateFactory
 import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.airbnb.mvrx.MvRx
@@ -127,7 +127,7 @@ object MavericksMocks {
      *
      * It is an error to call this if the store is not scriptable.
      */
-    fun <VM : BaseMavericksViewModel<S>, S : MvRxState> setScriptableState(viewModel: VM, state: S) {
+    fun <VM : MavericksViewModel<S>, S : MvRxState> setScriptableState(viewModel: VM, state: S) {
         val stateStore = viewModel.config.stateStore
         check(stateStore is ScriptableStateStore) {
             "State store of ${viewModel.javaClass.simpleName} must be a ScriptableStateStore"
@@ -149,7 +149,7 @@ object MavericksMocks {
      * See [setScriptableState] if you want to force a state on a [ScriptableStateStore] that would
      * otherwise not allow state changes.
      */
-    fun <VM : BaseMavericksViewModel<S>, S : MvRxState> setState(viewModel: VM, state: S) {
+    fun <VM : MavericksViewModel<S>, S : MvRxState> setState(viewModel: VM, state: S) {
         val stateStore = viewModel.config.stateStore
         stateStore.set { state }
     }

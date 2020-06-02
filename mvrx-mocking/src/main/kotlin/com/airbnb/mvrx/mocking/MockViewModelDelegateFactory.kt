@@ -2,7 +2,7 @@ package com.airbnb.mvrx.mocking
 
 import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.ActivityViewModelContext
-import com.airbnb.mvrx.BaseMavericksViewModel
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
@@ -28,7 +28,7 @@ class MockViewModelDelegateFactory(
     val configFactory: MockMavericksViewModelConfigFactory
 ) : ViewModelDelegateFactory {
 
-    override fun <S : MvRxState, T, VM : BaseMavericksViewModel<S>> createLazyViewModel(
+    override fun <S : MvRxState, T, VM : MavericksViewModel<S>> createLazyViewModel(
         fragment: T,
         viewModelProperty: KProperty<*>,
         viewModelClass: KClass<VM>,
@@ -105,7 +105,7 @@ class MockViewModelDelegateFactory(
         }
     }
 
-    private fun <S : MvRxState, T, VM : BaseMavericksViewModel<S>> getMockedViewModel(
+    private fun <S : MvRxState, T, VM : MavericksViewModel<S>> getMockedViewModel(
         existingViewModel: Boolean,
         viewModelProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM,
         fragment: T,
@@ -178,7 +178,7 @@ class MockViewModelDelegateFactory(
         }
     }
 
-    private fun <S : MvRxState, VM : BaseMavericksViewModel<S>> stateFactory(
+    private fun <S : MvRxState, VM : MavericksViewModel<S>> stateFactory(
         mockState: S?
     ): MvRxStateFactory<VM, S> {
         return if (mockState == null) {

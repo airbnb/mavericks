@@ -1,7 +1,7 @@
 package com.airbnb.mvrx.mocking
 
 import androidx.fragment.app.Fragment
-import com.airbnb.mvrx.BaseMavericksViewModel
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.existingViewModel
@@ -107,8 +107,8 @@ class ViewModelDelegateProviderTest : BaseTest() {
 
     data class TestState(val num: Int = 0) : MvRxState
     class FragmentVM(initialState: TestState) :
-        BaseMavericksViewModel<TestState>(initialState)
+        MavericksViewModel<TestState>(initialState)
 
     class ActivityVM(initialState: TestState) :
-        BaseMavericksViewModel<TestState>(initialState)
+        MavericksViewModel<TestState>(initialState)
 }
