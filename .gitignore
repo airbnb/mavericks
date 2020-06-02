@@ -64,6 +64,7 @@ captures/
 .idea/misc.xml
 .idea/tasks.xml
 .idea/workspace.xml
+.idea/jarRepositories.xml
 
 # Android Studio 3 in .gitignore file.
 .idea/caches

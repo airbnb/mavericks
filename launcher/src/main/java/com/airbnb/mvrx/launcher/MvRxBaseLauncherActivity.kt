@@ -8,12 +8,7 @@ import androidx.fragment.app.Fragment
  * Intended to be overridden by other activities in the launcher module.
  * Provides an easy way to set a single fragment.
  */
-open class MvRxBaseLauncherActivity : AppCompatActivity() {
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.mvrx_launcher_base_activity)
-    }
+open class MvRxBaseLauncherActivity : AppCompatActivity(R.layout.mvrx_launcher_base_activity) {
 
     protected fun setFragment(fragment: Fragment, commitNow: Boolean = false) {
         supportFragmentManager.beginTransaction()
