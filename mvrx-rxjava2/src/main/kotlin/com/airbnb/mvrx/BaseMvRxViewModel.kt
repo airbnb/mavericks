@@ -19,40 +19,21 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.disposables.Disposables
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
-import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.KProperty1
 
 /**
- * To use MvRx, create your own base MvRxViewModel that extends this one and sets debugMode.
- *
- * All subsequent ViewModels in your app should use that one.
+ * Base ViewModel implementation that all other ViewModels should extend.
  */
 abstract class BaseMvRxViewModel<S : MvRxState>(
-    initialState: S,
-    debugMode: Boolean,
-    /**
-     * Provide an overridden state store. This should only be used for tests and should only
-     * be exposed via a shared base class within your app. If your features extend this
-     * directly, do not override this in the primary constructor of your feature ViewModel.
-     */
-    stateStoreOverride: MvRxStateStore<S>? = null,
-    /**
-     * Provide a default context for viewModelScope. It will be added after [SupervisorJob]
-     * and [Dispatchers.Main.immediate]. This should only be used for tests and should only
-     * be exposed via a shared base class within your app. If your features extend this
-     * directly, do not override this in the primary constructor of your feature ViewModel.
-     */
-    contextOverride: CoroutineContext? = null
-) : BaseMavericksViewModel<S>(initialState, debugMode, stateStoreOverride, contextOverride) {
+    initialState: S
+) : MavericksViewModel<S>(initialState) {
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
     private val lastDeliveredStates = ConcurrentHashMap<String, Any>()
@@ -129,6 +110,14 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
         successMetaData: ((T) -> Any)? = null,
         stateReducer: S.(Async<V>) -> S
     ): Disposable {
+        val blockExecutions = config.onExecute(this@BaseMvRxViewModel)
+        if (blockExecutions != MavericksViewModelConfig.BlockExecutions.No) {
+            if (blockExecutions == MavericksViewModelConfig.BlockExecutions.WithLoading) {
+                setState { stateReducer(Loading()) }
+            }
+            return Disposables.disposed()
+        }
+
         // Intentionally didn't use RxJava's startWith operator. When withState is called right after execute then the loading reducer won't be enqueued yet if startWith is used.
         setState { stateReducer(Loading()) }
 
@@ -148,7 +137,7 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * Output all state changes to logcat.
      */
     fun logStateChanges() {
-        if (!debugMode) return
+        if (!config.debugMode) return
         subscribe { Log.d(tag, "New State: $it") }
     }
 

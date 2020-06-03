@@ -27,7 +27,14 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
 
     private val bindMethod = bindingClass.getMethod("bind", View::class.java)
 
-    init {
+    override fun getValue(thisRef: Fragment, property: KProperty<*>): T {
+        binding?.let { return it }
+
+        val lifecycle = fragment.viewLifecycleOwner.lifecycle
+        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.INITIALIZED)) {
+            error("Cannot access view bindings. View lifecycle is ${lifecycle.currentState}!")
+        }
+
         fragment.viewLifecycleOwnerLiveData.observe(fragment, Observer { viewLifecycleOwner ->
             viewLifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
                 @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
@@ -36,15 +43,6 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
                 }
             })
         })
-    }
-
-    override fun getValue(thisRef: Fragment, property: KProperty<*>): T {
-        binding?.let { return it }
-
-        val lifecycle = fragment.viewLifecycleOwner.lifecycle
-        if (!lifecycle.currentState.isAtLeast(Lifecycle.State.INITIALIZED)) {
-            error("Cannot access view bindings. View lifecycle is ${lifecycle.currentState}!")
-        }
 
         @Suppress("UNCHECKED_CAST")
         binding = bindMethod.invoke(null, thisRef.requireView()) as T

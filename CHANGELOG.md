@@ -29,6 +29,20 @@ Now, it will run:
 - BaseMvRxViewModel no longer extends Jetpack ViewModel
 - viewModelScope is now a property on BaseMvRxViewModel, not the Jetpack extension function for ViewModel. Functionally, this is the same but the previous viewModelScope import will now be unused.
 
+## Version 1.5.0
+- Add an optional nullable value to all Async classes (#383)
+- Update various dependencies
+
+Note: MvRx now targets 1.8 for Java/Kotlin, so you may need to update your projects to also target
+1.8
+```
+android {
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+}
+```
+
 ## Version 1.4.0
 - Remove Kotlin-Reflect entirely (#334)
 - Remove extra proguard dependency (#310)

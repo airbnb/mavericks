@@ -8,29 +8,12 @@ import android.os.Parcelable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.test.MvRxTestRule
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Runnable
-import org.junit.AfterClass
-import io.reactivex.Scheduler
-import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.annotations.NonNull
-import io.reactivex.disposables.Disposable
-import io.reactivex.exceptions.CompositeException
-import io.reactivex.internal.schedulers.ExecutorScheduler
-import io.reactivex.plugins.RxJavaPlugins
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
-import org.junit.BeforeClass
-import org.junit.ClassRule
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.android.controller.ActivityController
-import org.robolectric.shadows.ShadowLog
-import kotlin.coroutines.CoroutineContext
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 @RunWith(RobolectricTestRunner::class)

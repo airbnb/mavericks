@@ -31,6 +31,10 @@ dependencies {
     kapt AnnotationProcessors.moshi
 
     implementation project(":mvrx")
+    implementation project(':mvrx-mocking')
+    // In real apps this should be debugImplementation so that the launcher isn't included in production!
+    implementation project(':launcher')
+
     implementation Libraries.appcompat
     implementation Libraries.constraintlayout
     implementation (Libraries.epoxy) { exclude group: "com.android.support" }

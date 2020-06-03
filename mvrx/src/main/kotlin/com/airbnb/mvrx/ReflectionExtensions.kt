@@ -12,10 +12,8 @@ internal val primitiveWrapperMap = mapOf(
 )
 
 internal fun isPrimitiveWrapperOf(targetClass: Class<*>, primitive: Class<*>): Boolean {
-    if (!primitive.isPrimitive) {
-        throw IllegalArgumentException("First argument has to be primitive type")
-    }
-    return primitiveWrapperMap.get(primitive) == targetClass
+    require(primitive.isPrimitive) { "First argument has to be primitive type" }
+    return primitiveWrapperMap[primitive] == targetClass
 }
 
 internal fun isAssignableTo(from: Class<*>, to: Class<*>): Boolean {

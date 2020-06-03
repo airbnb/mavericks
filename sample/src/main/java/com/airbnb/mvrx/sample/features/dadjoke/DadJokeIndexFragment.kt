@@ -7,10 +7,12 @@ import androidx.navigation.ui.setupWithNavController
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.epoxy.EpoxyRecyclerView
 import com.airbnb.mvrx.fragmentViewModel
+import com.airbnb.mvrx.mocking.mockSingleViewModel
 import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.databinding.DadJokeIndexFragmentBinding
 import com.airbnb.mvrx.sample.utils.viewBinding
+import com.airbnb.mvrx.sample.features.dadjoke.mocks.mockDadJokeIndexState
 import com.airbnb.mvrx.sample.views.basicRow
 import com.airbnb.mvrx.sample.views.loadingRow
 import com.airbnb.mvrx.withState
@@ -55,5 +57,13 @@ class DadJokeIndexFragment : BaseFragment(R.layout.dad_joke_index_fragment) {
             id("loading${state.jokes.size}")
             onBind { _, _, _ -> viewModel.fetchNextPage() }
         }
+    }
+
+    override fun provideMocks() = mockSingleViewModel(
+        viewModelReference = DadJokeIndexFragment::viewModel,
+        defaultState = mockDadJokeIndexState,
+        defaultArgs = null
+    ) {
+        stateForLoadingAndFailure { ::request }
     }
 }

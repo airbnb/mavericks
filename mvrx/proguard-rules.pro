@@ -9,7 +9,7 @@
 # constructor accepting a data class holding the state exists. Need to make sure to keep the constructor
 # around. Additionally, a static create / inital state method will be generated in the case a
 # companion object factory is used with JvmStatic. This is accessed via reflection.
--keepclassmembers class ** extends com.airbnb.mvrx.BaseMavericksViewModel {
+-keepclassmembers class ** extends com.airbnb.mvrx.MavericksViewModel {
     public <init>(...);
     public static *** create(...);
     public static *** initialState(...);

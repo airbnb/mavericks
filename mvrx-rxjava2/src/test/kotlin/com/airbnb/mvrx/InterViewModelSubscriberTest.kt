@@ -15,7 +15,7 @@ data class OuterViewModelTestState(
     val async: Async<String> = Uninitialized
 ) : MvRxState
 
-class OuterViewModelTestViewModel(initialState: OuterViewModelTestState) : TestMvRxViewModel<OuterViewModelTestState>(initialState) {
+class OuterViewModelTestViewModel(initialState: OuterViewModelTestState) : BaseMvRxViewModel<OuterViewModelTestState>(initialState) {
 
     fun setFoo(foo: Int) = setState { copy(foo = foo) }
 
@@ -118,7 +118,7 @@ data class InnerViewModelTestState(
 class InnerViewModelTestViewModel(
     initialState: InnerViewModelTestState,
     outerViewModelTestViewModel: OuterViewModelTestViewModel
-) : TestMvRxViewModel<InnerViewModelTestState>(initialState) {
+) : BaseMvRxViewModel<InnerViewModelTestState>(initialState) {
 
     var subscribeCalled = 0
     var selectSubscribeCalled = 0

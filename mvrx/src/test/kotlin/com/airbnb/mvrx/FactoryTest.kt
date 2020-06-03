@@ -75,19 +75,19 @@ class NoFactoryTest : BaseTest() {
 
     @Test(expected = IllegalArgumentException::class)
     fun failOnWrongSingleParameterType() {
-        class ViewModel : BaseMavericksViewModel<FactoryState>(initialState = FactoryState(), debugMode = false)
+        class ViewModel : MavericksViewModel<FactoryState>(initialState = FactoryState())
         MvRxViewModelProvider.get(ViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, null))
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun failOnMultipleParametersAndNoCompanion() {
-        class OptionalParamViewModel(initialState: FactoryState, debugMode: Boolean = false) : BaseMavericksViewModel<FactoryState>(initialState, debugMode)
+        class OptionalParamViewModel(initialState: FactoryState, someOtherParam: Int) : MavericksViewModel<FactoryState>(initialState)
         MvRxViewModelProvider.get(OptionalParamViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, null))
     }
 
     @Test(expected = IllegalArgumentException::class)
     fun failOnNoViewModelParameters() {
-        class OptionalParamViewModel : BaseMavericksViewModel<FactoryState>(initialState = FactoryState(), debugMode = false)
+        class OptionalParamViewModel : MavericksViewModel<FactoryState>(initialState = FactoryState())
         MvRxViewModelProvider.get(OptionalParamViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, null))
     }
 }

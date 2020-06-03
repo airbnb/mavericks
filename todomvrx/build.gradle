@@ -11,6 +11,7 @@ android {
         versionName "0.0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
 }
 
@@ -31,7 +32,9 @@ dependencies {
     implementation Libraries.roomRxJava
     implementation Libraries.rxAndroid
     implementation Libraries.rxJava
+    implementation Libraries.multidex
     implementation project(":mvrx-rxjava2")
+    implementation project(':mvrx-mocking')
 
     debugImplementation Libraries.debugDb
 

@@ -4,7 +4,7 @@ import androidx.annotation.RestrictTo
 import java.lang.reflect.Modifier
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-interface MvRxStateFactory<VM : BaseMavericksViewModel<S>, S : MvRxState> {
+interface MvRxStateFactory<VM : MavericksViewModel<S>, S : MvRxState> {
 
     fun createInitialState(
         viewModelClass: Class<out VM>,
@@ -14,7 +14,8 @@ interface MvRxStateFactory<VM : BaseMavericksViewModel<S>, S : MvRxState> {
     ): S
 }
 
-internal class RealMvRxStateFactory<VM : BaseMavericksViewModel<S>, S : MvRxState> : MvRxStateFactory<VM, S> {
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+class RealMvRxStateFactory<VM : MavericksViewModel<S>, S : MvRxState> : MvRxStateFactory<VM, S> {
 
     override fun createInitialState(
         viewModelClass: Class<out VM>,
@@ -35,7 +36,7 @@ internal class RealMvRxStateFactory<VM : BaseMavericksViewModel<S>, S : MvRxStat
  * If no such function exists, null is returned.
  */
 @Suppress("UNCHECKED_CAST")
-internal fun <VM : BaseMavericksViewModel<S>, S : MvRxState> createStateFromCompanionFactory(
+internal fun <VM : MavericksViewModel<S>, S : MvRxState> createStateFromCompanionFactory(
     viewModelClass: Class<out VM>,
     viewModelContext: ViewModelContext
 ): S? {
@@ -55,7 +56,7 @@ internal fun <VM : BaseMavericksViewModel<S>, S : MvRxState> createStateFromComp
  * Searches [stateClass] for a single argument constructor matching the type of [args]. If [args] is null, then
  * no arg constructor is invoked.
  */
-internal fun <VM : BaseMavericksViewModel<S>, S : MvRxState> createStateFromConstructor(
+internal fun <VM : MavericksViewModel<S>, S : MvRxState> createStateFromConstructor(
     viewModelClass: Class<out VM>,
     stateClass: Class<out S>,
     args: Any?
@@ -63,7 +64,10 @@ internal fun <VM : BaseMavericksViewModel<S>, S : MvRxState> createStateFromCons
     val argsConstructor = args?.let { arg ->
         val argType = arg::class.java
         stateClass.constructors.firstOrNull { constructor ->
-            constructor.parameterTypes.size == 1 && isAssignableTo(argType, constructor.parameterTypes[0])
+            constructor.parameterTypes.size == 1 && isAssignableTo(
+                argType,
+                constructor.parameterTypes[0]
+            )
         }
     }
 
@@ -85,9 +89,10 @@ internal fun <VM : BaseMavericksViewModel<S>, S : MvRxState> createStateFromCons
         // Throw this exception if we don't know which method to use to create the initial state.
         ?: throw IllegalStateException(
             "Attempt to create the MvRx state class ${stateClass.simpleName} has failed. One of the following must be true:" +
-                "\n 1) The state class has default values for every constructor property." +
-                "\n 2) The state class has a secondary constructor for ${args?.javaClass?.simpleName ?: "a fragment argument"}." +
-                "\n 3) ${viewModelClass.simpleName} must have a companion object implementing MvRxFactory with an initialState function " +
-                "that does not return null. "
+                    "\n 1) The state class has default values for every constructor property." +
+                    "\n 2) The state class has a secondary constructor for ${args?.javaClass?.simpleName
+                        ?: "a fragment argument"}." +
+                    "\n 3) ${viewModelClass.simpleName} must have a companion object implementing MvRxFactory with an initialState function " +
+                    "that does not return null. "
         )
 }

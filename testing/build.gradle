@@ -18,5 +18,6 @@ dependencies {
     implementation Libraries.kotlinReflect
     implementation Libraries.rxAndroid
     implementation TestLibraries.kotlinCoroutinesTest
+    api project(':mvrx-mocking')
     implementation project(":mvrx-rxjava2")
 }

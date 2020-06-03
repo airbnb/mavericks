@@ -7,19 +7,15 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.runBlockingTest
 import kotlinx.coroutines.test.setMain
-import org.junit.After
 import org.junit.AfterClass
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
-import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
 import java.util.concurrent.ConcurrentLinkedQueue
 
 data class OrderingState(val count: Int = 0) : MvRxState
-class SetStateWithStateOrderingTest : BaseMavericksViewModel<OrderingState>(OrderingState(), debugMode = false) {
+class SetStateWithStateOrderingTest : MavericksViewModel<OrderingState>(OrderingState()) {
 
     companion object {
         @BeforeClass
@@ -27,14 +23,17 @@ class SetStateWithStateOrderingTest : BaseMavericksViewModel<OrderingState>(Orde
         fun setup() {
             // We need to set main but don't want a synchronous state store to make sure that the real ordering is correct
             Dispatchers.setMain(TestCoroutineDispatcher())
+            MvRx.viewModelConfigFactory = MavericksViewModelConfigFactory(false)
         }
 
         @AfterClass
         @JvmStatic
         fun cleanup() {
             Dispatchers.resetMain()
+            MvRx.viewModelConfigFactory = null
         }
     }
+
 
     @Test
     fun test1() = runBlocking {

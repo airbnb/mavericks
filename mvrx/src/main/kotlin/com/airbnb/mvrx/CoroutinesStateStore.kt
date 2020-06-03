@@ -67,8 +67,7 @@ class CoroutinesStateStore<S : MvRxState>(
     }
 
     /**
-     * Observe [flushQueuesChannel] and flush queues whenever there is a new item.
-     * This no-ops if [MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES] is set.
+     * Poll [withStateChannel] and [setStateChannel] to respond to set/get state requests.
      */
     private fun setupTriggerFlushQueues(scope: CoroutineScope) {
         if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) return

@@ -1,7 +1,6 @@
 import com.airbnb.mvrx.AndroidMetaModulePlugin
 
 buildscript {
-
     repositories {
         google()
         jcenter()

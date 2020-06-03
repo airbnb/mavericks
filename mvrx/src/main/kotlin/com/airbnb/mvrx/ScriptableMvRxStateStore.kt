@@ -15,10 +15,11 @@ import kotlinx.coroutines.flow.flow
  * as business logic in state reducers will not be used.
  */
 @Suppress("EXPERIMENTAL_API_USAGE")
-class ScriptableMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
+class ScriptableMvRxStateStore<S : Any>(initialState: S) : ScriptableStateStore<S> {
 
     private val stateChannel = BroadcastChannel<S>(capacity = Channel.BUFFERED)
     override var state = initialState
+
     override val flow: Flow<S>
         get() = flow {
             emit(state)
@@ -33,8 +34,13 @@ class ScriptableMvRxStateStore<S : Any>(initialState: S) : MvRxStateStore<S> {
         // No-op set the state via next
     }
 
-    fun next(state: S) {
+    override fun next(state: S) {
         this.state = state
         stateChannel.offer(state)
     }
+}
+
+interface ScriptableStateStore<S : Any> : MvRxStateStore<S> {
+    /** Force the current state to be moved to the given value immediately. */
+    fun next(state: S)
 }

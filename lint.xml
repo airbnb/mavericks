@@ -1,6 +1,3 @@
 <lint>
-    <issue id="InvalidPackage">
-        <!-- Needed for https://github.com/Kotlin/kotlinx.coroutines/issues/2004 -->
-        <ignore path="**/kotlinx-coroutines-core-1.3.6.jar"/>
-    </issue>
+
 </lint>

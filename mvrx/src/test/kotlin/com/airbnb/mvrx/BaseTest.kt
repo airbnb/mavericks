@@ -7,20 +7,10 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import org.junit.AfterClass
-import io.reactivex.Scheduler
-import io.reactivex.android.plugins.RxAndroidPlugins
-import io.reactivex.annotations.NonNull
-import io.reactivex.disposables.Disposable
-import io.reactivex.exceptions.CompositeException
-import io.reactivex.internal.schedulers.ExecutorScheduler
-import io.reactivex.plugins.RxJavaPlugins
-import java.util.concurrent.Executor
-import java.util.concurrent.TimeUnit
+import org.junit.After
+import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Ignore
 import org.junit.runner.RunWith
@@ -28,7 +18,6 @@ import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.android.controller.ActivityController
 import org.robolectric.shadows.ShadowLog
-import kotlin.coroutines.CoroutineContext
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 @RunWith(RobolectricTestRunner::class)
@@ -49,26 +38,46 @@ abstract class BaseTest {
         }
     }
 
+    @Before
+    fun setupViewModelConfigFactory() {
+        MvRx.viewModelConfigFactory = MavericksViewModelConfigFactory(true, contextOverride = TestCoroutineDispatcher())
+    }
+
+    @After
+    fun resetViewModelConfigFactory() {
+        MvRx.viewModelConfigFactory = null
+    }
+
     protected inline fun <reified F : Fragment, reified A : AppCompatActivity> createFragment(
         savedInstanceState: Bundle? = null,
         args: Parcelable? = null,
-        containerId: Int? = null
+        containerId: Int? = null,
+        existingController: ActivityController<A>? = null
     ): Pair<ActivityController<A>, F> {
-        val controller = Robolectric.buildActivity(A::class.java)
-        if (savedInstanceState == null) {
-            controller.setup()
-        } else {
-            controller.setup(savedInstanceState)
+        val controller = existingController ?: Robolectric.buildActivity(A::class.java)
+
+        if (existingController == null) {
+            if (savedInstanceState == null) {
+                controller.setup()
+            } else {
+                controller.setup(savedInstanceState)
+            }
         }
+
         val activity = controller.get()
         val fragment = if (savedInstanceState == null) {
             F::class.java.newInstance().apply {
                 arguments = Bundle().apply { putParcelable(MvRx.KEY_ARG, args) }
-                if (containerId != null) {
-                    activity.supportFragmentManager.beginTransaction().add(containerId, this, "TAG").commitNow()
-                } else {
-                    activity.supportFragmentManager.beginTransaction().add(this, "TAG").commitNow()
-                }
+                activity.supportFragmentManager
+                    .beginTransaction()
+                    .also {
+                        if (containerId != null) {
+                            it.add(containerId, this, "TAG")
+                        } else {
+                            it.add(this, "TAG")
+                        }
+                    }
+                    .commitNow()
             }
         } else {
             activity.supportFragmentManager.findFragmentByTag("TAG") as F
