@@ -24,6 +24,12 @@ buildscript {
     }
 }
 
+plugins {
+    id("io.gitlab.arturbosch.detekt").version("1.9.1")
+}
+
+apply plugin: 'io.gitlab.arturbosch.detekt'
+
 plugins.apply(AndroidMetaModulePlugin.class)
 
 allprojects {
@@ -46,4 +52,8 @@ allprojects {
             }
         }
     }
+}
+
+subprojects {
+    apply from: "$rootDir/detekt.gradle"
 }
