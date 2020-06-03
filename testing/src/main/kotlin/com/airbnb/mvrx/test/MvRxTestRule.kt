@@ -13,7 +13,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.rules.ExternalResource
 
 /**
- * To use this in your test class, add
+ * To use this in your test class, add:
  * ```
  * @get:Rule
  * val mvrxRule = MvRxTestRule()
@@ -77,6 +77,4 @@ class MvRxTestRule(
         MvRx.viewModelDelegateFactory = DefaultViewModelDelegateFactory()
         MvRx.viewModelConfigFactory = null
     }
-
-
 }
