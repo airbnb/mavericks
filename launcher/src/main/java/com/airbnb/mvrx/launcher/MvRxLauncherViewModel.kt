@@ -5,9 +5,9 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.core.content.edit
 import com.airbnb.mvrx.Async
-import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.Incomplete
 import com.airbnb.mvrx.Loading
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.Success

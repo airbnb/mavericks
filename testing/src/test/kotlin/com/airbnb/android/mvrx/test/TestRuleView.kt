@@ -1,4 +1,5 @@
 @file:Suppress("DEPRECATION")
+
 package com.airbnb.android.mvrx.test
 
 import com.airbnb.mvrx.BaseMvRxFragment
@@ -18,5 +19,4 @@ class TestRuleView : BaseMvRxFragment() {
     override fun invalidate() {}
 
     fun doSomething() = viewModel.doSomething()
-
 }

@@ -51,16 +51,16 @@ object MvRxViewModelProvider {
 
         @Suppress("UNCHECKED_CAST")
         val viewModel: MvRxViewModelWrapper<VM, S> = ViewModelProvider(
-                viewModelContext.owner,
-                MvRxFactory(
-                        viewModelClass,
-                        stateClass,
-                        restoredContext,
-                        key,
-                        stateRestorer?.toRestoredState,
-                        forExistingViewModel,
-                        initialStateFactory
-                )
+            viewModelContext.owner,
+            MvRxFactory(
+                viewModelClass,
+                stateClass,
+                restoredContext,
+                key,
+                stateRestorer?.toRestoredState,
+                forExistingViewModel,
+                initialStateFactory
+            )
         ).get(key, MvRxViewModelWrapper::class.java) as MvRxViewModelWrapper<VM, S>
 
         try {

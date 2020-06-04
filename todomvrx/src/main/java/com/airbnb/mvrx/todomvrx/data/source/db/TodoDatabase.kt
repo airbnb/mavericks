@@ -1,10 +1,9 @@
 package com.airbnb.mvrx.todomvrx.data.source.db
 
+import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import android.content.Context
-
 import com.airbnb.mvrx.todomvrx.data.Task
 
 /**
@@ -25,8 +24,8 @@ abstract class ToDoDatabase : RoomDatabase() {
             synchronized(lock) {
                 if (INSTANCE == null) {
                     INSTANCE = Room
-                            .databaseBuilder(context.applicationContext, ToDoDatabase::class.java, "Tasks.db")
-                            .build()
+                        .databaseBuilder(context.applicationContext, ToDoDatabase::class.java, "Tasks.db")
+                        .build()
                 }
                 return INSTANCE!!
             }

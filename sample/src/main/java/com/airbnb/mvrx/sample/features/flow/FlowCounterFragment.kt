@@ -13,6 +13,7 @@ import com.airbnb.mvrx.withState
 
 class FlowCounterFragment : BaseFragment(R.layout.flow_counter_fragment) {
     private val binding: FlowCounterFragmentBinding by viewBinding()
+
     /**
      * Because we know that this Fragment isn't the first Fragment in the flow and that the ViewModel
      * will have been created by an earlier screen in the Fragment, we can use [existingViewModel]

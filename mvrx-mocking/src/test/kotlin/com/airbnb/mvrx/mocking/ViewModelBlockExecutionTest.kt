@@ -1,8 +1,8 @@
 package com.airbnb.mvrx.mocking
 
 import com.airbnb.mvrx.Async
-import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.Loading
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksViewModelConfig
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.Uninitialized

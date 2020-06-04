@@ -2,13 +2,12 @@ package com.airbnb.mvrx.todomvrx.core
 
 import android.os.Bundle
 import android.os.Parcelable
-import androidx.annotation.CallSuper
-import androidx.annotation.IdRes
-import androidx.coordinatorlayout.widget.CoordinatorLayout
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.CallSuper
+import androidx.annotation.IdRes
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.airbnb.epoxy.EpoxyRecyclerView
@@ -22,6 +21,7 @@ import com.airbnb.mvrx.todomvrx.data.findTask
 import com.airbnb.mvrx.todomvrx.todoapp.R
 import com.airbnb.mvrx.todomvrx.util.ToDoEpoxyController
 import com.airbnb.mvrx.todomvrx.util.showLongSnackbar
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 abstract class BaseFragment : Fragment(), MvRxView {
 
@@ -31,6 +31,7 @@ abstract class BaseFragment : Fragment(), MvRxView {
     protected lateinit var recyclerView: EpoxyRecyclerView
     protected lateinit var fab: FloatingActionButton
     protected val epoxyController by lazy { epoxyController() }
+
     // Used to keep track of task changes to determine if we should show a snackbar.
     private var oldTasks: Tasks? = null
 

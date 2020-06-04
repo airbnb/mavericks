@@ -99,5 +99,4 @@ class CoroutineStateStoreReplayTest {
         scope.cancel()
         Unit
     }
-
 }

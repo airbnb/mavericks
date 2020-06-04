@@ -135,7 +135,8 @@ class ConstructorCodeGeneratorTest : BaseTest() {
             val list: List<Int> = listOf(1, 2, 3, 4)
         ) : MvRxState
 
-        com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200).expect("ConstructorCodeGeneratorTest.listIsTruncated\$Test(list=listOf(1,2,3))")
+        com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
+            .expect("ConstructorCodeGeneratorTest.listIsTruncated\$Test(list=listOf(1,2,3))")
     }
 
     @Test
@@ -188,7 +189,8 @@ class ConstructorCodeGeneratorTest : BaseTest() {
             val list: Array<Int> = arrayOf(1, 2, 3, 4)
         ) : MvRxState
 
-        com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200).expect("ConstructorCodeGeneratorTest.arrayIsTruncated\$Test(list=arrayOf(1,2,3))")
+        com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
+            .expect("ConstructorCodeGeneratorTest.arrayIsTruncated\$Test(list=arrayOf(1,2,3))")
     }
 
     @Suppress("ArrayInDataClass")

@@ -106,6 +106,7 @@ data class FragmentViewModelContext(
 
     override val owner get() = fragment
     override val savedStateRegistry get() = fragment.savedStateRegistry
+
     /**
      * Convenience method to type [fragment].
      */

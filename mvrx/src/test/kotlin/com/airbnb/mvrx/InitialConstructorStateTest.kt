@@ -4,10 +4,10 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.MvRx.KEY_ARG
-import java.io.Serializable
 import kotlinx.android.parcel.Parcelize
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import java.io.Serializable
 
 /** Test auto creating state from fragment arguments. */
 class InitialConstructorStateTest : BaseTest() {

@@ -17,11 +17,11 @@
 package com.airbnb.mvrx.todomvrx
 
 import android.os.Bundle
-import androidx.appcompat.widget.PopupMenu
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
+import androidx.appcompat.widget.PopupMenu
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
@@ -88,11 +88,13 @@ class TaskListFragment : BaseFragment() {
         } else if (!(state.isLoading && state.tasks.isEmpty())) {
             header {
                 id("header")
-                title(when (taskListState.filter) {
-                    TaskListFilter.All -> R.string.label_all
-                    TaskListFilter.Active -> R.string.label_active
-                    TaskListFilter.Completed -> R.string.label_completed
-                })
+                title(
+                    when (taskListState.filter) {
+                        TaskListFilter.All -> R.string.label_all
+                        TaskListFilter.Active -> R.string.label_active
+                        TaskListFilter.Completed -> R.string.label_completed
+                    }
+                )
             }
 
             state.tasks

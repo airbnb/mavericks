@@ -3,8 +3,8 @@ package com.airbnb.mvrx.test
 import com.airbnb.mvrx.DefaultViewModelDelegateFactory
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxTestOverridesProxy
-import com.airbnb.mvrx.mocking.MockableMavericks
 import com.airbnb.mvrx.mocking.MockBehavior
+import com.airbnb.mvrx.mocking.MockableMavericks
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher

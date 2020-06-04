@@ -11,8 +11,8 @@ import com.airbnb.mvrx.mocking.mockSingleViewModel
 import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.databinding.DadJokeIndexFragmentBinding
-import com.airbnb.mvrx.sample.utils.viewBinding
 import com.airbnb.mvrx.sample.features.dadjoke.mocks.mockDadJokeIndexState
+import com.airbnb.mvrx.sample.utils.viewBinding
 import com.airbnb.mvrx.sample.views.basicRow
 import com.airbnb.mvrx.sample.views.loadingRow
 import com.airbnb.mvrx.withState

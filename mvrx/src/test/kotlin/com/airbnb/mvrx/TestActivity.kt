@@ -13,7 +13,8 @@ open class TestActivity : AppCompatActivity() {
             FrameLayout(this).apply {
                 layoutParams = LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
-                    LinearLayout.LayoutParams.MATCH_PARENT)
+                    LinearLayout.LayoutParams.MATCH_PARENT
+                )
                 id = CONTAINER_ID
             }
         )

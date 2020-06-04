@@ -1,5 +1,7 @@
 package com.airbnb.mvrx
 
+import Libraries
+import Versions
 import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import org.gradle.api.JavaVersion

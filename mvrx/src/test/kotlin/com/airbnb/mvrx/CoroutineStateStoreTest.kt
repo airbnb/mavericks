@@ -35,5 +35,4 @@ class AsyncStateStoreTest {
         collectJob.join()
         latch.countDown()
     }
-
 }

@@ -3,9 +3,7 @@ package com.airbnb.mvrx
 import android.content.Intent
 import android.content.res.Configuration
 import android.os.Bundle
-import android.os.Parcelable
 import androidx.fragment.app.Fragment
-import kotlinx.android.parcel.Parcelize
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
 import org.junit.Test
@@ -35,7 +33,7 @@ class ViewModelStoreTestFragment : Fragment(), MavericksView {
     val viewModelFragment: ViewModelStoreTestViewModel by fragmentViewModel()
     val viewModelActivity: ViewModelStoreTestViewModel by activityViewModel()
 
-    override fun invalidate() { }
+    override fun invalidate() {}
 }
 
 class ViewModelStoreTest : BaseTest() {

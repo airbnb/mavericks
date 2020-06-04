@@ -1,4 +1,5 @@
 @file:Suppress("Detekt.ParameterListWrapping")
+
 package com.airbnb.mvrx.launcher
 
 import com.airbnb.epoxy.AsyncEpoxyController

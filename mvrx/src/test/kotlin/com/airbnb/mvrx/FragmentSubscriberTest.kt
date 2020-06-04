@@ -56,8 +56,8 @@ open class ViewSubscriberFragment : Fragment(), MavericksView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.onEach { _ -> viewCreatedSubscribeCallCount ++ }
-        viewModel.onEach(uniqueOnly("onCreateView")) { _ -> viewCreatedUniqueOnlyCallCount ++ }
+        viewModel.onEach { _ -> viewCreatedSubscribeCallCount++ }
+        viewModel.onEach(uniqueOnly("onCreateView")) { _ -> viewCreatedUniqueOnlyCallCount++ }
     }
 
     fun setFoo(foo: Int) = viewModel.setFoo(foo)
@@ -66,7 +66,6 @@ open class ViewSubscriberFragment : Fragment(), MavericksView {
         invalidateCallCount++
     }
 }
-
 
 class FragmentSubscriberTest : BaseTest() {
 
@@ -241,7 +240,6 @@ class FragmentSubscriberTest : BaseTest() {
         assertEquals(2, fragment.subscribeCallCount)
         assertEquals(1, fragment.subscribeUniqueOnlyCallCount)
     }
-
 
     @Test
     fun subscribeOnBackStackResumeWhenStateNotChanged() {
@@ -458,7 +456,7 @@ class FragmentSubscriberTest : BaseTest() {
             viewModel.onEach(uniqueOnly()) { }
         }
 
-        override fun invalidate() { }
+        override fun invalidate() {}
     }
 
     @Test(expected = RuntimeException::class)

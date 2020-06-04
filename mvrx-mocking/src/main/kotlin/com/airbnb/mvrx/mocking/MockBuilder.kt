@@ -1,4 +1,5 @@
 @file:Suppress("Detekt.ParameterListWrapping")
+
 package com.airbnb.mvrx.mocking
 
 import android.os.Parcelable
@@ -6,8 +7,8 @@ import android.util.Log
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
 import com.airbnb.mvrx.Async
-import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksView
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.PersistState
 import com.airbnb.mvrx.mocking.MvRxMock.Companion.DEFAULT_INITIALIZATION_NAME

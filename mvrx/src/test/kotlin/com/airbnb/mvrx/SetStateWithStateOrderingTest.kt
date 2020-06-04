@@ -34,7 +34,6 @@ class SetStateWithStateOrderingTest : MavericksViewModel<OrderingState>(Ordering
         }
     }
 
-
     @Test
     fun test1() = runBlocking {
         val calls = mutableListOf<String>()

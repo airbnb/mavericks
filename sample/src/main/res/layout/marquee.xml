@@ -13,7 +13,7 @@
         android:textColor="@color/text_color"
         android:textSize="32sp"
         android:textStyle="bold"
-        tools:text="Marquee"/>
+        tools:text="Marquee" />
 
     <TextView
         android:id="@+id/subtitle"
@@ -22,10 +22,10 @@
         android:paddingLeft="@dimen/padding_horizontal"
         android:paddingRight="@dimen/padding_horizontal"
         android:paddingTop="4dp"
-        android:textSize="16sp"/>
+        android:textSize="16sp" />
 
     <Space
         android:layout_width="0dp"
-        android:layout_height="24dp"/>
+        android:layout_height="24dp" />
 
 </merge>
