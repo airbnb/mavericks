@@ -76,12 +76,14 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewMod
         var callCount = 0
         onEach(ViewModelTestState::asyncUnit) {
             callCount++
-            assertEquals(when (callCount) {
-                1 -> Uninitialized
-                2 -> Loading()
-                3 -> Success(Unit)
-                else -> throw IllegalArgumentException("Unexpected call count $callCount")
-            }, it)
+            assertEquals(
+                when (callCount) {
+                    1 -> Uninitialized
+                    2 -> Loading()
+                    3 -> Success(Unit)
+                    else -> throw IllegalArgumentException("Unexpected call count $callCount")
+                }, it
+            )
         }
         Completable.create { emitter ->
             emitter.onComplete()
@@ -94,12 +96,14 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewMod
         val error = IllegalStateException("Fail")
         onEach(ViewModelTestState::asyncUnit) {
             callCount++
-            assertEquals(when (callCount) {
-                1 -> Uninitialized
-                2 -> Loading()
-                3 -> Fail<Unit>(error)
-                else -> throw IllegalArgumentException("Unexpected call count $callCount")
-            }, it)
+            assertEquals(
+                when (callCount) {
+                    1 -> Uninitialized
+                    2 -> Loading()
+                    3 -> Fail<Unit>(error)
+                    else -> throw IllegalArgumentException("Unexpected call count $callCount")
+                }, it
+            )
         }
         Completable.create {
             throw error
@@ -111,12 +115,14 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewMod
         var callCount = 0
         onEach(ViewModelTestState::async) {
             callCount++
-            assertEquals(when (callCount) {
-                1 -> Uninitialized
-                2 -> Loading()
-                3 -> Success("Hello World")
-                else -> throw IllegalArgumentException("Unexpected call count $callCount")
-            }, it)
+            assertEquals(
+                when (callCount) {
+                    1 -> Uninitialized
+                    2 -> Loading()
+                    3 -> Success("Hello World")
+                    else -> throw IllegalArgumentException("Unexpected call count $callCount")
+                }, it
+            )
         }
         Single.create<String> { emitter ->
             emitter.onSuccess("Hello World")
@@ -129,12 +135,14 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewMod
         val error = IllegalStateException("Fail")
         onEach(ViewModelTestState::async) {
             callCount++
-            assertEquals(when (callCount) {
-                1 -> Uninitialized
-                2 -> Loading()
-                3 -> Fail<String>(error)
-                else -> throw IllegalArgumentException("Unexpected call count $callCount")
-            }, it)
+            assertEquals(
+                when (callCount) {
+                    1 -> Uninitialized
+                    2 -> Loading()
+                    3 -> Fail<String>(error)
+                    else -> throw IllegalArgumentException("Unexpected call count $callCount")
+                }, it
+            )
         }
         Single.create<String> {
             throw error
@@ -146,12 +154,14 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewMod
         var callCount = 0
         onEach(ViewModelTestState::async) {
             callCount++
-            assertEquals(when (callCount) {
-                1 -> Uninitialized
-                2 -> Loading()
-                3 -> Success("Hello World")
-                else -> throw IllegalArgumentException("Unexpected call count $callCount")
-            }, it)
+            assertEquals(
+                when (callCount) {
+                    1 -> Uninitialized
+                    2 -> Loading()
+                    3 -> Success("Hello World")
+                    else -> throw IllegalArgumentException("Unexpected call count $callCount")
+                }, it
+            )
         }
         Observable.just("Hello World").execute { copy(async = it) }
         assertEquals(3, callCount)
@@ -162,12 +172,14 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewMod
         withState {
             onEach(ViewModelTestState::foo) {
                 callCount++
-                assertEquals(when (callCount) {
-                    1 -> 0
-                    2 -> 1
-                    3 -> 2
-                    else -> throw IllegalArgumentException("Unexpected call count $callCount")
-                }, it)
+                assertEquals(
+                    when (callCount) {
+                        1 -> 0
+                        2 -> 1
+                        3 -> 2
+                        else -> throw IllegalArgumentException("Unexpected call count $callCount")
+                    }, it
+                )
             }
             setState { copy(foo = 1) }
             setState { copy(foo = 2) }
@@ -180,12 +192,14 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewMod
         val error = IllegalStateException("Fail")
         onEach(ViewModelTestState::async) {
             callCount++
-            assertEquals(when (callCount) {
-                1 -> Uninitialized
-                2 -> Loading()
-                3 -> Fail<String>(error)
-                else -> throw IllegalArgumentException("Unexpected call count $callCount")
-            }, it)
+            assertEquals(
+                when (callCount) {
+                    1 -> Uninitialized
+                    2 -> Loading()
+                    3 -> Fail<String>(error)
+                    else -> throw IllegalArgumentException("Unexpected call count $callCount")
+                }, it
+            )
         }
         Observable.create<String> {
             throw error
@@ -197,12 +211,14 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewMod
         var callCount = 0
         onEach(ViewModelTestState::async) {
             callCount++
-            assertEquals(when (callCount) {
-                1 -> Uninitialized
-                2 -> Loading()
-                3 -> Success("Hello World!")
-                else -> throw IllegalArgumentException("Unexpected call count $callCount")
-            }, it)
+            assertEquals(
+                when (callCount) {
+                    1 -> Uninitialized
+                    2 -> Loading()
+                    3 -> Success("Hello World!")
+                    else -> throw IllegalArgumentException("Unexpected call count $callCount")
+                }, it
+            )
         }
         Observable.just("Hello World").execute(mapper = { "$it!" }) { copy(async = it) }
         assertEquals(3, callCount)

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2015 The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<manifest
-    package="com.airbnb.mvrx.todomvrx.todoapp"
+<manifest package="com.airbnb.mvrx.todomvrx.todoapp"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
@@ -28,9 +26,9 @@
         android:theme="@style/AppTheme">
         <activity android:name="com.airbnb.mvrx.todomvrx.MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
     </application>

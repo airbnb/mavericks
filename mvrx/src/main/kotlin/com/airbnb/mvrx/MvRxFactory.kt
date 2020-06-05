@@ -3,7 +3,6 @@ package com.airbnb.mvrx
 import androidx.annotation.RestrictTo
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import java.lang.IllegalStateException
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 class MvRxFactory<VM : MavericksViewModel<S>, S : MvRxState>(

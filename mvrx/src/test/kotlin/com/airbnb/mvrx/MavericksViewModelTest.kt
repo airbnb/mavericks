@@ -129,7 +129,10 @@ class MavericksViewModelTest : BaseTest() {
         flowOf(1, 2).setOnEach { copy(int = it) }
     }
 
-    private fun runInViewModelBlocking(vararg expectedState: BaseMavericksViewModelTestState, block: suspend MavericksViewModelTestViewModel.() -> Unit) = runBlockingTest {
+    private fun runInViewModelBlocking(
+        vararg expectedState: BaseMavericksViewModelTestState,
+        block: suspend MavericksViewModelTestViewModel.() -> Unit
+    ) = runBlockingTest {
         val states = mutableListOf<BaseMavericksViewModelTestState>()
         viewModel.stateFlow.onEach { states += it }.launchIn(this)
         viewModel.runInViewModel(block)

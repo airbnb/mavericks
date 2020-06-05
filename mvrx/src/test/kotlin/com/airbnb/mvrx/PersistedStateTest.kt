@@ -264,16 +264,19 @@ class PersistedStateTest : BaseTest() {
             val p38: Int = 0,
             @PersistState val p39: Int = 0
         ) : MvRxState
-        val bundle = PersistStateTestHelpers.persistState(StateWithLotsOfParameters(
-            p0 = 1,
-            p1 = 2,
-            p30 = 3,
-            p31 = 4,
-            p32 = 5,
-            p33 = 6,
-            p34 = 7,
-            p35 = 8
-        ))
+
+        val bundle = PersistStateTestHelpers.persistState(
+            StateWithLotsOfParameters(
+                p0 = 1,
+                p1 = 2,
+                p30 = 3,
+                p31 = 4,
+                p32 = 5,
+                p33 = 6,
+                p34 = 7,
+                p35 = 8
+            )
+        )
         val newState = PersistStateTestHelpers.restorePersistedState(bundle, StateWithLotsOfParameters())
         assertEquals(2, newState.p1)
         assertEquals(4, newState.p31)

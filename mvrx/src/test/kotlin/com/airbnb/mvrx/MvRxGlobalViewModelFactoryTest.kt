@@ -3,7 +3,6 @@ package com.airbnb.mvrx
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.fragment.app.FragmentActivity
-import java.lang.IllegalStateException
 import kotlinx.android.parcel.Parcelize
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotEquals
@@ -36,7 +35,8 @@ data class InvalidState(val count: Int = 0) : MvRxState {
 class InvalidViewModel(initialState: InvalidState) : TestMavericksViewModel<InvalidState>(initialState)
 
 class MvRxGlobalViewModelFactoryTest : BaseTest() {
-    @get:Rule val thrown: ExpectedException = ExpectedException.none()
+    @get:Rule
+    val thrown: ExpectedException = ExpectedException.none()
 
     @Test(expected = ViewModelDoesNotExistException::class)
     fun failForNonExistentViewModel() {

@@ -1,13 +1,13 @@
 package com.airbnb.mvrx.sample
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
+import com.airbnb.mvrx.launcher.MvRxLauncherActivity
 import com.airbnb.mvrx.sample.databinding.MainFragmentBinding
 import com.airbnb.mvrx.sample.utils.viewBinding
-import android.content.Intent
-import com.airbnb.mvrx.launcher.MvRxLauncherActivity
 import com.airbnb.mvrx.sample.views.basicRow
 import com.airbnb.mvrx.sample.views.marquee
 

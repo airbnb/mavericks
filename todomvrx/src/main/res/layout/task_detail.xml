@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/content"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:parentTag="android.widget.RelativeLayout">
+
     <TextView
         android:id="@+id/no_data_view"
         android:layout_width="wrap_content"
@@ -13,7 +13,7 @@
         android:layout_centerInParent="true"
         android:text="@string/no_data"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:visibility="gone"/>
+        android:visibility="gone" />
 
     <CheckBox
         android:id="@+id/complete"
@@ -24,7 +24,7 @@
         android:layout_gravity="center_vertical"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_vertical_margin"
-        android:layout_marginTop="@dimen/activity_vertical_margin"/>
+        android:layout_marginTop="@dimen/activity_vertical_margin" />
 
     <TextView
         android:id="@+id/task_title"
@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_alignTop="@id/complete"
         android:layout_toRightOf="@id/complete"
-        android:textAppearance="?android:attr/textAppearanceLarge"/>
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <TextView
         android:id="@+id/task_description"
@@ -40,5 +40,5 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/task_title"
         android:layout_toRightOf="@id/complete"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 </merge>

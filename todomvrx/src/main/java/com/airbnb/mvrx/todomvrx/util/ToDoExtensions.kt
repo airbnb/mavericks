@@ -1,10 +1,10 @@
 package com.airbnb.mvrx.todomvrx.util
 
+import android.view.View
+import android.view.ViewGroup
 import androidx.annotation.StringRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.snackbar.Snackbar
-import android.view.View
-import android.view.ViewGroup
 
 fun <T> List<T>.upsert(value: T, finder: (T) -> Boolean) = indexOfFirst(finder).let { index ->
     if (index >= 0) copy(index, value) else this + value

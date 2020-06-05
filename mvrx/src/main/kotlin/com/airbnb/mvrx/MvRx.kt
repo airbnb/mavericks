@@ -35,7 +35,7 @@ object MvRx {
     var viewModelConfigFactory: MavericksViewModelConfigFactory? = null
 
     /**
-     * A helper for setting [viewModelConfigFactory] based on whether the app was built in debug mode or not
+     * A helper for setting [viewModelConfigFactory] based on whether the app was built in debug mode or not.
      */
     fun install(context: Context) {
         install(context.isDebuggable())

@@ -25,7 +25,7 @@ jobs:
   include:
     - stage: format
       name: Detekt
-      script: "./detekt"
+      script: "./gradlew detekt -PCI=true"
     - stage: test
       name: Lint
       script: "./gradlew lintRelease"

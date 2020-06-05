@@ -13,11 +13,11 @@ import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.Uninitialized
 import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.fragmentViewModel
+import com.airbnb.mvrx.mocking.mockSingleViewModel
 import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.core.MvRxViewModel
 import com.airbnb.mvrx.sample.databinding.RandomDadJokeFragmentBinding
-import com.airbnb.mvrx.mocking.mockSingleViewModel
 import com.airbnb.mvrx.sample.features.dadjoke.mocks.mockRandomDadJokeState
 import com.airbnb.mvrx.sample.models.Joke
 import com.airbnb.mvrx.sample.network.DadJokeService

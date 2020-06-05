@@ -1,7 +1,7 @@
 package com.airbnb.mvrx
 
 import android.graphics.Rect
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class MvRxExtensionsKtTest : BaseTest() {

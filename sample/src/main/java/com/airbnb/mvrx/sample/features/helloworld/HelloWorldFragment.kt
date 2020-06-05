@@ -25,7 +25,7 @@ class HelloWorldFragment : BaseFragment(R.layout.hello_world_fragment) {
         binding.toolbar.setupWithNavController(findNavController())
     }
 
-    override fun invalidate() = withState (viewModel) { state ->
+    override fun invalidate() = withState(viewModel) { state ->
         binding.marquee.setTitle(state.title)
     }
 }

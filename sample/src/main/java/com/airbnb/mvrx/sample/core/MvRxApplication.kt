@@ -32,16 +32,16 @@ class MvRxApplication : Application() {
 private val dadJokeServiceModule = module {
     factory {
         Moshi.Builder()
-                .add(KotlinJsonAdapterFactory())
-                .build()
+            .add(KotlinJsonAdapterFactory())
+            .build()
     }
 
     factory {
         Retrofit.Builder()
-                .baseUrl("https://icanhazdadjoke.com/")
-                .addConverterFactory(MoshiConverterFactory.create(get<Moshi>()))
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build()
+            .baseUrl("https://icanhazdadjoke.com/")
+            .addConverterFactory(MoshiConverterFactory.create(get<Moshi>()))
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .build()
     }
 
     single {

@@ -15,10 +15,10 @@ open class JacocoReportTask : JacocoReport() {
         }
 
         val excludes = listOf(
-                "**/R.class",
-                "**/R$*.class",
-                "**/BuildConfig.*",
-                "**/Manifest*.*"
+            "**/R.class",
+            "**/R$*.class",
+            "**/BuildConfig.*",
+            "**/Manifest*.*"
         )
         val buildDir = project.buildDir
 
@@ -30,10 +30,12 @@ open class JacocoReportTask : JacocoReport() {
         }
 
         classDirectories.from(arrayOf(debugTree), arrayOf(kotlinDebugTree))
-        sourceDirectories.from(arrayOf(
+        sourceDirectories.from(
+            arrayOf(
                 project.android.sourceSets.getByName("main").java.srcDirs,
                 "${project.projectDir}/src/main/kotlin"
-        ))
+            )
+        )
         executionData.from("$buildDir/jacoco/testDebugUnitTest.exec")
     }
 }

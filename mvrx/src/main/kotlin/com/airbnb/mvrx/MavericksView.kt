@@ -41,11 +41,14 @@ interface MavericksView : LifecycleOwner {
      * in onSaveInstance state. The viewId will not be accessed until a subscribe method is called.
      * Accessing mvrxViewId before calling super.onCreate() will cause a crash.
      */
-    val mvrxViewId: String get() = when (this) {
-        is ViewModelStoreOwner -> ViewModelProvider(this).get(MvRxViewIdViewModel::class.java).mvrxViewId
-        else -> error("If your MvRxView is not a ViewModelStoreOwner, you must implement mvrxViewId " +
-            "and return a string that is unique to this view and persistant across its entire lifecycle.")
-    }
+    val mvrxViewId: String
+        get() = when (this) {
+            is ViewModelStoreOwner -> ViewModelProvider(this).get(MvRxViewIdViewModel::class.java).mvrxViewId
+            else -> error(
+                "If your MvRxView is not a ViewModelStoreOwner, you must implement mvrxViewId " +
+                    "and return a string that is unique to this view and persistant across its entire lifecycle."
+            )
+        }
 
     /**
      * Override this to handle any state changes from MvRxViewModels created through MvRx Fragment delegates.

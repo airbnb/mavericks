@@ -8,8 +8,8 @@ import android.os.Parcelable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.test.TestCoroutineDispatcher
-import org.junit.AfterClass
 import org.junit.After
+import org.junit.AfterClass
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Ignore

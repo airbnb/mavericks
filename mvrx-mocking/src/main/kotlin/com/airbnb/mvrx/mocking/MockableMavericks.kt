@@ -1,14 +1,15 @@
 package com.airbnb.mvrx.mocking
 
 import android.content.Context
-import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.DefaultViewModelDelegateFactory
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.MvRxStateStore
 import com.airbnb.mvrx.ScriptableStateStore
 import com.airbnb.mvrx.isDebuggable
+import com.airbnb.mvrx.mocking.MockableMavericks.install
 import com.airbnb.mvrx.mocking.printer.MavericksMockPrinter
 import com.airbnb.mvrx.mocking.printer.MockPrinterConfiguration
 import com.airbnb.mvrx.mocking.printer.ViewModelStatePrinter

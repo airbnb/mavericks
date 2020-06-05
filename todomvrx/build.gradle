@@ -22,7 +22,7 @@ dependencies {
 
     implementation Libraries.appcompat
     implementation Libraries.constraintlayout
-    implementation (Libraries.epoxy) { exclude group: "com.android.support" }
+    implementation(Libraries.epoxy) { exclude group: "com.android.support" }
     implementation Libraries.espressoIdlingResource
     implementation Libraries.lifecycleCommon
     implementation Libraries.navigationFragmentKtx
