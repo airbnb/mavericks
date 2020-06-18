@@ -1,0 +1,57 @@
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-android-extensions"
+apply plugin: 'dagger.hilt.android.plugin'
+apply plugin: "kotlin-kapt"
+
+android {
+
+    defaultConfig {
+        applicationId "com.airbnb.mvrx.helloHilt"
+        versionCode 1
+        versionName "0.0.1"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file("debug.keystore")
+            storePassword "testing"
+            keyAlias "hellodagger"
+            keyPassword "testing"
+        }
+    }
+}
+
+dependencies {
+    kapt AnnotationProcessors.daggerAssisted
+    kapt AnnotationProcessors.hilt
+
+    implementation Libraries.appcompat
+    implementation Libraries.constraintlayout
+    implementation Libraries.coreKtx
+    implementation Libraries.daggerAssisted
+    implementation Libraries.fragmentKtx
+    implementation Libraries.hilt
+    implementation Libraries.rxJava
+    implementation Libraries.viewModelKtx
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation project(":mvrx")
+
+    debugImplementation Libraries.fragmentTesting
+
+    androidTestImplementation InstrumentedTestLibraries.core
+    androidTestImplementation InstrumentedTestLibraries.espresso
+    androidTestImplementation InstrumentedTestLibraries.junit
+
+    testImplementation TestLibraries.junit
+    testImplementation TestLibraries.mockk
+}
