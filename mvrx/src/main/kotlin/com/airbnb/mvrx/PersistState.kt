@@ -31,15 +31,18 @@ annotation class PersistState
 internal fun <T : MvRxState> T.persistState(validation: Boolean = false): Bundle {
     val jvmClass = this::class.java
     // Find the first constructor that has parameters annotated with @PersistState or return.
-    val constructor = jvmClass.constructors.firstOrNull { it.parameterAnnotations.any { it.any { it is PersistState } } } ?: return Bundle()
+    val constructor = jvmClass.constructors.firstOrNull { it.parameterAnnotations.any { it.any { it is PersistState } } }
+            ?: return Bundle()
 
     val bundle = Bundle()
     constructor.parameterAnnotations.forEachIndexed { i, p ->
         if (p.none { it is PersistState }) return@forEachIndexed
-        // For each parameter in the constructor, there is a componentN function becasuse state is a data class.
+        // For each parameter in the constructor, there is a componentN function because state is a data class.
         // We can rely on this to be true because the MvRxMutabilityHelpers asserts that the state class is a data class.
         // See MvRxMutabilityHelper Class<*>.isData
-        val getter = jvmClass.getDeclaredMethod("component${i + 1}").also { it.isAccessible = true }
+
+        val getter = jvmClass.getComponentNFunction(i)
+
         val value = getter.invoke(this)
         if (validation) assertCollectionPersistability(value)
         bundle.putAny(i.toString(), value)
@@ -47,17 +50,31 @@ internal fun <T : MvRxState> T.persistState(validation: Boolean = false): Bundle
     return bundle
 }
 
+private fun <T : MvRxState> Class<out T>.getComponentNFunction(componentIndex: Int): Method {
+    val functionName = "component${componentIndex + 1}"
+    return try {
+        getDeclaredMethod(functionName)
+    } catch (e: NoSuchMethodException) {
+        // if the data class property is internal then kotlin appends '$module_name_debug' to the
+        // expected function name.
+        declaredMethods.firstOrNull { it.name.startsWith("$functionName\$") }
+    }
+            ?.also { it.isAccessible = true }
+            ?: error("Unable to find function $functionName in ${this@getComponentNFunction::class.simpleName}")
+}
+
+
 private fun assertCollectionPersistability(value: Any?) {
     when (value) {
         is Collection<*> -> {
             value
-                .filterNotNull()
-                .forEach(::assertPersistable)
+                    .filterNotNull()
+                    .forEach(::assertPersistable)
         }
         is Map<*, *> -> {
             value
-                .mapNotNull { it.value }
-                .forEach(::assertPersistable)
+                    .mapNotNull { it.value }
+                    .forEach(::assertPersistable)
         }
     }
 }
@@ -81,7 +98,8 @@ private fun <T : Any?> Bundle.putAny(key: String?, value: T): Bundle {
  */
 internal fun <T : MvRxState> Bundle.restorePersistedState(initialState: T, validation: Boolean = false): T {
     val jvmClass = initialState::class.java
-    val constructor = jvmClass.constructors.firstOrNull { it.parameterAnnotations.any { it.any { it is PersistState } } } ?: return initialState
+    val constructor = jvmClass.constructors.firstOrNull { it.parameterAnnotations.any { it.any { it is PersistState } } }
+            ?: return initialState
 
     // If we don't set the correct class loader, when the bundle is restored in a new process, it will have the system class loader which
     // can't unmarshal any custom classes.

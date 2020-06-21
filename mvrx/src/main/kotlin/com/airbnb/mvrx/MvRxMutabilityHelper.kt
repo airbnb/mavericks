@@ -25,7 +25,7 @@ private const val IMMUTABLE_MAP_MESSAGE =
  * As a result, you may not use MutableList, mutableListOf(...) or the map variants by convention only.
  */
 internal fun KClass<*>.assertImmutability() {
-    require(java.isData) { "MvRx state must be a data class!" }
+    require(java.isData) { "MvRx state must be a data class! - ${this::class.simpleName}" }
 
     fun Field.isSubtype(vararg classes: KClass<*>): Boolean {
         return classes.any { klass ->
@@ -55,7 +55,7 @@ internal fun KClass<*>.assertImmutability() {
                     "You cannot use functions inside MvRx state. Only pure data should be represented: ${prop.name}"
                 }
                 else -> null
-            }?.let { throw IllegalArgumentException(it) }
+            }?.let { throw IllegalArgumentException("Invalid property in state ${this@assertImmutability::class.simpleName}: $it") }
         }
 }
 
@@ -63,10 +63,16 @@ internal fun KClass<*>.assertImmutability() {
  * Since we can only use java reflection, this basically duck types a data class.
  * componentN methods are also used for @PersistState.
  */
-private val Class<*>.isData: Boolean
+internal val Class<*>.isData: Boolean
     get() {
-        declaredMethods.firstOrNull { it.name == "copy\$default" } ?: return false
-        declaredMethods.firstOrNull { it.name == "component1" } ?: return false
+        if (!declaredMethods.any { it.name == "copy\$default" && it.isSynthetic }) {
+            return false
+        }
+
+        // if the data class property is internal then kotlin appends '$module_name_debug' to the
+        // expected function name.
+        declaredMethods.firstOrNull { it.name.startsWith("component1") } ?: return false
+
         declaredMethods.firstOrNull { it.name == "equals" } ?: return false
         declaredMethods.firstOrNull { it.name == "hashCode" } ?: return false
         return true
