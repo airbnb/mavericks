@@ -1,4 +1,7 @@
 # Change log
+## Version 1.5.1
+- Fix incorrectly failing debug assertions for state class being a data class when a property has internal visibility
+
 ## Version 1.5.0
 - Add an optional nullable value to all Async classes (#383)
 - Update various dependencies
