@@ -32,6 +32,17 @@ class PersistedStateTest : BaseTest() {
         assertEquals(5, newState.count)
     }
 
+    data class StateWithInternalVal(@PersistState internal val count: Int = 5) : MvRxState
+
+    @Test
+    fun saveInternalInt() {
+        // internal properties in data classes have different method names generated for them,
+        // and our custom copy function needs to handle that.
+        val bundle = PersistStateTestHelpers.persistState(StateWithInternalVal())
+        val newState = PersistStateTestHelpers.restorePersistedState(bundle, StateWithInternalVal())
+        assertEquals(5, newState.count)
+    }
+
     @Test(expected = IllegalStateException::class)
     fun validatesMissingKeyInBundle() {
         data class State(@PersistState val count: Int = 5) : MvRxState

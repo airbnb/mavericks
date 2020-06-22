@@ -7,6 +7,7 @@ import android.os.Parcelable
 import androidx.annotation.VisibleForTesting
 import java.io.Serializable
 import java.lang.reflect.Constructor
+import java.lang.reflect.Method
 
 /**
  * Annotate a field in your MvRxViewModel state with [PersistState] to have it automatically persisted when Android kills your process
@@ -39,7 +40,9 @@ internal fun <T : MvRxState> T.persistState(validation: Boolean = false): Bundle
         // For each parameter in the constructor, there is a componentN function because state is a data class.
         // We can rely on this to be true because the MvRxMutabilityHelpers asserts that the state class is a data class.
         // See MvRxMutabilityHelper Class<*>.isData
-        val getter = jvmClass.getDeclaredMethod("component${i + 1}").also { it.isAccessible = true }
+
+        val getter = jvmClass.getComponentNFunction(i)
+
         val value = getter.invoke(this)
         if (validation) assertCollectionPersistability(value)
         bundle.putAny(i.toString(), value)
@@ -55,6 +58,19 @@ private fun <T : MvRxState> Class<out T>.primaryConstructor(): Constructor<*>? {
             paramAnnotations.any { it is PersistState }
         }
     }
+}
+
+private fun <T : MvRxState> Class<out T>.getComponentNFunction(componentIndex: Int): Method {
+    val functionName = "component${componentIndex + 1}"
+    return try {
+        getDeclaredMethod(functionName)
+    } catch (e: NoSuchMethodException) {
+        // if the data class property is internal then kotlin appends '$module_name_debug' to the
+        // expected function name.
+        declaredMethods.firstOrNull { it.name.startsWith("$functionName\$") }
+    }
+        ?.also { it.isAccessible = true }
+        ?: error("Unable to find function $functionName in ${this@getComponentNFunction::class.simpleName}")
 }
 
 private fun assertCollectionPersistability(value: Any?) {
