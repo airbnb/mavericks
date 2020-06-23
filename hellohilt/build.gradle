@@ -28,15 +28,6 @@ android {
             signingConfig signingConfigs.debug
         }
     }
-
-    signingConfigs {
-        debug {
-            storeFile file("debug.keystore")
-            storePassword "testing"
-            keyAlias "hellodagger"
-            keyPassword "testing"
-        }
-    }
 }
 
 dependencies {
