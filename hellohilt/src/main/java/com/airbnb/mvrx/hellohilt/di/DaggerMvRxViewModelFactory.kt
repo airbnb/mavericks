@@ -10,7 +10,6 @@ import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
 
-
 /**
  * A [MvRxViewModelFactory] which makes it easy to create instances of a ViewModel
  * using its AssistedInject Factory. This class should be implemented by the companion object
@@ -18,8 +17,8 @@ import dagger.hilt.android.components.ApplicationComponent
  *
  * @param viewModelClass The [Class] of the ViewModel being requested for creation
  *
- * This class accesses the map of [AssistedViewModelFactory]s from [AppComponent] and uses it to
- * retrieve the requested ViewModel's factory class. It then creates an instance of this ViewModel
+ * This class accesses the map of [AssistedViewModelFactory]s from [ApplicationComponent] via an [EntryPoint]
+ * and uses it to retrieve the requested ViewModel's factory class. It then creates an instance of this ViewModel
  * using the retrieved factory and returns it.
  *
  * Example:

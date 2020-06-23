@@ -49,8 +49,10 @@ dependencies {
     implementation Libraries.hilt
     implementation Libraries.rxJava
     implementation Libraries.viewModelKtx
+    implementation Libraries.multidex
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation project(":mvrx")
+    implementation project(":mvrx-rxjava2")
+    implementation project(":mvrx-mocking")
 
     debugImplementation Libraries.fragmentTesting
 
@@ -58,6 +60,7 @@ dependencies {
     androidTestImplementation InstrumentedTestLibraries.espresso
     androidTestImplementation InstrumentedTestLibraries.junit
 
+    testImplementation project(":testing")
     testImplementation TestLibraries.junit
     testImplementation TestLibraries.mockk
 }
