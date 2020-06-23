@@ -12,6 +12,8 @@ android {
         versionName "0.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
+        // To disable checking for the InstallIn annotation and make assisted modules work without,
+        // the installIn annotation, enable the compiler option:
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments["dagger.hilt.disableModulesHaveInstallInCheck"] = "true"
@@ -50,7 +52,6 @@ dependencies {
     implementation Libraries.rxJava
     implementation Libraries.viewModelKtx
     implementation Libraries.multidex
-    implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(":mvrx-rxjava2")
     implementation project(":mvrx-mocking")
 
