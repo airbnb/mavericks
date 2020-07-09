@@ -71,7 +71,7 @@ data class Fail<out T>(val error: Throwable, private val value: T? = null) : Asy
             error.stackTrace.firstOrNull() == otherError.stackTrace.firstOrNull()
     }
 
-    override fun hashCode(): Int = Arrays.hashCode(arrayOf(error::class, error.message, error.stackTrace[0]))
+    override fun hashCode(): Int = Arrays.hashCode(arrayOf(error::class, error.message, error.stackTrace.firstOrNull()))
 }
 
 /**
