@@ -1,6 +1,7 @@
 package com.airbnb.mvrx
 
 import android.util.Log
+import androidx.annotation.RestrictTo
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -145,6 +146,18 @@ abstract class BaseMvRxViewModel<S : MvRxState>(
      * For ViewModels that want to subscribe to itself.
      */
     protected fun subscribe(subscriber: (S) -> Unit): Disposable = onEachInternal(null, action = { subscriber(it) }).toDisposable()
+
+    /**
+     * Subscribe to state when this LifecycleOwner is started.
+     */
+    @RestrictTo(RestrictTo.Scope.LIBRARY)
+    fun subscribe(
+        owner: LifecycleOwner,
+        deliveryMode: DeliveryMode = RedeliverOnStart,
+        subscriber: (S) -> Unit
+    ): Disposable {
+        return onEachInternal(owner, deliveryMode, { subscriber(it) }).toDisposable()
+    }
 
     /**
      * For ViewModels that want to subscribe to another ViewModel.
