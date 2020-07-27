@@ -533,6 +533,9 @@ abstract class MavericksViewModel<S : MvRxState>(
         }
         val scope = lifecycleOwner?.lifecycleScope ?: viewModelScope
         return scope.launch(start = CoroutineStart.UNDISPATCHED) {
+            // Use yield to ensure flow collect coroutine is dispatched rather than invoked immediately.
+            // This is necessary when Dispatchers.Main.immediate is used in scope.
+            // Coroutine is launched with start = CoroutineStart.UNDISPATCHED to perform dispatch only once.
             yield()
             flow.collectLatest(action)
         }
