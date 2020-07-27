@@ -7,6 +7,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -22,6 +23,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import kotlinx.coroutines.yield
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KProperty1
@@ -510,6 +512,7 @@ abstract class MavericksViewModel<S : MvRxState>(
         }
     }
 
+    @Suppress("EXPERIMENTAL_API_USAGE")
     private fun <T : Any> Flow<T>.resolveSubscription(
         lifecycleOwner: LifecycleOwner? = null,
         deliveryMode: DeliveryMode,
@@ -529,7 +532,8 @@ abstract class MavericksViewModel<S : MvRxState>(
             flowWhenStarted(lifecycleOwner)
         }
         val scope = lifecycleOwner?.lifecycleScope ?: viewModelScope
-        return scope.launch {
+        return scope.launch(start = CoroutineStart.UNDISPATCHED) {
+            yield()
             flow.collectLatest(action)
         }
     }
