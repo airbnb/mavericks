@@ -20,7 +20,7 @@ import java.util.concurrent.Executors
 @Suppress("EXPERIMENTAL_API_USAGE")
 class CoroutinesStateStore<S : MvRxState>(
     initialState: S,
-    scope: CoroutineScope
+    private val scope: CoroutineScope
 ) : MvRxStateStore<S> {
 
     private val setStateChannel = Channel<S.() -> S>(capacity = Channel.UNLIMITED)
@@ -84,12 +84,10 @@ class CoroutinesStateStore<S : MvRxState>(
     }
 
     /**
-     * Close all channels. It will complete state flow as well.
+     * Close [stateChannel]. It will complete state flow as well.
      */
     private fun closeChannels() {
         stateChannel.close()
-        setStateChannel.close()
-        withStateChannel.close()
     }
 
     /**
@@ -126,17 +124,23 @@ class CoroutinesStateStore<S : MvRxState>(
         }
     }
 
+    private fun flushQueuesOnceBlocking() {
+        if (scope.isActive) {
+            runBlocking { flushQueuesOnce() }
+        }
+    }
+
     override fun get(block: (S) -> Unit) {
         withStateChannel.offer(block)
         if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
-            runBlocking { flushQueuesOnce() }
+            flushQueuesOnceBlocking()
         }
     }
 
     override fun set(stateReducer: S.() -> S) {
         setStateChannel.offer(stateReducer)
         if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
-            runBlocking { flushQueuesOnce() }
+            flushQueuesOnceBlocking()
         }
     }
 
