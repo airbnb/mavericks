@@ -1,5 +1,6 @@
 package com.airbnb.mvrx
 
+import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -15,6 +16,8 @@ class SetStateWithStateAfterScopeCancellation : BaseTest() {
         scope.cancel()
         val store = CoroutinesStateStore(State(foo = 0), scope)
         store.set { copy(foo = foo + 1) }
+        // ensure set operation above is ignored
+        assertEquals(0, store.state.foo)
     }
 
     @Test
@@ -22,7 +25,6 @@ class SetStateWithStateAfterScopeCancellation : BaseTest() {
         val scope = CoroutineScope(Dispatchers.Default + Job())
         scope.cancel()
         val store = CoroutinesStateStore(State(foo = 0), scope)
-        store.get {  }
+        store.get { }
     }
-
 }
