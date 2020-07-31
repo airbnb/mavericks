@@ -2,9 +2,8 @@ package com.airbnb.mvrx.hellokoin
 
 import io.reactivex.Observable
 import java.util.concurrent.TimeUnit
-import javax.inject.Inject
 
-class HelloRepository @Inject constructor() {
+class HelloRepository {
 
     fun sayHello(): Observable<String> {
         return Observable

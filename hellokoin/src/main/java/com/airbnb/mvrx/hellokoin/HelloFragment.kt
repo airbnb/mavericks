@@ -18,6 +18,8 @@ class HelloFragment : BaseMvRxFragment(R.layout.fragment_hello) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         helloButton.setOnClickListener { viewModel.sayHello() }
+        viewModel.logStateChanges()
+        viewModel.sayHello()
     }
 
     override fun invalidate() = withState(viewModel) { state ->
