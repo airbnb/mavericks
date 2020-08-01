@@ -95,6 +95,7 @@ object InstrumentedTestLibraries {
     const val core = "androidx.test:core:${Versions.testCore}"
     const val espresso = "androidx.test.espresso:espresso-core:${Versions.espresso}"
     const val junit = "androidx.test.ext:junit:${Versions.junitExt}"
+    const val junitExt = "androidx.test.ext:junit-ktx:${Versions.junitExt}"
 }
 
 object TestLibraries {

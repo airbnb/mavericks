@@ -37,6 +37,7 @@ dependencies {
     androidTestImplementation InstrumentedTestLibraries.core
     androidTestImplementation InstrumentedTestLibraries.espresso
     androidTestImplementation InstrumentedTestLibraries.junit
+    androidTestImplementation InstrumentedTestLibraries.junitExt
 
     testImplementation TestLibraries.junit
     testImplementation TestLibraries.mockk
