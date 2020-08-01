@@ -4,13 +4,11 @@ import android.os.Bundle
 import android.view.View
 import com.airbnb.mvrx.*
 import com.airbnb.mvrx.hellokoin.di.koinActivityViewModel
-import kotlinx.android.synthetic.main.fragment_hello.helloButton
-import kotlinx.android.synthetic.main.fragment_hello.messageTextView
-import org.koin.androidx.scope.lifecycleScope
+import kotlinx.android.synthetic.main.fragment_hello.*
 
-class HelloFragment : BaseMvRxFragment(R.layout.fragment_hello) {
+class ScopedHelloFragment : BaseMvRxFragment(R.layout.fragment_hello) {
 
-    val viewModel: HelloViewModel by fragmentViewModel()
+    val viewModel: ScopedHelloViewModel by koinActivityViewModel()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         helloButton.setOnClickListener { viewModel.sayHello() }

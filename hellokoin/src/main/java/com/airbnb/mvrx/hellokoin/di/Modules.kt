@@ -1,8 +1,6 @@
 package com.airbnb.mvrx.hellokoin.di
 
-import com.airbnb.mvrx.hellokoin.HelloRepository
-import com.airbnb.mvrx.hellokoin.HelloState
-import com.airbnb.mvrx.hellokoin.HelloViewModel
+import com.airbnb.mvrx.hellokoin.*
 import org.koin.androidx.viewmodel.compat.ScopeCompat.viewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.KoinContextHandler.get
@@ -15,6 +13,10 @@ val appModule = module {
 
 val mvvmModule = module {
     viewModel { (state: HelloState) -> HelloViewModel(state, get()) }
+
+    scope<MainActivity> {
+        viewModel { (state: ScopedHelloState) -> ScopedHelloViewModel(state, get()) }
+    }
 }
 
 val allModules = appModule + mvvmModule

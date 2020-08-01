@@ -1,10 +1,22 @@
 package com.airbnb.mvrx.hellokoin
 
+import android.content.ComponentCallbacks
 import android.util.Log
+import androidx.lifecycle.LifecycleOwner
 import com.airbnb.mvrx.*
 import com.airbnb.mvrx.hellokoin.base.BaseViewModel
+import com.airbnb.mvrx.hellokoin.di.KoinMvRxViewModelFactory
+import org.koin.android.ext.android.getKoin
+import org.koin.androidx.scope.lifecycleScope
 import org.koin.core.context.KoinContextHandler
 import org.koin.core.parameter.parametersOf
+import org.koin.core.qualifier.Qualifier
+import org.koin.core.qualifier.named
+import org.koin.core.scope.Scope
+import org.koin.core.scope.ScopeID
+import org.koin.ext.getOrCreateScope
+import org.koin.ext.getScopeId
+import org.koin.ext.getScopeName
 
 data class HelloState(
         @PersistState val counter: Int = 0,
@@ -12,13 +24,13 @@ data class HelloState(
 ) : MvRxState
 
 class HelloViewModel constructor(
-    /*@Assisted*/ state: HelloState,
+    state: HelloState,
     private val repo: HelloRepository
 ) : BaseViewModel<HelloState>(state) {
 
-//    init {
-//        sayHello()
-//    }
+    init {
+        sayHello()
+    }
 
     fun sayHello() {
         repo.sayHello().execute {
@@ -26,13 +38,5 @@ class HelloViewModel constructor(
         }
     }
 
-    companion object : MvRxViewModelFactory<HelloViewModel, HelloState> {
-        override fun create(viewModelContext: ViewModelContext, state: HelloState): HelloViewModel? {
-            Log.i("State", "Initial state: $state")
-            val koin = KoinContextHandler.get()
-            return koin.get<HelloViewModel> {
-                parametersOf(state)
-            }
-        }
-    }
+    companion object : KoinMvRxViewModelFactory<HelloViewModel, HelloState>(HelloViewModel::class.java)
 }

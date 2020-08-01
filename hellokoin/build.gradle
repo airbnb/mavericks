@@ -10,6 +10,8 @@ android {
         versionCode 1
         versionName "0.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        multiDexEnabled true
     }
 }
 
@@ -21,6 +23,8 @@ dependencies {
 
     implementation Libraries.appcompat
     implementation Libraries.constraintlayout
+    implementation Libraries.navigationFragmentKtx
+    implementation Libraries.navigationUiKtx
     implementation Libraries.coreKtx
     implementation Libraries.fragmentKtx
     implementation Libraries.rxJava
