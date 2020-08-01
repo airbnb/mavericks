@@ -12,10 +12,12 @@ class ScopedHelloFragment : BaseMvRxFragment(R.layout.fragment_hello) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         helloButton.setOnClickListener { viewModel.sayHello() }
+        // To immediately apply state from VM to UI
+        invalidate()
     }
 
     override fun invalidate() = withState(viewModel) { state ->
-        helloButton.isEnabled = state.message !is Loading
+        helloButton.isEnabled = state.message !is Incomplete
         messageTextView.text = when (state.message) {
             is Uninitialized, is Loading -> getString(R.string.hello_fragment_loading_text)
             is Success -> state.message()
