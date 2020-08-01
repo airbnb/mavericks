@@ -52,7 +52,8 @@ sealed class ViewModelContext {
     abstract val activity: FragmentActivity
 
     internal abstract val savedStateRegistry: SavedStateRegistry
-    internal abstract val owner: ViewModelStoreOwner
+    abstract val owner: ViewModelStoreOwner
+    abstract val customData: Any?
 
     /**
      * Convenience method to type [activity].
@@ -85,7 +86,8 @@ sealed class ViewModelContext {
  */
 data class ActivityViewModelContext(
     override val activity: FragmentActivity,
-    override val args: Any?
+    override val args: Any?,
+    override val customData: Any? = null
 ) : ViewModelContext() {
     override val owner get() = activity
     override val savedStateRegistry get() = activity.savedStateRegistry
@@ -101,7 +103,8 @@ data class FragmentViewModelContext(
     /**
      * The fragment owner of the ViewModel.
      */
-    val fragment: Fragment
+    val fragment: Fragment,
+    override val customData: Any? = null
 ) : ViewModelContext() {
 
     override val owner get() = fragment
