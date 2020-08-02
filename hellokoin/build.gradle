@@ -16,11 +16,8 @@ android {
 }
 
 dependencies {
-    def koin_version = '2.1.6'
-    implementation("org.koin:koin-androidx-ext:$koin_version")
-    implementation("org.koin:koin-androidx-fragment:$koin_version")
-    implementation("org.koin:koin-android-viewmodel:$koin_version")
-
+    implementation Libraries.koinExt
+    implementation Libraries.koinViewModelExt
     implementation Libraries.appcompat
     implementation Libraries.constraintlayout
     implementation Libraries.navigationFragmentKtx
@@ -42,6 +39,6 @@ dependencies {
     testImplementation TestLibraries.junit
     testImplementation TestLibraries.mockk
     testImplementation TestLibraries.roboeletric
-    testImplementation("org.koin:koin-test:$koin_version")
+    testImplementation TestLibraries.koinTest
     testImplementation project(":testing")
 }
