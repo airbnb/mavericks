@@ -1,13 +1,23 @@
 package com.airbnb.mvrx.hellokoin
 
 import androidx.fragment.app.FragmentActivity
-import com.airbnb.mvrx.*
+import com.airbnb.mvrx.ActivityViewModelContext
+import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MvRxViewModelProvider
 import com.airbnb.mvrx.hellokoin.base.BaseViewModel
 import com.airbnb.mvrx.hellokoin.di.KoinMvRxViewModelFactory
+import com.airbnb.mvrx.hellokoin.di.KoinNoFactoryFoundException
 import com.airbnb.mvrx.hellokoin.di.defaultScopeProvider
 import com.airbnb.mvrx.hellokoin.di.scopeProvider
 import com.airbnb.mvrx.test.MvRxTestRule
-import org.junit.*
+import com.airbnb.mvrx.withState
+import org.junit.After
+import org.junit.Assert
+import org.junit.Before
+import org.junit.ClassRule
+import org.junit.Rule
+import org.junit.Test
+import org.junit.rules.ExpectedException
 import org.junit.runner.RunWith
 import org.koin.android.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
@@ -55,6 +65,9 @@ class KoinMvRxViewModelFactoryTest : KoinTest {
         @ClassRule
         val mvrxTestRule = MvRxTestRule()
     }
+
+    @get:Rule
+    val exception: ExpectedException = ExpectedException.none()
 
     private lateinit var activity: FragmentActivity
 
@@ -134,5 +147,47 @@ class KoinMvRxViewModelFactoryTest : KoinTest {
         withState(viewModel) { state ->
             Assert.assertEquals(ScopedTestState(), state)
         }
+    }
+
+    @Test
+    fun failToCreateFromOuterScope() {
+        startKoin {
+            loadModule {
+                factory { GlobalDependency() }
+                scope<FragmentActivity> {
+                    scoped { ScopedDependency() }
+                    viewModel { (state: ScopedTestState) -> ScopedTestViewModel(state, get(), get()) }
+                }
+            }
+        }
+
+        exception.expectCause<KoinNoFactoryFoundException>()
+        MvRxViewModelProvider.get(
+                ScopedTestViewModel::class.java,
+                ScopedTestState::class.java,
+                ActivityViewModelContext(activity, null),
+                ScopedTestViewModel::class.java.name
+        )
+    }
+
+    @Test
+    fun failToCreateFromInnerScope() {
+        startKoin {
+            loadModule {
+                factory { GlobalDependency() }
+                viewModel { (state: TestState) -> TestViewModel(state, get()) }
+                scope<FragmentActivity> {
+                    scoped { ScopedDependency() }
+                }
+            }
+        }
+
+        exception.expectCause<KoinNoFactoryFoundException>()
+        MvRxViewModelProvider.get(
+                ScopedTestViewModel::class.java,
+                ScopedTestState::class.java,
+                ActivityViewModelContext(activity, null, customData = defaultScopeProvider),
+                ScopedTestViewModel::class.java.name
+        )
     }
 }
