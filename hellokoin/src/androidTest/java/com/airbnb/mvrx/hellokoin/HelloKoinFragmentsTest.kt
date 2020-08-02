@@ -4,7 +4,9 @@ import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.isEnabled
+import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.filters.MediumTest
 import com.airbnb.mvrx.Loading
@@ -14,11 +16,11 @@ import com.airbnb.mvrx.hellokoin.screens.scopedhello.ScopedHelloFragment
 import com.airbnb.mvrx.withState
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.TestScheduler
+import java.util.concurrent.TimeUnit
 import org.hamcrest.CoreMatchers.not
 import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
-import java.util.concurrent.TimeUnit
 
 @MediumTest
 class HelloKoinFragmentsTest {

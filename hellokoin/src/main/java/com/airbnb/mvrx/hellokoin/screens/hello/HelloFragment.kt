@@ -2,8 +2,15 @@ package com.airbnb.mvrx.hellokoin.screens.hello
 
 import android.os.Bundle
 import android.view.View
-import com.airbnb.mvrx.*
+import com.airbnb.mvrx.BaseMvRxFragment
+import com.airbnb.mvrx.Fail
+import com.airbnb.mvrx.Incomplete
+import com.airbnb.mvrx.Loading
+import com.airbnb.mvrx.Success
+import com.airbnb.mvrx.Uninitialized
+import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.hellokoin.R
+import com.airbnb.mvrx.withState
 import kotlinx.android.synthetic.main.fragment_hello.helloButton
 import kotlinx.android.synthetic.main.fragment_hello.messageTextView
 

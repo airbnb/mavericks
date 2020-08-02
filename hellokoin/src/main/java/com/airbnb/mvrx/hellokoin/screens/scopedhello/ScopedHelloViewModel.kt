@@ -10,14 +10,14 @@ import com.airbnb.mvrx.hellokoin.base.BaseViewModel
 import com.airbnb.mvrx.hellokoin.di.KoinMvRxViewModelFactory
 
 data class ScopedHelloState(
-        @PersistState val counter: Int = 0,
-        val message: Async<String> = Uninitialized
+    @PersistState val counter: Int = 0,
+    val message: Async<String> = Uninitialized
 ) : MvRxState
 
 class ScopedHelloViewModel constructor(
-        state: ScopedHelloState,
-        private val repo: HelloRepository,
-        private val scopedObject: ScopedObject
+    state: ScopedHelloState,
+    private val repo: HelloRepository,
+    private val scopedObject: ScopedObject
 ) : BaseViewModel<ScopedHelloState>(state) {
 
     init {

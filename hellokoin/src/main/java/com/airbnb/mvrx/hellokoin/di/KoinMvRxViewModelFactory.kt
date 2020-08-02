@@ -11,15 +11,15 @@ import org.koin.core.parameter.parametersOf
 
 
 abstract class KoinMvRxViewModelFactory<VM : BaseViewModel<S>, S : MvRxState>(
-        private val viewModelClass: Class<out BaseViewModel<S>>
+    private val viewModelClass: Class<out BaseViewModel<S>>
 ) : MvRxViewModelFactory<VM, S> {
 
     @Suppress("UNCHECKED_CAST")
     override fun create(viewModelContext: ViewModelContext, state: S): VM? {
         val koinScope = try {
             (viewModelContext.customData as? MvRxKoinScopeProvider)
-                    ?.invoke(viewModelContext)
-                    ?: KoinContextHandler.get()._scopeRegistry.rootScope
+                ?.invoke(viewModelContext)
+                ?: KoinContextHandler.get()._scopeRegistry.rootScope
         } catch (e: IllegalStateException) {
             /**
              * If couldn't get [rootScope],

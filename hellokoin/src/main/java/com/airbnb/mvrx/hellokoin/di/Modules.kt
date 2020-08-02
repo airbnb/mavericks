@@ -1,6 +1,8 @@
 package com.airbnb.mvrx.hellokoin.di
 
-import com.airbnb.mvrx.hellokoin.*
+import com.airbnb.mvrx.hellokoin.HelloRepository
+import com.airbnb.mvrx.hellokoin.MainActivity
+import com.airbnb.mvrx.hellokoin.ScopedObject
 import com.airbnb.mvrx.hellokoin.screens.hello.HelloState
 import com.airbnb.mvrx.hellokoin.screens.hello.HelloViewModel
 import com.airbnb.mvrx.hellokoin.screens.scopedhello.ScopedHelloState

@@ -31,27 +31,27 @@ class GlobalDependency
 class ScopedDependency
 
 data class TestState(
-        val int: Int = 0,
-        val str: String = "test"
+    val int: Int = 0,
+    val str: String = "test"
 ) : MvRxState
 
 class TestViewModel constructor(
-        state: TestState,
-        private val globalDep: GlobalDependency
+    state: TestState,
+    private val globalDep: GlobalDependency
 ) : BaseViewModel<TestState>(state) {
 
     companion object : KoinMvRxViewModelFactory<TestViewModel, TestState>(TestViewModel::class.java)
 }
 
 data class ScopedTestState(
-        val int: Int = 0,
-        val str: String = "test"
+    val int: Int = 0,
+    val str: String = "test"
 ) : MvRxState
 
 class ScopedTestViewModel constructor(
-        state: ScopedTestState,
-        private val globalDep: GlobalDependency,
-        private val scopedDep: ScopedDependency
+    state: ScopedTestState,
+    private val globalDep: GlobalDependency,
+    private val scopedDep: ScopedDependency
 ) : BaseViewModel<ScopedTestState>(state) {
 
     companion object : KoinMvRxViewModelFactory<ScopedTestViewModel, ScopedTestState>(ScopedTestViewModel::class.java)
@@ -91,10 +91,10 @@ class KoinMvRxViewModelFactoryTest : KoinTest {
         }
 
         val viewModel = MvRxViewModelProvider.get(
-                TestViewModel::class.java,
-                TestState::class.java,
-                ActivityViewModelContext(activity, null),
-                TestViewModel::class.java.name
+            TestViewModel::class.java,
+            TestState::class.java,
+            ActivityViewModelContext(activity, null),
+            TestViewModel::class.java.name
         )
         withState(viewModel) { state ->
             Assert.assertEquals(TestState(), state)
@@ -114,10 +114,10 @@ class KoinMvRxViewModelFactoryTest : KoinTest {
         }
 
         val viewModel = MvRxViewModelProvider.get(
-                ScopedTestViewModel::class.java,
-                ScopedTestState::class.java,
-                ActivityViewModelContext(activity, null, customData = defaultScopeProvider),
-                ScopedTestViewModel::class.java.name
+            ScopedTestViewModel::class.java,
+            ScopedTestState::class.java,
+            ActivityViewModelContext(activity, null, customData = defaultScopeProvider),
+            ScopedTestViewModel::class.java.name
         )
         withState(viewModel) { state ->
             Assert.assertEquals(ScopedTestState(), state)
@@ -139,10 +139,10 @@ class KoinMvRxViewModelFactoryTest : KoinTest {
         val testScope = getKoin().createScope("testScope", named("custom_scope"))
 
         val viewModel = MvRxViewModelProvider.get(
-                ScopedTestViewModel::class.java,
-                ScopedTestState::class.java,
-                ActivityViewModelContext(activity, null, customData = scopeProvider { testScope }),
-                ScopedTestViewModel::class.java.name
+            ScopedTestViewModel::class.java,
+            ScopedTestState::class.java,
+            ActivityViewModelContext(activity, null, customData = scopeProvider { testScope }),
+            ScopedTestViewModel::class.java.name
         )
         withState(viewModel) { state ->
             Assert.assertEquals(ScopedTestState(), state)
@@ -163,10 +163,10 @@ class KoinMvRxViewModelFactoryTest : KoinTest {
 
         exception.expectCause<KoinNoFactoryFoundException>()
         MvRxViewModelProvider.get(
-                ScopedTestViewModel::class.java,
-                ScopedTestState::class.java,
-                ActivityViewModelContext(activity, null),
-                ScopedTestViewModel::class.java.name
+            ScopedTestViewModel::class.java,
+            ScopedTestState::class.java,
+            ActivityViewModelContext(activity, null),
+            ScopedTestViewModel::class.java.name
         )
     }
 
@@ -184,10 +184,10 @@ class KoinMvRxViewModelFactoryTest : KoinTest {
 
         exception.expectCause<KoinNoFactoryFoundException>()
         MvRxViewModelProvider.get(
-                ScopedTestViewModel::class.java,
-                ScopedTestState::class.java,
-                ActivityViewModelContext(activity, null, customData = defaultScopeProvider),
-                ScopedTestViewModel::class.java.name
+            ScopedTestViewModel::class.java,
+            ScopedTestState::class.java,
+            ActivityViewModelContext(activity, null, customData = defaultScopeProvider),
+            ScopedTestViewModel::class.java.name
         )
     }
 }

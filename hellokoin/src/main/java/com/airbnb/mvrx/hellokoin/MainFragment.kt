@@ -1,13 +1,12 @@
 package com.airbnb.mvrx.hellokoin
 
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.View
 import androidx.annotation.IdRes
 import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.BaseMvRxFragment
-import com.airbnb.mvrx.MvRx
-import kotlinx.android.synthetic.main.fragment_main.*
+import kotlinx.android.synthetic.main.fragment_main.helloButton
+import kotlinx.android.synthetic.main.fragment_main.scopedHelloButton
 
 class MainFragment : BaseMvRxFragment(R.layout.fragment_main) {
 

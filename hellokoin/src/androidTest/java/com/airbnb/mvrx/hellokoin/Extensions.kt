@@ -5,7 +5,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.fragment.NavHostFragment
 
-fun <A: Fragment> FragmentActivity.findFragmentById(@IdRes id: Int): A {
+fun <A : Fragment> FragmentActivity.findFragmentById(@IdRes id: Int): A {
     @Suppress("UNCHECKED_CAST")
     return supportFragmentManager.findFragmentById(id) as A
 }
