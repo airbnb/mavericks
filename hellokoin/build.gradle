@@ -41,4 +41,7 @@ dependencies {
 
     testImplementation TestLibraries.junit
     testImplementation TestLibraries.mockk
+    testImplementation TestLibraries.roboeletric
+    testImplementation("org.koin:koin-test:$koin_version")
+    testImplementation project(":testing")
 }

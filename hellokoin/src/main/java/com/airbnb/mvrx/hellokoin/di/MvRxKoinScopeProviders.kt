@@ -8,6 +8,8 @@ import org.koin.core.scope.Scope
 
 typealias MvRxKoinScopeProvider = (ViewModelContext) -> Scope?
 
+fun scopeProvider(block: MvRxKoinScopeProvider): MvRxKoinScopeProvider = block
+
 val defaultScopeProvider: MvRxKoinScopeProvider = { context ->
     when (context) {
         is ActivityViewModelContext -> context.activity.lifecycleScope
