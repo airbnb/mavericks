@@ -57,6 +57,9 @@ class ScopedTestViewModel constructor(
     companion object : KoinMvRxViewModelFactory<ScopedTestViewModel, ScopedTestState>(ScopedTestViewModel::class.java)
 }
 
+/**
+ * Test integration between [Koin] an [MvRx] in [KoinMvRxViewModelFactory].
+ */
 @RunWith(RobolectricTestRunner::class)
 class KoinMvRxViewModelFactoryTest : KoinTest {
 

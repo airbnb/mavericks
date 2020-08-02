@@ -22,6 +22,9 @@ import org.junit.BeforeClass
 import org.junit.Rule
 import org.junit.Test
 
+/**
+ * UI tests for checking correctness of [Koin] and [MvRx] integration in sample app.
+ */
 @MediumTest
 class HelloKoinFragmentsTest {
 

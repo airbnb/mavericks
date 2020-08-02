@@ -53,6 +53,11 @@ sealed class ViewModelContext {
 
     internal abstract val savedStateRegistry: SavedStateRegistry
     abstract val owner: ViewModelStoreOwner
+    /**
+     * Custom data, that can be specified from client. One of useful applications
+     * of this property - easing creation of custom MvRxViewModelFactories.
+     * @see [com.airbnb.mvrx.hellokoin.di.KoinMvRxViewModelFactory]
+     */
     abstract val customData: Any?
 
     /**
