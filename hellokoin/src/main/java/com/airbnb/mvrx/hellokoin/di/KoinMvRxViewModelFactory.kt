@@ -16,10 +16,11 @@ import org.koin.core.parameter.parametersOf
  * of every ViewModel which wants to use [Koin] bindings.
  *
  * This class accesses either [org.koin.core.scope.Scope] provided by [MvRxKoinScopeProvider] from
- * [ViewModelContext], or rootScope of [Koin] (note, that prior to this, `startKoin` should be called).
+ * [ViewModelContext], or rootScope of [Koin], if no [MvRxKoinScopeProvider] was provided
+ * (note, that prior to this, `startKoin` should be called).
  * Than the scope is used to get or create ViewModel for requested [viewModelClass].
  *
- * Example:
+ * Here is an example, how you can attach this factory to your ViewModel:
  *
  * class MyViewModel constructor(...): BaseViewModel<MyState>(...) {
  *
