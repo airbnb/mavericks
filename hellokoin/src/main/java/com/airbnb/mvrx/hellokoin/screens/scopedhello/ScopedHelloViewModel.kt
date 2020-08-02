@@ -1,9 +1,11 @@
-package com.airbnb.mvrx.hellokoin
+package com.airbnb.mvrx.hellokoin.screens.scopedhello
 
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.PersistState
 import com.airbnb.mvrx.Uninitialized
+import com.airbnb.mvrx.hellokoin.HelloRepository
+import com.airbnb.mvrx.hellokoin.ScopedObject
 import com.airbnb.mvrx.hellokoin.base.BaseViewModel
 import com.airbnb.mvrx.hellokoin.di.KoinMvRxViewModelFactory
 
@@ -13,9 +15,9 @@ data class ScopedHelloState(
 ) : MvRxState
 
 class ScopedHelloViewModel constructor(
-    state: ScopedHelloState,
-    private val repo: HelloRepository,
-    private val scopedObject: ScopedObject
+        state: ScopedHelloState,
+        private val repo: HelloRepository,
+        private val scopedObject: ScopedObject
 ) : BaseViewModel<ScopedHelloState>(state) {
 
     init {

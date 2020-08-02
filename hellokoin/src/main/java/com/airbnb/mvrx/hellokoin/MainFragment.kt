@@ -21,13 +21,7 @@ class MainFragment : BaseMvRxFragment(R.layout.fragment_main) {
         // No-op
     }
 
-    protected fun navigateTo(@IdRes actionId: Int, arg: Parcelable? = null) {
-        /**
-         * If we put a parcelable arg in [MvRx.KEY_ARG] then MvRx will attempt to call a secondary
-         * constructor on any MvRxState objects and pass in this arg directly.
-         * @see [com.airbnb.mvrx.sample.features.dadjoke.DadJokeDetailState]
-         */
-        val bundle = arg?.let { Bundle().apply { putParcelable(MvRx.KEY_ARG, it) } }
-        findNavController().navigate(actionId, bundle)
+    protected fun navigateTo(@IdRes actionId: Int) {
+        findNavController().navigate(actionId, null)
     }
 }

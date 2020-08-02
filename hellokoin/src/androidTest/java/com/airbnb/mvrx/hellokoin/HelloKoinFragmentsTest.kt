@@ -9,6 +9,8 @@ import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.filters.MediumTest
 import com.airbnb.mvrx.Loading
 import com.airbnb.mvrx.Success
+import com.airbnb.mvrx.hellokoin.screens.hello.HelloFragment
+import com.airbnb.mvrx.hellokoin.screens.scopedhello.ScopedHelloFragment
 import com.airbnb.mvrx.withState
 import io.reactivex.plugins.RxJavaPlugins
 import io.reactivex.schedulers.TestScheduler

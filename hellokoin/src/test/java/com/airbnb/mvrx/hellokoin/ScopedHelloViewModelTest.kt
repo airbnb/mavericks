@@ -1,5 +1,7 @@
 package com.airbnb.mvrx.hellokoin
 
+import com.airbnb.mvrx.hellokoin.screens.scopedhello.ScopedHelloState
+import com.airbnb.mvrx.hellokoin.screens.scopedhello.ScopedHelloViewModel
 import com.airbnb.mvrx.test.MvRxTestRule
 import com.airbnb.mvrx.withState
 import io.mockk.every

@@ -1,12 +1,11 @@
-package com.airbnb.mvrx.hellokoin
+package com.airbnb.mvrx.hellokoin.screens.hello
 
 import android.os.Bundle
 import android.view.View
 import com.airbnb.mvrx.*
-import com.airbnb.mvrx.hellokoin.di.koinActivityViewModel
+import com.airbnb.mvrx.hellokoin.R
 import kotlinx.android.synthetic.main.fragment_hello.helloButton
 import kotlinx.android.synthetic.main.fragment_hello.messageTextView
-import org.koin.androidx.scope.lifecycleScope
 
 class HelloFragment : BaseMvRxFragment(R.layout.fragment_hello) {
 

@@ -1,8 +1,9 @@
-package com.airbnb.mvrx.hellokoin
+package com.airbnb.mvrx.hellokoin.screens.scopedhello
 
 import android.os.Bundle
 import android.view.View
 import com.airbnb.mvrx.*
+import com.airbnb.mvrx.hellokoin.R
 import com.airbnb.mvrx.hellokoin.di.koinActivityViewModel
 import kotlinx.android.synthetic.main.fragment_hello.*
 
