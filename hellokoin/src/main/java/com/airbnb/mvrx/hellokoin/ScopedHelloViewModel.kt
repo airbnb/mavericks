@@ -14,7 +14,8 @@ data class ScopedHelloState(
 
 class ScopedHelloViewModel constructor(
     state: ScopedHelloState,
-    private val repo: HelloRepository
+    private val repo: HelloRepository,
+    private val scopedObject: ScopedObject
 ) : BaseViewModel<ScopedHelloState>(state) {
 
     init {
