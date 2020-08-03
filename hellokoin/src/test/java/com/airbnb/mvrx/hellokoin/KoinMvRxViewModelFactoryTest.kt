@@ -174,7 +174,7 @@ class KoinMvRxViewModelFactoryTest : KoinTest {
     }
 
     @Test
-    fun failToCreateFromInnerScope() {
+    fun createFromInnerScope() {
         startKoin {
             loadModule {
                 factory { GlobalDependency() }
@@ -185,12 +185,14 @@ class KoinMvRxViewModelFactoryTest : KoinTest {
             }
         }
 
-        exception.expectCause<KoinNoFactoryFoundException>()
-        MvRxViewModelProvider.get(
-            ScopedTestViewModel::class.java,
-            ScopedTestState::class.java,
+        val viewModel = MvRxViewModelProvider.get(
+            TestViewModel::class.java,
+            TestState::class.java,
             ActivityViewModelContext(activity, null, customData = defaultScopeProvider),
-            ScopedTestViewModel::class.java.name
+            TestViewModel::class.java.name
         )
+        withState(viewModel) { state ->
+            Assert.assertEquals(TestState(), state)
+        }
     }
 }
