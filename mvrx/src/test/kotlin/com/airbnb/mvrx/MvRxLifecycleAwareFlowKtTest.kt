@@ -75,4 +75,40 @@ class MvRxLifecycleAwareFlowKtTest {
         job.cancel()
         channel.close()
     }
+
+    @Test
+    fun testStateUpdateHasHigherPriority() = runBlockingTest {
+        val owner = TestLifecycleOwner()
+        owner.lifecycle.currentState = Lifecycle.State.STARTED
+        val values = mutableListOf<Int>()
+        val channel = Channel<Int>(Channel.UNLIMITED)
+        channel.send(0)
+        val job = channel.consumeAsFlow().flowWhenStarted(owner).onEach { value ->
+            values += value
+            if (value == 0) {
+                // add 1,2,3,4,5 to channel and stop lifecycle, so none of these values should be collected
+                repeat(5) { channel.send(it + 1) }
+                owner.lifecycle.currentState = Lifecycle.State.CREATED
+            }
+        }.launchIn(this)
+        delay(1)
+
+        assertEquals(listOf(0), values)
+        job.cancel()
+    }
+
+    @Test
+    fun testAllValuesCollectedIfLifecycleWasStarted() = runBlockingTest {
+        val owner = TestLifecycleOwner()
+        owner.lifecycle.currentState = Lifecycle.State.STARTED
+        val values = mutableListOf<Int>()
+        // Since lifecycle in started, we should collect all three values, not only last
+        val job = flowOf(1, 2, 3).flowWhenStarted(owner).onEach { value ->
+            values += value
+        }.launchIn(this)
+        delay(1)
+
+        assertEquals(listOf(1, 2, 3), values)
+        job.cancel()
+    }
 }
