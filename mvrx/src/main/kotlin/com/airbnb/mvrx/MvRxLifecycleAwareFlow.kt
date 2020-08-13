@@ -17,15 +17,13 @@ import kotlinx.coroutines.flow.onCompletion
  */
 fun <T : Any> Flow<T>.flowWhenStarted(owner: LifecycleOwner): Flow<T> {
     val startedChannel = startedChannel(owner.lifecycle)
-    return onCompletion {
-        startedChannel.cancel()
-    }.combineTransform<T, Boolean, T>(startedChannel.consumeAsFlow()) { value, started ->
+    return startedChannel.consumeAsFlow().combineTransform(this.onCompletion { startedChannel.cancel() }) { started, value ->
         if (started) emit(value)
     }
 }
 
 private fun startedChannel(owner: Lifecycle): Channel<Boolean> {
-    val channel = Channel<Boolean>(Channel.BUFFERED)
+    val channel = Channel<Boolean>(Channel.CONFLATED)
     val observer = object : DefaultLifecycleObserver {
         override fun onStart(owner: LifecycleOwner) {
             channel.offer(true)
