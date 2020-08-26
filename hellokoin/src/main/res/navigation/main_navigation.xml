@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.airbnb.mvrx.hellokoin.MainFragment"
+        android:label="MainFragment">
+        <action
+            android:id="@+id/action_mainFragment_to_helloFragment"
+            app:destination="@id/helloFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_scopedHelloFragment"
+            app:destination="@id/scopedHelloFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/helloFragment"
+        android:name="com.airbnb.mvrx.hellokoin.screens.hello.HelloFragment"
+        android:label="HelloFragment" />
+
+    <fragment
+        android:id="@+id/scopedHelloFragment"
+        android:name="com.airbnb.mvrx.hellokoin.screens.scopedhello.ScopedHelloFragment"
+        android:label="ScopedHelloFragment" />
+
+</navigation>

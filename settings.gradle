@@ -8,3 +8,4 @@ include ":dogs"
 include ":hellodagger"
 include ":sample"
 include ":todomvrx"
+include ':hellokoin'

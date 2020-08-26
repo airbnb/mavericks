@@ -1,0 +1,44 @@
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-android-extensions"
+apply plugin: "kotlin-kapt"
+
+android {
+
+    defaultConfig {
+        applicationId "com.airbnb.mvrx.helloKoin"
+        versionCode 1
+        versionName "0.0.1"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        multiDexEnabled true
+    }
+}
+
+dependencies {
+    implementation Libraries.koinExt
+    implementation Libraries.koinViewModelExt
+    implementation Libraries.appcompat
+    implementation Libraries.constraintlayout
+    implementation Libraries.navigationFragmentKtx
+    implementation Libraries.navigationUiKtx
+    implementation Libraries.coreKtx
+    implementation Libraries.fragmentKtx
+    implementation Libraries.rxJava
+    implementation Libraries.viewModelKtx
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+    implementation project(":mvrx")
+
+    debugImplementation Libraries.fragmentTesting
+
+    androidTestImplementation InstrumentedTestLibraries.core
+    androidTestImplementation InstrumentedTestLibraries.espresso
+    androidTestImplementation InstrumentedTestLibraries.junit
+    androidTestImplementation InstrumentedTestLibraries.junitExt
+
+    testImplementation TestLibraries.junit
+    testImplementation TestLibraries.mockk
+    testImplementation TestLibraries.roboeletric
+    testImplementation TestLibraries.koinTest
+    testImplementation project(":testing")
+}

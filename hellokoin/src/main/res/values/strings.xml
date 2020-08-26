@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Hello Koin</string>
+    <string name="hello_button_text">Say Hello</string>
+    <string name="hello_fragment_loading_text">Loading…</string>
+    <string name="hello_fragment_failure_text">Loading failed</string>
+    <string name="hello_sample">Hello Sample</string>
+    <string name="scoped_hello_sample">Scoped Hello Sample</string>
+</resources>

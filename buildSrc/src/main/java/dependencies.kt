@@ -24,7 +24,7 @@ object Versions {
     const val daggerAssisted = "0.5.2"
     const val debugDb = "1.0.4"
     const val epoxy = "3.9.0"
-    const val koin = "2.0.1"
+    const val koin = "2.1.6"
     const val lottie = "3.4.0"
     const val moshi = "1.9.2"
     const val multidex = "2.0.1"
@@ -70,6 +70,8 @@ object Libraries {
     const val fragmentTesting = "androidx.fragment:fragment-testing:${Versions.fragment}"
     const val junit = "junit:junit:${Versions.junit}"
     const val koin = "org.koin:koin-android:${Versions.koin}"
+    const val koinExt = "org.koin:koin-androidx-ext:${Versions.koin}"
+    const val koinViewModelExt = "org.koin:koin-android-viewmodel:${Versions.koin}"
     const val kotlin = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}"
     const val kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}"
     const val lifecycleCommon = "androidx.lifecycle:lifecycle-common-java8:${Versions.lifecycle}"
@@ -95,10 +97,12 @@ object InstrumentedTestLibraries {
     const val core = "androidx.test:core:${Versions.testCore}"
     const val espresso = "androidx.test.espresso:espresso-core:${Versions.espresso}"
     const val junit = "androidx.test.ext:junit:${Versions.junitExt}"
+    const val junitExt = "androidx.test.ext:junit-ktx:${Versions.junitExt}"
 }
 
 object TestLibraries {
     const val junit = "junit:junit:${Versions.junit}"
+    const val koinTest = "org.koin:koin-test:${Versions.koin}"
     const val mockito = "org.mockito:mockito-core:${Versions.mockito}"
     const val mockitoKotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:${Versions.mockitoKotlin}"
     const val mockk = "io.mockk:mockk:${Versions.mockk}"

@@ -52,7 +52,13 @@ sealed class ViewModelContext {
     abstract val activity: FragmentActivity
 
     internal abstract val savedStateRegistry: SavedStateRegistry
-    internal abstract val owner: ViewModelStoreOwner
+    abstract val owner: ViewModelStoreOwner
+    /**
+     * Custom data, that can be specified by client. One of useful applications
+     * of this property - easing creation of custom MvRxViewModelFactories.
+     * @see [com.airbnb.mvrx.hellokoin.di.KoinMvRxViewModelFactory]
+     */
+    abstract val customData: Any?
 
     /**
      * Convenience method to type [activity].
@@ -85,7 +91,8 @@ sealed class ViewModelContext {
  */
 data class ActivityViewModelContext(
     override val activity: FragmentActivity,
-    override val args: Any?
+    override val args: Any?,
+    override val customData: Any? = null
 ) : ViewModelContext() {
     override val owner get() = activity
     override val savedStateRegistry get() = activity.savedStateRegistry
@@ -101,7 +108,8 @@ data class FragmentViewModelContext(
     /**
      * The fragment owner of the ViewModel.
      */
-    val fragment: Fragment
+    val fragment: Fragment,
+    override val customData: Any? = null
 ) : ViewModelContext() {
 
     override val owner get() = fragment
