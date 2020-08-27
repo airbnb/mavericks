@@ -4,7 +4,7 @@ object Versions {
     const val compileSdk = 29
     const val gradlePlugin = "4.0.0"
     const val jetpack = "1.1.0"
-    const val kotlin = "1.3.72"
+    const val kotlin = "1.4.10-rc-360"
     const val minSdk = 16
     const val targetSdk = 29
 
@@ -21,7 +21,7 @@ object Versions {
 
     // Libraries
     const val autoValue = "1.6.6"
-    const val kotlinCoroutines = "1.3.7"
+    const val kotlinCoroutines = "1.3.9"
     const val dagger = "2.27"
     const val daggerAssisted = "0.5.2"
     const val debugDb = "1.0.4"
@@ -75,7 +75,6 @@ object Libraries {
     const val fragmentTesting = "androidx.fragment:fragment-testing:${Versions.fragment}"
     const val junit = "junit:junit:${Versions.junit}"
     const val koin = "org.koin:koin-android:${Versions.koin}"
-    const val kotlin = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}"
     const val kotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.kotlinCoroutines}"
     const val kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}"
     const val lifecycleCommon = "androidx.lifecycle:lifecycle-common-java8:${Versions.lifecycle}"

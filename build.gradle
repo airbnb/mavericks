@@ -5,6 +5,7 @@ buildscript {
         google()
         jcenter()
         maven { url "https://oss.sonatype.org/service/local/repositories/snapshots/content/" }
+        maven { url "https://dl.bintray.com/kotlin/kotlin-dev" }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:${Versions.gradlePlugin}"
@@ -40,6 +41,7 @@ allprojects {
         google()
         jcenter()
         maven { url "https://jitpack.io" }
+        maven { url "https://dl.bintray.com/kotlin/kotlin-dev/" }
     }
 
     tasks.whenTaskAdded { task ->

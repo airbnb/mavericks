@@ -32,10 +32,6 @@ class AndroidMetaModulePlugin : Plugin<Project> {
                     }
                 }
                 if (this is AppPlugin || this is LibraryPlugin) {
-                    dependencies {
-                        add("implementation", Libraries.kotlin)
-                    }
-
                     android.apply {
                         compileSdkVersion(Versions.compileSdk)
                         buildToolsVersion(Versions.buildTools)
