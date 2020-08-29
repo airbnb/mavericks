@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.os.Parcelable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.airbnb.mvrx.MvRx
+import com.airbnb.mvrx.Mavericks
 import org.junit.After
 import org.junit.Before
 import org.junit.Ignore
@@ -48,7 +48,7 @@ abstract class BaseTest {
         val activity = controller.get()
         val fragment = if (savedInstanceState == null) {
             F::class.java.newInstance().apply {
-                arguments = Bundle().apply { putParcelable(MvRx.KEY_ARG, args) }
+                arguments = Bundle().apply { putParcelable(Mavericks.KEY_ARG, args) }
                 activity.supportFragmentManager
                     .beginTransaction()
                     .also {

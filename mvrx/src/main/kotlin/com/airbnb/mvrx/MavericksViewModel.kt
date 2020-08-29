@@ -29,23 +29,21 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KProperty1
 
 /**
- * To use Mavericks, make a class MavericksViewModel or YourCompanyViewModel that extends BaseMavericksViewModel and set debugMode.
+ * All Mavericks ViewModels must extend this class. In Mavericks, ViewModels are generic on a single state class. The ViewModel owns all
+ * state modifications via [setState] and other classes may observe the state.
  *
- * Most of the time, debugMode should be set to `BuildConfig.DEBUG`. When debug mode is enabled, Mavericks will run a series of checks on
- * your state and reducers to ensure that you are using Mavericks safely and will catch numerous common errors and mistakes.
+ * From a [MavericksView]/Fragment, using the view model provider delegates will automatically subscribe to state updates in a lifecycle-aware way
+ * and call [MavericksView.invalidate] whenever it changes.
  *
- * Most base classes will look like:
- * ```
- * abstract class MavericksViewModel<S : MvRxState>(state: S) : BaseMavericksViewModel<S>(state, debugMode = BuildConfig.DEBUG)
- * ```
+ * Other classes can observe the state via [stateFlow].
  */
-abstract class MavericksViewModel<S : MvRxState>(
+abstract class MavericksViewModel<S : MavericksState>(
     initialState: S
 ) {
 
     @Suppress("LeakingThis")
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    val config: MavericksViewModelConfig<S> = MvRx.nonNullViewModelConfigFactory.provideConfig(
+    val config: MavericksViewModelConfig<S> = Mavericks.nonNullViewModelConfigFactory.provideConfig(
         this,
         initialState
     )
@@ -165,7 +163,7 @@ abstract class MavericksViewModel<S : MvRxState>(
      *
      * @param dispatcher The coroutine dispatcher that the coroutine will run on. Defaults to [Dispatchers.Main.immediate].
      * @param retainValue A state property that, when set, will be called to retrieve an optional existing data value that will be retained across
-     *                    subsequent Loading and Fail states. This is useful if you want to display the previously succcessful data when
+     *                    subsequent Loading and Fail states. This is useful if you want to display the previously successful data when
      *                    refreshing.
      * @param reducer A reducer that is applied to the current state and should return the new state. Because the state is the receiver
      *                and it likely a data class, an implementation may look like: `{ copy(response = it) }`.
@@ -181,7 +179,7 @@ abstract class MavericksViewModel<S : MvRxState>(
      *
      * @param dispatcher The coroutine dispatcher that the coroutine will run on. Defaults to [Dispatchers.Main.immediate].
      * @param retainValue A state property that, when set, will be called to retrieve an optional existing data value that will be retained across
-     *                    subsequent Loading and Fail states. This is useful if you want to display the previously succcessful data when
+     *                    subsequent Loading and Fail states. This is useful if you want to display the previously successful data when
      *                    refreshing.
      * @param reducer A reducer that is applied to the current state and should return the new state. Because the state is the receiver
      *                and it likely a data class, an implementation may look like: `{ copy(response = it) }`.
@@ -258,7 +256,7 @@ abstract class MavericksViewModel<S : MvRxState>(
     }
 
     /**
-     * Subscribe to state changes for only a single property.
+     * Subscribe to all state changes.
      *
      * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
      * the next one is emitted.
@@ -369,7 +367,9 @@ abstract class MavericksViewModel<S : MvRxState>(
      * Subscribe to changes in an async property. There are optional parameters for onSuccess
      * and onFail which automatically unwrap the value or error.
      *
-     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * @param onFail supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * the next one is emitted.
+     * @param onSuccess supports cooperative cancellation. The previous action will be cancelled if it as not completed before
      * the next one is emitted.
      */
     protected fun <T> onAsync(
@@ -392,7 +392,7 @@ abstract class MavericksViewModel<S : MvRxState>(
         deliveryMode: DeliveryMode = RedeliverOnStart,
         action: suspend (A) -> Unit
     ) = stateFlow
-        .map { MvRxTuple1(prop1.get(it)) }
+        .map { MavericksTuple1(prop1.get(it)) }
         .distinctUntilChanged()
         .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1)) { (a) ->
             action(a)
@@ -406,7 +406,7 @@ abstract class MavericksViewModel<S : MvRxState>(
         deliveryMode: DeliveryMode = RedeliverOnStart,
         action: suspend (A, B) -> Unit
     ) = stateFlow
-        .map { MvRxTuple2(prop1.get(it), prop2.get(it)) }
+        .map { MavericksTuple2(prop1.get(it), prop2.get(it)) }
         .distinctUntilChanged()
         .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2)) { (a, b) ->
             action(a, b)
@@ -421,7 +421,7 @@ abstract class MavericksViewModel<S : MvRxState>(
         deliveryMode: DeliveryMode = RedeliverOnStart,
         action: suspend (A, B, C) -> Unit
     ) = stateFlow
-        .map { MvRxTuple3(prop1.get(it), prop2.get(it), prop3.get(it)) }
+        .map { MavericksTuple3(prop1.get(it), prop2.get(it), prop3.get(it)) }
         .distinctUntilChanged()
         .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3)) { (a, b, c) ->
             action(a, b, c)
@@ -437,7 +437,7 @@ abstract class MavericksViewModel<S : MvRxState>(
         deliveryMode: DeliveryMode = RedeliverOnStart,
         action: suspend (A, B, C, D) -> Unit
     ) = stateFlow
-        .map { MvRxTuple4(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it)) }
+        .map { MavericksTuple4(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it)) }
         .distinctUntilChanged()
         .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4)) { (a, b, c, d) ->
             action(a, b, c, d)
@@ -454,7 +454,7 @@ abstract class MavericksViewModel<S : MvRxState>(
         deliveryMode: DeliveryMode = RedeliverOnStart,
         action: suspend (A, B, C, D, E) -> Unit
     ) = stateFlow
-        .map { MvRxTuple5(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it)) }
+        .map { MavericksTuple5(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it)) }
         .distinctUntilChanged()
         .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4, prop5)) { (a, b, c, d, e) ->
             action(a, b, c, d, e)
@@ -472,7 +472,7 @@ abstract class MavericksViewModel<S : MvRxState>(
         deliveryMode: DeliveryMode = RedeliverOnStart,
         action: suspend (A, B, C, D, E, F) -> Unit
     ) = stateFlow
-        .map { MvRxTuple6(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it), prop6.get(it)) }
+        .map { MavericksTuple6(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it), prop6.get(it)) }
         .distinctUntilChanged()
         .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4, prop5, prop6)) { (a, b, c, d, e, f) ->
             action(a, b, c, d, e, f)
@@ -491,7 +491,7 @@ abstract class MavericksViewModel<S : MvRxState>(
         deliveryMode: DeliveryMode = RedeliverOnStart,
         action: suspend (A, B, C, D, E, F, G) -> Unit
     ) = stateFlow
-        .map { MvRxTuple7(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it), prop6.get(it), prop7.get(it)) }
+        .map { MavericksTuple7(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it), prop6.get(it), prop7.get(it)) }
         .distinctUntilChanged()
         .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4, prop5, prop6, prop7)) { (a, b, c, d, e, f, g) ->
             action(a, b, c, d, e, f, g)
@@ -518,7 +518,7 @@ abstract class MavericksViewModel<S : MvRxState>(
         deliveryMode: DeliveryMode,
         action: suspend (T) -> Unit
     ): Job {
-        val flow = if (lifecycleOwner == null || MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER) {
+        val flow = if (lifecycleOwner == null || MavericksTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER) {
             this
         } else if (deliveryMode is UniqueOnly) {
             val lastDeliveredValue: T? = lastDeliveredValue(deliveryMode)
@@ -573,7 +573,7 @@ abstract class MavericksViewModel<S : MvRxState>(
         lifecycle owner. See BaseMvRxFragment for an example.
     """.trimIndent()
 
-    private fun <S : MvRxState> assertSubscribeToDifferentViewModel(viewModel: MavericksViewModel<S>) {
+    private fun <S : MavericksState> assertSubscribeToDifferentViewModel(viewModel: MavericksViewModel<S>) {
         require(this != viewModel) {
             "This method is for subscribing to other view models. Please pass a different instance as the argument."
         }

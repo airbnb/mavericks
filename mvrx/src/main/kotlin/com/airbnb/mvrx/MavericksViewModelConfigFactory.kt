@@ -11,7 +11,7 @@ import kotlin.coroutines.CoroutineContext
 /**
  * Factory for providing the [MavericksViewModelConfig] for each new ViewModel that is created.
  *
- * An instance of this must be set on [MvRx.viewModelConfigFactory].
+ * An instance of this must be set on [Mavericks.viewModelConfigFactory].
  *
  * A custom subclass of this may be used to allow you to override [buildConfig], but this should
  * generally not be necessary.
@@ -43,7 +43,7 @@ open class MavericksViewModelConfigFactory(
         return CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate + contextOverride)
     }
 
-    internal fun <S : MvRxState> provideConfig(
+    internal fun <S : MavericksState> provideConfig(
         viewModel: MavericksViewModel<S>,
         initialState: S
     ): MavericksViewModelConfig<S> {
@@ -56,13 +56,13 @@ open class MavericksViewModelConfigFactory(
      * Create a new [MavericksViewModelConfig] for the given viewmodel.
      * This can be overridden to customize the config.
      */
-    open fun <S : MvRxState> buildConfig(
+    open fun <S : MavericksState> buildConfig(
         viewModel: MavericksViewModel<S>,
         initialState: S
     ): MavericksViewModelConfig<S> {
         val scope = coroutineScope()
         return object : MavericksViewModelConfig<S>(debugMode, CoroutinesStateStore(initialState, scope), scope) {
-            override fun <S : MvRxState> onExecute(viewModel: MavericksViewModel<S>): BlockExecutions {
+            override fun <S : MavericksState> onExecute(viewModel: MavericksViewModel<S>): BlockExecutions {
                 return BlockExecutions.No
             }
         }

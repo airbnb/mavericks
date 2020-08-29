@@ -14,7 +14,7 @@ import org.junit.BeforeClass
 import org.junit.Test
 import java.util.concurrent.ConcurrentLinkedQueue
 
-data class OrderingState(val count: Int = 0) : MvRxState
+data class OrderingState(val count: Int = 0) : MavericksState
 class SetStateWithStateOrderingTest : MavericksViewModel<OrderingState>(OrderingState()) {
 
     companion object {
@@ -23,14 +23,14 @@ class SetStateWithStateOrderingTest : MavericksViewModel<OrderingState>(Ordering
         fun setup() {
             // We need to set main but don't want a synchronous state store to make sure that the real ordering is correct
             Dispatchers.setMain(TestCoroutineDispatcher())
-            MvRx.viewModelConfigFactory = MavericksViewModelConfigFactory(false)
+            Mavericks.viewModelConfigFactory = MavericksViewModelConfigFactory(false)
         }
 
         @AfterClass
         @JvmStatic
         fun cleanup() {
             Dispatchers.resetMain()
-            MvRx.viewModelConfigFactory = null
+            Mavericks.viewModelConfigFactory = null
         }
     }
 
@@ -170,11 +170,5 @@ class SetStateWithStateOrderingTest : MavericksViewModel<OrderingState>(Ordering
             delay(1)
         }
         assertEquals(expectedCalls.toList(), calls.toList())
-    }
-
-    private fun spinUntil(block: () -> Boolean) {
-        @Suppress("ControlFlowWithEmptyBody")
-        while (!block()) {
-        }
     }
 }

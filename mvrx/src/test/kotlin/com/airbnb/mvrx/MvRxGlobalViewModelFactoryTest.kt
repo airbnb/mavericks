@@ -15,20 +15,20 @@ import org.robolectric.android.controller.ActivityController
 @Parcelize
 data class MvRxTestArgs(val initialCount: Int = 1) : Parcelable
 
-data class MvRxTestState(
+data class MavericksTestState(
     @PersistState val persistedCount: Int = 0,
     val notPersistedCount: Int = 0
-) : MvRxState {
+) : MavericksState {
     constructor(args: MvRxTestArgs) : this(persistedCount = args.initialCount, notPersistedCount = args.initialCount)
 }
 
-class MyViewModel(initialState: MvRxTestState) : TestMavericksViewModel<MvRxTestState>(initialState) {
+class MyViewModel(initialState: MavericksTestState) : TestMavericksViewModel<MavericksTestState>(initialState) {
     fun setCount(count: Int) = setState { copy(persistedCount = count, notPersistedCount = count) }
 }
 
 data class InvalidArgs(val initialCount: Int = 1)
 
-data class InvalidState(val count: Int = 0) : MvRxState {
+data class InvalidState(val count: Int = 0) : MavericksState {
     constructor(args: InvalidArgs) : this(count = args.initialCount)
 }
 
@@ -105,7 +105,7 @@ class MvRxGlobalViewModelFactoryTest : BaseTest() {
         val vmClass = InvalidViewModel::class.java
         val (controller, activity) = buildActivity()
 
-        MvRxViewModelProvider.get(
+        MavericksViewModelProvider.get(
             vmClass,
             InvalidState::class.java,
             ActivityViewModelContext(activity, InvalidArgs()),
@@ -118,9 +118,9 @@ class MvRxGlobalViewModelFactoryTest : BaseTest() {
 private fun getViewModel(
     activity: FragmentActivity,
     forExistingViewModel: Boolean = false
-) = MvRxViewModelProvider.get(
+) = MavericksViewModelProvider.get(
     VM_CLASS,
-    MvRxTestState::class.java,
+    MavericksTestState::class.java,
     ActivityViewModelContext(activity, MvRxTestArgs()),
     VM_KEY,
     forExistingViewModel

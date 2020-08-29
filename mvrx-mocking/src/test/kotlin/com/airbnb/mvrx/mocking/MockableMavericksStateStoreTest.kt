@@ -1,7 +1,7 @@
 package com.airbnb.mvrx.mocking
 
 import com.airbnb.mvrx.MavericksViewModelConfig
-import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.mocking.MockBehavior.InitialStateMocking
 import com.airbnb.mvrx.mocking.MockBehavior.StateStoreBehavior
 import com.airbnb.mvrx.test.MvRxTestRule
@@ -15,7 +15,7 @@ import org.junit.Assert.assertTrue
 import org.junit.ClassRule
 import org.junit.Test
 
-class MockableMvRxStateStoreTest : BaseTest() {
+class MockableMavericksStateStoreTest : BaseTest() {
 
     companion object {
         @JvmField
@@ -25,7 +25,7 @@ class MockableMvRxStateStoreTest : BaseTest() {
 
     @Test
     fun addOnDisposedCallback() {
-        val disposedStores = mutableSetOf<MockableMvRxStateStore<*>>()
+        val disposedStores = mutableSetOf<MockableMavericksStateStore<*>>()
         val store = createStore().apply {
             addOnCancelListener { disposedStores.add(it) }
         }
@@ -41,7 +41,7 @@ class MockableMvRxStateStoreTest : BaseTest() {
 
     @Test
     fun onDisposedCalledImmediatelyIfAlreadyDisposed() {
-        val disposedStores = mutableSetOf<MockableMvRxStateStore<*>>()
+        val disposedStores = mutableSetOf<MockableMavericksStateStore<*>>()
         val store = createStore()
         store.coroutineScope.cancel()
 
@@ -182,8 +182,8 @@ class MockableMvRxStateStoreTest : BaseTest() {
 
     private fun createStore(
         storeBehavior: StateStoreBehavior = StateStoreBehavior.Scriptable
-    ): MockableMvRxStateStore<TestState> {
-        return MockableMvRxStateStore(
+    ): MockableMavericksStateStore<TestState> {
+        return MockableMavericksStateStore(
             TestState(),
             MockBehavior(
                 initialStateMocking = InitialStateMocking.None,
@@ -194,5 +194,5 @@ class MockableMvRxStateStoreTest : BaseTest() {
         )
     }
 
-    private data class TestState(val num: Int = 0) : MvRxState
+    private data class TestState(val num: Int = 0) : MavericksState
 }

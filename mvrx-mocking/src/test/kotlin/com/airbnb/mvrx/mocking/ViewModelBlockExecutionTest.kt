@@ -4,7 +4,7 @@ import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.Loading
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksViewModelConfig
-import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.Uninitialized
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -45,7 +45,7 @@ class ViewModelBlockExecutionTest : BaseTest() {
         assertEquals(Loading<Int>(), vm.state().num)
     }
 
-    data class State(val num: Async<Int> = Uninitialized) : MvRxState
+    data class State(val num: Async<Int> = Uninitialized) : MavericksState
     class ViewModel(
         state: State = State()
     ) : MavericksViewModel<State>(state) {
@@ -58,4 +58,4 @@ class ViewModelBlockExecutionTest : BaseTest() {
     }
 }
 
-fun <S : MvRxState, VM : MavericksViewModel<S>> VM.state(): S = config.stateStore.state
+fun <S : MavericksState, VM : MavericksViewModel<S>> VM.state(): S = config.stateStore.state

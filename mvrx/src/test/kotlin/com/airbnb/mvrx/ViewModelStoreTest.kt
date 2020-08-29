@@ -10,7 +10,7 @@ import org.junit.Test
 import org.robolectric.Robolectric
 import org.robolectric.annotation.Config
 
-data class ViewModelStoreTestState(val notPersistedCount: Int = 1, @PersistState val persistedCount: Int = 1) : MvRxState {
+data class ViewModelStoreTestState(val notPersistedCount: Int = 1, @PersistState val persistedCount: Int = 1) : MavericksState {
     constructor(args: ViewModelStoreTestArgs) : this(args.count, args.count)
 }
 
@@ -215,7 +215,7 @@ class ViewModelStoreTest : BaseTest() {
     fun testViewModelInActivityWithArgs() {
         val args = ViewModelStoreTestArgs(3)
         val intent = Intent()
-        intent.putExtra(MvRx.KEY_ARG, args)
+        intent.putExtra(Mavericks.KEY_ARG, args)
 
         val controller = Robolectric.buildActivity(ViewModelStoreActivity::class.java, intent).setup()
         withState(controller.get().viewModel) { state ->
@@ -228,7 +228,7 @@ class ViewModelStoreTest : BaseTest() {
     fun testViewModelInActivityWithSavedInstanceState() {
         val args = ViewModelStoreTestArgs(3)
         val intent = Intent()
-        intent.putExtra(MvRx.KEY_ARG, args)
+        intent.putExtra(Mavericks.KEY_ARG, args)
 
         val controller = Robolectric.buildActivity(ViewModelStoreActivity::class.java, intent).setup()
 

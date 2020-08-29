@@ -22,7 +22,7 @@ sealed class DeliveryMode {
  * The subscription will receive the most recent state update when transitioning from locked to unlocked states (stopped -> started),
  * even if the state has not changed while locked.
  *
- * Likewise, when a MvRxView resubscribes after a configuration change the most recent update will always be emitted.
+ * Likewise, when a [MavericksView] resubscribes after a configuration change the most recent update will always be emitted.
  */
 object RedeliverOnStart : DeliveryMode()
 
@@ -30,7 +30,7 @@ object RedeliverOnStart : DeliveryMode()
  * The subscription will receive the most recent state update when transitioning from locked to unlocked states (stopped -> started),
  * only if the state has changed while locked.
  *
- * Likewise, when a MvRxView resubscribes after a configuration change the most recent update will only be emitted
+ * Likewise, when a [MavericksView] resubscribes after a configuration change the most recent update will only be emitted
  * if the state has changed while locked.
  *
  * @param subscriptionId A uniqueIdentifier for this subscription. It is an error for two unique only subscriptions to

@@ -10,7 +10,7 @@ import androidx.savedstate.SavedStateRegistry
  * Implement this on your ViewModel's companion object for hooks into state creation and ViewModel creation. For example, if you need access
  * to the fragment or activity owner for dependency injection.
  */
-interface MvRxViewModelFactory<VM : MavericksViewModel<S>, S : MvRxState> {
+interface MvRxViewModelFactory<VM : MavericksViewModel<S>, S : MavericksState> {
 
     /**
      * @param viewModelContext [ViewModelContext] which contains the ViewModel owner and arguments.
@@ -37,7 +37,7 @@ interface MvRxViewModelFactory<VM : MavericksViewModel<S>, S : MvRxState> {
 
 /**
  * Creation context for the ViewModel. Includes the ViewModel store owner (either an activity or fragment), and fragment arguments
- * set via [MvRx.KEY_ARG].
+ * set via [Mavericks.KEY_ARG].
  *
  * For activity scoped ViewModels see [ActivityViewModelContext].
  * For fragment scoped ViewModels see [FragmentViewModelContext].
@@ -67,7 +67,7 @@ sealed class ViewModelContext {
     fun <A : Application> app(): A = activity.application as A
 
     /**
-     * Fragment arguments set via [MvRx.KEY_ARG].
+     * Fragment arguments set via [Mavericks.KEY_ARG].
      */
     abstract val args: Any?
 

@@ -80,9 +80,9 @@ internal val Class<*>.isData: Boolean
 /**
  * Checks that a state's value is not changed over its lifetime.
  */
-internal class MutableStateChecker<S : MvRxState>(val initialState: S) {
+internal class MutableStateChecker<S : MavericksState>(val initialState: S) {
 
-    data class StateWrapper<S : MvRxState>(val state: S) {
+    data class StateWrapper<S : MavericksState>(val state: S) {
         private val originalHashCode = hashCode()
 
         fun validate() = require(originalHashCode == hashCode()) {

@@ -15,7 +15,7 @@ abstract class MavericksViewModelConfig<S : Any>(
     /**
      * The state store instance that will control the state of the ViewModel.
      */
-    @RestrictTo(RestrictTo.Scope.LIBRARY) val stateStore: MvRxStateStore<S>,
+    @RestrictTo(RestrictTo.Scope.LIBRARY) val stateStore: MavericksStateStore<S>,
     /**
      * The coroutine scope that will be provided to the view model.
      */
@@ -37,7 +37,7 @@ abstract class MavericksViewModelConfig<S : Any>(
      * is "enabled", even if the execute was performed when the state store was "disabled" and we
      * didn't intend to allow operations to change the state.
      */
-    abstract fun <S : MvRxState> onExecute(
+    abstract fun <S : MavericksState> onExecute(
         viewModel: MavericksViewModel<S>
     ): BlockExecutions
 

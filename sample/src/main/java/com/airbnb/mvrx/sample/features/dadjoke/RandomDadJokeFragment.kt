@@ -7,7 +7,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.Loading
-import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.Uninitialized
@@ -26,7 +26,7 @@ import com.airbnb.mvrx.withState
 import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.android.inject
 
-data class RandomDadJokeState(val joke: Async<Joke> = Uninitialized) : MvRxState
+data class RandomDadJokeState(val joke: Async<Joke> = Uninitialized) : MavericksState
 
 class RandomDadJokeViewModel(
     initialState: RandomDadJokeState,

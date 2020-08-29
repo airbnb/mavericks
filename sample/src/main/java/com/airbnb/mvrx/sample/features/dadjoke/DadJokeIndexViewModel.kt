@@ -2,7 +2,7 @@ package com.airbnb.mvrx.sample.features.dadjoke
 
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.Loading
-import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.Uninitialized
 import com.airbnb.mvrx.ViewModelContext
@@ -20,7 +20,7 @@ data class DadJokeIndexState(
     val jokes: List<Joke> = emptyList(),
     /** We use this Async to keep track of the state of the current network request. */
     val request: Async<JokesResponse> = Uninitialized
-) : MvRxState
+) : MavericksState
 
 /**
  * initialState *must* be implemented as a constructor parameter.
@@ -44,7 +44,7 @@ class DadJokeIndexViewModel(
 
     /**
      * If you implement MvRxViewModelFactory in your companion object, MvRx will use that to create
-     * your ViewModel. You can use this to achieve constructor dependency injection with MvRx.
+     * your ViewModel. You can use this to achieve constructor dependency injection with Mavericks.
      *
      * @see MvRxViewModelFactory
      */

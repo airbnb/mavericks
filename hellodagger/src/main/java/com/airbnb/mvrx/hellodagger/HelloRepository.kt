@@ -1,14 +1,14 @@
 package com.airbnb.mvrx.hellodagger
 
-import io.reactivex.Observable
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class HelloRepository @Inject constructor() {
 
-    fun sayHello(): Observable<String> {
-        return Observable
-            .just("Hello, world!")
-            .delay(2, TimeUnit.SECONDS)
+    fun sayHello() = flowOf("Hello").map { value ->
+        delay(2_000)
+        value
     }
 }

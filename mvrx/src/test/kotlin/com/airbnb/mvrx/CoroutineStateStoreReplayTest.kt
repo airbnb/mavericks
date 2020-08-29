@@ -19,7 +19,7 @@ import org.junit.Test
 
 @ExperimentalCoroutinesApi
 class CoroutineStateStoreReplayTest {
-    data class State(val foo: Int) : MvRxState
+    data class State(val foo: Int) : MavericksState
 
     @Test
     fun replayTest() = runBlocking {

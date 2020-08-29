@@ -2,15 +2,15 @@ package com.airbnb.mvrx
 
 import android.content.Context
 
-object MvRx {
+object Mavericks {
     /**
      * If your initial state needs to use Fragment arguments, store your arguments
      * as a parcelable class stored at this key.
      */
-    const val KEY_ARG = "mvrx:arg"
+    const val KEY_ARG = "mavericks:arg"
 
     /**
-     * A factory that provides the Lazy ViewModels created for MvRx extension functions,
+     * A factory that provides the Lazy ViewModels created for Mavericks extension functions,
      * such as [activityViewModel].
      *
      * Each time a ViewModel is accessed via one of these extension functions this factory
@@ -28,7 +28,7 @@ object MvRx {
      * You MUST provide an instance here before creating any viewmodels. You can do this when
      * your application is created via the [install] helper.
      *
-     * This allows you to specify whether MvRx should run in debug mode or not. Additionally, it
+     * This allows you to specify whether Mavericks should run in debug mode or not. Additionally, it
      * allows custom state stores or execution behavior for the ViewModel, which can be helpful
      * for testing.
      */
@@ -51,6 +51,6 @@ object MvRx {
     internal val nonNullViewModelConfigFactory: MavericksViewModelConfigFactory
         get() {
             return viewModelConfigFactory
-                ?: error("You must specify a viewModelConfigFactory in the MvRx object. Call 'MvRx.install(context)' in your app's Application class.")
+                ?: error("You must specify a viewModelConfigFactory in the MvRx object. Call 'Mavericks.install(context)' in your app's Application class.")
         }
 }

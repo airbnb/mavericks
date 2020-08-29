@@ -29,7 +29,7 @@ annotation class PersistState
  * Iterates through all member properties annotated with [PersistState] and parcels them into a bundle that can be
  * saved with savedInstanceState.
  */
-internal fun <T : MvRxState> T.persistState(validation: Boolean = false): Bundle {
+internal fun <T : MavericksState> T.persistState(validation: Boolean = false): Bundle {
     val jvmClass = this::class.java
     // Find the first constructor that has parameters annotated with @PersistState or return.
     val constructor = jvmClass.primaryConstructor() ?: return Bundle()
@@ -50,7 +50,7 @@ internal fun <T : MvRxState> T.persistState(validation: Boolean = false): Bundle
     return bundle
 }
 
-private fun <T : MvRxState> Class<out T>.primaryConstructor(): Constructor<*>? {
+private fun <T : MavericksState> Class<out T>.primaryConstructor(): Constructor<*>? {
     // Assumes that only the primary constructor has PersistState annotations.
     // TODO - potentially throw if multiple constructors have PersistState as that is not supported.
     return constructors.firstOrNull { constructor ->
@@ -60,7 +60,7 @@ private fun <T : MvRxState> Class<out T>.primaryConstructor(): Constructor<*>? {
     }
 }
 
-private fun <T : MvRxState> Class<out T>.getComponentNFunction(componentIndex: Int): Method {
+private fun <T : MavericksState> Class<out T>.getComponentNFunction(componentIndex: Int): Method {
     val functionName = "component${componentIndex + 1}"
     return try {
         getDeclaredMethod(functionName)
@@ -105,7 +105,7 @@ private fun <T : Any?> Bundle.putAny(key: String?, value: T): Bundle {
 /**
  * Updates the initial state object given state persisted with [PersistState] in a [Bundle].
  */
-internal fun <T : MvRxState> Bundle.restorePersistedState(
+internal fun <T : MavericksState> Bundle.restorePersistedState(
     initialState: T,
     validation: Boolean = false
 ): T {
@@ -167,8 +167,8 @@ internal fun <T : MvRxState> Bundle.restorePersistedState(
  */
 @VisibleForTesting
 object PersistStateTestHelpers {
-    fun <T : MvRxState> persistState(state: T) = state.persistState(validation = true)
-    fun <T : MvRxState> restorePersistedState(
+    fun <T : MavericksState> persistState(state: T) = state.persistState(validation = true)
+    fun <T : MavericksState> restorePersistedState(
         bundle: Bundle,
         initialState: T,
         validation: Boolean = false

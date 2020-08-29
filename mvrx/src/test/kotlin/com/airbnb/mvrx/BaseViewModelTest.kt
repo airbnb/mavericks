@@ -5,7 +5,7 @@ import org.junit.Assert.assertFalse
 import org.junit.Test
 
 class BaseViewModelTest : BaseTest() {
-    data class TestState(val foo: Int = 5) : MvRxState
+    data class TestState(val foo: Int = 5) : MavericksState
     class TestViewModel : MavericksViewModel<TestState>(TestState()) {
         // Make viewModelScope public
         val scope = viewModelScope

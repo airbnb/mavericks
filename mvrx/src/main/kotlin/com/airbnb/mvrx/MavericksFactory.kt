@@ -5,14 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-class MvRxFactory<VM : MavericksViewModel<S>, S : MvRxState>(
+class MavericksFactory<VM : MavericksViewModel<S>, S : MavericksState>(
     private val viewModelClass: Class<out VM>,
     private val stateClass: Class<out S>,
     private val viewModelContext: ViewModelContext,
     private val key: String,
     private val stateRestorer: ((S) -> S)?,
     private val forExistingViewModel: Boolean = false,
-    private val initialStateFactory: MvRxStateFactory<VM, S> = RealMvRxStateFactory()
+    private val initialStateFactory: MavericksStateFactory<VM, S> = RealMavericksStateFactory()
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
@@ -33,21 +33,21 @@ class MvRxFactory<VM : MavericksViewModel<S>, S : MvRxState>(
 }
 
 @Suppress("UNCHECKED_CAST")
-private fun <VM : MavericksViewModel<S>, S : MvRxState> createViewModel(
+private fun <VM : MavericksViewModel<S>, S : MavericksState> createViewModel(
     viewModelClass: Class<out VM>,
     stateClass: Class<out S>,
     viewModelContext: ViewModelContext,
     stateRestorer: (S) -> S,
-    initialStateFactory: MvRxStateFactory<VM, S>
-): MvRxViewModelWrapper<VM, S> {
+    initialStateFactory: MavericksStateFactory<VM, S>
+): MavericksViewModelWrapper<VM, S> {
     val initialState = initialStateFactory.createInitialState(viewModelClass, stateClass, viewModelContext, stateRestorer)
     val factoryViewModel = viewModelClass.factoryCompanion()?.let { factoryClass ->
         try {
-            factoryClass.getMethod("create", ViewModelContext::class.java, MvRxState::class.java)
+            factoryClass.getMethod("create", ViewModelContext::class.java, MavericksState::class.java)
                 .invoke(factoryClass.instance(), viewModelContext, initialState) as VM?
         } catch (exception: NoSuchMethodException) {
             // Check for JvmStatic method.
-            viewModelClass.getMethod("create", ViewModelContext::class.java, MvRxState::class.java)
+            viewModelClass.getMethod("create", ViewModelContext::class.java, MavericksState::class.java)
                 .invoke(null, viewModelContext, initialState) as VM?
         }
     }
@@ -61,11 +61,11 @@ private fun <VM : MavericksViewModel<S>, S : MvRxState> createViewModel(
                 "single non-optional parameter that takes initial state of ${stateClass.simpleName}."
         }
     }
-    return MvRxViewModelWrapper(viewModel)
+    return MavericksViewModelWrapper(viewModel)
 }
 
 @Suppress("UNCHECKED_CAST", "NestedBlockDepth")
-private fun <VM : MavericksViewModel<S>, S : MvRxState> createDefaultViewModel(viewModelClass: Class<VM>, state: S): VM? {
+private fun <VM : MavericksViewModel<S>, S : MavericksState> createDefaultViewModel(viewModelClass: Class<VM>, state: S): VM? {
     // If we are checking for a default ViewModel, we expect only a single default constructor. Any other case
     // is a misconfiguration and we will throw an appropriate error under further inspection.
     if (viewModelClass.constructors.size == 1) {

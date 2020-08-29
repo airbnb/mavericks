@@ -68,8 +68,8 @@ class MainFragment : Fragment(R.layout.main_fragment) {
             }
 
             basicRow {
-                id("flow")
-                title("Flow")
+                id("user_flow")
+                title("User Flow")
                 subtitle(
                     demonstrates(
                         "Sharing data across screens",

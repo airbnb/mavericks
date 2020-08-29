@@ -1,7 +1,7 @@
 package com.airbnb.mvrx.mocking
 
 import androidx.annotation.RestrictTo
-import com.airbnb.mvrx.MvRxStateStore
+import com.airbnb.mvrx.MavericksStateStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.BroadcastChannel
@@ -20,7 +20,7 @@ import kotlinx.coroutines.flow.flow
  */
 @Suppress("EXPERIMENTAL_API_USAGE")
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-class SynchronousMvRxStateStore<S : Any>(initialState: S, coroutineScope: CoroutineScope) : MvRxStateStore<S> {
+class SynchronousMavericksStateStore<S : Any>(initialState: S, coroutineScope: CoroutineScope) : MavericksStateStore<S> {
 
     private val stateChannel = BroadcastChannel<S>(capacity = Channel.BUFFERED)
 

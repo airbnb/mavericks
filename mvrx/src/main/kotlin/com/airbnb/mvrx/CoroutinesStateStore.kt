@@ -18,10 +18,10 @@ import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.Executors
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-class CoroutinesStateStore<S : MvRxState>(
+class CoroutinesStateStore<S : MavericksState>(
     initialState: S,
     private val scope: CoroutineScope
-) : MvRxStateStore<S> {
+) : MavericksStateStore<S> {
 
     private val setStateChannel = Channel<S.() -> S>(capacity = Channel.UNLIMITED)
     private val withStateChannel = Channel<(S) -> Unit>(capacity = Channel.UNLIMITED)
@@ -70,7 +70,7 @@ class CoroutinesStateStore<S : MvRxState>(
      * Poll [withStateChannel] and [setStateChannel] to respond to set/get state requests.
      */
     private fun setupTriggerFlushQueues(scope: CoroutineScope) {
-        if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) return
+        if (MavericksTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) return
 
         scope.launch(flushDispatcher) {
             try {
@@ -132,14 +132,14 @@ class CoroutinesStateStore<S : MvRxState>(
 
     override fun get(block: (S) -> Unit) {
         withStateChannel.offer(block)
-        if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
+        if (MavericksTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
             flushQueuesOnceBlocking()
         }
     }
 
     override fun set(stateReducer: S.() -> S) {
         setStateChannel.offer(stateReducer)
-        if (MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
+        if (MavericksTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
             flushQueuesOnceBlocking()
         }
     }

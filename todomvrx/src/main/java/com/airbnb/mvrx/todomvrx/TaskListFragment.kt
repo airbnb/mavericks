@@ -22,7 +22,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.PopupMenu
-import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.core.MvRxViewModel
@@ -34,7 +34,7 @@ import com.airbnb.mvrx.todomvrx.views.header
 import com.airbnb.mvrx.todomvrx.views.horizontalLoader
 import com.airbnb.mvrx.todomvrx.views.taskItemView
 
-data class TaskListState(val filter: TaskListFilter = TaskListFilter.All) : MvRxState
+data class TaskListState(val filter: TaskListFilter = TaskListFilter.All) : MavericksState
 
 class TaskListViewModel(initialState: TaskListState) : MvRxViewModel<TaskListState>(initialState) {
     fun setFilter(filter: TaskListFilter) = setState { copy(filter = filter) }

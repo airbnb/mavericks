@@ -10,7 +10,7 @@ import androidx.fragment.app.Fragment
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-data class ViewSubscriberState(val foo: Int = 0) : MvRxState
+data class ViewSubscriberState(val foo: Int = 0) : MavericksState
 
 class ViewSubscriberViewModel(initialState: ViewSubscriberState) : TestMavericksViewModel<ViewSubscriberState>(initialState) {
     fun setFoo(foo: Int) = setState { copy(foo = foo) }

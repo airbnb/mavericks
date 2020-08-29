@@ -11,14 +11,14 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-data class MvRxStateStoreTestState(val count: Int = 1, val list: List<Int> = emptyList()) : MvRxState
+data class MavericksStateStoreTestState(val count: Int = 1, val list: List<Int> = emptyList()) : MavericksState
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 class StateStoreTest : BaseTest() {
 
     @Test
     fun testGetRunsSynchronouslyForTests() = runBlocking {
-        val store = CoroutinesStateStore(MvRxStateStoreTestState(), this)
+        val store = CoroutinesStateStore(MavericksStateStoreTestState(), this)
         var callCount = 0
         store.get { callCount++ }
         assertEquals(1, callCount)
@@ -26,7 +26,7 @@ class StateStoreTest : BaseTest() {
 
     @Test
     fun testSetState() = runBlocking {
-        val store = CoroutinesStateStore(MvRxStateStoreTestState(), this)
+        val store = CoroutinesStateStore(MavericksStateStoreTestState(), this)
         store.set {
             copy(count = 2)
         }
@@ -40,7 +40,7 @@ class StateStoreTest : BaseTest() {
 
     @Test
     fun testSubscribeNotCalledForNoop() = runBlockingTest {
-        val store = CoroutinesStateStore(MvRxStateStoreTestState(), this)
+        val store = CoroutinesStateStore(MavericksStateStoreTestState(), this)
         var callCount = 0
         val job = store.flow.onEach {
             callCount++
@@ -53,7 +53,7 @@ class StateStoreTest : BaseTest() {
 
     @Test
     fun testSubscribeNotCalledForSameValue() = runBlockingTest {
-        val store = CoroutinesStateStore(MvRxStateStoreTestState(), this)
+        val store = CoroutinesStateStore(MavericksStateStoreTestState(), this)
         var callCount = 0
         val job = store.flow.onEach {
             callCount++
@@ -66,7 +66,7 @@ class StateStoreTest : BaseTest() {
 
     @Test
     fun testBlockingReceiver() = runBlockingTest {
-        val store = CoroutinesStateStore(MvRxStateStoreTestState(), this)
+        val store = CoroutinesStateStore(MavericksStateStoreTestState(), this)
         val values = mutableListOf<Int>()
         val job1 = launch {
             store.flow.collect {

@@ -4,8 +4,8 @@ import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
+import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.MavericksView
-import com.airbnb.mvrx.MvRx
 import kotlin.system.measureTimeMillis
 
 /**
@@ -16,7 +16,7 @@ import kotlin.system.measureTimeMillis
  * @param viewClassName The fully qualified name of the view's class.
  * @param viewProvider Creates an instance of the view from the view class. The view should be created
  * with the given arguments bundle if it exists. The bundle contains parcelable arguments under the
- * [MvRx.KEY_ARG] key.
+ * [Mavericks.KEY_ARG] key.
  */
 fun getMockVariants(
     viewClassName: String,
@@ -78,7 +78,7 @@ fun <T : MockableMavericksView> List<MockedViewProvider<T>>.forDefaultInitializa
  * @param viewClass The Java class representing the [MavericksView]
  * @param viewProvider Creates an instance of the view from the view class. The view should be created
  * with the given arguments bundle if it exists. The bundle contains parcelable arguments under the
- * [MvRx.KEY_ARG] key.
+ * [Mavericks.KEY_ARG] key.
  */
 fun getMockVariants(
     viewClass: Class<MockableMavericksView>,
@@ -109,7 +109,7 @@ fun getMockVariants(
  * created with the provided arguments if they exist. Both the arguments and argumentsBundle
  * parameters in the lambda represent the same arguments, they are just provided in multiple
  * forms so you can use the most convenient. The Bundle just contains the Parcelable arguments
- * under the [MvRx.KEY_ARG] key.
+ * under the [Mavericks.KEY_ARG] key.
  *
  * @param emptyMockPlaceholder If you use a custom object to represent that a [MavericksView] legitimately
  * has no mocks then specify it here. Otherwise any view with empty mocks will throw an error.
@@ -181,7 +181,7 @@ private fun argumentsBundle(arguments: Parcelable, viewName: String): Bundle {
     @Suppress("Detekt.TooGenericExceptionCaught")
     return try {
         Bundle().apply {
-            putParcelable(MvRx.KEY_ARG, arguments)
+            putParcelable(Mavericks.KEY_ARG, arguments)
         }.makeClone()
     } catch (e: Throwable) {
         throw AssertionError(

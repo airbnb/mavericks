@@ -2,11 +2,11 @@ package com.airbnb.mvrx.mocking
 
 import android.content.Context
 import com.airbnb.mvrx.DefaultViewModelDelegateFactory
+import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksViewModelConfigFactory
-import com.airbnb.mvrx.MvRx
-import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.MvRxStateStore
+import com.airbnb.mvrx.MavericksState
+import com.airbnb.mvrx.MavericksStateStore
 import com.airbnb.mvrx.ScriptableStateStore
 import com.airbnb.mvrx.isDebuggable
 import com.airbnb.mvrx.mocking.MockableMavericks.install
@@ -33,7 +33,7 @@ object MockableMavericks {
      * Configuration for how mock state is printed.
      *
      * The MvRx mocking system allows you to generate a reproduction of a ViewModel's state. For
-     * any [MvRxState] instance that a ViewModel has, MvRx can generate a file containing code
+     * any [MavericksState] instance that a ViewModel has, MvRx can generate a file containing code
      * to completely reconstruct that state.
      *
      * This generated code can then be used to reconstruct States that can be used during testing.
@@ -63,15 +63,15 @@ object MockableMavericks {
 
     val mockConfigFactory: MockMavericksViewModelConfigFactory
         get() {
-            return (MvRx.viewModelConfigFactory as? MockMavericksViewModelConfigFactory)
+            return (Mavericks.viewModelConfigFactory as? MockMavericksViewModelConfigFactory)
                 ?: error("Expecting MockMvRxViewModelConfigFactory for config factory. Make sure you have called MvRxMocks#install")
         }
 
     /**
-     * Initializes the required [MvRx.viewModelConfigFactory] and sets ViewModel debug and mock behavior for the app.
+     * Initializes the required [Mavericks.viewModelConfigFactory] and sets ViewModel debug and mock behavior for the app.
      *
      * If the application was built with the debuggable flag enabled in its Android Manifest then
-     * this will add plugins to [MvRx] that enable working with mock State. This is useful for
+     * this will add plugins to [Mavericks] that enable working with mock State. This is useful for
      * both manual and automated testing of development builds.
      *
      * This function is a shortcut instead of setting each property in this object individually.
@@ -96,9 +96,9 @@ object MockableMavericks {
     }
 
     /**
-     * Initializes the required [MvRx.viewModelConfigFactory] and sets ViewModel debug and mock behavior for the app.
+     * Initializes the required [Mavericks.viewModelConfigFactory] and sets ViewModel debug and mock behavior for the app.
      *
-     * Choose whether to enable [MvRx] mocking tools. This is useful for
+     * Choose whether to enable [Mavericks] mocking tools. This is useful for
      * both manual and automated testing of development builds.
      *
      * This function is a shortcut instead of setting each property in this object individually.
@@ -121,13 +121,13 @@ object MockableMavericks {
 
         if (mocksEnabled) {
             val mockConfigFactory = MockMavericksViewModelConfigFactory(context?.applicationContext, debugMode)
-            MvRx.viewModelConfigFactory = mockConfigFactory
-            MvRx.viewModelDelegateFactory = MockViewModelDelegateFactory(mockConfigFactory)
+            Mavericks.viewModelConfigFactory = mockConfigFactory
+            Mavericks.viewModelDelegateFactory = MockViewModelDelegateFactory(mockConfigFactory)
         } else {
             // These are both set to make sure that all MvRx plugins are completely cleared
             // when debuggable is set to false. This helps in the unit testing case.
-            MvRx.viewModelConfigFactory = MavericksViewModelConfigFactory(debugMode)
-            MvRx.viewModelDelegateFactory = DefaultViewModelDelegateFactory()
+            Mavericks.viewModelConfigFactory = MavericksViewModelConfigFactory(debugMode)
+            Mavericks.viewModelDelegateFactory = DefaultViewModelDelegateFactory()
         }
     }
 
@@ -137,7 +137,7 @@ object MockableMavericks {
      *
      * It is an error to call this if the store is not scriptable.
      */
-    fun <VM : MavericksViewModel<S>, S : MvRxState> setScriptableState(viewModel: VM, state: S) {
+    fun <VM : MavericksViewModel<S>, S : MavericksState> setScriptableState(viewModel: VM, state: S) {
         val stateStore = viewModel.config.stateStore
         check(stateStore is ScriptableStateStore) {
             "State store of ${viewModel.javaClass.simpleName} must be a ScriptableStateStore"
@@ -146,7 +146,7 @@ object MockableMavericks {
     }
 
     /**
-     * A helper to set a state on a view model via [MvRxStateStore.set].
+     * A helper to set a state on a view model via [MavericksStateStore.set].
      *
      * This may not work if the ViewModel's state store is mocked or configured to not accept
      * state changes, and it is the responsibility of the caller to make sure that the state store
@@ -159,7 +159,7 @@ object MockableMavericks {
      * See [setScriptableState] if you want to force a state on a [ScriptableStateStore] that would
      * otherwise not allow state changes.
      */
-    fun <VM : MavericksViewModel<S>, S : MvRxState> setState(viewModel: VM, state: S) {
+    fun <VM : MavericksViewModel<S>, S : MavericksState> setState(viewModel: VM, state: S) {
         val stateStore = viewModel.config.stateStore
         stateStore.set { state }
     }

@@ -1,5 +1,6 @@
 package com.airbnb.android.mvrx.test
 
+import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.test.MvRxTestRule
 import org.junit.Rule
@@ -11,7 +12,7 @@ class MvRxTestRuleMockBehaviorTest {
 
     @Test
     fun mockingDisabledFromNullBehavior() {
-        check(MvRx.viewModelConfigFactory is com.airbnb.mvrx.mocking.MockMavericksViewModelConfigFactory)
+        check(Mavericks.viewModelConfigFactory is com.airbnb.mvrx.mocking.MockMavericksViewModelConfigFactory)
     }
 }
 
@@ -22,6 +23,6 @@ class MvRxTestRuleNoMockBehaviorTest {
 
     @Test
     fun mockingDisabledFromNullBehavior() {
-        check(MvRx.viewModelConfigFactory !is com.airbnb.mvrx.mocking.MockMavericksViewModelConfigFactory)
+        check(Mavericks.viewModelConfigFactory !is com.airbnb.mvrx.mocking.MockMavericksViewModelConfigFactory)
     }
 }
