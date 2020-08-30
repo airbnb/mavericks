@@ -1,14 +1,13 @@
 package com.airbnb.mvrx.hellodagger
 
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class HelloRepository @Inject constructor() {
 
-    fun sayHello() = flowOf("Hello").map { value ->
+    fun sayHello() = flow {
         delay(2_000)
-        value
+        emit("Hello")
     }
 }

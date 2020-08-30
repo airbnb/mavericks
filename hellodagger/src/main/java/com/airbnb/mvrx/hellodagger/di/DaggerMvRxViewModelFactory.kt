@@ -32,7 +32,7 @@ import com.airbnb.mvrx.hellodagger.appComponent
  * }
  */
 abstract class DaggerMvRxViewModelFactory<VM : MavericksViewModel<S>, S : MavericksState>(
-    private val viewModelClass: Class<out MavericksViewModel<S>>
+    private val viewModelClass: Class<VM>
 ) : MvRxViewModelFactory<VM, S> {
 
     override fun create(viewModelContext: ViewModelContext, state: S): VM? {

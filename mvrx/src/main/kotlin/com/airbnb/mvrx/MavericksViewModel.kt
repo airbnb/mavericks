@@ -233,7 +233,7 @@ abstract class MavericksViewModel<S : MavericksState>(
             return viewModelScope.launch { delay(Long.MAX_VALUE) }
         }
 
-        setState { reducer(Loading<T>()) }
+        setState { reducer(Loading()) }
         return onEach {
             setState { reducer(Success(it)) }
         }.launchIn(viewModelScope + dispatcher)
