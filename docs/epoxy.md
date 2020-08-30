@@ -8,60 +8,48 @@ Epoxy uses immutable "models" to describe the interface between data and view. A
 To create the layout of a page, EpoxyModels are declared in the order that views should appear, with the data that should be bound to them. This is called "building models". Since the models are immutable they must be rebuilt whenever the data changes to provide a new snapshot that describes the view.
 
 This looks like this (adopted from the Mavericks sample app):
+
 ```kotlin
-fun buildModels() {
-  marquee {
-    id("marquee")
-    title("Dad Jokes")
+fun invalidate() {
+    recyclerView.requestModelBuild()
+}
+
+fun buildModels() = withState(viewModel) { state ->
+  header {
+    id("header")
+    title("Hello World")
   }
 
-  state.jokes.forEach { joke ->
-    basicRow {
-        id(joke.id)
-        title(joke.joke)
+  state.items.forEach { item ->
+    itemCard {
+        id(item.id)
+        title(item.title)
         clickListener { _ ->
-            navigateTo(
-                R.id.action_dadJokeIndex_to_dadJokeDetailFragment,
-                DadJokeDetailArgs(joke.id)
-            )
+            navigateToItemDetails(item.id)
         }
     }
-  }
-
-  loadingRow {
-    onBind { _, _, _ -> viewModel.fetchNextPage() }
   }
 }
 ```
 
-### Combining with MvRx
-The model building pattern of Epoxy enforces a one way data flow. When a state change occurs, models are rebuilt asynchronously and Epoxy runs a background diff to figure out what changed. Changes are then dispatched on the main thread to the RecyclerView. This fits in perfectly with the reactive, state based approach of MvRx.
+### Combining with Mavericks
+The model building pattern of Epoxy enforces a one way data flow. When a state change occurs, models are rebuilt asynchronously and Epoxy runs a background diff to figure out what changed. Changes are then dispatched on the main thread to the RecyclerView. This fits in perfectly with the reactive, state based approach of Mavericks.
 
-A pattern we use at Airbnb, and that we share in the sample app, is that each fragment contains an EpoxyController that defines how models are built. MvRx automatically manages this, and rebuilds the models whenever the state changes and the view is invalidated. This can be built into a base fragment, so that individual feature fragments have very little overhead in declaring a new page.
+A pattern we use at Airbnb, and that we share in the sample app, is that each fragment contains an EpoxyController that defines how models are built. Mavericks automatically manages this, and rebuilds the models whenever the state changes and the view is invalidated. This can be built into a base fragment, so that individual feature fragments have very little overhead in declaring a new page.
 
 An abridged version looks like this: (The complete code can be found in the sample app)
 ```kotlin
-abstract class BaseFragment : Fragment() {
+abstract class BaseEpoxyFragment : Fragment(R.layout.base_epoxy_fragment) {
 
-    protected lateinit var recyclerView: EpoxyRecyclerView
-    protected val epoxyController by lazy { epoxyController() }
+    abstract val epoxyController: EpoxyController
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.fragment_base_mvrx, container, false).apply {
-            recyclerView = findViewById(R.id.recycler_view)
-            recyclerView.setController(epoxyController)
-        }
+    override fun onViewCreated() {
+        recyclerView.setController(epoxyController)
     }
 
     override fun invalidate() {
         recyclerView.requestModelBuild()
     }
-
-    abstract fun epoxyController(): MvRxEpoxyController
 }
 ```
 
@@ -80,10 +68,10 @@ class HelloWorldEpoxyFragment : BaseFragment() {
 ```
 
 ### Benefits of Epoxy
-While Epoxy gives us a pretty syntax for declaring UI, it has a lot of other things going on under the hood that improve its usefulness with MvRx.
+While Epoxy gives us a pretty syntax for declaring UI, it has a lot of other things going on under the hood that improve its usefulness with Mavericks.
 
-- Epoxy supports building models and diffing on a background thread. The base fragment MvRx uses provides this automatically so all of the Epoxy rendering happens off the main thread. You can trigger a large amount of state changes and not have to worry about performance.
+- Epoxy supports building models and diffing on a background thread. The base fragment Mavericks uses provides this automatically so all of the Epoxy rendering happens off the main thread. You can trigger a large amount of state changes and not have to worry about performance.
 - Epoxy only updates the parts of a view that changed. If a state change resulted in an updated header title, only the header text of your view is rebound. Only your picture changed? Great, nothing else needs to be updated.
-- The functions in the example code for declaring a view, such as `marquee`, are Kotlin extension functions generated by Epoxy. Epoxy generates almost all the boilerplate for you, so you can simply create an xml layout with databinding and use it immediately in a MvRx fragment.
+- The functions in the example code for declaring a view, such as `itemCard`, are Kotlin extension functions generated by Epoxy. Epoxy generates almost all the boilerplate for you, so you can simply create an xml layout with databinding and use it immediately in a Mavericks fragment.
 - Epoxy integrates with [Paris](https://github.com/airbnb/paris) to allow full styling control of your views through the model declaration.
 

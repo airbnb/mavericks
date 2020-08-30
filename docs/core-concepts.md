@@ -1,11 +1,11 @@
-# Core Concepts
+## Core Concepts
 Mastering Mavericks only requires using three classes: MavericksState, MavericksViewModel, MavericksView.
 
-# MavericksState
+## MavericksState
 The first step in creating a Mavericks screen is to model it as a function of state. The MavericksState interface doesn't do anything itself but signals the intention of your class to be used as state.
 
 Modeling a screen as a function of state is a useful concept because it is:
-1. Is thread safe
+1. Thread safe
 1. Easy for you and other engineers to reason through
 1. Renders the same independently of the order of events leading up to it
 1. Powerful enough to render any type of screen
@@ -34,9 +34,9 @@ data class UserState(
     val previousHighScore = 150,
     val livesLeft: Int = 99,
 ) : MavericksState {
-    // Any properties here are derived from constructor or other derived properties
+    // Properties inside the body of your state class are "derived".
     val pointsUntilHighScore = (previousHighScore - score).coerceAtLeast(0)
-    val isHighScore = pointsUntilHighScore == 0
+    val isHighScore = score >= previousHighScore
 }
 ```
 Placing logic as a derived property like `pointsUntilHighScore` or `isHighScore` means that:
@@ -45,11 +45,13 @@ Placing logic as a derived property like `pointsUntilHighScore` or `isHighScore`
 1. It is extremely easy to reason about
 1. It is extremely easy to write unit tests for
 
-# MavericksViewModel
+## MavericksViewModel
 
 A ViewModel is responsible for:
 1. Updating state
 2. Exposing a stream of states for other classes to subscribe to (MavericksViewModel.stateFlow)
+
+Mavericks ViewModels are conceptually nearly identical [Jetpack ViewModels](https://developer.android.com/topic/libraries/architecture/viewmodel).
 
 #### Updating state
 From within a viewModel, you call `setState { copy(yourProp = newValue) }`. If this syntax is unfamiliar:
@@ -84,7 +86,7 @@ If you just want to retrieve the value of state one time, you can use `withState
 
 When called from within a ViewModel, this will _not_ be run synchronously. It will be placed on a background queue so that all pending `setState` reducers are called prior to your `withState` call.
 
-# MavericksView
+## MavericksView
 `MavericksView` is where you actually render your state class to the screen. Most of the time, this will be a Fragment but it doesn't have to be.
 By implementing `MavericksView`, you:
 1. You can get access to a `MavericksViewModel` via any of the view model delegates. Doing so will automatically subscribe to changes and call `invalidate()`.
@@ -108,47 +110,3 @@ When called from outside a ViewModel, this will _is_ be run synchronously.
 
 #### Triggering state changes
 The ViewModel should expose named functions that can be called by the view. For example, a counter view model could expose a function `incrementCount()` to create a clear API accessible to the view.
-
-# Async
-Mavericks makes dealing with async requests like fetching from a network, database, or anything that can be mapped to an observable incredibly easy. Mavericks includes `Async<T>`. Async is a [sealed class](https://kotlinlang.org/docs/reference/sealed-classes.html) with four subclasses:
-* Uninitialized
-* Loading
-* Success
-* Fail
-    * Fail has an `error` property to retrieve the failure.
-
-You can directly invoke an Async object and it will return either the value if it is `Success` or null otherwise.
-For example:
-```kotlin
-var foo = Loading()
-println(foo()) // null
-foo = Success(5)
-println(foo()) // 5
-foo = Fail(IllegalStateException("bar"))
-println(foo()) // null
-```
-
-#### Initiating an asynchronous action (network, db, etc.)
-`MavericksViewModel` ships an `execute(...)` extension on common asynchronous types such as `suspend () -> T`, `Flow<T>`, and `Deferred<T>`.
-
-When you call `execute` on one of these types, it will begin executing it, immediately emit `Loading`, and then emit `Success` or `Fail` when it succeeds, emits a new value, or fails.
-
-Mavericks will automatically dispose of the subscription in `onCleared` of the ViewModel so you _never have to manage the lifecycle or unsubscribing_.
-
-For each event it emits, it will call the `reducer` which takes the current state and returns an updated state just like `setState`
-
-Executing a network request looks like:
-```kotlin
-suspend {
-    weatherApi.fetchTemperature()
-}.execute { copy(currentTemperature = it) }
-```
-In this case:
-* `currentTemperature` is of type `Async<Int>` and originally set to `Uninitialized`
-* After calling `execute`, `currentTemperature` is set to `Loading()`
-* If the API call succeeds, `currentTemperature` is set to `Success(temp)`
-* If the API call fails, `currentTemperature` is set to `Fail(e)`
-* If the ViewModel is cleared, the API request is cancelled
-
-#### Retaining data across reloads
-You may have a model where you want to refresh data and show the last successful data in addition to the loading/failure state of the refresh. To do this, use the optional `retainValue` parameter for `execute` and MvRx will automatically persist the value stored in that property to subsequent `Loading` or `Fail` states.
