@@ -19,7 +19,7 @@ import com.airbnb.mvrx.MavericksViewModel
  * First we define our ViewModel with an @AssistedInject annotated constructor, and a Factory interface
  * implementing AssistedViewModelFactory.
  *
- * class MyViewModel @AssistedInject constructor(...): MavericksViewModelViewModel<MyState>(...) {
+ * class MyViewModel @AssistedInject constructor(...): MavericksViewModel<MyState>(...) {
  *   @AssistedInject.Factory
  *   interface Factory : AssistedViewModelFactory<MyViewModel, MyState> {
  *     override fun create(state: MyState): MyViewModel
