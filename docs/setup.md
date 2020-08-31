@@ -1,6 +1,8 @@
 # Setting up Mavericks
 
-### Update Your Base Fragment
+Adding Mavericks to your app requires just two steps:
+
+### 1. Update Your Base Fragment
 Make your base Fragment class implement `MavericksView`.
 ***
 
@@ -8,7 +10,19 @@ Make your base Fragment class implement `MavericksView`.
 
 `MavericksView` can be implemented on any `LifecycleOwner` so you may create your own view constructs if you don't want to use Fragments.
 
-### Configure Global Mavericks Plugins
+### 2. Initialize Mavericks
+
+In your Application onCreate method, add a single line:
+```kotlin
+Mavericks.install(this)
+```
+
+If you plan to use [Mavericks Mocking](/mocking.md), use this line instead:
+```kotlin
+MavericksMocks.install(this)
+```
+
+### [Optional] Configure Global Mavericks Plugins
 Add this to your application initialization:
 ```kotlin
 Mavericks.viewModelConfigFactory = MavericksViewModelConfigFactory(applicationContext)

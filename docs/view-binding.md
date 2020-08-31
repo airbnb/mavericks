@@ -1,8 +1,8 @@
 # View Binding
 
-[View Binding](https://developer.android.com/topic/libraries/view-binding) is Google's replacement for `findViewById()` and [Butterknife](https://github.com/JakeWharton/butterknife).
+[View Binding](https://developer.android.com/topic/libraries/view-binding) is Google's replacement for `findViewById()`, Kotlin synthetic accessors, and [Butterknife](https://github.com/JakeWharton/butterknife).
 Although not strictly Mavericks related, our sample apps use custom delegates to easily use View Binding with a single line of code.
-Add (FragmentViewBindingDelegate.kt)[https://github.com/airbnb/MvRx/blob/release/2.0.0/sample/src/main/java/com/airbnb/mvrx/sample/utils/FragmentViewBindingDelegate.kt] to your project then you can use it like this:
+Add [FragmentViewBindingDelegate.kt](https://github.com/airbnb/MvRx/blob/release/2.0.0/sample/src/main/java/com/airbnb/mvrx/sample/utils/FragmentViewBindingDelegate.kt) to your project then you can use it like this:
 ```kotlin
 class CounterFragment : BaseFragment(R.layout.counter_fragment) {
   private val binding: CounterFragmentBinding by viewBinding()

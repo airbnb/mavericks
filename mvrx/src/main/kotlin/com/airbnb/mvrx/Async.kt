@@ -1,7 +1,6 @@
 package com.airbnb.mvrx
 
 import androidx.annotation.RestrictTo
-import java.util.Arrays
 
 /**
  * The T generic is unused for some classes but since it is sealed and useful for Success and Fail,
