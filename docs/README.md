@@ -9,7 +9,7 @@ When we began creating Mavericks, our goal was to make building products easier,
 
 Mavericks is used in hundreds of screens at Airbnb including 100% of new screens. It has also been adopted by countless other apps from small smaple apps to apps with over 1 billion downloads.
 
-Mavericks is build on top of [Android Jetpack](https://developer.android.com/jetpack) so it can be thought of as a complement rather than a departure from Google's standard set of libraries.
+Mavericks is built on top of [Android Jetpack](https://developer.android.com/jetpack) so it can be thought of as a complement rather than a departure from Google's standard set of libraries.
 
 This is what it looks like:
 ```kotlin
