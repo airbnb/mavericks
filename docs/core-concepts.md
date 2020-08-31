@@ -51,7 +51,7 @@ A ViewModel is responsible for:
 1. Updating state
 2. Exposing a stream of states for other classes to subscribe to (MavericksViewModel.stateFlow)
 
-Mavericks ViewModels are conceptually nearly identical [Jetpack ViewModels](https://developer.android.com/topic/libraries/architecture/viewmodel).
+Mavericks ViewModels are conceptually nearly identical to [Jetpack ViewModels](https://developer.android.com/topic/libraries/architecture/viewmodel).
 
 #### Updating state
 From within a viewModel, you call `setState { copy(yourProp = newValue) }`. If this syntax is unfamiliar:

@@ -2,7 +2,7 @@
 
 For the most part, you never have to think about or even be aware of the threading model Mavericks uses under the hood. However, it may be good to familiarize yourself with it to understanding what is happening under the hood.
 
-Mavericks is is thread-safe and nearly everything non-view related runs on background threads. However, Mavericks abstracts away most of the challenges of multi-threading.
+Mavericks is thread-safe and nearly everything non-view related runs on background threads. However, Mavericks abstracts away most of the challenges of multi-threading.
 
 State updates are not processed synchronously. They are placed on a queue and run on a background thread.
 In other words:
