@@ -1,5 +1,5 @@
 # Async&lt;T&gt;
-Mavericks makes dealing with async requests like fetching from a network, database, or anything that can be mapped to an observable incredibly easy. Mavericks includes `Async<T>`. Async is a [sealed class](https://kotlinlang.org/docs/reference/sealed-classes.html) with four subclasses:
+Mavericks makes dealing with async requests like fetching from a network, database, or anything else asynchronous easy. Mavericks includes `Async<T>`. Async is a [sealed class](https://kotlinlang.org/docs/reference/sealed-classes.html) with four subclasses:
 
 Here is an abridged form:
 ```kotlin
@@ -26,8 +26,8 @@ val foo = Success(5)
 println(foo()) // 5
 ```
 
-#### Using Async for asynchronous actions (network, db, etc.)
-`MavericksViewModel` ships an `execute(...)` extension on common asynchronous types such as `suspend () -> T`, `Flow<T>`, and `Deferred<T>`.
+### Using Async for asynchronous actions (network, db, etc.)
+`MavericksViewModel` ships an `execute(...)` extension on common asynchronous types such as `suspend () -> T`, `Flow<T>`, and `Deferred<T>`. The `mvrx-rxjava2` artifact has extensions for `Observable<T>`, `Single<T>`, and `Completable<T>`.
 
 When you call `execute` on one of these types, it will begin executing it, immediately emit `Loading`, and then emit `Success` or `Fail` when it succeeds, emits a new value, or fails.
 
