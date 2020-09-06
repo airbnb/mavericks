@@ -1,10 +1,8 @@
 package com.airbnb.mvrx.mocking
 
 import android.content.Context
-import com.airbnb.mvrx.DefaultViewModelDelegateFactory
 import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksStateStore
 import com.airbnb.mvrx.ScriptableStateStore

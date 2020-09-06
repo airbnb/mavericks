@@ -1,6 +1,5 @@
 package com.airbnb.mvrx.dogs
 
-import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.dogs.data.DogRepository
