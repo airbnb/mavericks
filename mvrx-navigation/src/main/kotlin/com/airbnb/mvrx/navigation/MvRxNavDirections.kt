@@ -5,11 +5,11 @@ import android.os.Parcelable
 import androidx.annotation.IdRes
 import androidx.core.os.bundleOf
 import androidx.navigation.NavDirections
-import com.airbnb.mvrx.MvRx
+import com.airbnb.mvrx.Mavericks
 
 /**
  * @param actionId - the navigation graph action ID.
- * @param data -  the a Parcelable MvRx that is passed as the [MvRx.KEY_ARG] fragment argument
+ * @param data -  the a Parcelable MvRx that is passed as the [Mavericks.KEY_ARG] fragment argument
  * @param title - an optional title that the destination can extract in the graph definition
  *
  * [title] usage examples
@@ -38,7 +38,7 @@ class MvRxNavDirections(
     }
 
     override fun getArguments(): Bundle =
-        bundleOf(MvRx.KEY_ARG to data).apply {
+        bundleOf(Mavericks.KEY_ARG to data).apply {
             title?.also { putString(KEY_ARG_TITLE, it) }
         }
 

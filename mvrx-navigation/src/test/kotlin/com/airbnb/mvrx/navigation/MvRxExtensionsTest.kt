@@ -2,7 +2,7 @@ package com.airbnb.mvrx.navigation
 
 import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.Navigation
-import com.airbnb.mvrx.MvRx
+import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.navigation.test.R
 import com.airbnb.mvrx.test.MvRxTestRule
 import com.airbnb.mvrx.withState
@@ -23,7 +23,7 @@ class MvRxExtensionsTest {
 
     @Before
     fun setup() {
-        MvRx.viewModelDelegateFactory = factory
+        Mavericks.viewModelDelegateFactory = factory
     }
 
     @Test

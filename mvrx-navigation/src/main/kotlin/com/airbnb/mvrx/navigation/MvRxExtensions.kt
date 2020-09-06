@@ -6,14 +6,14 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.DefaultViewModelDelegateFactory
 import com.airbnb.mvrx.FragmentViewModelContext
+import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.MavericksDelegateProvider
+import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MvRx
-import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.MvRxStateFactory
-import com.airbnb.mvrx.MvRxViewModelProvider
-import com.airbnb.mvrx.RealMvRxStateFactory
+import com.airbnb.mvrx.MavericksStateFactory
+import com.airbnb.mvrx.MavericksViewModelProvider
+import com.airbnb.mvrx.RealMavericksStateFactory
 import com.airbnb.mvrx.ViewModelDelegateFactory
 import com.airbnb.mvrx._fragmentArgsProvider
 import kotlin.reflect.KClass
@@ -24,7 +24,7 @@ import kotlin.reflect.KProperty
  * [IllegalArgumentException] if the navGraphId destination is not on the back stack.
  * [IllegalStateException] if the ViewModel is accessed before onViewCreated and there was a re-configuration or launch after process death
  */
-inline fun <reified T, reified VM : MavericksViewModel<S>, reified S : MvRxState> T.navGraphViewModel(
+inline fun <reified T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T.navGraphViewModel(
     @IdRes navGraphId: Int,
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
@@ -34,7 +34,7 @@ inline fun <reified T, reified VM : MavericksViewModel<S>, reified S : MvRxState
         keyFactory,
         navGraphId = navGraphId
     ) { stateFactory, backStackEntry ->
-        MvRxViewModelProvider.get(
+        MavericksViewModelProvider.get(
             viewModelClass = viewModelClass.java,
             stateClass = S::class.java,
             viewModelContext = FragmentViewModelContext(
@@ -53,11 +53,11 @@ inline fun <reified T, reified VM : MavericksViewModel<S>, reified S : MvRxState
  * Creates an object that provides a Lazy ViewModel for use in Fragments.
  */
 @PublishedApi
-internal inline fun <T, reified VM : MavericksViewModel<S>, reified S : MvRxState> viewModelNavigationDelegateProvider(
+internal inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> viewModelNavigationDelegateProvider(
     viewModelClass: KClass<VM>,
     crossinline keyFactory: () -> String,
     @IdRes navGraphId: Int,
-    noinline viewModelProvider: (stateFactory: MvRxStateFactory<VM, S>, backStackEntry: NavBackStackEntry) -> VM
+    noinline viewModelProvider: (stateFactory: MavericksStateFactory<VM, S>, backStackEntry: NavBackStackEntry) -> VM
 ): MavericksDelegateProvider<T, VM> where T : Fragment, T : MavericksView {
     return object : MavericksDelegateProvider<T, VM>() {
 
@@ -65,7 +65,7 @@ internal inline fun <T, reified VM : MavericksViewModel<S>, reified S : MvRxStat
             thisRef: T,
             property: KProperty<*>
         ): Lazy<VM> {
-            val viewModelDelegateFactory = MvRx.viewModelDelegateFactory
+            val viewModelDelegateFactory = Mavericks.viewModelDelegateFactory
             if (viewModelDelegateFactory !is NavigationViewModelDelegateFactory) {
                 throw IllegalStateException(
                     """
@@ -91,14 +91,14 @@ internal inline fun <T, reified VM : MavericksViewModel<S>, reified S : MvRxStat
 }
 
 interface NavigationViewModelDelegateFactory : ViewModelDelegateFactory {
-    fun <S : MvRxState, T, VM : MavericksViewModel<S>> createLazyNavigationViewModel(
+    fun <S : MavericksState, T, VM : MavericksViewModel<S>> createLazyNavigationViewModel(
         fragment: T,
         viewModelProperty: KProperty<*>,
         viewModelClass: KClass<VM>,
         keyFactory: () -> String,
         stateClass: KClass<S>,
         @IdRes navGraphId: Int,
-        viewModelProvider: (stateFactory: MvRxStateFactory<VM, S>, backStackEntry: NavBackStackEntry) -> VM
+        viewModelProvider: (stateFactory: MavericksStateFactory<VM, S>, backStackEntry: NavBackStackEntry) -> VM
     ): Lazy<VM> where T : Fragment, T : MavericksView
 }
 
@@ -107,19 +107,19 @@ class DefaultNavigationViewModelDelegateFactory(
 ) : NavigationViewModelDelegateFactory,
     ViewModelDelegateFactory by defaultViewModelDelegateFactory {
 
-    override fun <S : MvRxState, T, VM : MavericksViewModel<S>> createLazyNavigationViewModel(
+    override fun <S : MavericksState, T, VM : MavericksViewModel<S>> createLazyNavigationViewModel(
         fragment: T,
         viewModelProperty: KProperty<*>,
         viewModelClass: KClass<VM>,
         keyFactory: () -> String,
         stateClass: KClass<S>,
         @IdRes navGraphId: Int,
-        viewModelProvider: (stateFactory: MvRxStateFactory<VM, S>, backStackEntry: NavBackStackEntry) -> VM
+        viewModelProvider: (stateFactory: MavericksStateFactory<VM, S>, backStackEntry: NavBackStackEntry) -> VM
     ): Lazy<VM> where T : Fragment, T : MavericksView {
         return navigationLifecycleAwareLazy(fragment) {
             val backStackEntry = fragment.findNavController().getBackStackEntry(navGraphId)
 
-            viewModelProvider(RealMvRxStateFactory(), backStackEntry)
+            viewModelProvider(RealMavericksStateFactory(), backStackEntry)
                 .apply { onEachInternal(fragment, action = { fragment.postInvalidate() }) }
         }
     }

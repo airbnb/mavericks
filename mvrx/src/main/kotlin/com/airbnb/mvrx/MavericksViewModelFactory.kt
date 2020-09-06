@@ -110,7 +110,6 @@ data class FragmentViewModelContext(
     override val savedStateRegistry: SavedStateRegistry = fragment.savedStateRegistry
 ) : ViewModelContext() {
 
-
     /**
      * Convenience method to type [fragment].
      */

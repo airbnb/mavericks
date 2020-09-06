@@ -7,25 +7,9 @@ apply plugin: 'jacoco'
 apply plugin: 'com.vanniktech.maven.publish'
 
 android {
-    compileSdkVersion Versions.compileSdk
-    buildToolsVersion Versions.buildTools
     resourcePrefix "mvrx_"
 
-    defaultConfig {
-        minSdkVersion Versions.minSdk
-        targetSdkVersion Versions.targetSdk
-        consumerProguardFiles "proguard-rules.pro"
-    }
-
-    lintOptions {
-        abortOnError true
-        textReport true
-        textOutput "stdout"
-    }
-
     sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-        test.java.srcDirs += 'src/test/kotlin'
         test.res.srcDirs += 'src/test/res'
     }
 
@@ -39,14 +23,6 @@ android {
             }
         }
     }
-}
-
-androidExtensions {
-    experimental = true
-}
-
-jacoco {
-    toolVersion = "0.8.2"
 }
 
 dependencies {
@@ -71,30 +47,8 @@ dependencies {
     testImplementation "androidx.fragment:fragment-testing:$fragment_version"
 }
 
-// Ensure custom source sets are included:
-// https://www.virag.si/2015/01/publishing-gradle-android-library-to-jcenter/
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
-
-tasks.withType(Javadoc).all {
-    enabled = false
+jacoco {
+    toolVersion = "0.8.2"
 }
 
 tasks.register("coverage", JacocoReportTask.class) {
