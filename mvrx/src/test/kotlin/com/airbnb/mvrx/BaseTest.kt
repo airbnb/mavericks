@@ -45,7 +45,7 @@ abstract class BaseTest {
 
     @After
     fun resetViewModelConfigFactory() {
-        Mavericks.viewModelConfigFactory = null
+        Mavericks.viewModelConfigFactory = MavericksViewModelConfigFactory(true)
     }
 
     protected inline fun <reified F : Fragment, reified A : AppCompatActivity> createFragment(

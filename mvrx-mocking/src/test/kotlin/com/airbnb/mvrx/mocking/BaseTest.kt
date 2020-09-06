@@ -92,8 +92,4 @@ abstract class BaseTest {
 
         return controller
     }
-
-    protected inline fun <reified F : Fragment> ActivityController<out AppCompatActivity>.mvRxFragment(): F {
-        return get().supportFragmentManager.findFragmentByTag("TAG") as F
-    }
 }

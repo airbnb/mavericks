@@ -20,16 +20,7 @@ object Mavericks {
      * but a custom factory may be provided to assist with testing, or if you want control
      * over how and when ViewModels and their State are created.
      */
-    var viewModelDelegateFactory: ViewModelDelegateFactory
-        set(value) {
-            _viewModelDelegateFactory = value
-        }
-        get() {
-            _viewModelDelegateFactory
-                ?.let { return it }
-                ?: error("You must initialize Mavericks. Add Mavericks.initialize(...) to your Application.onCreate().")
-        }
-    private var _viewModelDelegateFactory: ViewModelDelegateFactory? = null
+    var viewModelDelegateFactory: ViewModelDelegateFactory = DefaultViewModelDelegateFactory()
 
     /**
      * A factory for creating a [MavericksViewModelConfig] for each ViewModel.
@@ -71,9 +62,11 @@ object Mavericks {
         viewModelConfigFactory: MavericksViewModelConfigFactory? = null,
         viewModelDelegateFactory: ViewModelDelegateFactory? = null
     ) {
-        if (_viewModelConfigFactory != null) error("Mavericks is already initialized.")
-
         _viewModelConfigFactory = viewModelConfigFactory ?: MavericksViewModelConfigFactory(debugMode = debugMode)
-        _viewModelDelegateFactory = viewModelDelegateFactory ?: DefaultViewModelDelegateFactory()
+        this.viewModelDelegateFactory = when {
+            viewModelDelegateFactory != null -> viewModelDelegateFactory
+            this.viewModelDelegateFactory !is DefaultViewModelDelegateFactory -> DefaultViewModelDelegateFactory()
+            else -> this.viewModelDelegateFactory
+        }
     }
 }
