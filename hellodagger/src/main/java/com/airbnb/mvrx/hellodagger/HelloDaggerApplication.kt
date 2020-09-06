@@ -13,7 +13,7 @@ class HelloDaggerApplication : Application() {
     override fun onCreate() {
         super.onCreate()
         appComponent = DaggerAppComponent.create()
-        Mavericks.install(this)
+        Mavericks.initialize(this)
     }
 }
 

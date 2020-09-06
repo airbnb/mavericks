@@ -43,7 +43,7 @@ abstract class MavericksViewModel<S : MavericksState>(
 
     @Suppress("LeakingThis")
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    val config: MavericksViewModelConfig<S> = Mavericks.nonNullViewModelConfigFactory.provideConfig(
+    val config: MavericksViewModelConfig<S> = Mavericks.viewModelConfigFactory.provideConfig(
         this,
         initialState
     )

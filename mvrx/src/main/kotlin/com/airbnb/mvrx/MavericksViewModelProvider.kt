@@ -110,14 +110,14 @@ object MavericksViewModelProvider {
 }
 
 /**
- * Return the [Class] of the companion [MvRxViewModelFactory] for a given ViewModel class, if it exists.
+ * Return the [Class] of the companion [MavericksViewModelFactory] for a given ViewModel class, if it exists.
  */
-internal fun <VM : MavericksViewModel<*>> Class<VM>.factoryCompanion(): Class<out MvRxViewModelFactory<VM, *>>? {
+internal fun <VM : MavericksViewModel<*>> Class<VM>.factoryCompanion(): Class<out MavericksViewModelFactory<VM, *>>? {
     return declaredClasses.firstOrNull {
-        MvRxViewModelFactory::class.java.isAssignableFrom(it)
+        MavericksViewModelFactory::class.java.isAssignableFrom(it)
     }?.let { klass ->
         @Suppress("UNCHECKED_CAST")
-        klass as Class<out MvRxViewModelFactory<VM, *>>
+        klass as Class<out MavericksViewModelFactory<VM, *>>
     }
 }
 

@@ -23,7 +23,7 @@ fun <T : Fragment> T._fragmentArgsProvider(): Any? = arguments?.get(Mavericks.KE
  * Gets or creates a ViewModel scoped to this Fragment. You will get the same instance every time for this Fragment, even
  * through rotation, or other configuration changes.
  *
- * If the ViewModel has additional dependencies, implement [MvRxViewModelFactory] in its companion object.
+ * If the ViewModel has additional dependencies, implement [MavericksViewModelFactory] in its companion object.
  * You will be given the initial state as well as a FragmentActivity with which you can access other dependencies to
  * pass to the ViewModel's constructor.
  *

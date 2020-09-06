@@ -20,37 +20,60 @@ object Mavericks {
      * but a custom factory may be provided to assist with testing, or if you want control
      * over how and when ViewModels and their State are created.
      */
-    var viewModelDelegateFactory: ViewModelDelegateFactory = DefaultViewModelDelegateFactory()
+    var viewModelDelegateFactory: ViewModelDelegateFactory
+        set(value) {
+            _viewModelDelegateFactory = value
+        }
+        get() {
+            _viewModelDelegateFactory
+                ?.let { return it }
+                ?: error("You must initialize Mavericks. Add Mavericks.initialize(...) to your Application.onCreate().")
+        }
+    private var _viewModelDelegateFactory: ViewModelDelegateFactory? = null
 
     /**
      * A factory for creating a [MavericksViewModelConfig] for each ViewModel.
      *
      * You MUST provide an instance here before creating any viewmodels. You can do this when
-     * your application is created via the [install] helper.
+     * your application is created via the [initialize] helper.
      *
      * This allows you to specify whether Mavericks should run in debug mode or not. Additionally, it
      * allows custom state stores or execution behavior for the ViewModel, which can be helpful
      * for testing.
      */
-    var viewModelConfigFactory: MavericksViewModelConfigFactory? = null
+    var viewModelConfigFactory: MavericksViewModelConfigFactory
+        set(value) {
+            _viewModelConfigFactory = value
+        }
+        get() {
+            _viewModelConfigFactory
+                ?.let { return it }
+                ?: error("You must initialize Mavericks. Add Mavericks.initialize(...) to your Application.onCreate().")
+        }
+    private var _viewModelConfigFactory: MavericksViewModelConfigFactory? = null
 
     /**
      * A helper for setting [viewModelConfigFactory] based on whether the app was built in debug mode or not.
      */
-    fun install(context: Context) {
-        install(context.isDebuggable())
+    fun initialize(
+        context: Context,
+        viewModelConfigFactory: MavericksViewModelConfigFactory? = null,
+        viewModelDelegateFactory: ViewModelDelegateFactory? = null
+    ) {
+        initialize(context.isDebuggable(), viewModelConfigFactory, viewModelDelegateFactory)
     }
 
     /**
      * A helper for setting [viewModelConfigFactory] with the given debug mode.
      */
-    fun install(debugMode: Boolean) {
-        viewModelConfigFactory = MavericksViewModelConfigFactory(debugMode = debugMode)
-    }
+    fun initialize(
+        debugMode: Boolean,
+        viewModelConfigFactory: MavericksViewModelConfigFactory? = null,
+        viewModelDelegateFactory: ViewModelDelegateFactory? = null
+    ) {
+        if (_viewModelConfigFactory != null) error("Mavericks is already initialized.")
 
-    internal val nonNullViewModelConfigFactory: MavericksViewModelConfigFactory
-        get() {
-            return viewModelConfigFactory
-                ?: error("You must specify a viewModelConfigFactory in the MvRx object. Call 'Mavericks.install(context)' in your app's Application class.")
-        }
+        _viewModelConfigFactory = viewModelConfigFactory ?: MavericksViewModelConfigFactory(debugMode = debugMode)
+        _viewModelDelegateFactory = viewModelDelegateFactory ?: DefaultViewModelDelegateFactory()
+    }
 }

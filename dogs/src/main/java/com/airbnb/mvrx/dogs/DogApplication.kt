@@ -12,6 +12,6 @@ class DogApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        Mavericks.install(this)
+        Mavericks.initialize(this)
     }
 }

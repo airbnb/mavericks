@@ -6,7 +6,7 @@ import com.airbnb.mvrx.MavericksViewModelConfig
 import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksStateStore
-import com.airbnb.mvrx.MvRxViewModelFactory
+import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.ScriptableStateStore
 import com.airbnb.mvrx.mocking.printer.ViewModelStatePrinter
 import kotlinx.coroutines.CoroutineScope
@@ -98,7 +98,7 @@ data class MockBehavior(
 
         /**
          * Initial view model state is taken from [MockStateHolder] and used in ViewModel creation,
-         * but that mocked state may be overridden either in the [MvRxViewModelFactory] or constructor of the ViewModel.
+         * but that mocked state may be overridden either in the [MavericksViewModelFactory] or constructor of the ViewModel.
          */
         Partial,
 

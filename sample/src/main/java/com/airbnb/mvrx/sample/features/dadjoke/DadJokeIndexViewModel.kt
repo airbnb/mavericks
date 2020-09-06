@@ -3,7 +3,7 @@ package com.airbnb.mvrx.sample.features.dadjoke
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.Loading
 import com.airbnb.mvrx.MavericksState
-import com.airbnb.mvrx.MvRxViewModelFactory
+import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.Uninitialized
 import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.sample.core.MvRxViewModel
@@ -46,9 +46,9 @@ class DadJokeIndexViewModel(
      * If you implement MvRxViewModelFactory in your companion object, MvRx will use that to create
      * your ViewModel. You can use this to achieve constructor dependency injection with Mavericks.
      *
-     * @see MvRxViewModelFactory
+     * @see MavericksViewModelFactory
      */
-    companion object : MvRxViewModelFactory<DadJokeIndexViewModel, DadJokeIndexState> {
+    companion object : MavericksViewModelFactory<DadJokeIndexViewModel, DadJokeIndexState> {
 
         override fun create(viewModelContext: ViewModelContext, state: DadJokeIndexState): DadJokeIndexViewModel {
             val service: DadJokeService by viewModelContext.activity.inject()

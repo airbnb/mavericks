@@ -107,7 +107,7 @@ class NoFactoryTest : BaseTest() {
 class FactoryViewModelTest : BaseTest() {
 
     private class TestFactoryViewModel(initialState: FactoryState, val otherProp: Long) : TestMavericksViewModel<FactoryState>(initialState) {
-        companion object : MvRxViewModelFactory<TestFactoryViewModel, FactoryState> {
+        companion object : MavericksViewModelFactory<TestFactoryViewModel, FactoryState> {
             override fun create(viewModelContext: ViewModelContext, state: FactoryState): TestFactoryViewModel {
                 return when (viewModelContext) {
                     // Use Fragment args to test that there is a valid fragment reference.
@@ -120,14 +120,14 @@ class FactoryViewModelTest : BaseTest() {
 
     private class TestFactoryJvmStaticViewModel(initialState: FactoryState, val otherProp: Long) :
         TestMavericksViewModel<FactoryState>(initialState) {
-        companion object : MvRxViewModelFactory<TestFactoryJvmStaticViewModel, FactoryState> {
+        companion object : MavericksViewModelFactory<TestFactoryJvmStaticViewModel, FactoryState> {
             @JvmStatic
             override fun create(viewModelContext: ViewModelContext, state: FactoryState) = TestFactoryJvmStaticViewModel(state, 5)
         }
     }
 
     private class TestNullFactory(initialState: FactoryState) : TestMavericksViewModel<FactoryState>(initialState) {
-        companion object : MvRxViewModelFactory<TestFactoryViewModel, FactoryState> {
+        companion object : MavericksViewModelFactory<TestFactoryViewModel, FactoryState> {
             override fun create(viewModelContext: ViewModelContext, state: FactoryState) = null
         }
     }
@@ -137,13 +137,13 @@ class FactoryViewModelTest : BaseTest() {
         // Ensures we don't accidently consider this to be the factory.
         class NestedClass
 
-        companion object NamedFactory : MvRxViewModelFactory<NamedFactoryViewModel, FactoryState> {
+        companion object NamedFactory : MavericksViewModelFactory<NamedFactoryViewModel, FactoryState> {
             override fun create(viewModelContext: ViewModelContext, state: FactoryState) = NamedFactoryViewModel(state)
         }
     }
 
     private class ViewModelContextApplicationFactory(initialState: FactoryState) : TestMavericksViewModel<FactoryState>(initialState) {
-        companion object : MvRxViewModelFactory<TestFactoryJvmStaticViewModel, FactoryState> {
+        companion object : MavericksViewModelFactory<TestFactoryJvmStaticViewModel, FactoryState> {
             override fun create(viewModelContext: ViewModelContext, state: FactoryState): TestFactoryJvmStaticViewModel? {
                 // If this doesn't crash then there was an application that successfully casted.
                 viewModelContext.app<Application>()
@@ -237,7 +237,7 @@ class FactoryViewModelTest : BaseTest() {
 class FactoryStateTest : BaseTest() {
 
     private class TestFactoryViewModel(initialState: FactoryState) : TestMavericksViewModel<FactoryState>(initialState) {
-        companion object : MvRxViewModelFactory<TestFactoryViewModel, FactoryState> {
+        companion object : MavericksViewModelFactory<TestFactoryViewModel, FactoryState> {
             override fun initialState(viewModelContext: ViewModelContext): FactoryState? {
                 return when (viewModelContext) {
                     is FragmentViewModelContext -> FactoryState("${viewModelContext.fragment.arguments?.getString("greeting")!!} and ${viewModelContext.args<TestArgs>().greeting} factory")
@@ -248,14 +248,14 @@ class FactoryStateTest : BaseTest() {
     }
 
     private class TestFactoryJvmStaticViewModel(initialState: FactoryState) : TestMavericksViewModel<FactoryState>(initialState) {
-        companion object : MvRxViewModelFactory<TestFactoryJvmStaticViewModel, FactoryState> {
+        companion object : MavericksViewModelFactory<TestFactoryJvmStaticViewModel, FactoryState> {
             override fun initialState(viewModelContext: ViewModelContext): FactoryState? =
                 FactoryState("${viewModelContext.args<TestArgs>().greeting} factory")
         }
     }
 
     private class TestNullFactory(initialState: FactoryState) : TestMavericksViewModel<FactoryState>(initialState) {
-        companion object : MvRxViewModelFactory<TestNullFactory, FactoryState> {
+        companion object : MavericksViewModelFactory<TestNullFactory, FactoryState> {
             override fun initialState(viewModelContext: ViewModelContext): FactoryState? = null
         }
     }
@@ -321,7 +321,7 @@ class FactoryStateTest : BaseTest() {
 class FactoryViewModelAndStateTest : BaseTest() {
 
     private class TestFactoryViewModel(initialState: FactoryState, val otherProp: Long) : TestMavericksViewModel<FactoryState>(initialState) {
-        companion object : MvRxViewModelFactory<TestFactoryViewModel, FactoryState> {
+        companion object : MavericksViewModelFactory<TestFactoryViewModel, FactoryState> {
             override fun create(viewModelContext: ViewModelContext, state: FactoryState) =
                 TestFactoryViewModel(FactoryState("${viewModelContext.args<TestArgs>().greeting} factory"), 5)
         }
@@ -329,7 +329,7 @@ class FactoryViewModelAndStateTest : BaseTest() {
 
     private class TestFactoryJvmStaticViewModel(initialState: FactoryState, val otherProp: Long) :
         TestMavericksViewModel<FactoryState>(initialState) {
-        companion object : MvRxViewModelFactory<TestFactoryJvmStaticViewModel, FactoryState> {
+        companion object : MavericksViewModelFactory<TestFactoryJvmStaticViewModel, FactoryState> {
             @JvmStatic
             override fun create(viewModelContext: ViewModelContext, state: FactoryState) =
                 TestFactoryJvmStaticViewModel(FactoryState("${viewModelContext.args<TestArgs>().greeting} factory"), 5)

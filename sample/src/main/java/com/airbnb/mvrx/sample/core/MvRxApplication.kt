@@ -18,7 +18,7 @@ class MvRxApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        MockableMavericks.install(this)
+        MockableMavericks.initialize(this)
         // Override the default activity for showing mocks from the launcher
         MvRxLauncherMockActivity.activityToShowMock = LauncherActivity::class
 
