@@ -4,7 +4,7 @@ import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.Uninitialized
 import com.airbnb.mvrx.fragmentViewModel
@@ -416,7 +416,7 @@ class MockBuilderTest : BaseTest() {
         val asyncBookingDetails: Async<BookingDetails>,
         val asyncDisclaimer: Async<DisclaimerInfo>,
         val asyncInt: Async<Int>
-    ) : MvRxState
+    ) : MavericksState
 
     data class BookingDetails(val num: Int = 7, val disclaimerInfo: DisclaimerInfo?)
     data class DisclaimerInfo(val text: String)

@@ -8,7 +8,7 @@ import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.Incomplete
 import com.airbnb.mvrx.Loading
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.ViewModelContext
@@ -19,7 +19,7 @@ import com.airbnb.mvrx.mocking.getMockVariants
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
-data class MvRxLauncherState(
+data class MavericksLauncherState(
     /**
      * Mocks that were loaded in previous app sessions will be restored from cache in this property.
      * It will update incrementally as each cache entry is loaded.
@@ -43,7 +43,7 @@ data class MvRxLauncherState(
     val viewNamePatternToTest: String? = null,
     /** The name of a specific view or mock, provided by a deeplink, that should be opened directly once all mocks load. */
     val viewNameToOpen: String? = null
-) : MvRxState {
+) : MavericksState {
 
     /**
      * If [viewNameToOpen] or [viewNamePatternToTest] are set, this returns the result of which
@@ -159,9 +159,9 @@ data class LauncherMockIdentifier(val viewName: String, val mockName: String) {
 }
 
 class MvRxLauncherViewModel(
-    private val initialState: MvRxLauncherState,
+    private val initialState: MavericksLauncherState,
     private val sharedPrefs: SharedPreferences
-) : MavericksViewModel<MvRxLauncherState>(initialState) {
+) : MavericksViewModel<MavericksLauncherState>(initialState) {
 
     init {
         loadViewsFromCache(initialState)
@@ -184,7 +184,7 @@ class MvRxLauncherViewModel(
     }
 
     /** Since parsing views from dex files is slow we can remember the last list of view names and load them directly. */
-    private fun loadViewsFromCache(initialState: MvRxLauncherState) = GlobalScope.launch {
+    private fun loadViewsFromCache(initialState: MavericksLauncherState) = GlobalScope.launch {
         val selectedMockData: String? = sharedPrefs.getString(KEY_SELECTED_MOCK, null)
         log("Selected mock from cache: $selectedMockData")
 
@@ -273,18 +273,18 @@ class MvRxLauncherViewModel(
         }
     }
 
-    companion object : MvRxViewModelFactory<MvRxLauncherViewModel, MvRxLauncherState> {
+    companion object : MvRxViewModelFactory<MvRxLauncherViewModel, MavericksLauncherState> {
 
         override fun create(
             viewModelContext: ViewModelContext,
-            state: MvRxLauncherState
+            state: MavericksLauncherState
         ): MvRxLauncherViewModel {
             log("Created viewmodel")
             val sharedPrefs = viewModelContext.sharedPrefs()
             return MvRxLauncherViewModel(state, sharedPrefs)
         }
 
-        override fun initialState(viewModelContext: ViewModelContext): MvRxLauncherState? {
+        override fun initialState(viewModelContext: ViewModelContext): MavericksLauncherState? {
             val sharedPrefs = viewModelContext.sharedPrefs()
             val selectedView: String? = sharedPrefs.getString(KEY_SELECTED_VIEW, null)
             val recentViews = sharedPrefs.getList(KEY_RECENTLY_USED_VIEWS)
@@ -298,7 +298,7 @@ class MvRxLauncherViewModel(
             val params = viewModelContext.activity.intent?.extras
             fun parseParam(name: String) = params?.getString(name)
 
-            return MvRxLauncherState(
+            return MavericksLauncherState(
                 selectedView = selectedView,
                 recentUsage = LauncherRecentUsage(
                     viewNames = recentViews,

@@ -2,8 +2,8 @@ package com.airbnb.mvrx
 
 import org.junit.Test
 
-data class StateWithMutableMap(val map: MutableMap<String, String> = mutableMapOf()) : MvRxState
-data class StateWithImmutableMap(val map: Map<String, String> = mapOf()) : MvRxState
+data class StateWithMutableMap(val map: MutableMap<String, String> = mutableMapOf()) : MavericksState
+data class StateWithImmutableMap(val map: Map<String, String> = mapOf()) : MavericksState
 
 class MutableStateValidationTest : BaseTest() {
 

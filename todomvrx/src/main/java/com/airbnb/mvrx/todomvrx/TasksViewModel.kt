@@ -1,7 +1,7 @@
 package com.airbnb.mvrx.todomvrx
 
 import com.airbnb.mvrx.Async
-import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.Uninitialized
 import com.airbnb.mvrx.ViewModelContext
@@ -22,7 +22,7 @@ data class TasksState(
     val taskRequest: Async<Tasks> = Uninitialized,
     val isLoading: Boolean = false,
     val lastEditedTask: String? = null
-) : MvRxState
+) : MavericksState
 
 class TasksViewModel(initialState: TasksState, private val sources: List<TasksDataSource>) : MvRxViewModel<TasksState>(initialState) {
 

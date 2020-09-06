@@ -34,12 +34,7 @@ android {
 
 dependencies {
     implementation Libraries.appcompat
-    implementation Libraries.fragmentKtx
-    implementation Libraries.constraintlayout
-    implementation Libraries.coreKtx
-    implementation Libraries.lifecycleCommon
     implementation project(":mvrx")
-    implementation project(':mvrx-mocking')
 
     testImplementation TestLibraries.junit
     testImplementation project(":testing")

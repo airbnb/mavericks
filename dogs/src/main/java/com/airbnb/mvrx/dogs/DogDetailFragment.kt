@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.airbnb.mvrx.MvRx
+import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.args
@@ -38,6 +38,6 @@ class DogDetailFragment : Fragment(), MvRxView, DogDetailFragmentHandler {
     }
 
     companion object {
-        fun arg(dogId: Long) = bundleOf(MvRx.KEY_ARG to dogId)
+        fun arg(dogId: Long) = bundleOf(Mavericks.KEY_ARG to dogId)
     }
 }

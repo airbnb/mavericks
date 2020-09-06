@@ -31,7 +31,7 @@ data class ViewModelTestState(
     val asyncUnit: Async<Unit> = Uninitialized,
     val prop6: Int = 0,
     val prop7: Int = 0
-) : MvRxState
+) : MavericksState
 
 class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewModel<ViewModelTestState>(initialState) {
 

@@ -8,7 +8,7 @@ import kotlinx.coroutines.cancel
 import org.junit.Test
 
 class SetStateWithStateAfterScopeCancellation : BaseTest() {
-    data class State(val foo: Int) : MvRxState
+    data class State(val foo: Int) : MavericksState
 
     @Test
     fun setStateAfterScopeCancellation() {

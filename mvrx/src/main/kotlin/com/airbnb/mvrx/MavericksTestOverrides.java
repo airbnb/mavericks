@@ -4,7 +4,7 @@ package com.airbnb.mvrx;
 import androidx.annotation.RestrictTo;
 
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-public class MvRxTestOverrides {
+public class MavericksTestOverrides {
     /**
      * This should only be set by the MvRxTestRule from the mvrx-testing artifact.
      * <p>

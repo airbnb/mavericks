@@ -1,7 +1,7 @@
 package com.airbnb.mvrx.test
 
 import com.airbnb.mvrx.DefaultViewModelDelegateFactory
-import com.airbnb.mvrx.MvRx
+import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.MvRxTestOverridesProxy
 import com.airbnb.mvrx.mocking.MockBehavior
 import com.airbnb.mvrx.mocking.MockableMavericks
@@ -40,7 +40,7 @@ class MvRxTestRule(
         stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
     ),
     /**
-     * Changes whether the [MvRxViewModelConfigFactory] is initialized with debug mode or not.
+     * Changes whether the [com.airbnb.mvrx.MavericksViewModelConfigFactory] is initialized with debug mode or not.
      * By default debug mode is not used so that viewmodels don't all have to run the debug checks
      * each time they are created for Unit tests. This also prevents the need for Robolectric,
      * since the debug checks use Android APIs.
@@ -74,7 +74,7 @@ class MvRxTestRule(
         // clear any changes or listeners that were set on the plugins, and reset defaults
         MockableMavericks.enableMavericksViewMocking = false
         MockableMavericks.enableMockPrinterBroadcastReceiver = false
-        MvRx.viewModelDelegateFactory = DefaultViewModelDelegateFactory()
-        MvRx.viewModelConfigFactory = null
+        Mavericks.viewModelDelegateFactory = DefaultViewModelDelegateFactory()
+        Mavericks.viewModelConfigFactory = null
     }
 }

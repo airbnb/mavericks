@@ -37,7 +37,7 @@ abstract class BaseTest {
         val activity = controller.get()
         val fragment = if (savedInstanceState == null) {
             F::class.java.newInstance().apply {
-                arguments = Bundle().apply { putParcelable(MvRx.KEY_ARG, args) }
+                arguments = Bundle().apply { putParcelable(Mavericks.KEY_ARG, args) }
                 if (containerId != null) {
                     activity.supportFragmentManager.beginTransaction().add(containerId, this, "TAG").commitNow()
                 } else {

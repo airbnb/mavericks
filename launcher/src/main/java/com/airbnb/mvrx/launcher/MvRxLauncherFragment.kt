@@ -40,7 +40,7 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
 
         // This is the main callback for showing the selected mock once it is set.
         viewModel.onEach(
-            MvRxLauncherState::selectedMock,
+            MavericksLauncherState::selectedMock,
             deliveryMode = uniqueOnly()
         ) { mock ->
             if (mock != null) {
@@ -48,7 +48,7 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
             }
         }
 
-        viewModel.onEach(MvRxLauncherState::queryResult) { result ->
+        viewModel.onEach(MavericksLauncherState::queryResult) { result ->
             // If we're already finishing because we started a different deeplink result, don't
             // start one again. This can happen because the objects don't have strict equals
             // implementations.
@@ -80,10 +80,10 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
         )
     }
 
-    private val MvRxLauncherState.mocksLoadedSoFar: List<MockedViewProvider<*>>?
+    private val MavericksLauncherState.mocksLoadedSoFar: List<MockedViewProvider<*>>?
         get() = allMocks() ?: cachedMocks()
 
-    private val MvRxLauncherState.mocksForSelectedView: List<MockedViewProvider<*>>?
+    private val MavericksLauncherState.mocksForSelectedView: List<MockedViewProvider<*>>?
         get() {
             val loadedMocks = mocksLoadedSoFar ?: return null
             return if (selectedView != null) loadedMocks.filter { it.viewName == selectedView } else null
@@ -285,7 +285,7 @@ internal fun String.splitCamelCase(): CharSequence {
 /** Assumes a FQN - returns the simple name. */
 internal val String.simpleName: String get() = substringAfterLast(".")
 
-internal fun viewUiOrderComparator(state: MvRxLauncherState): Comparator<String> {
+internal fun viewUiOrderComparator(state: MavericksLauncherState): Comparator<String> {
     return compareBy { viewName ->
         // Show recently used views first, otherwise compare alphabetically by view name
         val recentViewIndex = state.recentUsage.viewNames.indexOf(viewName)

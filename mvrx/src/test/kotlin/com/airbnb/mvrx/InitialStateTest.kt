@@ -7,7 +7,7 @@ import org.junit.Test
 
 @Parcelize
 data class ViewModelStoreTestArgs(val count: Int = 2) : Parcelable
-data class DefaultParamState(val foo: String = "") : MvRxState
+data class DefaultParamState(val foo: String = "") : MavericksState
 class DefaultParamViewModel(initialState: DefaultParamState = DefaultParamState()) : TestMavericksViewModel<DefaultParamState>(initialState)
 class NonDefaultParamViewModel(initialState: DefaultParamState) : TestMavericksViewModel<DefaultParamState>(initialState)
 
@@ -16,7 +16,7 @@ class InitialStateTest : BaseTest() {
     fun testViewModelCantHaveDefaultState() {
         val (controller, fragment) = createFragment<Fragment, TestActivity>(args = ViewModelStoreTestArgs(3))
 
-        MvRxViewModelProvider.get(
+        MavericksViewModelProvider.get(
             DefaultParamViewModel::class.java,
             DefaultParamState::class.java,
             FragmentViewModelContext(controller.get(), null, fragment), "foo"
@@ -27,7 +27,7 @@ class InitialStateTest : BaseTest() {
     fun testViewModelCanBeCreated() {
         val (controller, fragment) = createFragment<Fragment, TestActivity>(args = ViewModelStoreTestArgs(3))
 
-        MvRxViewModelProvider.get(
+        MavericksViewModelProvider.get(
             NonDefaultParamViewModel::class.java,
             DefaultParamState::class.java,
             FragmentViewModelContext(controller.get(), null, fragment), "foo"

@@ -1,3 +1,3 @@
 package com.airbnb.mvrx
 
-abstract class TestMavericksViewModel<S : MvRxState>(initialState: S) : MavericksViewModel<S>(initialState)
+abstract class TestMavericksViewModel<S : MavericksState>(initialState: S) : MavericksViewModel<S>(initialState)

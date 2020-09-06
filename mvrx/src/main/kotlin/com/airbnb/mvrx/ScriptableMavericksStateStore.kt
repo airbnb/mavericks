@@ -9,13 +9,13 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 
 /**
- * A [MvRxStateStore] which ignores standard calls to [set]. Instead it can be scripted via calls to
+ * A [MavericksStateStore] which ignores standard calls to [set]. Instead it can be scripted via calls to
  * [next]. This is intended to be used for tests only, and in particular UI tests where you wish to test
  * how your UI code reacts to different ViewModel states. This is not as useful for unit testing your view model,
  * as business logic in state reducers will not be used.
  */
 @Suppress("EXPERIMENTAL_API_USAGE")
-class ScriptableMvRxStateStore<S : Any>(initialState: S) : ScriptableStateStore<S> {
+class ScriptableMavericksStateStore<S : Any>(initialState: S) : ScriptableStateStore<S> {
 
     private val stateChannel = BroadcastChannel<S>(capacity = Channel.BUFFERED)
     override var state = initialState
@@ -40,7 +40,7 @@ class ScriptableMvRxStateStore<S : Any>(initialState: S) : ScriptableStateStore<
     }
 }
 
-interface ScriptableStateStore<S : Any> : MvRxStateStore<S> {
+interface ScriptableStateStore<S : Any> : MavericksStateStore<S> {
     /** Force the current state to be moved to the given value immediately. */
     fun next(state: S)
 }

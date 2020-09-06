@@ -11,7 +11,7 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.airbnb.epoxy.EpoxyRecyclerView
-import com.airbnb.mvrx.MvRx
+import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.MvRxView
 import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.todomvrx.TasksState
@@ -95,6 +95,6 @@ abstract class BaseFragment : Fragment(), MvRxView {
     abstract fun epoxyController(): ToDoEpoxyController
 
     protected fun navigate(@IdRes id: Int, args: Parcelable? = null) {
-        findNavController().navigate(id, Bundle().apply { putParcelable(MvRx.KEY_ARG, args) })
+        findNavController().navigate(id, Bundle().apply { putParcelable(Mavericks.KEY_ARG, args) })
     }
 }

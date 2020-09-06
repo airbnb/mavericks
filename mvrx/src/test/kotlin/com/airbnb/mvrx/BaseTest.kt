@@ -28,24 +28,24 @@ abstract class BaseTest {
         @BeforeClass
         fun classSetUp() {
             ShadowLog.stream = System.out
-            MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES = true
+            MavericksTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES = true
         }
 
         @JvmStatic
         @AfterClass
         fun classTearDown() {
-            MvRxTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES = false
+            MavericksTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES = false
         }
     }
 
     @Before
     fun setupViewModelConfigFactory() {
-        MvRx.viewModelConfigFactory = MavericksViewModelConfigFactory(true, contextOverride = TestCoroutineDispatcher())
+        Mavericks.viewModelConfigFactory = MavericksViewModelConfigFactory(true, contextOverride = TestCoroutineDispatcher())
     }
 
     @After
     fun resetViewModelConfigFactory() {
-        MvRx.viewModelConfigFactory = null
+        Mavericks.viewModelConfigFactory = null
     }
 
     protected inline fun <reified F : Fragment, reified A : AppCompatActivity> createFragment(
@@ -67,7 +67,7 @@ abstract class BaseTest {
         val activity = controller.get()
         val fragment = if (savedInstanceState == null) {
             F::class.java.newInstance().apply {
-                arguments = Bundle().apply { putParcelable(MvRx.KEY_ARG, args) }
+                arguments = Bundle().apply { putParcelable(Mavericks.KEY_ARG, args) }
                 activity.supportFragmentManager
                     .beginTransaction()
                     .also {

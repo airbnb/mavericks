@@ -14,7 +14,7 @@ class AsyncStateStoreTest {
     @Test(timeout = 10_000)
     fun testFlowCompletedAfterScopeCancelled() = runBlocking {
         val scope = CoroutineScope(Job())
-        val store = CoroutinesStateStore(MvRxStateStoreTestState(), scope)
+        val store = CoroutinesStateStore(MavericksStateStoreTestState(), scope)
         val collectJob = scope.launch(Job()) { store.flow.collect() }
         scope.cancel()
         collectJob.join()
@@ -23,7 +23,7 @@ class AsyncStateStoreTest {
     @Test(timeout = 10_000)
     fun testFlowCompletedAfterScopeCancelledEvenWithSlowJob() = runBlocking {
         val scope = CoroutineScope(Job(coroutineContext[Job]))
-        val store = CoroutinesStateStore(MvRxStateStoreTestState(), scope)
+        val store = CoroutinesStateStore(MavericksStateStoreTestState(), scope)
         val latch = CountDownLatch(1)
         scope.launch {
             latch.await()

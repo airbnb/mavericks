@@ -14,7 +14,7 @@ import org.junit.Test
 data class BaseMavericksViewModelTestState(
     val asyncInt: Async<Int> = Uninitialized,
     val int: Int = 0
-) : MvRxState
+) : MavericksState
 
 class MavericksViewModelTestViewModel : MavericksViewModel<BaseMavericksViewModelTestState>(BaseMavericksViewModelTestState()) {
     suspend fun runInViewModel(block: suspend MavericksViewModelTestViewModel.() -> Unit) {

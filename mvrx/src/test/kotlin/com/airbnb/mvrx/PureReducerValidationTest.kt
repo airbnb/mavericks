@@ -4,8 +4,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
 
-data class PureReducerValidationState(val count: Int = 0) : MvRxState
-data class StateWithPrivateVal(private val count: Int = 0) : MvRxState
+data class PureReducerValidationState(val count: Int = 0) : MavericksState
+data class StateWithPrivateVal(private val count: Int = 0) : MavericksState
 
 class PureReducerValidationTest : BaseTest() {
 

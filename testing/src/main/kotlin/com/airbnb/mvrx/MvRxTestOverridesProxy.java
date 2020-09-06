@@ -12,6 +12,6 @@ import com.airbnb.mvrx.test.MvRxTestRule;
 public class MvRxTestOverridesProxy {
 
     public static void forceDisableLifecycleAwareObserver(Boolean disableLifecycleAwareObserver) {
-        MvRxTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER = disableLifecycleAwareObserver;
+        MavericksTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER = disableLifecycleAwareObserver;
     }
 }

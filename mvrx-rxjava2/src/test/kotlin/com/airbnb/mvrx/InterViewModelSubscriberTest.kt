@@ -13,7 +13,7 @@ data class OuterViewModelTestState(
     val prop6: Int = 0,
     val prop7: Int = 0,
     val async: Async<String> = Uninitialized
-) : MvRxState
+) : MavericksState
 
 class OuterViewModelTestViewModel(initialState: OuterViewModelTestState) : BaseMvRxViewModel<OuterViewModelTestState>(initialState) {
 
@@ -113,7 +113,7 @@ class OuterViewModelTestViewModel(initialState: OuterViewModelTestState) : BaseM
 
 data class InnerViewModelTestState(
     val foo: Int = 0
-) : MvRxState
+) : MavericksState
 
 class InnerViewModelTestViewModel(
     initialState: InnerViewModelTestState,

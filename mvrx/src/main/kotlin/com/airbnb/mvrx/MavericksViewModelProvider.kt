@@ -13,7 +13,7 @@ import java.io.Serializable
  * of two separate ones. The logic for providing the correct scope is inside the method.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
-object MvRxViewModelProvider {
+object MavericksViewModelProvider {
     /**
      * MvRx specific ViewModelProvider used for creating a BaseMavericksViewModel scoped to either a [Fragment] or [FragmentActivity].
      * If this is in a [Fragment], it cannot be called before the Fragment has been added to an Activity or wrapped in a [Lazy] call.
@@ -29,13 +29,13 @@ object MvRxViewModelProvider {
      * @param initialStateFactory A way to specify how to create the initial state, can be mocked out for testing.
      *
      */
-    fun <VM : MavericksViewModel<S>, S : MvRxState> get(
+    fun <VM : MavericksViewModel<S>, S : MavericksState> get(
         viewModelClass: Class<out VM>,
         stateClass: Class<out S>,
         viewModelContext: ViewModelContext,
         key: String = viewModelClass.name,
         forExistingViewModel: Boolean = false,
-        initialStateFactory: MvRxStateFactory<VM, S> = RealMvRxStateFactory()
+        initialStateFactory: MavericksStateFactory<VM, S> = RealMavericksStateFactory()
     ): VM {
         val savedStateRegistry = viewModelContext.savedStateRegistry
 
@@ -50,9 +50,9 @@ object MvRxViewModelProvider {
         val restoredContext = stateRestorer?.viewModelContext ?: viewModelContext
 
         @Suppress("UNCHECKED_CAST")
-        val viewModel: MvRxViewModelWrapper<VM, S> = ViewModelProvider(
+        val viewModel: MavericksViewModelWrapper<VM, S> = ViewModelProvider(
             viewModelContext.owner,
-            MvRxFactory(
+            MavericksFactory(
                 viewModelClass,
                 stateClass,
                 restoredContext,
@@ -61,7 +61,7 @@ object MvRxViewModelProvider {
                 forExistingViewModel,
                 initialStateFactory
             )
-        ).get(key, MvRxViewModelWrapper::class.java) as MvRxViewModelWrapper<VM, S>
+        ).get(key, MavericksViewModelWrapper::class.java) as MavericksViewModelWrapper<VM, S>
 
         try {
             // Save the view model's state to the bundle so that it can be used to recreate
@@ -77,7 +77,7 @@ object MvRxViewModelProvider {
         return viewModel.viewModel
     }
 
-    private fun <VM : MavericksViewModel<S>, S : MvRxState> VM.getSavedStateBundle(
+    private fun <VM : MavericksViewModel<S>, S : MavericksState> VM.getSavedStateBundle(
         initialArgs: Any?
     ) = withState(this) { state ->
         Bundle().apply {
@@ -92,7 +92,7 @@ object MvRxViewModelProvider {
         }
     }
 
-    private fun <S : MvRxState> Bundle.toStateRestorer(viewModelContext: ViewModelContext): StateRestorer<S> {
+    private fun <S : MavericksState> Bundle.toStateRestorer(viewModelContext: ViewModelContext): StateRestorer<S> {
         val restoredArgs = get(KEY_MVRX_SAVED_ARGS)
         val restoredState = getBundle(KEY_MVRX_SAVED_INSTANCE_STATE)
 
@@ -132,7 +132,7 @@ internal fun Class<*>.instance(): Any {
 internal const val ACCESSED_BEFORE_ON_CREATE_ERR_MSG =
     "You can only access a view model after super.onCreate of your activity/fragment has been called."
 
-private data class StateRestorer<S : MvRxState>(
+private data class StateRestorer<S : MavericksState>(
     val viewModelContext: ViewModelContext,
     val toRestoredState: (S) -> S
 )

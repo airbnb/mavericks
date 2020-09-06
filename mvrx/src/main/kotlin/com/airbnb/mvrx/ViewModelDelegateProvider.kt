@@ -9,11 +9,11 @@ import kotlin.reflect.KProperty
  * Creates an object that provides a Lazy ViewModel for use in Fragments.
  */
 @PublishedApi
-internal inline fun <T, reified VM : MavericksViewModel<S>, reified S : MvRxState> viewModelDelegateProvider(
+internal inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> viewModelDelegateProvider(
     viewModelClass: KClass<VM>,
     crossinline keyFactory: () -> String,
     existingViewModel: Boolean,
-    noinline viewModelProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM
+    noinline viewModelProvider: (stateFactory: MavericksStateFactory<VM, S>) -> VM
 ): MavericksDelegateProvider<T, VM> where T : Fragment, T : MavericksView {
     return object : MavericksDelegateProvider<T, VM>() {
 
@@ -21,7 +21,7 @@ internal inline fun <T, reified VM : MavericksViewModel<S>, reified S : MvRxStat
             thisRef: T,
             property: KProperty<*>
         ): Lazy<VM> {
-            return MvRx.viewModelDelegateFactory.createLazyViewModel(
+            return Mavericks.viewModelDelegateFactory.createLazyViewModel(
                 stateClass = S::class,
                 fragment = thisRef,
                 viewModelProperty = property,
@@ -60,14 +60,14 @@ interface ViewModelDelegateFactory {
      * the viewmodel. It knows how to configure the viewmodel, and just needs to be provided with
      * a state factory.
      */
-    fun <S : MvRxState, T, VM : MavericksViewModel<S>> createLazyViewModel(
+    fun <S : MavericksState, T, VM : MavericksViewModel<S>> createLazyViewModel(
         fragment: T,
         viewModelProperty: KProperty<*>,
         viewModelClass: KClass<VM>,
         keyFactory: () -> String,
         stateClass: KClass<S>,
         existingViewModel: Boolean,
-        viewModelProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM
+        viewModelProvider: (stateFactory: MavericksStateFactory<VM, S>) -> VM
     ): Lazy<VM> where T : Fragment, T : MavericksView
 }
 
@@ -75,24 +75,24 @@ interface ViewModelDelegateFactory {
  * Creates ViewModels that are wrapped with a [lifecycleAwareLazy] so that the ViewModel
  * is automatically created when the Fragment is started (if it is not accessed before then).
  *
- * ViewModels are created with a [RealMvRxStateFactory].
+ * ViewModels are created with a [RealMavericksStateFactory].
  *
  * The Fragment is subscribed to all changes to the ViewModel, so that [MavericksView.postInvalidate] is
  * called on each State change. This allows the Fragment view to be automatically invalidated,
  * only while the Fragment is in the STARTED lifecycle state.
  */
 class DefaultViewModelDelegateFactory : ViewModelDelegateFactory {
-    override fun <S : MvRxState, T, VM : MavericksViewModel<S>> createLazyViewModel(
+    override fun <S : MavericksState, T, VM : MavericksViewModel<S>> createLazyViewModel(
         fragment: T,
         viewModelProperty: KProperty<*>,
         viewModelClass: KClass<VM>,
         keyFactory: () -> String,
         stateClass: KClass<S>,
         existingViewModel: Boolean,
-        viewModelProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM
+        viewModelProvider: (stateFactory: MavericksStateFactory<VM, S>) -> VM
     ): Lazy<VM> where T : Fragment, T : MavericksView {
         return lifecycleAwareLazy(fragment) {
-            viewModelProvider(RealMvRxStateFactory())
+            viewModelProvider(RealMavericksStateFactory())
                 .apply { onEachInternal(fragment, action = { fragment.postInvalidate() }) }
         }
     }

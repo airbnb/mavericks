@@ -7,10 +7,10 @@ import org.junit.Test
 
 // Not extending BaseTest to avoid making Rx synchronous, since we want to test that this
 // state store is synchronous by default.
-class SynchronousMvRxStateStoreTest {
+class SynchronousMavericksStateStoreTest {
     @Test
     fun setAndGetStateSynchronously() {
-        val store = SynchronousMvRxStateStore(TestState(), testCoroutineScope())
+        val store = SynchronousMavericksStateStore(TestState(), testCoroutineScope())
         store.set { TestState(5) }
         store.get { state ->
             assertEquals(5, state.num)
@@ -19,7 +19,7 @@ class SynchronousMvRxStateStoreTest {
 
     @Test
     fun flowWorks() = runBlocking {
-        val store = SynchronousMvRxStateStore(TestState(), testCoroutineScope())
+        val store = SynchronousMavericksStateStore(TestState(), testCoroutineScope())
         store.set { TestState(5) }
 
         val flowResult = store.flow.firstOrNull()

@@ -3,7 +3,7 @@ package com.airbnb.mvrx.todomvrx.util
 import com.airbnb.epoxy.AsyncEpoxyController
 import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.BaseMvRxViewModel
-import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.core.MvRxViewModel
 import com.airbnb.mvrx.withState
@@ -32,7 +32,7 @@ fun BaseFragment.simpleController(
  * Create a [ToDoEpoxyController] that builds models with the given callback.
  * When models are built the current state of the viewmodel will be provided.
  */
-fun <S : MvRxState, A : MvRxViewModel<S>> BaseFragment.simpleController(
+fun <S : MavericksState, A : MvRxViewModel<S>> BaseFragment.simpleController(
     viewModel: A,
     buildModels: EpoxyController.(state: S) -> Unit
 ) = ToDoEpoxyController {
@@ -42,7 +42,7 @@ fun <S : MvRxState, A : MvRxViewModel<S>> BaseFragment.simpleController(
     }
 }
 
-fun <A : BaseMvRxViewModel<B>, B : MvRxState, C : BaseMvRxViewModel<D>, D : MvRxState> BaseFragment.simpleController(
+fun <A : BaseMvRxViewModel<B>, B : MavericksState, C : BaseMvRxViewModel<D>, D : MavericksState> BaseFragment.simpleController(
     viewModel1: A,
     viewModel2: C,
     buildModels: EpoxyController.(state1: B, state2: D) -> Unit

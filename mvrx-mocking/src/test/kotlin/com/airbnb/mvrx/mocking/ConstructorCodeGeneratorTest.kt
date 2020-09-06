@@ -1,6 +1,6 @@
 package com.airbnb.mvrx.mocking
 
-import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MavericksState
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -110,7 +110,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
     fun testCustomTypePrinter() {
         data class Test(
             val date: CustomDate = CustomDate.fromString("2000")
-        ) : MvRxState
+        ) : MavericksState
 
         val result = com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(
             Test(),
@@ -133,7 +133,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
     fun listIsTruncated() {
         data class Test(
             val list: List<Int> = listOf(1, 2, 3, 4)
-        ) : MvRxState
+        ) : MavericksState
 
         com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
             .expect("ConstructorCodeGeneratorTest.listIsTruncated\$Test(list=listOf(1,2,3))")
@@ -143,7 +143,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
     fun listIsNotTruncated() {
         data class Test(
             val list: List<Int> = listOf(1, 2, 3, 4)
-        ) : MvRxState
+        ) : MavericksState
 
         com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(
             Test(),
@@ -156,7 +156,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
     fun listIsNotTruncatedWhenTypesDiffer() {
         data class Test(
             val list: List<Any> = listOf(1, 2, 3, "A")
-        ) : MvRxState
+        ) : MavericksState
 
         com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
             .expect("ConstructorCodeGeneratorTest.listIsNotTruncatedWhenTypesDiffer\$Test(list=listOf(1,2,3,\"A\"))")
@@ -166,7 +166,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
     fun listIsNotTruncatedWhenSomeItemsAreNull() {
         data class Test(
             val list: List<Int?> = listOf(null, 1, 2, 3)
-        ) : MvRxState
+        ) : MavericksState
 
         com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
             .expect("ConstructorCodeGeneratorTest.listIsNotTruncatedWhenSomeItemsAreNull\$Test(list=listOf(null,1,2,3))")
@@ -176,7 +176,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
     fun listIsTruncatedWhenAllItemsAreNull() {
         data class Test(
             val list: List<Int?> = listOf(null, null, null, null)
-        ) : MvRxState
+        ) : MavericksState
 
         com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
             .expect("ConstructorCodeGeneratorTest.listIsTruncatedWhenAllItemsAreNull\$Test(list=listOf(null,null,null))")
@@ -187,7 +187,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
     fun arrayIsTruncated() {
         data class Test(
             val list: Array<Int> = arrayOf(1, 2, 3, 4)
-        ) : MvRxState
+        ) : MavericksState
 
         com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
             .expect("ConstructorCodeGeneratorTest.arrayIsTruncated\$Test(list=arrayOf(1,2,3))")
@@ -198,7 +198,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
     fun arrayIsNotTruncated() {
         data class Test(
             val list: Array<Int> = arrayOf(1, 2, 3, 4)
-        ) : MvRxState
+        ) : MavericksState
 
         com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(
             Test(),
@@ -207,18 +207,18 @@ class ConstructorCodeGeneratorTest : BaseTest() {
         ).expect("ConstructorCodeGeneratorTest.arrayIsNotTruncated\$Test(list=arrayOf(1,2,3,4))")
     }
 
-    private fun <T : MvRxState> com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator<T>.expect(expectedCode: String) {
+    private fun <T : MavericksState> com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator<T>.expect(expectedCode: String) {
         assertEquals("valmockTestbylazy{$expectedCode}", lazyPropertyToCreateObject.removeWhiteSpace())
     }
 
     data class StateWithJsonObject(val json: String = """{"color":"red","numbers":[{"favorite":7},{"lowest":0}]}""") :
-        MvRxState
+        MavericksState
 
     data class StateWithInvalidJsonObject(val json: String = """not valid{"color":"red","numbers":[{"favorite":7},{"lowest":0}]}""") :
-        MvRxState
+        MavericksState
 
     data class StateWithJsonArray(val json: String = """[{"favorite":7},{"lowest":0}]""") :
-        MvRxState
+        MavericksState
 
     data class NestedObject(val nullableInt: Int? = null, val myEnum: MyEnum = MyEnum.A)
 
@@ -242,7 +242,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
         val nestedObject: NestedObject = NestedObject(),
         val singleTon: MySingleton = MySingleton,
         val nestedObjectList: List<NestedObject> = listOf(NestedObject())
-    ) : MvRxState
+    ) : MavericksState
 
     class CustomDate private constructor(private val time: Long) {
         fun asString(): String = time.toString()

@@ -4,7 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.setupWithNavController
-import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.core.BaseFragment
@@ -13,7 +13,7 @@ import com.airbnb.mvrx.sample.databinding.HelloWorldFragmentBinding
 import com.airbnb.mvrx.sample.utils.viewBinding
 import com.airbnb.mvrx.withState
 
-data class HelloWorldState(val title: String = "Hello World") : MvRxState
+data class HelloWorldState(val title: String = "Hello World") : MavericksState
 
 class HelloWorldViewModel(initialState: HelloWorldState) : MvRxViewModel<HelloWorldState>(initialState)
 

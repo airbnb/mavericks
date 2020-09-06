@@ -4,16 +4,16 @@ import android.content.Context
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksViewModelConfig
 import com.airbnb.mvrx.MavericksViewModelConfigFactory
-import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.MvRxStateStore
+import com.airbnb.mvrx.MavericksState
+import com.airbnb.mvrx.MavericksStateStore
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.ScriptableStateStore
 import com.airbnb.mvrx.mocking.printer.ViewModelStatePrinter
 import kotlinx.coroutines.CoroutineScope
 import java.util.LinkedList
 
-class MockableMavericksViewModelConfig<S : MvRxState>(
-    private val mockableStateStore: MockableMvRxStateStore<S>,
+class MockableMavericksViewModelConfig<S : MavericksState>(
+    private val mockableStateStore: MockableMavericksStateStore<S>,
     private val initialMockBehavior: MockBehavior,
     coroutineScope: CoroutineScope,
     debugMode: Boolean
@@ -50,12 +50,12 @@ class MockableMavericksViewModelConfig<S : MvRxState>(
          *
          * This assumes the viewmodel was created with a mock config applied, and fails otherwise.
          */
-        fun <S : MvRxState> access(viewModel: MavericksViewModel<S>): MockableMavericksViewModelConfig<S> {
+        fun <S : MavericksState> access(viewModel: MavericksViewModel<S>): MockableMavericksViewModelConfig<S> {
             return viewModel.config as MockableMavericksViewModelConfig
         }
     }
 
-    override fun <S : MvRxState> onExecute(viewModel: MavericksViewModel<S>): BlockExecutions {
+    override fun <S : MavericksState> onExecute(viewModel: MavericksViewModel<S>): BlockExecutions {
         val blockExecutions = currentMockBehavior.blockExecutions
 
         if (blockExecutions != BlockExecutions.No) {
@@ -116,13 +116,13 @@ data class MockBehavior(
         Normal,
 
         /**
-         * An implementation of [ScriptableStateStore] that blocks any calls to [MvRxStateStore.set],
+         * An implementation of [ScriptableStateStore] that blocks any calls to [MavericksStateStore.set],
          * and instead allows immediate state updates via [ScriptableStateStore.next].
          */
         Scriptable,
 
         /**
-         * A fully functional [MvRxStateStore] implementation that makes all updates synchronously.
+         * A fully functional [MavericksStateStore] implementation that makes all updates synchronously.
          */
         Synchronous
     }
@@ -137,7 +137,7 @@ open class MockMavericksViewModelConfigFactory(context: Context?, debugMode: Boo
 
     private val applicationContext: Context? = context?.applicationContext
 
-    private val mockConfigs = mutableMapOf<MvRxStateStore<*>, MockableMavericksViewModelConfig<*>>()
+    private val mockConfigs = mutableMapOf<MavericksStateStore<*>, MockableMavericksViewModelConfig<*>>()
 
     /**
      * Determines what sort of mocked state store is created when [provideConfig] is called.
@@ -158,8 +158,8 @@ open class MockMavericksViewModelConfigFactory(context: Context?, debugMode: Boo
      *
      * After the block has executed, the previous setting for mockBehavior will be used again.
      *
-     * @param mockBehavior Null to have ViewModels created with a [RealMvRxStateFactory]. Non null to create ViewModels with a [MockableMvRxStateStore]
-     * If not null, the [MockableMvRxStateStore] will be created with the options declared in the [MockBehavior]
+     * @param mockBehavior Null to have ViewModels created with a [RealMvRxStateFactory]. Non null to create ViewModels with a [MockableMavericksStateStore]
+     * If not null, the [MockableMavericksStateStore] will be created with the options declared in the [MockBehavior]
      */
     fun <R> withMockBehavior(
         mockBehavior: MockBehavior = this.mockBehavior,
@@ -183,11 +183,11 @@ open class MockMavericksViewModelConfigFactory(context: Context?, debugMode: Boo
         mockConfigs.remove(store)
     }
 
-    override fun <S : MvRxState> buildConfig(viewModel: MavericksViewModel<S>, initialState: S): MavericksViewModelConfig<S> {
+    override fun <S : MavericksState> buildConfig(viewModel: MavericksViewModel<S>, initialState: S): MavericksViewModelConfig<S> {
         val mockBehavior = mockBehavior
         val coroutineScope = coroutineScope()
 
-        val stateStore = MockableMvRxStateStore(
+        val stateStore = MockableMavericksStateStore(
             initialState = initialState,
             mockBehavior = mockBehavior,
             coroutineScope = coroutineScope

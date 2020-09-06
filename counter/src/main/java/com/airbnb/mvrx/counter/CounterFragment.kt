@@ -7,13 +7,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.PersistState
 import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.withState
 import kotlinx.android.synthetic.main.fragment_counter.counterText
 
-data class CounterState(@PersistState val count: Int = 0) : MvRxState
+data class CounterState(@PersistState val count: Int = 0) : MavericksState
 
 class CounterViewModel(state: CounterState) : MavericksViewModel<CounterState>(state) {
 

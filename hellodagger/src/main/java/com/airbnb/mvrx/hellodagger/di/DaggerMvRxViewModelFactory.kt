@@ -1,11 +1,11 @@
 package com.airbnb.mvrx.hellodagger.di
 
 import androidx.fragment.app.FragmentActivity
-import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MavericksState
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MvRxViewModelFactory
 import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.hellodagger.appComponent
-import com.airbnb.mvrx.hellodagger.base.BaseViewModel
 
 /**
  * A [MvRxViewModelFactory] which makes it easy to create instances of a ViewModel
@@ -31,15 +31,15 @@ import com.airbnb.mvrx.hellodagger.base.BaseViewModel
  *
  * }
  */
-abstract class DaggerMvRxViewModelFactory<VM : BaseViewModel<S>, S : MvRxState>(
-    private val viewModelClass: Class<out BaseViewModel<S>>
+abstract class DaggerMvRxViewModelFactory<VM : MavericksViewModel<S>, S : MavericksState>(
+    private val viewModelClass: Class<VM>
 ) : MvRxViewModelFactory<VM, S> {
 
     override fun create(viewModelContext: ViewModelContext, state: S): VM? {
         return createViewModel(viewModelContext.activity, state)
     }
 
-    private fun <VM : BaseViewModel<S>, S : MvRxState> createViewModel(fragmentActivity: FragmentActivity, state: S): VM {
+    private fun <VM : MavericksViewModel<S>, S : MavericksState> createViewModel(fragmentActivity: FragmentActivity, state: S): VM {
         val viewModelFactoryMap = fragmentActivity.appComponent().viewModelFactories()
         val viewModelFactory = viewModelFactoryMap[viewModelClass]
 

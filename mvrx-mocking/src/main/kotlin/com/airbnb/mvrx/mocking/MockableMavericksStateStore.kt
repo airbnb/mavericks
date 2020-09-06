@@ -1,8 +1,8 @@
 package com.airbnb.mvrx.mocking
 
 import com.airbnb.mvrx.CoroutinesStateStore
-import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.ScriptableMvRxStateStore
+import com.airbnb.mvrx.MavericksState
+import com.airbnb.mvrx.ScriptableMavericksStateStore
 import com.airbnb.mvrx.ScriptableStateStore
 import com.airbnb.mvrx.mocking.MockBehavior.StateStoreBehavior
 import kotlinx.coroutines.CoroutineScope
@@ -24,14 +24,14 @@ interface MockableStateStore<S : Any> : ScriptableStateStore<S> {
  *
  * The mode can be dynamically changed to modify behavior at runtime.
  */
-class MockableMvRxStateStore<S : MvRxState>(
+class MockableMavericksStateStore<S : MavericksState>(
     initialState: S,
     override var mockBehavior: MockBehavior,
     val coroutineScope: CoroutineScope
 ) : MockableStateStore<S> {
-    private val scriptableStore = ScriptableMvRxStateStore(initialState)
+    private val scriptableStore = ScriptableMavericksStateStore(initialState)
     private val realStore = CoroutinesStateStore(initialState, coroutineScope)
-    private val realImmediateStore = SynchronousMvRxStateStore(initialState, coroutineScope)
+    private val realImmediateStore = SynchronousMavericksStateStore(initialState, coroutineScope)
 
     private val onStateSetListeners = mutableListOf<(previousState: S, newState: S) -> Unit>()
 
@@ -86,7 +86,7 @@ class MockableMvRxStateStore<S : MvRxState>(
         onStateSetListeners.remove(callback)
     }
 
-    fun addOnCancelListener(callback: (MockableMvRxStateStore<*>) -> Unit) {
+    fun addOnCancelListener(callback: (MockableMavericksStateStore<*>) -> Unit) {
         if (coroutineScope.isActive) {
             coroutineScope.coroutineContext[Job]!!.invokeOnCompletion {
                 callback(this)

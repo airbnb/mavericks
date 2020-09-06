@@ -2,7 +2,7 @@ package com.airbnb.mvrx.mocking
 
 import android.os.Parcelable
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.lifecycleAwareLazy
 import kotlin.reflect.KProperty
 
@@ -54,7 +54,7 @@ class MockStateHolder {
      * @param forceMockExistingViewModel If true, and if [existingViewModel] is true, then we expect that no mock state has been set for this viewmodel
      * and we should instead manually retrieve the default mock state from the View and force that as the mock state to use.
      */
-    fun <S : MvRxState> getMockedState(
+    fun <S : MavericksState> getMockedState(
         view: MockableMavericksView,
         viewModelProperty: KProperty<*>,
         existingViewModel: Boolean,
@@ -114,7 +114,7 @@ class MockStateHolder {
         }
     }
 
-    fun <VM : MavericksViewModel<S>, S : MvRxState> addViewModelDelegate(
+    fun <VM : MavericksViewModel<S>, S : MavericksState> addViewModelDelegate(
         view: MockableMavericksView,
         existingViewModel: Boolean,
         viewModelProperty: KProperty<*>,
@@ -130,7 +130,7 @@ class MockStateHolder {
             .add(ViewModelDelegateInfo(existingViewModel, viewModelProperty, viewModelDelegate))
     }
 
-    data class ViewModelDelegateInfo<VM : MavericksViewModel<S>, S : MvRxState>(
+    data class ViewModelDelegateInfo<VM : MavericksViewModel<S>, S : MavericksState>(
         val existingViewModel: Boolean,
         val viewModelProperty: KProperty<*>,
         val viewModelDelegate: lifecycleAwareLazy<VM>

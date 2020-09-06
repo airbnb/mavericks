@@ -2,13 +2,13 @@ package com.airbnb.mvrx.mocking
 
 import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.ActivityViewModelContext
+import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MvRx
-import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.MvRxStateFactory
-import com.airbnb.mvrx.MvRxViewModelProvider
-import com.airbnb.mvrx.RealMvRxStateFactory
+import com.airbnb.mvrx.MavericksState
+import com.airbnb.mvrx.MavericksStateFactory
+import com.airbnb.mvrx.MavericksViewModelProvider
+import com.airbnb.mvrx.RealMavericksStateFactory
 import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.ViewModelDelegateFactory
 import com.airbnb.mvrx.ViewModelDoesNotExistException
@@ -28,16 +28,16 @@ class MockViewModelDelegateFactory(
     val configFactory: MockMavericksViewModelConfigFactory
 ) : ViewModelDelegateFactory {
 
-    override fun <S : MvRxState, T, VM : MavericksViewModel<S>> createLazyViewModel(
+    override fun <S : MavericksState, T, VM : MavericksViewModel<S>> createLazyViewModel(
         fragment: T,
         viewModelProperty: KProperty<*>,
         viewModelClass: KClass<VM>,
         keyFactory: () -> String,
         stateClass: KClass<S>,
         existingViewModel: Boolean,
-        viewModelProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM
+        viewModelProvider: (stateFactory: MavericksStateFactory<VM, S>) -> VM
     ): Lazy<VM> where T : Fragment, T : MavericksView {
-        check(configFactory == MvRx.viewModelConfigFactory) {
+        check(configFactory == Mavericks.viewModelConfigFactory) {
             "Config factory provided in constructor is not the same one as installed on MvRx object."
         }
 
@@ -105,9 +105,9 @@ class MockViewModelDelegateFactory(
         }
     }
 
-    private fun <S : MvRxState, T, VM : MavericksViewModel<S>> getMockedViewModel(
+    private fun <S : MavericksState, T, VM : MavericksViewModel<S>> getMockedViewModel(
         existingViewModel: Boolean,
-        viewModelProvider: (stateFactory: MvRxStateFactory<VM, S>) -> VM,
+        viewModelProvider: (stateFactory: MavericksStateFactory<VM, S>) -> VM,
         fragment: T,
         keyFactory: () -> String,
         viewModelClass: KClass<VM>,
@@ -122,7 +122,7 @@ class MockViewModelDelegateFactory(
             // If it does exist we can look it up and return it, and  if it does not exist
             // we can create it like "activityViewModel" behavior would.
             try {
-                viewModelProvider(object : MvRxStateFactory<VM, S> {
+                viewModelProvider(object : MavericksStateFactory<VM, S> {
                     override fun createInitialState(
                         viewModelClass: Class<out VM>,
                         stateClass: Class<out S>,
@@ -142,7 +142,7 @@ class MockViewModelDelegateFactory(
                 // When existing view models don't exist it is normally an error, but since
                 // we are mocking them we just create a new view  model with the mocked state.
                 // This copies the behavior of "activityViewModel".
-                MvRxViewModelProvider.get(
+                MavericksViewModelProvider.get(
                     viewModelClass = viewModelClass.java,
                     stateClass = stateClass.java,
                     viewModelContext = ActivityViewModelContext(
@@ -158,7 +158,7 @@ class MockViewModelDelegateFactory(
         }
     }
 
-    private fun <S : MvRxState, T : MavericksView> getMockState(
+    private fun <S : MavericksState, T : MavericksView> getMockState(
         fragment: T,
         mockBehavior: MockBehavior,
         viewModelProperty: KProperty<*>,
@@ -178,13 +178,13 @@ class MockViewModelDelegateFactory(
         }
     }
 
-    private fun <S : MvRxState, VM : MavericksViewModel<S>> stateFactory(
+    private fun <S : MavericksState, VM : MavericksViewModel<S>> stateFactory(
         mockState: S?
-    ): MvRxStateFactory<VM, S> {
+    ): MavericksStateFactory<VM, S> {
         return if (mockState == null) {
-            RealMvRxStateFactory()
+            RealMavericksStateFactory()
         } else {
-            object : MvRxStateFactory<VM, S> {
+            object : MavericksStateFactory<VM, S> {
                 override fun createInitialState(
                     viewModelClass: Class<out VM>,
                     stateClass: Class<out S>,

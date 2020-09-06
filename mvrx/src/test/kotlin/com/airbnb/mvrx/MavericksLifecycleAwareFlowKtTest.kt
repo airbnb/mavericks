@@ -13,7 +13,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 @ExperimentalCoroutinesApi
-class MvRxLifecycleAwareFlowKtTest {
+class MavericksLifecycleAwareFlowKtTest {
     @Test
     fun testDoesntFlowFromCreate() = runBlockingTest {
         val flow = flowOf(1)

@@ -24,7 +24,7 @@ interface MvRxView : MavericksView {
      *
      * Default: [RedeliverOnStart].
      */
-    fun <S : MvRxState> BaseMvRxViewModel<S>.subscribe(deliveryMode: DeliveryMode = RedeliverOnStart, subscriber: (S) -> Unit) =
+    fun <S : MavericksState> BaseMvRxViewModel<S>.subscribe(deliveryMode: DeliveryMode = RedeliverOnStart, subscriber: (S) -> Unit) =
         onEachInternal(subscriptionLifecycleOwner, deliveryMode, { subscriber(it) }).toDisposable()
 
     /**
@@ -40,7 +40,7 @@ interface MvRxView : MavericksView {
      *
      * Default: [RedeliverOnStart].
      */
-    fun <S : MvRxState, A> BaseMvRxViewModel<S>.selectSubscribe(
+    fun <S : MavericksState, A> BaseMvRxViewModel<S>.selectSubscribe(
         prop1: KProperty1<S, A>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A) -> Unit
@@ -59,7 +59,7 @@ interface MvRxView : MavericksView {
      *
      * Default: [RedeliverOnStart].
      */
-    fun <S : MvRxState, T> BaseMvRxViewModel<S>.asyncSubscribe(
+    fun <S : MavericksState, T> BaseMvRxViewModel<S>.asyncSubscribe(
         asyncProp: KProperty1<S, Async<T>>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         onFail: ((Throwable) -> Unit)? = null,
@@ -78,7 +78,7 @@ interface MvRxView : MavericksView {
      *
      * Default: [RedeliverOnStart].
      */
-    fun <S : MvRxState, A, B> BaseMvRxViewModel<S>.selectSubscribe(
+    fun <S : MavericksState, A, B> BaseMvRxViewModel<S>.selectSubscribe(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
@@ -97,7 +97,7 @@ interface MvRxView : MavericksView {
      *
      * Default: [RedeliverOnStart].
      */
-    fun <S : MvRxState, A, B, C> BaseMvRxViewModel<S>.selectSubscribe(
+    fun <S : MavericksState, A, B, C> BaseMvRxViewModel<S>.selectSubscribe(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
@@ -117,7 +117,7 @@ interface MvRxView : MavericksView {
      *
      * Default: [RedeliverOnStart].
      */
-    fun <S : MvRxState, A, B, C, D> BaseMvRxViewModel<S>.selectSubscribe(
+    fun <S : MavericksState, A, B, C, D> BaseMvRxViewModel<S>.selectSubscribe(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
@@ -138,7 +138,7 @@ interface MvRxView : MavericksView {
      *
      * Default: [RedeliverOnStart].
      */
-    fun <S : MvRxState, A, B, C, D, E> BaseMvRxViewModel<S>.selectSubscribe(
+    fun <S : MavericksState, A, B, C, D, E> BaseMvRxViewModel<S>.selectSubscribe(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
@@ -162,7 +162,7 @@ interface MvRxView : MavericksView {
      *
      * Default: [RedeliverOnStart].
      */
-    fun <S : MvRxState, A, B, C, D, E, F> BaseMvRxViewModel<S>.selectSubscribe(
+    fun <S : MavericksState, A, B, C, D, E, F> BaseMvRxViewModel<S>.selectSubscribe(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
@@ -187,7 +187,7 @@ interface MvRxView : MavericksView {
      *
      * Default: [RedeliverOnStart].
      */
-    fun <S : MvRxState, A, B, C, D, E, F, G> BaseMvRxViewModel<S>.selectSubscribe(
+    fun <S : MavericksState, A, B, C, D, E, F, G> BaseMvRxViewModel<S>.selectSubscribe(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,

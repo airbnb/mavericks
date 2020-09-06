@@ -3,7 +3,7 @@ package com.airbnb.mvrx
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
-import com.airbnb.mvrx.MvRx.KEY_ARG
+import com.airbnb.mvrx.Mavericks.KEY_ARG
 import kotlinx.android.parcel.Parcelize
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -76,7 +76,7 @@ class Frag<T>(args: T?) : Fragment() {
 data class TestState(
     val str: String?,
     val num: Int?
-) : MvRxState {
+) : MavericksState {
     constructor(args: ParcelableArgs) : this(args.str, null)
     constructor(args: SerializableArgs) : this(null, args.num)
     constructor(id: Long) : this("id", id.toInt())

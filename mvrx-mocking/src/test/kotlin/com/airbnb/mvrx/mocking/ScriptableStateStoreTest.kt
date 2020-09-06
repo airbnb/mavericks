@@ -1,7 +1,7 @@
 package com.airbnb.mvrx.mocking
 
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MvRxState
+import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.withState
 import org.junit.Assert
 import org.junit.Before
@@ -36,7 +36,7 @@ class ScriptableStateStoreTest : BaseTest() {
         }
     }
 
-    data class TestState(val foo: Int = 1) : MvRxState
+    data class TestState(val foo: Int = 1) : MavericksState
 
     private class TestViewModel(
         initialState: TestState = TestState()
