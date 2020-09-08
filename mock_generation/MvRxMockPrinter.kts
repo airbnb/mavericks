@@ -1,5 +1,4 @@
 #!/usr/bin/env kscript
-@file:Suppress("Detekt.SpacingBetweenPackageAndImports")
 @file:Include("ShellAccess.kt")
 @file:Include("DirectoryUtils.kt")
 @file:Include("CommandLineArgs.kt")

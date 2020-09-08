@@ -79,7 +79,14 @@ class MockableMavericksViewModelConfig<S : MavericksState>(
 data class MockBehavior(
     val initialStateMocking: InitialStateMocking = InitialStateMocking.None,
     val blockExecutions: MavericksViewModelConfig.BlockExecutions = MavericksViewModelConfig.BlockExecutions.No,
-    val stateStoreBehavior: StateStoreBehavior = StateStoreBehavior.Normal
+    val stateStoreBehavior: StateStoreBehavior = StateStoreBehavior.Normal,
+    /**
+     * If true, when a view registers a ViewModel via a delegate the view will be subscribed
+     * to changes to the state view [MvRxView.postInvalidate]. This is the normal behavior of
+     * MvRx. This can be set to false so that a Fragment is not updated for state changes during
+     * tests.
+     */
+    val subscribeViewToStateUpdates: Boolean = true
 ) {
     /** Describes how a custom mocked state is applied to initialize a new ViewModel. */
     enum class InitialStateMocking {

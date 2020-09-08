@@ -69,24 +69,27 @@ class MockViewModelDelegateFactory(
                     mockBehavior
                 )
 
-                viewModel.apply { onEachInternal(fragment, action = { fragment.postInvalidate() }) }
-                    .also { vm ->
-                        if (mockState != null && mockBehavior.initialStateMocking == MockBehavior.InitialStateMocking.Full) {
-                            // Custom viewmodel factories can override initial state, so we also force state on the viewmodel
-                            // to be the expected mocked value after the ViewModel has been created.
-
-                            val stateStore =
-                                vm.config.stateStore as? MockableStateStore
-                                    ?: error("Expected a mockable state store for 'Full' mock behavior.")
-
-                            require(stateStore.mockBehavior.stateStoreBehavior == MockBehavior.StateStoreBehavior.Scriptable) {
-                                "Full mock state requires that the state store be set to scriptable to " +
-                                    "guarantee that state is frozen on the mock and not allowed to be changed by the view."
-                            }
-
-                            stateStore.next(mockState!!)
-                        }
+                viewModel.apply {
+                    if (mockBehavior.subscribeViewToStateUpdates) {
+                        onEachInternal(fragment, action = { fragment.postInvalidate() })
                     }
+                }.also { vm ->
+                    if (mockState != null && mockBehavior.initialStateMocking == MockBehavior.InitialStateMocking.Full) {
+                        // Custom viewmodel factories can override initial state, so we also force state on the viewmodel
+                        // to be the expected mocked value after the ViewModel has been created.
+
+                        val stateStore =
+                            vm.config.stateStore as? MockableStateStore
+                                ?: error("Expected a mockable state store for 'Full' mock behavior.")
+
+                        require(stateStore.mockBehavior.stateStoreBehavior == MockBehavior.StateStoreBehavior.Scriptable) {
+                            "Full mock state requires that the state store be set to scriptable to " +
+                                "guarantee that state is frozen on the mock and not allowed to be changed by the view."
+                        }
+
+                        stateStore.next(mockState!!)
+                    }
+                }
             }
         }.also { viewModelDelegate ->
             if (fragment is MockableMavericksView) {

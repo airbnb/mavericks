@@ -140,6 +140,16 @@ class ConstructorCodeGeneratorTest : BaseTest() {
     }
 
     @Test
+    fun setIsTruncated() {
+        data class Test(
+            val set: Set<Int> = setOf(1, 2, 3, 4)
+        ) : MavericksState
+
+        com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
+            .expect("ConstructorCodeGeneratorTest.setIsTruncated\$Test(set=setOf(1,2,3))")
+    }
+
+    @Test
     fun listIsNotTruncated() {
         data class Test(
             val list: List<Int> = listOf(1, 2, 3, 4)

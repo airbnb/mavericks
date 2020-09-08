@@ -16,3 +16,8 @@ You must have a device connected via adb with debugging enabled.
 Open your app to a MvRx screen and execute the script. State files for all running MvRx views
 will be generated.
 Follow the script help and output for more details.
+
+## Building
+
+The executable can be rebuilt by running the `package` script
+in this directory (you must have kotlin and kscript installed).

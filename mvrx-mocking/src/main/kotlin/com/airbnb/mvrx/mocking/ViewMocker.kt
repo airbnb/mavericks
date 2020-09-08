@@ -180,8 +180,12 @@ fun <V : MockableMavericksView, A : Parcelable> getMockVariants(
 private fun argumentsBundle(arguments: Parcelable, viewName: String): Bundle {
     @Suppress("Detekt.TooGenericExceptionCaught")
     return try {
-        Bundle().apply {
-            putParcelable(Mavericks.KEY_ARG, arguments)
+        if (arguments is Bundle) {
+            arguments
+        } else {
+            Bundle().apply {
+                putParcelable(Mavericks.KEY_ARG, arguments)
+            }
         }.makeClone()
     } catch (e: Throwable) {
         throw AssertionError(
