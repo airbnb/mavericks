@@ -155,11 +155,17 @@ interface DataClassSetDsl {
                 nextProp = (nextProp as? NestedProperty<*, *>)?.wrapperProperty
             }
 
-            return propertyChain.fold<KProperty0<Any?>, Any>(dataClass) { data, kProp0 ->
+            return propertyChain.fold<KProperty0<Any?>, Any?>(dataClass) { data, kProp0 ->
+                checkNotNull(data) {
+                    "Value of data class is null, cannot get property ${kProp0.name}"
+                }
+
                 val kProp1 = data::class.memberProperties.singleOrNull { it.name == kProp0.name }
                     ?: error("Could not find property of name ${kProp0.name} on class ${data::class.simpleName}")
 
-                kProp1.call(data) ?: error("kProp1.call(recursiveDataClass) as PropType")
+                // it is valid for the final result to be null, but intermediate values in the chain
+                // cannot be null.
+                kProp1.call(data)
             } as PropType
         }
 
