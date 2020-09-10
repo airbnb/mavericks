@@ -37,9 +37,7 @@ object Mavericks {
             _viewModelConfigFactory = value
         }
         get() {
-            _viewModelConfigFactory
-                ?.let { return it }
-                ?: error("You must initialize Mavericks. Add Mavericks.initialize(...) to your Application.onCreate().")
+            return _viewModelConfigFactory ?: error("You must initialize Mavericks. Add Mavericks.initialize(...) to your Application.onCreate().")
         }
     private var _viewModelConfigFactory: MavericksViewModelConfigFactory? = null
 
