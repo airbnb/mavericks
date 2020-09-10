@@ -208,6 +208,53 @@ fun <V : MockableMavericksView,
 }
 
 /**
+ * Similar to [mockTwoViewModels], but for the five view model case.
+ */
+@Suppress("Detekt.ParameterListWrapping")
+@SuppressWarnings("Detekt.LongParameterList")
+fun <V : MockableMavericksView,
+    S1 : MavericksState,
+    VM1 : MavericksViewModel<S1>,
+    S2 : MavericksState,
+    VM2 : MavericksViewModel<S2>,
+    S3 : MavericksState,
+    VM3 : MavericksViewModel<S3>,
+    S4 : MavericksState,
+    VM4 : MavericksViewModel<S4>,
+    S5 : MavericksState,
+    VM5 : MavericksViewModel<S5>,
+    Args : Parcelable>
+    V.mockFiveViewModels(
+    viewModel1Reference: KProperty1<V, VM1>,
+    defaultState1: S1,
+    viewModel2Reference: KProperty1<V, VM2>,
+    defaultState2: S2,
+    viewModel3Reference: KProperty1<V, VM3>,
+    defaultState3: S3,
+    viewModel4Reference: KProperty1<V, VM4>,
+    defaultState4: S4,
+    viewModel5Reference: KProperty1<V, VM5>,
+    defaultState5: S5,
+    defaultArgs: Args?,
+    mockBuilder: FiveViewModelMockBuilder<V, VM1, S1, VM2, S2, VM3, S3, VM4, S4, VM5, S5, Args>.() -> Unit
+): MockBuilder<V, Args> = FiveViewModelMockBuilder(
+    viewModel1Reference,
+    defaultState1,
+    viewModel2Reference,
+    defaultState2,
+    viewModel3Reference,
+    defaultState3,
+    viewModel4Reference,
+    defaultState4,
+    viewModel5Reference,
+    defaultState5,
+    defaultArgs
+).apply {
+    mockBuilder()
+    build(this@mockFiveViewModels)
+}
+
+/**
  * Defines a unique variation of a View's state for testing purposes.
  *
  * A view is represented completely by:
@@ -696,7 +743,7 @@ internal constructor(
     }
 }
 
-class FourStatesBuilder<
+open class FourStatesBuilder<
     V : MavericksView,
     S1 : MavericksState,
     VM1 : MavericksViewModel<S1>,
@@ -735,6 +782,121 @@ internal constructor(
      */
     fun viewModel4(stateBuilder: S4.() -> S4) {
         vm4 setStateTo defaultState4.stateBuilder()
+    }
+}
+
+class FiveViewModelMockBuilder<
+    V : MockableMavericksView,
+    VM1 : MavericksViewModel<S1>,
+    S1 : MavericksState,
+    VM2 : MavericksViewModel<S2>,
+    S2 : MavericksState,
+    VM3 : MavericksViewModel<S3>,
+    S3 : MavericksState,
+    VM4 : MavericksViewModel<S4>,
+    S4 : MavericksState,
+    VM5 : MavericksViewModel<S5>,
+    S5 : MavericksState,
+    Args : Parcelable>
+internal constructor(
+    val vm1: KProperty1<V, VM1>,
+    val defaultState1: S1,
+    val vm2: KProperty1<V, VM2>,
+    val defaultState2: S2,
+    val vm3: KProperty1<V, VM3>,
+    val defaultState3: S3,
+    val vm4: KProperty1<V, VM4>,
+    val defaultState4: S4,
+    val vm5: KProperty1<V, VM5>,
+    val defaultState5: S5,
+    defaultArgs: Args?
+) : MockBuilder<V, Args>(
+    defaultArgs,
+    vm1.pairDefault(defaultState1),
+    vm2.pairDefault(defaultState2),
+    vm3.pairDefault(defaultState3),
+    vm4.pairDefault(defaultState4),
+    vm5.pairDefault(defaultState5)
+) {
+
+    /**
+     * Provide state objects for each view model in the view.
+     *
+     * @param name Describes the UI these states put the view in. Should be unique.
+     * @param args The arguments that should be provided to the view.
+     *             This is only used if the view accesses arguments directly to get data that is not provided in the view model state.
+     *             In other cases it should be omitted. This must be provided if the view accesses args directly.
+     * @param statesBuilder A lambda that is used to define state objects for each view model. See [FiveStatesBuilder]
+     */
+    fun state(
+        name: String,
+        args: (Args.() -> Args)? = null,
+        statesBuilder: FiveStatesBuilder<V, S1, VM1, S2, VM2, S3, VM3, S4, VM4, S5, VM5>.() -> Unit
+    ) {
+        addState(
+            name,
+            evaluateArgsLambda(args),
+            FiveStatesBuilder(
+                vm1,
+                defaultState1,
+                vm2,
+                defaultState2,
+                vm3,
+                defaultState3,
+                vm4,
+                defaultState4,
+                vm5,
+                defaultState5
+            ).apply(statesBuilder).states
+        )
+    }
+}
+
+open class FiveStatesBuilder<
+    V : MavericksView,
+    S1 : MavericksState,
+    VM1 : MavericksViewModel<S1>,
+    S2 : MavericksState,
+    VM2 : MavericksViewModel<S2>,
+    S3 : MavericksState,
+    VM3 : MavericksViewModel<S3>,
+    S4 : MavericksState,
+    VM4 : MavericksViewModel<S4>,
+    S5 : MavericksState,
+    VM5 : MavericksViewModel<S5>>
+internal constructor(
+    vm1: KProperty1<V, VM1>,
+    defaultState1: S1,
+    vm2: KProperty1<V, VM2>,
+    defaultState2: S2,
+    vm3: KProperty1<V, VM3>,
+    defaultState3: S3,
+    vm4: KProperty1<V, VM4>,
+    defaultState4: S4,
+    val vm5: KProperty1<V, VM5>,
+    val defaultState5: S5
+) : FourStatesBuilder<V, S1, VM1, S2, VM2, S3, VM3, S4, VM4>(
+    vm1,
+    defaultState1,
+    vm2,
+    defaultState2,
+    vm3,
+    defaultState3,
+    vm4,
+    defaultState4
+) {
+
+    init {
+        vm5 setStateTo defaultState5
+    }
+
+    /**
+     * Define a state to be used when mocking your fifth view model (as defined in the top level mock method).
+     * If this method isn't called, your default state will be used automatically.
+     * For convenience, the receiver of the lambda is the default state.
+     */
+    fun viewModel5(stateBuilder: S5.() -> S5) {
+        vm5 setStateTo defaultState5.stateBuilder()
     }
 }
 
