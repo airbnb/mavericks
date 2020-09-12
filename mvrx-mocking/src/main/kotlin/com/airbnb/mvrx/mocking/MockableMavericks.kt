@@ -62,7 +62,7 @@ object MockableMavericks {
     val mockConfigFactory: MockMavericksViewModelConfigFactory
         get() {
             return (Mavericks.viewModelConfigFactory as? MockMavericksViewModelConfigFactory)
-                ?: error("Expecting MockMvRxViewModelConfigFactory for config factory. Make sure you have called MvRxMocks#install")
+                ?: error("Expecting MockMvRxViewModelConfigFactory for config factory. Make sure you have called MvRxMocks#initialize")
         }
 
     /**
