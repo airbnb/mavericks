@@ -3,12 +3,12 @@ package com.airbnb.mvrx.hellodagger.di
 import androidx.fragment.app.FragmentActivity
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MvRxViewModelFactory
+import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.hellodagger.appComponent
 
 /**
- * A [MvRxViewModelFactory] which makes it easy to create instances of a ViewModel
+ * A [MavericksViewModelFactory] which makes it easy to create instances of a ViewModel
  * using its AssistedInject Factory. This class should be implemented by the companion object
  * of every ViewModel which uses AssistedInject.
  *
@@ -31,9 +31,9 @@ import com.airbnb.mvrx.hellodagger.appComponent
  *
  * }
  */
-abstract class DaggerMvRxViewModelFactory<VM : MavericksViewModel<S>, S : MavericksState>(
+abstract class DaggerMavericksViewModelFactory<VM : MavericksViewModel<S>, S : MavericksState>(
     private val viewModelClass: Class<VM>
-) : MvRxViewModelFactory<VM, S> {
+) : MavericksViewModelFactory<VM, S> {
 
     override fun create(viewModelContext: ViewModelContext, state: S): VM? {
         return createViewModel(viewModelContext.activity, state)

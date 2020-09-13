@@ -23,7 +23,7 @@ abstract class BaseTest {
     @After
     fun resetConfigurationDefaults() {
         // Use a null context since we don't need mock printing during tests
-        MockableMavericks.install(debugMode = true, mocksEnabled = true, context = null)
+        MockableMavericks.initialize(debugMode = true, mocksEnabled = true, context = null)
         MockableMavericks.mockConfigFactory.mockBehavior = MockBehavior(
             stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
         )
@@ -91,9 +91,5 @@ abstract class BaseTest {
 
 
         return controller
-    }
-
-    protected inline fun <reified F : Fragment> ActivityController<out AppCompatActivity>.mvRxFragment(): F {
-        return get().supportFragmentManager.findFragmentByTag("TAG") as F
     }
 }

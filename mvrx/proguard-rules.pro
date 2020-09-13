@@ -17,7 +17,7 @@
 
 # If a MvRxViewModelFactory is used without JvmStatic, keep create and initalState methods which
 # are accessed via reflection.
--keepclassmembers class ** implements com.airbnb.mvrx.MvRxViewModelFactory {
+-keepclassmembers class ** implements com.airbnb.mvrx.MavericksViewModelFactory {
      public <init>(...);
      public *** create(...);
      public *** initialState(...);

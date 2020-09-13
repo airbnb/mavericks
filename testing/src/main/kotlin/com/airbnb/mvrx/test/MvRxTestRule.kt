@@ -2,6 +2,7 @@ package com.airbnb.mvrx.test
 
 import com.airbnb.mvrx.DefaultViewModelDelegateFactory
 import com.airbnb.mvrx.Mavericks
+import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.airbnb.mvrx.MvRxTestOverridesProxy
 import com.airbnb.mvrx.mocking.MockBehavior
 import com.airbnb.mvrx.mocking.MockableMavericks
@@ -27,14 +28,14 @@ class MvRxTestRule(
      */
     private val setForceDisableLifecycleAwareObserver: Boolean = true,
     /**
-     * If provided, MvRx mocking will be enabled via [MockableMavericks.install] and this will be set as
+     * If provided, MvRx mocking will be enabled via [MockableMavericks.initialize] and this will be set as
      * the mocking behavior. The default behavior simply puts the ViewModel in a configuration
      * where state changes happen synchronously, which is often necessary for tests.
      *
      * You can pass a "Scriptable" state store behavior to prevent state changes while forcing
      * your own state changes.
      *
-     * If null is given then mock behavior is disabled via [MockableMavericks.install].
+     * If null is given then mock behavior is disabled via [MockableMavericks.initialize].
      */
     private val viewModelMockBehavior: MockBehavior? = MockBehavior(
         stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
@@ -60,7 +61,7 @@ class MvRxTestRule(
     private fun setupMocking() {
         val mocksEnabled = viewModelMockBehavior != null
         // Use a null context since we don't need mock printing during tests
-        MockableMavericks.install(debugMode = debugMode, mocksEnabled = mocksEnabled, context = null)
+        MockableMavericks.initialize(debugMode = debugMode, mocksEnabled = mocksEnabled, context = null)
 
         if (viewModelMockBehavior != null) {
             MockableMavericks.mockConfigFactory.mockBehavior = viewModelMockBehavior
@@ -75,6 +76,6 @@ class MvRxTestRule(
         MockableMavericks.enableMavericksViewMocking = false
         MockableMavericks.enableMockPrinterBroadcastReceiver = false
         Mavericks.viewModelDelegateFactory = DefaultViewModelDelegateFactory()
-        Mavericks.viewModelConfigFactory = null
+        Mavericks.viewModelConfigFactory = MavericksViewModelConfigFactory(debugMode = debugMode)
     }
 }

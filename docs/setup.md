@@ -14,12 +14,12 @@ Make your base Fragment class implement `MavericksView`.
 
 In your Application onCreate method, add a single line:
 ```kotlin
-Mavericks.install(this)
+Mavericks.initialize(this)
 ```
 
 If you plan to use [Mavericks Mocking](/mocking.md), use this line instead:
 ```kotlin
-MavericksMocks.install(this)
+MavericksMocks.initialize(this)
 ```
 
 ### [Optional] Configure Global Mavericks Plugins
@@ -40,8 +40,8 @@ This checks whether your application was built as a debuggable build, and if so 
 #### [Optional] Configuration with Mocking Support
 If you would like to take advantage of [Mavericks's mocking system](https://github.com/airbnb/Mavericks/wiki/Mavericks-Mocking-System) at all you should instead initialize the global settings via the `MavericksMocks` object in your application's initialization.
 ```kotlin
-MavericksMocks.install(applicationContext)
+MavericksMocks.initialize(applicationContext)
 ```
 
-This can be done _instead_ of `Mavericks.viewModelConfigFactory`, as this will set a mockable debug version of `MavericksViewModelConfigFactory` if your app was built as a debuggable build. If your app was not built debuggable (ie for production), then `MavericksMocks.install` will simply set up a non debug version of `MavericksViewModelConfigFactory` for you.
+This can be done _instead_ of `Mavericks.viewModelConfigFactory`, as this will set a mockable debug version of `MavericksViewModelConfigFactory` if your app was built as a debuggable build. If your app was not built debuggable (ie for production), then `MavericksMocks.initialize` will simply set up a non debug version of `MavericksViewModelConfigFactory` for you.
 

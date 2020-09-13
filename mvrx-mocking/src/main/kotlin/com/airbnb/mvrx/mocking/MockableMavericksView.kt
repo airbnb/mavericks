@@ -31,7 +31,7 @@ interface MockableMavericksView : MavericksView {
      * printing. This is safe to call multiple times for the same [MavericksView].
      *
      * Doing this allows the arguments for the view to be printed out. View model states
-     * will be printed out if [MockableMavericks.install] has been done.
+     * will be printed out if [MockableMavericks.initialize] has been done.
      *
      * This should be called when the view is created, so it is available to have its state
      * printed. This is a no-op if [MockableMavericks.enableMockPrinterBroadcastReceiver] is disabled.

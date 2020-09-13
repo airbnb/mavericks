@@ -26,31 +26,45 @@ object Mavericks {
      * A factory for creating a [MavericksViewModelConfig] for each ViewModel.
      *
      * You MUST provide an instance here before creating any viewmodels. You can do this when
-     * your application is created via the [install] helper.
+     * your application is created via the [initialize] helper.
      *
      * This allows you to specify whether Mavericks should run in debug mode or not. Additionally, it
      * allows custom state stores or execution behavior for the ViewModel, which can be helpful
      * for testing.
      */
-    var viewModelConfigFactory: MavericksViewModelConfigFactory? = null
+    var viewModelConfigFactory: MavericksViewModelConfigFactory
+        set(value) {
+            _viewModelConfigFactory = value
+        }
+        get() {
+            return _viewModelConfigFactory ?: error("You must initialize Mavericks. Add Mavericks.initialize(...) to your Application.onCreate().")
+        }
+    private var _viewModelConfigFactory: MavericksViewModelConfigFactory? = null
 
     /**
      * A helper for setting [viewModelConfigFactory] based on whether the app was built in debug mode or not.
      */
-    fun install(context: Context) {
-        install(context.isDebuggable())
+    fun initialize(
+        context: Context,
+        viewModelConfigFactory: MavericksViewModelConfigFactory? = null,
+        viewModelDelegateFactory: ViewModelDelegateFactory? = null
+    ) {
+        initialize(context.isDebuggable(), viewModelConfigFactory, viewModelDelegateFactory)
     }
 
     /**
      * A helper for setting [viewModelConfigFactory] with the given debug mode.
      */
-    fun install(debugMode: Boolean) {
-        viewModelConfigFactory = MavericksViewModelConfigFactory(debugMode = debugMode)
-    }
-
-    internal val nonNullViewModelConfigFactory: MavericksViewModelConfigFactory
-        get() {
-            return viewModelConfigFactory
-                ?: error("You must specify a viewModelConfigFactory in the MvRx object. Call 'Mavericks.install(context)' in your app's Application class.")
+    fun initialize(
+        debugMode: Boolean,
+        viewModelConfigFactory: MavericksViewModelConfigFactory? = null,
+        viewModelDelegateFactory: ViewModelDelegateFactory? = null
+    ) {
+        _viewModelConfigFactory = viewModelConfigFactory ?: MavericksViewModelConfigFactory(debugMode = debugMode)
+        this.viewModelDelegateFactory = when {
+            viewModelDelegateFactory != null -> viewModelDelegateFactory
+            this.viewModelDelegateFactory !is DefaultViewModelDelegateFactory -> DefaultViewModelDelegateFactory()
+            else -> this.viewModelDelegateFactory
         }
+    }
 }

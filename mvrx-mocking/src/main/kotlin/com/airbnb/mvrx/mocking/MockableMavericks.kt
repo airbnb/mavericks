@@ -1,15 +1,13 @@
 package com.airbnb.mvrx.mocking
 
 import android.content.Context
-import com.airbnb.mvrx.DefaultViewModelDelegateFactory
 import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksStateStore
 import com.airbnb.mvrx.ScriptableStateStore
 import com.airbnb.mvrx.isDebuggable
-import com.airbnb.mvrx.mocking.MockableMavericks.install
+import com.airbnb.mvrx.mocking.MockableMavericks.initialize
 import com.airbnb.mvrx.mocking.printer.MavericksMockPrinter
 import com.airbnb.mvrx.mocking.printer.MockPrinterConfiguration
 import com.airbnb.mvrx.mocking.printer.ViewModelStatePrinter
@@ -17,7 +15,7 @@ import com.airbnb.mvrx.mocking.printer.ViewModelStatePrinter
 /**
  * Entry point for setting up Mavericks for the app in a mockable way.
  *
- * See [install]
+ * See [initialize]
  */
 object MockableMavericks {
     /**
@@ -50,21 +48,21 @@ object MockableMavericks {
     /**
      * Calls to [MavericksMockPrinter.startReceiver] will be no-ops unless this is enabled.
      *
-     * This will automatically be set when [install] is called.
+     * This will automatically be set when [initialize] is called.
      */
     var enableMockPrinterBroadcastReceiver: Boolean = false
 
     /**
      * Calls to [MockableMavericksView.provideMocks] will return empty unless this is enabled.
      *
-     * This will automatically be set when [install] is called.
+     * This will automatically be set when [initialize] is called.
      */
     var enableMavericksViewMocking: Boolean = false
 
     val mockConfigFactory: MockMavericksViewModelConfigFactory
         get() {
             return (Mavericks.viewModelConfigFactory as? MockMavericksViewModelConfigFactory)
-                ?: error("Expecting MockMvRxViewModelConfigFactory for config factory. Make sure you have called MvRxMocks#install")
+                ?: error("Expecting MockMvRxViewModelConfigFactory for config factory. Make sure you have called MvRxMocks#initialize")
         }
 
     /**
@@ -86,9 +84,9 @@ object MockableMavericks {
      *
      * Calling this subsequent times will replace the plugins with new instances.
      */
-    fun install(context: Context) {
+    fun initialize(context: Context) {
         val isDebuggable = context.isDebuggable()
-        install(
+        initialize(
             mocksEnabled = isDebuggable,
             debugMode = isDebuggable,
             context = context
@@ -115,19 +113,16 @@ object MockableMavericks {
      * @param context Application context. If provided this will be used to register a
      * [ViewModelStatePrinter] for each ViewModel to support mock state printing.
      */
-    fun install(mocksEnabled: Boolean, debugMode: Boolean, context: Context?) {
+    fun initialize(mocksEnabled: Boolean, debugMode: Boolean, context: Context?) {
         enableMockPrinterBroadcastReceiver = mocksEnabled
         enableMavericksViewMocking = mocksEnabled
 
         if (mocksEnabled) {
             val mockConfigFactory = MockMavericksViewModelConfigFactory(context?.applicationContext, debugMode)
-            Mavericks.viewModelConfigFactory = mockConfigFactory
-            Mavericks.viewModelDelegateFactory = MockViewModelDelegateFactory(mockConfigFactory)
+            val mockViewModelDelegateFactory = MockViewModelDelegateFactory(mockConfigFactory)
+            Mavericks.initialize(debugMode, mockConfigFactory, mockViewModelDelegateFactory)
         } else {
-            // These are both set to make sure that all MvRx plugins are completely cleared
-            // when debuggable is set to false. This helps in the unit testing case.
-            Mavericks.viewModelConfigFactory = MavericksViewModelConfigFactory(debugMode)
-            Mavericks.viewModelDelegateFactory = DefaultViewModelDelegateFactory()
+            Mavericks.initialize(debugMode)
         }
     }
 

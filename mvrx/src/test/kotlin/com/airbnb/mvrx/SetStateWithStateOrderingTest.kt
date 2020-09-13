@@ -30,7 +30,7 @@ class SetStateWithStateOrderingTest : MavericksViewModel<OrderingState>(Ordering
         @JvmStatic
         fun cleanup() {
             Dispatchers.resetMain()
-            Mavericks.viewModelConfigFactory = null
+            Mavericks.viewModelConfigFactory = MavericksViewModelConfigFactory(true)
         }
     }
 

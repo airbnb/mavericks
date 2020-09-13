@@ -8,7 +8,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.Loading
 import com.airbnb.mvrx.MavericksState
-import com.airbnb.mvrx.MvRxViewModelFactory
+import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.Uninitialized
 import com.airbnb.mvrx.ViewModelContext
@@ -42,7 +42,7 @@ class RandomDadJokeViewModel(
         }.execute(Dispatchers.IO) { copy(joke = it) }
     }
 
-    companion object : MvRxViewModelFactory<RandomDadJokeViewModel, RandomDadJokeState> {
+    companion object : MavericksViewModelFactory<RandomDadJokeViewModel, RandomDadJokeState> {
 
         override fun create(
             viewModelContext: ViewModelContext,

@@ -9,7 +9,7 @@ import com.airbnb.mvrx.Incomplete
 import com.airbnb.mvrx.Loading
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksState
-import com.airbnb.mvrx.MvRxViewModelFactory
+import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.launcher.MvRxLauncherActivity.Companion.PARAM_VIEW_PATTERN_TO_TEST
@@ -273,7 +273,7 @@ class MvRxLauncherViewModel(
         }
     }
 
-    companion object : MvRxViewModelFactory<MvRxLauncherViewModel, MavericksLauncherState> {
+    companion object : MavericksViewModelFactory<MvRxLauncherViewModel, MavericksLauncherState> {
 
         override fun create(
             viewModelContext: ViewModelContext,
