@@ -14,13 +14,18 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.selects.SelectBuilder
 import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.yield
 
 /**
  * Emits values from the source flow only when the owner is started.
  * When the owner transitions to started, the most recent value will be emitted.
+ *
+ * Implementation is similar to [Flow.combineTransform] with the following changes:
+ * 1. Regular channels are used instead of fair channels to avoid unnecessary [yield] calls.
+ *    It's possible because lifecycle state updated in the main thread
+ * 2. Flow completes when either [this] flow completes or lifecycle is destroyed
  */
 fun <T : Any> Flow<T>.flowWhenStarted(owner: LifecycleOwner): Flow<T> = flow {
-
     coroutineScope {
         val startedChannel = startedChannel(owner.lifecycle)
         val flowChannel = produce { collect { send(it) } }
@@ -37,9 +42,9 @@ fun <T : Any> Flow<T>.flowWhenStarted(owner: LifecycleOwner): Flow<T> = flow {
 
         while (!isClosed) {
             select<Unit> {
-                onReceive(startedChannel, { isClosed = true }) {
+                onReceive(startedChannel, { flowChannel.cancel(); isClosed = true }) {
                     started = it
-                    if (flowValue != null) {
+                    if (flowValue !== null) {
                         transform(it, flowValue as T)
                     }
                 }
@@ -66,7 +71,7 @@ private fun startedChannel(owner: Lifecycle): Channel<Boolean> {
         }
 
         override fun onDestroy(owner: LifecycleOwner) {
-            channel.cancel()
+            channel.close()
         }
     }
     owner.addObserver(observer)
