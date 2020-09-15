@@ -3,35 +3,35 @@ object Versions {
     const val buildTools = "29.0.3"
     const val compileSdk = 29
     const val gradlePlugin = "4.0.0"
-    const val jetpack = "1.1.0"
-    const val kotlin = "1.3.72"
+    const val kotlin = "1.4.10"
     const val minSdk = 16
     const val targetSdk = 29
 
     // Android libraries
     const val arch = "2.1.0"
+    const val appcompat = "1.2.0"
     const val cardview = "1.0.0"
-    const val constraintlayout = "1.1.3"
-    const val core = "1.2.0"
-    const val fragment = "1.2.3"
+    const val constraintlayout = "2.0.0"
+    const val core = "1.3.1"
+    const val fragment = "1.2.5"
     const val lifecycle = "2.2.0"
     const val navigation = "2.2.1"
     const val recyclerview = "1.1.0"
+    const val coordinatorLayout = "1.1.0"
     const val room = "2.2.5"
 
     // Libraries
     const val autoValue = "1.6.6"
-    const val kotlinCoroutines = "1.3.7"
+    const val kotlinCoroutines = "1.3.9"
     const val dagger = "2.27"
     const val daggerAssisted = "0.5.2"
-    const val debugDb = "1.0.4"
-    const val epoxy = "4.0.0-beta1"
+    const val epoxy = "4.0.0"
     const val koin = "2.0.1"
     const val lottie = "3.4.0"
     const val moshi = "1.9.2"
     const val multidex = "2.0.1"
     const val mvrx = "1.3.0"
-    const val picasso = "2.71828"
+    const val picasso = "2.8"
     const val retrofit = "2.7.2"
     const val rxAndroid = "2.1.1"
     const val rxJava = "2.2.9"
@@ -60,14 +60,13 @@ object AnnotationProcessors {
 }
 
 object Libraries {
-    const val appcompat = "androidx.appcompat:appcompat:${Versions.jetpack}"
+    const val appcompat = "androidx.appcompat:appcompat:${Versions.appcompat}"
     const val autoValue = "com.google.auto.value:auto-value-annotations:${Versions.autoValue}"
     const val cardview = "androidx.cardview:cardview:${Versions.cardview}"
     const val constraintlayout = "androidx.constraintlayout:constraintlayout:${Versions.constraintlayout}"
     const val coreKtx = "androidx.core:core-ktx:${Versions.core}"
     const val dagger = "com.google.dagger:dagger:${Versions.dagger}"
     const val daggerAssisted = "com.squareup.inject:assisted-inject-annotations-dagger2:${Versions.daggerAssisted}"
-    const val debugDb = "com.amitshekhar.android:debug-db:${Versions.debugDb}"
     const val epoxy = "com.airbnb.android:epoxy:${Versions.epoxy}"
     const val espressoIdlingResource = "androidx.test.espresso:espresso-idling-resource:${Versions.espresso}"
     const val fragment = "androidx.fragment:fragment:${Versions.fragment}"
@@ -87,6 +86,7 @@ object Libraries {
     const val navigationUiKtx = "androidx.navigation:navigation-ui-ktx:${Versions.navigation}"
     const val picasso = "com.squareup.picasso:picasso:${Versions.picasso}"
     const val recyclerview = "androidx.recyclerview:recyclerview:${Versions.recyclerview}"
+    const val coordinatorLayout = "androidx.coordinatorlayout:coordinatorlayout:${Versions.coordinatorLayout}"
     const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
     const val retrofitMoshi = "com.squareup.retrofit2:converter-moshi:${Versions.retrofit}"
     const val retrofitRxJava = "com.squareup.retrofit2:adapter-rxjava2:${Versions.retrofit}"

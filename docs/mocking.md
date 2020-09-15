@@ -40,7 +40,7 @@ The Mavericks mocking artifact provides several extension functions to help you 
 - `mockNoViewModels` - If the view has no viewmodels (It may still have Fragment arguments)
 - `mockSingleViewModel` - When the view has one view model
 - `mockTwoViewModels` - When the view has two view models
-- etc - additional functions follow this naming pattern for higher view model counts
+- Additional functions follow this naming pattern for higher view model counts
 
 Each of these functions follows a similar pattern for the parameters it requires:
 
@@ -87,7 +87,7 @@ If you don't use the `Mavericks.KEY_ARG` for your arguments you can pass a Bundl
 
 The `defaultState` and `defaultArgs` parameters passed to the top level mock function should be thought of as the canonical representation of data on that page. Generally, no properties in it should be null, have an empty List or Collection, be undefined, be in a loading or error state, etc.
 
-A default mock (named “Default state”) is created for you automatically based on the default state you pass in. Additionally, if default args are provided, a “Default initialization” mock is also automatically created.
+A default mock (named “Default state”) is created for you automatically based on the default state you pass in. Additionally, if default args are provided, a “Default initialization” mock is also automatically created. This tests initializing your ViewModel with the default arguments and the state that results from those arguments.
 
 Mock variations to the default state can describe possible differences a user might encounter, such as data in a loading or error state.
 
@@ -95,6 +95,8 @@ The purpose of this is two-fold:
 
 1. It standardizes a canonical representation of the screen which you can then use as a basis for testing
 2. It allows variations to be easily defined and tested in manageable pieces
+
+Additionally, Mavericks automatically adds another default mock named "Default state after process recreation". This is based on default state, but has the Mavericks state saving and restoring operations applied to it to simulate how the state reacts to process death.
 
 ## How Mocks Are Used
 
@@ -195,7 +197,7 @@ For this to work you must first make sure `MockableMavericksView.registerMockPri
 
 The script itself is written in Kotlin and packaged as a standalone executable that you can download from the Mavericks Github repository. It can be found at `mock_generation/MavericksMockPrinter`
 
-While your app is live and attached via ADB (with debugging enabled), run the mock printer tool via `./MavericksMockPrinter` from your computer. It is recommended to run this from your app's root project directory so the generated mock source files can be copied to the right directory for you.
+While your app is live and attached via ADB (with debugging enabled), run the mock printer tool via `./mock_generation/MavericksMockPrinter` from your computer. It is recommended to run this from your app's root project directory so the generated mock source files can be copied to the right directory for you.
 
 You can run the tool with the help flag - `./MavericksMockPrinter -h`
 

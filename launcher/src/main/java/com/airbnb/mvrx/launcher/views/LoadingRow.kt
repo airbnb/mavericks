@@ -14,6 +14,6 @@ class LoadingRow @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     init {
-        inflate(context, R.layout.mvrx_loading_row, this)
+        inflate(context, R.layout.mavericks_loading_row, this)
     }
 }
