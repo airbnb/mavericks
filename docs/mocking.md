@@ -193,11 +193,11 @@ Essentially, this allows you to capture a snapshot of the State of any of your M
 
 For this to work you must first make sure `MockableMavericksView.registerMockPrinter` is called when your view is created. This registers a lifecycle observer on your MavericksView that will use a Broadcast Receiver to listen for the scripts intent while the view is in the "Started" lifecycle state.
 
-The script itself is written in Kotlin and packaged as a standalone executable that you can download from the Mavericks Github repository. It can be found at `mock_generation/MvrxMockPrinter`
+The script itself is written in Kotlin and packaged as a standalone executable that you can download from the Mavericks Github repository. It can be found at `mock_generation/MavericksMockPrinter`
 
-While your app is live and attached via ADB (with debugging enabled), run the mock printer tool via `./MvRxMockPrinter` from your computer. It is recommended to run this from your app's root project directory so the generated mock source files can be copied to the right directory for you.
+While your app is live and attached via ADB (with debugging enabled), run the mock printer tool via `./MavericksMockPrinter` from your computer. It is recommended to run this from your app's root project directory so the generated mock source files can be copied to the right directory for you.
 
-You can run the tool with the help flag - `./MvRxMockPrinter -h`
+You can run the tool with the help flag - `./MavericksMockPrinter -h`
 
 It is recommended that you generate and save a single fully mocked state per ViewModel, which will be the "default state" that you pass to the `provideMocks` function of your mockable View.
 
