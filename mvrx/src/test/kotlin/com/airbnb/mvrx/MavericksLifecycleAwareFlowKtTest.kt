@@ -4,10 +4,14 @@ import androidx.lifecycle.Lifecycle
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -110,5 +114,37 @@ class MavericksLifecycleAwareFlowKtTest {
 
         assertEquals(listOf(1, 2, 3), values)
         job.cancel()
+    }
+
+    @Test
+    fun testFlowCompletedIfLifecycleDestroyed() = runBlocking {
+        val owner = TestLifecycleOwner()
+        owner.lifecycle.currentState = Lifecycle.State.STARTED
+
+        val endlessFlow = flow {
+            emit(0)
+            delay(Long.MAX_VALUE)
+        }
+
+        val values = mutableListOf<Int>()
+        val job = launch {
+            endlessFlow.flowWhenStarted(owner)
+                .collect {
+                    println("$it")
+                    values += it
+                }
+        }
+        delay(1)
+        owner.lifecycle.currentState = Lifecycle.State.DESTROYED
+
+        job.join()
+    }
+
+    @Test
+    fun testFlowCompleteIfSourceFlowCompleted() = runBlocking {
+        val owner = TestLifecycleOwner()
+        owner.lifecycle.currentState = Lifecycle.State.STARTED
+
+        flowOf(1).flowWhenStarted(owner).collect()
     }
 }
