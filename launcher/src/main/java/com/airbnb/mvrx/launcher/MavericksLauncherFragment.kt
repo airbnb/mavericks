@@ -2,9 +2,6 @@ package com.airbnb.mvrx.launcher
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.mvrx.fragmentViewModel
@@ -97,6 +94,22 @@ class MavericksLauncherFragment : MavericksLauncherBaseFragment() {
                 }
             }
         })
+
+        toolbar.inflateMenu(R.menu.mavericks_launcher_fragment)
+        toolbar.setOnMenuItemClickListener { menuItem ->
+            when (menuItem.itemId) {
+                // This option automatically launches all mocks shown on the screen.
+                // They are shown in order just long enough to verify they render and don't crash.
+                R.id.menu_mavericks_launcher_auto_run -> {
+                    withState(viewModel) { state ->
+                        val mocks = state.mocksForSelectedView ?: state.mocksLoadedSoFar ?: return@withState
+                        testMocks(mocks)
+                    }
+                    true
+                }
+                else -> false
+            }
+        }
     }
 
     override fun epoxyController() = simpleController(viewModel) { state ->
@@ -211,27 +224,6 @@ class MavericksLauncherFragment : MavericksLauncherBaseFragment() {
 
         if (state.allMocks() == null) {
             loadingRow { id("loading additional mocks") }
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.`mavericks_launcher_fragment.xml`, menu)
-        super.onCreateOptionsMenu(menu, inflater)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            // This option automatically launches all mocks shown on the screen.
-            // They are shown in order just long enough to verify they render and don't crash.
-            R.id.menu_mvrx_launcher_auto_run -> {
-                withState(viewModel) { state ->
-                    val mocks = state.mocksForSelectedView ?: state.mocksLoadedSoFar ?: return@withState
-                    testMocks(mocks)
-                }
-
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
         }
     }
 
