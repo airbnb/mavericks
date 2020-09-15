@@ -224,8 +224,7 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
             // They are shown in order just long enough to verify they render and don't crash.
             R.id.menu_mvrx_launcher_auto_run -> {
                 withState(viewModel) { state ->
-                    val mocks =
-                        state.mocksForSelectedView ?: state.mocksLoadedSoFar ?: return@withState
+                    val mocks = state.mocksForSelectedView ?: state.mocksLoadedSoFar ?: return@withState
                     testMocks(mocks)
                 }
 

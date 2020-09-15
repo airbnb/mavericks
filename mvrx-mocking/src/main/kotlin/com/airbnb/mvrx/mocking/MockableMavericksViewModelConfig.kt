@@ -230,7 +230,7 @@ open class MockMavericksViewModelConfigFactory(context: Context?, debugMode: Boo
 
     /**
      * Changes the current [MockBehavior] of all running ViewModels, if they were created when
-     * [mockBehavior] was non null. This forces the mock behavior of to this new value.
+     * [mockBehavior] was non null. This forces the mock behavior to this new value.
      *
      * This should be followed later by a corresponding call to [popMockBehaviorOverride] in order
      * to revert the mock behavior to its original value.

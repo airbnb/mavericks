@@ -61,7 +61,7 @@ class MvRxLauncherTestMocksActivity : AppCompatActivity() {
         private const val REQUEST_CODE_TEST_FINISHED = 2
 
         /**
-         * Override this in order to customize what activity is used to test eachh
+         * Override this in order to customize what activity is used to test each
          * mock.
          */
         var provideIntentToTestMock: (Context, MockedViewProvider<*>) -> Intent = { context, mock ->

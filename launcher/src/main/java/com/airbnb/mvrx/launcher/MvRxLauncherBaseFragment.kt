@@ -54,8 +54,6 @@ abstract class MvRxLauncherBaseFragment : Fragment(), MavericksView {
 
         recyclerView.setController(epoxyController)
 
-        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
-
         toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
         // We don't want a title shown. By default it adds "MvRx"
         activity?.title = ""

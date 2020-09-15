@@ -26,6 +26,11 @@ import kotlin.reflect.full.primaryConstructor
  *
  * @param defaultArgs If your view takes arguments you must provide an instance of those arguments here to be used as the default value for your mocks.
  *                      If your view has no arguments, pass null (and use Nothing as the type).
+ *                      For example, if you use Fragments this would be the arguments that you initialize the Fragment with.
+ *                      If you use the [Mavericks.KEY_ARG] key to pass a single Parcelable class to your Fragment you can pass that class here,
+ *                      and it will automatically be wrapped in a Bundle with the [Mavericks.KEY_ARG] key. Otherwise you can pass a [Bundle] and
+ *                      it will be passed along as-is to your Fragment when it is created.
+ *
  * @param mockBuilder Optionally provide other argument variations via the [MockBuilder] DSL
  *
  * @see mockSingleViewModel
@@ -88,7 +93,12 @@ inline fun <reified V : MockableMavericksView> V.combineMocks(
  * @param viewModelReference A reference to the view model that will be mocked. Use the "::" operator for this - "MyFragment::myViewModel"
  * @param defaultState An instance of your State that represents the canonical version of your view. It will be the basis for your tests.
  * @param defaultArgs If your view takes arguments you must provide an instance of those arguments here to be used as the default value for your mocks.
- *                      If your view has no arguments, pass null (and use Nothing as the type)
+ *                      If your view has no arguments, pass null (and use Nothing as the type).
+ *                      For example, if you use Fragments this would be the arguments that you initialize the Fragment with.
+ *                      If you use the [Mavericks.KEY_ARG] key to pass a single Parcelable class to your Fragment you can pass that class here,
+ *                      and it will automatically be wrapped in a Bundle with the [Mavericks.KEY_ARG] key. Otherwise you can pass a [Bundle] and
+ *                      it will be passed along as-is to your Fragment when it is created.
+ *
  * @param mockBuilder A lambda where the [SingleViewModelMockBuilder] DSL can be used to specify additional mock variants.
  * @see mockTwoViewModels
  * @see mockNoViewModels
