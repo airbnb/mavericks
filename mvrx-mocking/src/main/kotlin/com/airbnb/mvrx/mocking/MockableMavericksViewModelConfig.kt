@@ -82,7 +82,7 @@ data class MockBehavior(
     val stateStoreBehavior: StateStoreBehavior = StateStoreBehavior.Normal,
     /**
      * If true, when a view registers a ViewModel via a delegate the view will be subscribed
-     * to changes to the state view [MvRxView.postInvalidate]. This is the normal behavior of
+     * to changes to the state view [MavericksView.postInvalidate]. This is the normal behavior of
      * MvRx. This can be set to false so that a Fragment is not updated for state changes during
      * tests.
      */
@@ -118,7 +118,7 @@ data class MockBehavior(
 
     enum class StateStoreBehavior {
         /**
-         * Uses RealMvRxStateStore.
+         * Uses RealMavericksStateStore.
          */
         Normal,
 

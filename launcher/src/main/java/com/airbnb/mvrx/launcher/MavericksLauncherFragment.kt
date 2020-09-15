@@ -20,19 +20,19 @@ import com.airbnb.mvrx.mocking.MockedViewProvider
 import com.airbnb.mvrx.withState
 
 /**
- * Displays all MvRx screens and mocks that are detected in the app.
+ * Displays all Mavericks screens and mocks that are detected in the app.
  *
  * This is split into two "pages". The first shows the list of view names. Clicking a view
  * updates the screen to show the list of arguments and mocks for that view. Clicking back returns to the list of views.
  *
  * Clicking a mock loads the view in that state in a new activity.
  *
- * [MvRxLauncherTestMocksActivity] is used by default to open each mock. See the documentation on
+ * [MavericksLauncherTestMocksActivity] is used by default to open each mock. See the documentation on
  * that class for how to customize it, or use a different activity to launch the mock with.
  */
-class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
+class MavericksLauncherFragment : MavericksLauncherBaseFragment() {
 
-    private val viewModel by fragmentViewModel(MvRxLauncherViewModel::class)
+    private val viewModel by fragmentViewModel(MavericksLauncherViewModel::class)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -75,7 +75,7 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
         // The activity is started for a result so we can know when
         // it returns (so we can clear the selected mock property)
         startActivityForResult(
-            MvRxLauncherMockActivity.intent(requireContext(), mock),
+            MavericksLauncherMockActivity.intent(requireContext(), mock),
             SHOW_VIEW_REQUEST_CODE
         )
     }
@@ -131,6 +131,7 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
                 ?.split(".")
                 ?.lastOrNull()
                 ?.replace("mvrx", "", ignoreCase = true)
+                ?.replace("mavericks", "", ignoreCase = true)
                 ?.replace("fragment", "", ignoreCase = true)
 
             val activityName = context::class.java.simpleName
@@ -149,7 +150,7 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
 
         if (state.selectedView == null) {
             // TODO more generic approach
-            (activity as MvRxLauncherActivity).addCustomModels(this)
+            (activity as MavericksLauncherActivity).addCustomModels(this)
         }
 
         if (loadedMocks == null || (state.selectedView != null && mocksToShow == null)) {
@@ -174,7 +175,7 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
 
                     subtitle(buildText(context) {
                         if (LauncherMockIdentifier(mockedViewProvider) in state.recentUsage.mockIdentifiers) {
-                            appendWithColor("Recent ", R.color.mvrx_colorPrimary)
+                            appendWithColor("Recent ", R.color.mavericks_colorPrimary)
                         }
 
                         if (mockedViewProvider.mock.forInitialization) append("[With Arguments]")
@@ -192,7 +193,7 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
 
                     subtitle(buildText(context) {
                         if (viewName in state.recentUsage.viewNames) {
-                            appendWithColor("Recent", R.color.mvrx_colorPrimary)
+                            appendWithColor("Recent", R.color.mavericks_colorPrimary)
                             append(" · ")
                         }
                         append("${mocks.size} mocks")
@@ -214,7 +215,7 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.mvrx_launcher_fragment, menu)
+        inflater.inflate(R.menu.`mavericks_launcher_fragment.xml`, menu)
         super.onCreateOptionsMenu(menu, inflater)
     }
 
@@ -236,9 +237,9 @@ class MvRxLauncherFragment : MvRxLauncherBaseFragment() {
 
     private fun testMocks(mocks: List<MockedViewProvider<*>>) {
         toastShort("Testing ${mocks.size} mocks...")
-        MvRxLauncherTestMocksActivity.mocksToShow.clear()
-        MvRxLauncherTestMocksActivity.mocksToShow.addAll(mocks)
-        startActivity(requireContext().buildIntent<MvRxLauncherTestMocksActivity>())
+        MavericksLauncherTestMocksActivity.mocksToShow.clear()
+        MavericksLauncherTestMocksActivity.mocksToShow.addAll(mocks)
+        startActivity(requireContext().buildIntent<MavericksLauncherTestMocksActivity>())
     }
 
     override fun onBackPressed() = withState(viewModel) { state ->

@@ -38,7 +38,7 @@ class MockViewModelDelegateFactory(
         viewModelProvider: (stateFactory: MavericksStateFactory<VM, S>) -> VM
     ): Lazy<VM> where T : Fragment, T : MavericksView {
         check(configFactory == Mavericks.viewModelConfigFactory) {
-            "Config factory provided in constructor is not the same one as installed on MvRx object."
+            "Config factory provided in constructor is not the same one as initialized on Mavericks object."
         }
 
         // We lock  in the mockBehavior at the time that the Fragment is created (which is when the

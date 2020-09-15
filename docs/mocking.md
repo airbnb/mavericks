@@ -106,17 +106,17 @@ A Launcher activity is provided by default that allows you to browse and open yo
 
 ### Launching Mocked Screens
 
-To help you easily access your mocks, the mocking artifact ships with an Android Activity, `MvRxLauncherActivity`, that automatically aggregates all mocked Fragments in your App and displays them with their available mocks.
+To help you easily access your mocks, the mocking artifact ships with an Android Activity, `MavericksLauncherActivity`, that automatically aggregates all mocked Fragments in your App and displays them with their available mocks.
 
 ![Launcher Home](/images/mock_launcher_home.png) ![Launcher Detail Screen](/images/mock_launcher_detail_page.png) ![Fragment opened from launcher](/images/mock_launcher_opened_fragment.png)
 
 You can select a Fragment and mock and it will be opened in a new Activity.
 
-To access this Launcher Activity, call `MvRxLauncherActivity.show(context)`.
+To access this Launcher Activity, call `MavericksLauncherActivity.show(context)`.
 
-By default this loads each Fragment in a plain Activity, but if your Fragments expect a specific host Activity you can customize the Activity they are launched in by setting `MvRxLauncherMockActivity.activityToShowMock` to whichever Activity class you want.
+By default this loads each Fragment in a plain Activity, but if your Fragments expect a specific host Activity you can customize the Activity they are launched in by setting `MavericksLauncherMockActivity.activityToShowMock` to whichever Activity class you want.
 
-If you set a custom activity this way it should use the `MvRxLauncherMockActivity.showNextMockFromActivity` function to display the mocked view once the Activity is created. For example:
+If you set a custom activity this way it should use the `MavericksLauncherMockActivity.showNextMockFromActivity` function to display the mocked view once the Activity is created. For example:
 
 ```kotlin
 class LauncherActivity : AppCompatActivity() {
@@ -124,7 +124,7 @@ class LauncherActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         if (savedInstanceState == null) {
-                MvRxLauncherMockActivity.showNextMockFromActivity(
+                MavericksLauncherMockActivity.showNextMockFromActivity(
                     activity = this,
                     showView = { mavericksView ->
                        // Use whatever custom code you want to show your Mavericks View
@@ -141,7 +141,7 @@ From the Launcher activity a "Test All" button is available in the Fragment tool
 
 This offers a sanity check that each mock can be opened and loaded without crashes.
 
-By default this opens each mock in the `MvRxLauncherTestMocksActivity` activity, but that behavior can be changed via setting a custom intent for `MvRxLauncherTestMocksActivity.provideIntentToTestMock`
+By default this opens each mock in the `MavericksLauncherTestMocksActivity` activity, but that behavior can be changed via setting a custom intent for `MavericksLauncherTestMocksActivity.provideIntentToTestMock`
 
 The testing offered by this is fairly naive and basic, but could be expanded with future work.
 
@@ -189,7 +189,7 @@ For this to be effective it is important that the mocked data is as extensive as
 
 To help you create mocks, Mavericks provides a Mock Printer tool that you can run from your local computer when you have a device connected via ADB that is running your app. When this tool is run it will send an intent to your app that will tell Mavericks to generate the Kotlin code needed to recreate the States for any ViewModels that are currently on screen. This generated code will then be pulled from the device by the script and written to local `.kt` files on your machine so that you can use them as mock implementations.
 
-Essentially, this allows you to capture a snapshot of the State of any of your MvRx Views, save it to a source file, and reload it as a mocked view at any time in the future for testing.
+Essentially, this allows you to capture a snapshot of the State of any of your Mavericks Views, save it to a source file, and reload it as a mocked view at any time in the future for testing.
 
 For this to work you must first make sure `MockableMavericksView.registerMockPrinter` is called when your view is created. This registers a lifecycle observer on your MavericksView that will use a Broadcast Receiver to listen for the scripts intent while the view is in the "Started" lifecycle state.
 
@@ -412,7 +412,7 @@ mockSingleViewModel(MyFragment::MyViewModel, defaultState, defaultArgs) {
 This operates very similarly to mocks declared with the state function. The default arguments are the receiver to the lambda and you must return a new instance of your arguments.
 This example assumes that the arguments are a data class that uses the Mavericks.KEY_ARG pattern for passing arguments to a view in a bundle.
 
-If your fragment accesses arguments directly (instead of just using them to initialize it's MvRxState) - then you may want to test interactions between specific arguments and state. You can do that by passing arguments to a state mock function.
+If your fragment accesses arguments directly (instead of just using them to initialize it's MavericksState) - then you may want to test interactions between specific arguments and state. You can do that by passing arguments to a state mock function.
 
 ```kotlin
 mockSingleViewModel(MyFragment::MyViewModel, defaultState, defaultArgs) {

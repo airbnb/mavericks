@@ -12,12 +12,12 @@ import kotlinx.coroutines.runBlocking
 import java.lang.reflect.Modifier
 
 /**
- * Provides all of the mocks declared on MvRxViews in the app.
+ * Provides all of the mocks declared on MavericksViews in the app.
  */
-object MvRxGlobalMockLibrary {
+object MavericksGlobalMockLibrary {
 
     /**
-     * Returns all of the mocks declared on MvRxViews in the app.
+     * Returns all of the mocks declared on MavericksViews in the app.
      *
      * This should be accessed in a background thread since this data may be loaded synchronously when accessed!
      *
@@ -27,7 +27,7 @@ object MvRxGlobalMockLibrary {
     fun getMocks() = viewsFromDex
 
     /**
-     * Uses dex analysis to detect all MvRxViews in the app.
+     * Uses dex analysis to detect all MavericksViews in the app.
      *
      * This uses a lot of reflection and will take a few seconds to initialize the first time it is accessed.
      * Intended for testing only, and should only be accessed in a background thread!
@@ -35,7 +35,7 @@ object MvRxGlobalMockLibrary {
     @get:WorkerThread
     private val viewsFromDex: List<MockedViewProvider<*>> by lazy {
         runBlocking {
-            val classLoader = MvRxGlobalMockLibrary::class.java.classLoader as BaseDexClassLoader
+            val classLoader = MavericksGlobalMockLibrary::class.java.classLoader as BaseDexClassLoader
             loadMocks(classLoader)
         }
     }
@@ -53,7 +53,7 @@ private suspend fun loadMocks(classLoader: BaseDexClassLoader): List<MockedViewP
             dexFileEntry.startsWith("java.") ||
                 dexFileEntry.startsWith("android.") ||
                 dexFileEntry.startsWith("androidx.")
-            // TODO: Allow mvrx configuration to specify package name prefix whitelist, or
+            // TODO: Allow mavericks configuration to specify package name prefix whitelist, or
             //  more generally, naming whitelist to identify views, for faster initialization
         }
         .map { GlobalScope.async { getMocksForClassName(it, classLoader) } }

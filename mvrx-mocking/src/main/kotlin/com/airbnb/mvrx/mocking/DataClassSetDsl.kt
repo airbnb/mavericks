@@ -14,7 +14,7 @@ import kotlin.reflect.jvm.isAccessible
  * When a lambda has a receiver that extends this class it can make use of this special DSL syntax for changing properties on a data class.
  * This syntax makes it easier to change deeply nested properties.
  *
- * Example: mvrxState.set { ::listing { ::host { ::name } } }.with { "Elena" }
+ * Example: mavericksState.set { ::listing { ::host { ::name } } }.with { "Elena" }
  */
 interface DataClassSetDsl {
     /**

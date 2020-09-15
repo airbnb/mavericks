@@ -14,7 +14,7 @@ import com.airbnb.mvrx.launcher.utils.toastLong
 import com.airbnb.mvrx.mocking.MockBehavior
 import com.airbnb.mvrx.mocking.MockedView
 import com.airbnb.mvrx.mocking.MockedViewProvider
-import com.airbnb.mvrx.mocking.MvRxMock
+import com.airbnb.mvrx.mocking.MavericksMock
 import kotlin.reflect.KClass
 
 /**
@@ -28,7 +28,7 @@ import kotlin.reflect.KClass
  *
  * Note: If you want to use a custom activity to host your
  */
-class MvRxLauncherMockActivity : MvRxBaseLauncherActivity() {
+class MavericksLauncherMockActivity : MavericksBaseLauncherActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,7 +45,7 @@ class MvRxLauncherMockActivity : MvRxBaseLauncherActivity() {
     }
 
     companion object {
-        private val tag = MvRxLauncherMockActivity::class.java.simpleName
+        private val tag = MavericksLauncherMockActivity::class.java.simpleName
         private const val FINISH_AFTER_LAUNCH = "EXTRA_FINISH_AFTER_LAUNCH"
 
         var nextMockToShow: MockedViewProvider<*>? = null
@@ -53,16 +53,16 @@ class MvRxLauncherMockActivity : MvRxBaseLauncherActivity() {
 
         /**
          * Specify which activity should be used to display mocked views when a view is launched
-         * from the MvRx launcher.
+         * from the Mavericks launcher.
          *
          * @see [intent]
          */
-        var activityToShowMock: KClass<out Activity> = MvRxLauncherMockActivity::class
+        var activityToShowMock: KClass<out Activity> = MavericksLauncherMockActivity::class
 
         /**
          * Creates an intent to show the given mock, by setting [nextMockToShow].
          *
-         * By default this uses [MvRxLauncherMockActivity], however, you can change
+         * By default this uses [MavericksLauncherMockActivity], however, you can change
          * [activityToShowMock] in order to specify a custom activity that should be started
          * instead.
          *
@@ -79,7 +79,7 @@ class MvRxLauncherMockActivity : MvRxBaseLauncherActivity() {
         ): Intent {
             Log.d(
                 tag,
-                "Creating mvrx launcher intent for ${activityToShowMock::class.java.simpleName} for view ${mock.viewName}"
+                "Creating mavericks launcher intent for ${activityToShowMock::class.java.simpleName} for view ${mock.viewName}"
             )
             nextMockToShow = mock
             return Intent(context, activityToShowMock.java).apply {
@@ -118,7 +118,7 @@ class MvRxLauncherMockActivity : MvRxBaseLauncherActivity() {
                 showView(view)
             } catch (e: Throwable) {
                 Log.e(
-                    "MvRx Launcher",
+                    "Mavericks Launcher",
                     "${view.javaClass.simpleName} crashed while opening.",
                     e
                 )
@@ -157,7 +157,7 @@ class MvRxLauncherMockActivity : MvRxBaseLauncherActivity() {
                 }
             } catch (e: Throwable) {
                 Log.e(
-                    "MvRx Launcher",
+                    "Mavericks Launcher",
                     "${view.javaClass.simpleName} crashed while opening.",
                     e
                 )
@@ -172,7 +172,7 @@ class MvRxLauncherMockActivity : MvRxBaseLauncherActivity() {
         /**
          * Return the mock behavior that should be used to set up the given mock state.
          */
-        fun mockBehavior(mock: MvRxMock<out MavericksView, out Parcelable>): MockBehavior {
+        fun mockBehavior(mock: MavericksMock<out MavericksView, out Parcelable>): MockBehavior {
             return when {
                 // The fragment is created with mocked arguments and then follows the normal initialization and behavior path.
                 // However, if there are "existing" view models then those are expected to have mocked state.

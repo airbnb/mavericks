@@ -12,7 +12,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.MavericksView
-import com.airbnb.mvrx.launcher.MvRxLauncherMockActivity.Companion.showNextMockFromActivity
+import com.airbnb.mvrx.launcher.MavericksLauncherMockActivity.Companion.showNextMockFromActivity
 
 /**
  * This class provides a custom implementation for handling launched mocks, by overriding

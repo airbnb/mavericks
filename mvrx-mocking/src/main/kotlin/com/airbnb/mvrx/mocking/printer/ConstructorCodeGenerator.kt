@@ -15,7 +15,7 @@ import kotlin.reflect.jvm.isAccessible
 
 /**
  * This utility is used to generate the code need to construct an object.
- * It is useful for printing out a MvRxState instance's
+ * It is useful for printing out a MavericksState instance's
  * constructor code when setting up a test for that state.
  *
  * It uses recursion to analyze the given object instance and

@@ -7,7 +7,7 @@ apply plugin: "jacoco"
 apply plugin: "com.vanniktech.maven.publish"
 
 android {
-    resourcePrefix 'mvrx_'
+    resourcePrefix 'mavericks_'
 
     defaultConfig {
         consumerProguardFiles 'proguard-rules.pro'

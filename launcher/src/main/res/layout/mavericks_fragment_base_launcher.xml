@@ -25,7 +25,7 @@
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
-                app:navigationIcon="@drawable/mvrx_ic_arrow_back" />
+                app:navigationIcon="@drawable/mavericks_ic_arrow_back" />
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 

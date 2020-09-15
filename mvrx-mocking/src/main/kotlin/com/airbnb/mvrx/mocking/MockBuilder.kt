@@ -11,9 +11,9 @@ import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.PersistState
-import com.airbnb.mvrx.mocking.MvRxMock.Companion.DEFAULT_INITIALIZATION_NAME
-import com.airbnb.mvrx.mocking.MvRxMock.Companion.DEFAULT_STATE_NAME
-import com.airbnb.mvrx.mocking.MvRxMock.Companion.RESTORED_STATE_NAME
+import com.airbnb.mvrx.mocking.MavericksMock.Companion.DEFAULT_INITIALIZATION_NAME
+import com.airbnb.mvrx.mocking.MavericksMock.Companion.DEFAULT_STATE_NAME
+import com.airbnb.mvrx.mocking.MavericksMock.Companion.RESTORED_STATE_NAME
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
@@ -22,7 +22,7 @@ import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.primaryConstructor
 
 /**
- * Used with [MockableMavericksView.provideMocks] for mocking a MvRx view that has no view models (eg only static content and arguments).
+ * Used with [MockableMavericksView.provideMocks] for mocking a Mavericks view that has no view models (eg only static content and arguments).
  *
  * @param defaultArgs If your view takes arguments you must provide an instance of those arguments here to be used as the default value for your mocks.
  *                      If your view has no arguments, pass null (and use Nothing as the type).
@@ -60,7 +60,7 @@ inline fun <reified V : MockableMavericksView> V.combineMocks(
         validate(V::class.simpleName!!)
     }
 
-    override val mockGroups: List<List<MvRxMock<V, out Parcelable>>>
+    override val mockGroups: List<List<MavericksMock<V, out Parcelable>>>
         get() {
             return mocks.map { (prefix, mocker) ->
                 mocker.mocks.map {
@@ -89,7 +89,7 @@ inline fun <reified V : MockableMavericksView> V.combineMocks(
  * 2. Each mock variant is only one line of code, and is easily maintained
  * 3. Each variant tests a single edge case
  *
- * @param V The type of MvRx view that is being mocked
+ * @param V The type of Mavericks view that is being mocked
  * @param viewModelReference A reference to the view model that will be mocked. Use the "::" operator for this - "MyFragment::myViewModel"
  * @param defaultState An instance of your State that represents the canonical version of your view. It will be the basis for your tests.
  * @param defaultArgs If your view takes arguments you must provide an instance of those arguments here to be used as the default value for your mocks.
@@ -292,10 +292,10 @@ fun <V : MockableMavericksView,
  * 2. Each mock variant is only one line of code, and is easily maintained
  * 3. Each variant tests a single edge case
  */
-data class MvRxMock<V : MavericksView, Args : Parcelable> internal constructor(
+data class MavericksMock<V : MavericksView, Args : Parcelable> internal constructor(
     val name: String,
     /**
-     * Returns the arguments that should be used to initialize the MvRx view. If null, the view models will be
+     * Returns the arguments that should be used to initialize the Mavericks view. If null, the view models will be
      * initialized purely with the mock states instead.
      */
     val args: Args? = null,
@@ -315,7 +315,7 @@ data class MvRxMock<V : MavericksView, Args : Parcelable> internal constructor(
      * Find a mocked state value for the given view model property.
      *
      * If null is returned it means the initial state should be created through the
-     * default mvrx mechanism of arguments.
+     * default mavericks mechanism of arguments.
      */
     fun stateForViewModelProperty(property: KProperty<*>, existingViewModel: Boolean): MavericksState? {
         if (forInitialization && !existingViewModel) {
@@ -914,12 +914,12 @@ internal constructor(
  * This placeholder can be used as a NO-OP implementation of [MockableMavericksView.provideMocks].
  */
 object EmptyMocks : MavericksViewMocks<MockableMavericksView, Nothing>(allowCreationOfThisInstance = true) {
-    override val mocks: List<MvRxMock<MockableMavericksView, out Nothing>> = emptyList()
-    override val mockGroups: List<List<MvRxMock<MockableMavericksView, out Nothing>>> = emptyList()
+    override val mocks: List<MavericksMock<MockableMavericksView, out Nothing>> = emptyList()
+    override val mockGroups: List<List<MavericksMock<MockableMavericksView, out Nothing>>> = emptyList()
 }
 
 /**
- * Defines a set of mocks for a MvRx view.
+ * Defines a set of mocks for a Mavericks view.
  *
  * Use helper functions such as [mockSingleViewModel] to create this, instead of creating it directly.
  */
@@ -931,7 +931,7 @@ open class MavericksViewMocks<V : MockableMavericksView, Args : Parcelable> @Pub
      *
      * At least one of [mocks] or [mockGroups] must be implemented.
      */
-    open val mocks: List<MvRxMock<V, out Args>> get() = mockGroups.flatten()
+    open val mocks: List<MavericksMock<V, out Args>> get() = mockGroups.flatten()
 
     /**
      * An optional breakdown of [mocks] to categorize them into groups.
@@ -940,7 +940,7 @@ open class MavericksViewMocks<V : MockableMavericksView, Args : Parcelable> @Pub
      * with separate default arguments and states. This is useful for complicated views that
      * want to share different default arguments or states with many mocks.
      */
-    open val mockGroups: List<List<MvRxMock<V, out Args>>> get() = listOf(mocks)
+    open val mockGroups: List<List<MavericksMock<V, out Args>>> get() = listOf(mocks)
 
     init {
         require(allowCreationForTesting || allowCreationOfThisInstance || numAllowedCreationsOfMocks.get() > 0) {
@@ -955,10 +955,10 @@ open class MavericksViewMocks<V : MockableMavericksView, Args : Parcelable> @Pub
         val errorIntro = "Invalid mocks defined for $viewName. "
         val (mocksWithArgsOnly, mocksWithState) = mocks.partition { it.states.isEmpty() }
 
-        fun List<MvRxMock<V, *>>.validateUniqueNames() {
+        fun List<MavericksMock<V, *>>.validateUniqueNames() {
             val nameCounts = groupingBy { it.name }.eachCount()
             nameCounts.forEach { (name, count) ->
-                require(count == 1) { "$errorIntro '$name' was used multiple times. MvRx mock state and argument names must be unique." }
+                require(count == 1) { "$errorIntro '$name' was used multiple times. Mavericks mock state and argument names must be unique." }
             }
         }
 
@@ -1026,7 +1026,7 @@ open class MockBuilder<V : MockableMavericksView, Args : Parcelable> internal co
     internal val defaultStates = defaultStatePairs.map { MockState(it.first, it.second) }
 
     @VisibleForTesting
-    override val mocks = mutableListOf<MvRxMock<V, Args>>()
+    override val mocks = mutableListOf<MavericksMock<V, Args>>()
 
     init {
         val viewModelProperties = defaultStates.map { it.viewModelProperty }
@@ -1043,7 +1043,7 @@ open class MockBuilder<V : MockableMavericksView, Args : Parcelable> internal co
             args = defaultArgs,
             states = defaultStates,
             forInitialization = true,
-            type = MvRxMock.Type.DefaultInitialization
+            type = MavericksMock.Type.DefaultInitialization
         )
 
         if (defaultStates.isNotEmpty()) {
@@ -1051,13 +1051,13 @@ open class MockBuilder<V : MockableMavericksView, Args : Parcelable> internal co
                 name = DEFAULT_STATE_NAME,
                 args = defaultArgs,
                 states = defaultStates,
-                type = MvRxMock.Type.DefaultState
+                type = MavericksMock.Type.DefaultState
             )
             addState(
                 name = RESTORED_STATE_NAME,
                 args = defaultArgs,
                 states = defaultStates.map { it.copy(state = it.state.toRestoredState()) },
-                type = MvRxMock.Type.ProcessRecreation
+                type = MavericksMock.Type.ProcessRecreation
             )
         }
     }
@@ -1088,10 +1088,10 @@ open class MockBuilder<V : MockableMavericksView, Args : Parcelable> internal co
         args: Args? = defaultArgs,
         states: List<MockState<V, *>>,
         forInitialization: Boolean = false,
-        type: MvRxMock.Type = MvRxMock.Type.Custom
+        type: MavericksMock.Type = MavericksMock.Type.Custom
     ) {
         mocks.add(
-            MvRxMock(
+            MavericksMock(
                 name = name,
                 args = args,
                 states = states,

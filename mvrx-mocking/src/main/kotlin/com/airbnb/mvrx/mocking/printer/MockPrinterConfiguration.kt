@@ -5,7 +5,7 @@ package com.airbnb.mvrx.mocking.printer
  */
 class MockPrinterConfiguration(
     /**
-     * Given a [MvRxView] that we are generating mock states for, returns which package name to use
+     * Given a [MavericksView] that we are generating mock states for, returns which package name to use
      * for the generated file.
      *
      * By default mock states are place in a "mocks" subpackage within the package of the view

@@ -22,25 +22,25 @@ import java.io.File
 
 /**
  * This registers a Broadcast receiver on the MavericksView (only in debug mode) that
- * listens for the intent action [ACTION_COPY_MAVERICKS_STATE] to copy mvrx state to files on device.
+ * listens for the intent action [ACTION_COPY_MAVERICKS_STATE] to copy mavericks state to files on device.
  *
  * The resulting file names are printed to logcat so tooling can copy them from device.
  */
 class MavericksMockPrinter private constructor(
-    private val mvrxView: MavericksView
+    private val mavericksView: MavericksView
 ) : LifecycleObserver {
 
-    private val broadcastReceiver by lazy { ViewArgPrinter(mvrxView) }
+    private val broadcastReceiver by lazy { ViewArgPrinter(mavericksView) }
     private val context: Context
         get() {
             @Suppress("DEPRECATION")
-            return when (mvrxView) {
-                is View -> mvrxView.context
-                is Fragment -> mvrxView.requireContext()
+            return when (mavericksView) {
+                is View -> mavericksView.context
+                is Fragment -> mavericksView.requireContext()
                 is android.app.Fragment -> {
-                    mvrxView.activity ?: error("Fragment context is null")
+                    mavericksView.activity ?: error("Fragment context is null")
                 }
-                else -> error("Don't know how to get Context from mvrx view ${mvrxView.javaClass.simpleName}. Submit a PR to support your screen type.")
+                else -> error("Don't know how to get Context from mavericks view ${mavericksView.javaClass.simpleName}. Submit a PR to support your screen type.")
             }
         }
 
@@ -52,8 +52,8 @@ class MavericksMockPrinter private constructor(
         // To avoid leaking the view, it is removed when the lifecycle is destroyed.
         // If the lifecycle is already Destroyed when this is called, the observer will immediately
         // invoke the destroyed callback so the view is removed immediately as well.
-        if (viewsWithRegisteredReceivers.add(mvrxView)) {
-            mvrxView.lifecycle.addObserver(this)
+        if (viewsWithRegisteredReceivers.add(mavericksView)) {
+            mavericksView.lifecycle.addObserver(this)
         }
     }
 
@@ -69,7 +69,7 @@ class MavericksMockPrinter private constructor(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun onDestroyed() {
-        viewsWithRegisteredReceivers.remove(mvrxView)
+        viewsWithRegisteredReceivers.remove(mavericksView)
     }
 
     companion object {
@@ -284,7 +284,7 @@ private fun writeMock(
             stringTruncationThreshold
         )
     } catch (e: Throwable) {
-        Log.e(ERROR_TAG, "Error creating mvrx mock code for $objectName", e)
+        Log.e(ERROR_TAG, "Error creating mavericks mock code for $objectName", e)
     }
 }
 

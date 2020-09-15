@@ -6,17 +6,17 @@ import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.launcher.utils.buildIntent
 
 /**
- * Entry point for showing all MvRx Views in the application.
+ * Entry point for showing all Mavericks Views in the application.
  *
  * You can extend this activity to modify the UI that is displayed, via [buildCustomModels].
  */
-open class MvRxLauncherActivity : MvRxBaseLauncherActivity() {
+open class MavericksLauncherActivity : MavericksBaseLauncherActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         if (savedInstanceState == null) {
-            setFragment(MvRxLauncherFragment())
+            setFragment(MavericksLauncherFragment())
         }
     }
 
@@ -39,7 +39,7 @@ open class MvRxLauncherActivity : MvRxBaseLauncherActivity() {
          * Shortcut to create an intent for this activity and start the intent in one step.
          */
         fun show(context: Context) {
-            context.startActivity(context.buildIntent<MvRxLauncherActivity>())
+            context.startActivity(context.buildIntent<MavericksLauncherActivity>())
         }
     }
 }

@@ -11,7 +11,7 @@ import kotlin.reflect.KProperty
  */
 class MockStateHolder {
 
-    private val stateMap = mutableMapOf<MockableMavericksView, MvRxMock<*, *>>()
+    private val stateMap = mutableMapOf<MockableMavericksView, MavericksMock<*, *>>()
     private val delegateInfoMap =
         mutableMapOf<MockableMavericksView, MutableList<ViewModelDelegateInfo<*, *>>>()
 
@@ -21,7 +21,7 @@ class MockStateHolder {
      */
     fun <V : MockableMavericksView, A : Parcelable> setMock(
         view: MockableMavericksView,
-        mockInfo: MvRxMock<V, A>
+        mockInfo: MavericksMock<V, A>
     ) {
         stateMap[view] = mockInfo
     }
@@ -72,7 +72,7 @@ class MockStateHolder {
                 .firstOrNull { it.isDefaultState }
                 ?.let { mvRxMock ->
                     @Suppress("UNCHECKED_CAST")
-                    mvRxMock as MvRxMock<MockableMavericksView, *>
+                    mvRxMock as MavericksMock<MockableMavericksView, *>
                 }
                 ?: error(
                     "No mock state found in ${view.javaClass.simpleName} for ViewModel ${viewModelProperty.name}. " +
@@ -89,7 +89,7 @@ class MockStateHolder {
             error("An 'existingViewModel' must have its state provided in the mocks")
         }
 
-        // TODO Higher order view model support in MvRx
+        // TODO Higher order view model support in Mavericks
         // It's possible for this viewmodel to be injected with another view model in its constructor.
         // In that case, the other viewmodel needs to be initialized first, otherwise it will crash.
         // Fragments should use the 'dependencies' property of the viewmodel delegate function to specify viewmodels to initialize first,

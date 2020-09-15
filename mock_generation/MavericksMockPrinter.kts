@@ -160,7 +160,7 @@ if (printerApi.listTruncationThreshold > 0) {
 
 println("  - Run script with -h flag to see help and options.")
 
-getLogcatOutputForTag("MAVERICKS_PRINTER_ERROR")
+getLogcatOutputForTag("MOCK_PRINTER_ERROR")
     .takeIf { it.isNotEmpty() }
     ?.let { errorOutput ->
         println("\n\nThese errors were also reported:\n")

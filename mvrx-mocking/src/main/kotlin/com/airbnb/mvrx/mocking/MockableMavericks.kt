@@ -30,8 +30,8 @@ object MockableMavericks {
     /**
      * Configuration for how mock state is printed.
      *
-     * The MvRx mocking system allows you to generate a reproduction of a ViewModel's state. For
-     * any [MavericksState] instance that a ViewModel has, MvRx can generate a file containing code
+     * The Mavericks mocking system allows you to generate a reproduction of a ViewModel's state. For
+     * any [MavericksState] instance that a ViewModel has, Mavericks can generate a file containing code
      * to completely reconstruct that state.
      *
      * This generated code can then be used to reconstruct States that can be used during testing.
@@ -62,7 +62,7 @@ object MockableMavericks {
     val mockConfigFactory: MockMavericksViewModelConfigFactory
         get() {
             return (Mavericks.viewModelConfigFactory as? MockMavericksViewModelConfigFactory)
-                ?: error("Expecting MockMvRxViewModelConfigFactory for config factory. Make sure you have called MvRxMocks#initialize")
+                ?: error("Expecting MockMavericksViewModelConfigFactory for config factory. Make sure you have called MockableMavericks#initialize")
         }
 
     /**

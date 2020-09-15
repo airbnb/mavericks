@@ -1,7 +1,7 @@
 package com.airbnb.mvrx.sample.core
 
 import android.app.Application
-import com.airbnb.mvrx.launcher.MvRxLauncherMockActivity
+import com.airbnb.mvrx.launcher.MavericksLauncherMockActivity
 import com.airbnb.mvrx.mocking.MockableMavericks
 import com.airbnb.mvrx.sample.LauncherActivity
 import com.airbnb.mvrx.sample.network.DadJokeService
@@ -20,7 +20,7 @@ class MvRxApplication : Application() {
         super.onCreate()
         MockableMavericks.initialize(this)
         // Override the default activity for showing mocks from the launcher
-        MvRxLauncherMockActivity.activityToShowMock = LauncherActivity::class
+        MavericksLauncherMockActivity.activityToShowMock = LauncherActivity::class
 
         startKoin {
             androidContext(this@MvRxApplication)
