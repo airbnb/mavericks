@@ -96,7 +96,7 @@ abstract class BaseMvRxViewModel<S : MavericksState>(
     /**
      * Helper like [<T> Single<T>.execute] but with on demand IO thread Subscription
      */
-    fun <T> Single<T>.executeOnIO(
+    fun <T> Single<T>.executeOnIo(
         stateReducer: S.(Async<T>) -> S
     ) = toObservable()
         .execute({ it }, null, stateReducer)
@@ -104,7 +104,7 @@ abstract class BaseMvRxViewModel<S : MavericksState>(
     /**
      * Helper like [<T, V> Single<T>.execute] but with on demand IO thread Subscription
      */
-    fun <T, V> Single<T>.executeOnIO(
+    fun <T, V> Single<T>.executeOnIo(
         mapper: (T) -> V,
         stateReducer: S.(Async<V>) -> S
     ) = toObservable()
@@ -114,7 +114,7 @@ abstract class BaseMvRxViewModel<S : MavericksState>(
     /**
      * Helper like [<T> Observable<T>.execute] but with on demand IO thread Subscription
      */
-    fun <T> Observable<T>.executeOnIO(
+    fun <T> Observable<T>.executeOnIo(
         stateReducer: S.(Async<T>) -> S
     ) = subscribeOn(Schedulers.io())
         .execute({ it }, null, stateReducer)
@@ -122,9 +122,9 @@ abstract class BaseMvRxViewModel<S : MavericksState>(
     /**
      * Helper like [Completable.execute] but with on demand IO thread Subscription
      */
-    fun Completable.executeOnIO(
+    fun Completable.executeOnIo(
         stateReducer: S.(Async<Unit>) -> S
-    ) = toSingle { Unit }.executeOnIO(stateReducer)
+    ) = toSingle { Unit }.executeOnIo(stateReducer)
 
     /**
      * Execute an [Observable] and wrap its progression with [Async] property reduced to the global state.
