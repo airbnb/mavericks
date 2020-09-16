@@ -1,5 +1,55 @@
 # Change log
 
+## Version 2.0.0
+### Breaking Changes
+- The order of nested with and set states has changed slightly. It now matches the original intention.
+If you had code like:
+```kotlin
+withState {
+    // W1
+    withState {
+        // W2
+    }
+    setState {
+        // S1
+        setState {
+            // S2
+            setState {
+                // S3
+            }
+        }
+    }
+}
+```
+Previously, setState would only be prioritized at that nesting level so it would run:
+[W1, S1, W2, S2, S3]
+Now, it will run:
+[W1, S1, S2, S3, W2]
+- If your MvRxView/Fragment does not use any ViewModels, invalidate() will NOT be called in onStart(). In MvRx 1.x, invalidate would be called even if MvRx was not used at all. If you would like to maintain the original behavior, call `postInvalidate()` from onStart in your base Fragment class.
+- BaseMvRxViewModel no longer extends Jetpack ViewModel
+- viewModelScope is now a property on BaseMvRxViewModel, not the Jetpack extension function for ViewModel. Functionally, this is the same but the previous viewModelScope import will now be unused.
+
+## Version 1.5.1
+- Fix incorrectly failing debug assertions for state class being a data class when a property has internal visibility
+
+## Version 1.5.0
+- Add an optional nullable value to all Async classes (#383)
+- Update various dependencies
+
+Note: MvRx now targets 1.8 for Java/Kotlin, so you may need to update your projects to also target
+1.8
+```
+android {
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8.toString()
+    }
+}
+```
+
+## Version 1.4.0
+- Remove Kotlin-Reflect entirely (#334)
+- Remove extra proguard dependency (#310)
+
 ## Version 1.3.0
 - Revamp state saving to use Android Jetpack `SavedStateRegistry` (#254)
 

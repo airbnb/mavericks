@@ -2,9 +2,10 @@ package com.airbnb.mvrx.hellodagger
 
 import android.os.Bundle
 import android.view.View
-import com.airbnb.mvrx.BaseMvRxFragment
+import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.Fail
 import com.airbnb.mvrx.Loading
+import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.Uninitialized
 import com.airbnb.mvrx.fragmentViewModel
@@ -12,7 +13,7 @@ import com.airbnb.mvrx.withState
 import kotlinx.android.synthetic.main.fragment_hello.helloButton
 import kotlinx.android.synthetic.main.fragment_hello.messageTextView
 
-class HelloFragment : BaseMvRxFragment(R.layout.fragment_hello) {
+class HelloFragment : Fragment(R.layout.fragment_hello), MavericksView {
 
     val viewModel: HelloViewModel by fragmentViewModel()
 

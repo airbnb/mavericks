@@ -8,16 +8,15 @@
         android:toYScale="1"
         android:pivotX="50%p"
         android:pivotY="50%p"
-        android:duration="100"/>
+        android:duration="100" />
 
     <alpha
         android:fromAlpha="1"
         android:toAlpha="1"
-        android:duration="100"/>
+        android:duration="100" />
 
     <translate
         android:fromYDelta="3%p"
         android:toYDelta="0"
-        android:duration="250"
-        />
+        android:duration="250" />
 </set>

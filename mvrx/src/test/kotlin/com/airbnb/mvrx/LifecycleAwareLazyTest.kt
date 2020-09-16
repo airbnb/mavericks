@@ -19,20 +19,20 @@ class LifecycleAwareLazyTest : BaseTest() {
 
     @Test
     fun testNotInitializedBeforeOnCreate() {
-        owner.lifecycle.markState(Lifecycle.State.INITIALIZED)
+        owner.lifecycle.currentState = Lifecycle.State.INITIALIZED
         assertFalse(lazyProp.isInitialized())
     }
 
     @Test
     fun testNotInitializedAfterOnCreate() {
-        owner.lifecycle.markState(Lifecycle.State.INITIALIZED)
+        owner.lifecycle.currentState = Lifecycle.State.INITIALIZED
         owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_CREATE)
         assertTrue(lazyProp.isInitialized())
     }
 
     @Test
     fun testInitializedIfAlreadyStarted() {
-        owner.lifecycle.markState(Lifecycle.State.STARTED)
+        owner.lifecycle.currentState = Lifecycle.State.STARTED
         lazyProp = lifecycleAwareLazy(owner) { "Hello World" }
         assertTrue(lazyProp.isInitialized())
     }

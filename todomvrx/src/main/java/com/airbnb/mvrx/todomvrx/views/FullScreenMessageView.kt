@@ -1,11 +1,11 @@
 package com.airbnb.mvrx.todomvrx.views
 
 import android.content.Context
-import androidx.annotation.DrawableRes
 import android.util.AttributeSet
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.DrawableRes
 import com.airbnb.epoxy.ModelProp
 import com.airbnb.epoxy.ModelView
 import com.airbnb.epoxy.TextProp

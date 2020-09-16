@@ -2,13 +2,13 @@ package com.airbnb.mvrx.sample.views
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
-import android.widget.TextView
+import androidx.core.view.isVisible
 import com.airbnb.epoxy.CallbackProp
 import com.airbnb.epoxy.ModelView
 import com.airbnb.epoxy.TextProp
-import com.airbnb.mvrx.sample.R
+import com.airbnb.mvrx.sample.databinding.BasicRowBinding
+import com.airbnb.mvrx.sample.utils.viewBinding
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)
 class BasicRow @JvmOverloads constructor(
@@ -16,26 +16,21 @@ class BasicRow @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
-
-    private val titleView: TextView
-    private val subtitleView: TextView
+    private val binding: BasicRowBinding by viewBinding()
 
     init {
-        inflate(context, R.layout.basic_row, this)
-        titleView = findViewById(R.id.title)
-        subtitleView = findViewById(R.id.subtitle)
         orientation = VERTICAL
     }
 
     @TextProp
-    fun setTitle(title: CharSequence) {
-        titleView.text = title
+    fun setTitle(title: CharSequence?) {
+        binding.title.text = title
     }
 
     @TextProp
     fun setSubtitle(subtitle: CharSequence?) {
-        subtitleView.visibility = if (subtitle.isNullOrBlank()) View.GONE else View.VISIBLE
-        subtitleView.text = subtitle
+        binding.subtitle.isVisible = subtitle.isNullOrBlank().not()
+        binding.subtitle.text = subtitle
     }
 
     @CallbackProp

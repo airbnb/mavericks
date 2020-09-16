@@ -1,44 +1,23 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-android-extensions"
+apply plugin: "kotlin-kapt"
 apply plugin: "com.vanniktech.maven.publish"
 
 android {
-    compileSdkVersion 28
-    resourcePrefix 'mvrx_'
+    resourcePrefix "mvrx_"
 
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 28
-        consumerProguardFiles 'proguard-rules.pro'
+        consumerProguardFiles "proguard-rules.pro"
     }
-    buildToolsVersion "$buildToolsVersion"
-    lintOptions {
-        abortOnError true
-        textReport true
-        textOutput 'stdout'
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-        test.java.srcDirs += 'src/test/kotlin'
-    }
-}
-
-androidExtensions {
-    experimental = true
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
-    implementation "androidx.appcompat:appcompat:$appCompatVersion"
-    implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
-    implementation project(':mvrx')
-    implementation 'junit:junit:4.12'
+    implementation Libraries.appcompat
+    implementation Libraries.junit
+    implementation Libraries.kotlinReflect
+    implementation Libraries.rxAndroid
+    implementation TestLibraries.kotlinCoroutinesTest
+    api project(':mvrx-mocking')
+    implementation project(":mvrx-rxjava2")
 }

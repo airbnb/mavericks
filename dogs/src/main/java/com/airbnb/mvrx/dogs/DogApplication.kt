@@ -1,6 +1,7 @@
 package com.airbnb.mvrx.dogs
 
 import android.app.Application
+import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.dogs.data.DogRepository
 
 /**
@@ -8,4 +9,9 @@ import com.airbnb.mvrx.dogs.data.DogRepository
  */
 class DogApplication : Application() {
     val dogsRepository = DogRepository()
+
+    override fun onCreate() {
+        super.onCreate()
+        Mavericks.initialize(this)
+    }
 }

@@ -1,37 +1,11 @@
-autoCorrect: false
-failFast: false
-
-test-pattern:
-  active: true
-  patterns:
-    - '.*/test/.*'
-    - '.*Test.kt'
-    - '.*Spec.kt'
-  exclude-rule-sets:
-    - 'comments'
-  exclude-rules:
-    - 'NamingRules'
-    - 'WildcardImport'
-    - 'MagicNumber'
-    - 'MaxLineLength'
-    - 'LateinitUsage'
-    - 'StringLiteralDuplication'
-    - 'SpreadOperator'
-    - 'TooManyFunctions'
-    - 'ForEachOnRange'
-    - 'LongMethod'
-    - 'TooGenericExceptionCaught'
-
 build:
   maxIssues: 0
+  excludeCorrectable: true
 
 processors:
   active: true
 
 console-reports:
-  active: true
-
-output-reports:
   active: true
 
 formatting:
@@ -96,6 +70,7 @@ formatting:
     active: true
 
 comments:
+  excludes: ['.*/test/.*', '.*Test.kt', '.*Spec.kt']
   active: true
   CommentOverPrivateFunction:
     active: false
@@ -103,7 +78,7 @@ comments:
     active: false
   EndOfSentenceFormat:
     active: true
-    endOfSentenceFormat: ([.?!][ \t\n\r\f<])|([.?!:]$)|(\s*\-\s*\w*$)
+    endOfSentenceFormat: ([.?!:][ \t\n\r\f<])|([.?!:]$)|(\s*\-\s*\w*$)
   UndocumentedPublicClass:
     active: false
     searchInNestedClass: true
@@ -136,7 +111,8 @@ complexity:
     threshold: 15
   LongParameterList:
     active: false
-    threshold: 8
+    functionThreshold: 8
+    constructorThreshold: 8
     ignoreDefaultParameters: true
   MethodOverloading:
     active: false
@@ -179,7 +155,7 @@ empty-blocks:
     active: true
   EmptyFunctionBlock:
     active: true
-    ignoreOverriddenFunctions: false
+    ignoreOverridden: false
   EmptyIfBlock:
     active: true
   EmptyInitBlock:
@@ -197,7 +173,7 @@ exceptions:
   active: true
   ExceptionRaisedInUnexpectedLocation:
     active: true
-    methodNames: 'toString,hashCode,equals,finalize'
+    methodNames: ['toString','hashCode','equals','finalize']
   InstanceOfCheckForException:
     active: false
   NotImplementedDeclaration:
@@ -209,30 +185,30 @@ exceptions:
   ReturnFromFinally:
     active: true
   SwallowedException:
-    active: true
+    active: false
   ThrowingExceptionFromFinally:
     active: true
   ThrowingExceptionInMain:
     active: true
   ThrowingExceptionsWithoutMessageOrCause:
     active: true
-    exceptions: 'IllegalArgumentException,IllegalStateException,IOException'
+    exceptions: ['IllegalArgumentException','IllegalStateException','IOException']
   ThrowingNewInstanceOfSameException:
     active: true
   TooGenericExceptionCaught:
     active: true
     exceptionNames:
-     - Error
-     - Exception
-     - RuntimeException
-     - Throwable
+      - Error
+      - Exception
+      - RuntimeException
+      - Throwable
   TooGenericExceptionThrown:
     active: true
     exceptionNames:
-     - Error
-     - Exception
-     - Throwable
-     - RuntimeException
+      - Error
+      - Exception
+      - Throwable
+      - RuntimeException
 
 naming:
   active: true
@@ -244,7 +220,7 @@ naming:
     enumEntryPattern: '^[A-Z][_a-zA-Z0-9]*'
   ForbiddenClassName:
     active: false
-    forbiddenName: ''
+    forbiddenName: []
   FunctionMaxLength:
     active: false
     maximumFunctionNameLength: 100
@@ -259,7 +235,7 @@ naming:
     active: false # Covered by ktlint
   MemberNameEqualsClassName:
     active: true
-    ignoreOverriddenFunction: true
+    ignoreOverridden: true
   ObjectPropertyNaming:
     active: true
     propertyPattern: '[A-Za-z][_A-Za-z0-9]*'
@@ -311,7 +287,7 @@ potential-bugs:
     active: true
   LateinitUsage:
     active: false
-    excludeAnnotatedProperties: ""
+    excludeAnnotatedProperties: []
     ignoreOnClassesPattern: ""
   UnconditionalJumpStatementInLoop:
     active: true
@@ -339,10 +315,10 @@ style:
     active: false
   ForbiddenComment:
     active: false
-    values: 'TODO:,FIXME:,STOPSHIP:'
+    values: ['TODO:', 'FIXME:', 'STOPSHIP:']
   ForbiddenImport:
     active: false
-    imports: ''
+    imports: []
   FunctionOnlyReturningConstant:
     active: true
     ignoreOverridableFunction: true
@@ -352,7 +328,7 @@ style:
     maxJumpCount: 3
   MagicNumber:
     active: false
-    ignoreNumbers: '-1,0,1,2, 100, 1000'
+    ignoreNumbers: ['-1','0','1','2', '100', '1000']
     ignoreHashCodeFunction: false
     ignorePropertyDeclaration: false
     ignoreConstantDeclaration: true
@@ -381,7 +357,7 @@ style:
   OptionalAbstractKeyword:
     active: true
   OptionalUnit:
-    active: true
+    active: false
   OptionalWhenBraces:
     active: false
   PreferToOverPairSyntax:
@@ -421,9 +397,9 @@ style:
     allowedNames: "(_|ignored|expected)"
   UseDataClass:
     active: false
-    excludeAnnotatedClasses: ""
+    excludeAnnotatedClasses: []
   UtilityClassWithPublicConstructor:
     active: false
   WildcardImport:
     active: true
-    excludeImports: 'java.util.*,kotlinx.android.synthetic.*'
+    excludeImports: ['java.util.*', 'kotlinx.android.synthetic.*']

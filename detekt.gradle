@@ -1,0 +1,20 @@
+apply plugin: 'io.gitlab.arturbosch.detekt'
+
+tasks.detekt.jvmTarget = "1.8"
+
+dependencies {
+    detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:1.9.1"
+}
+
+detekt {
+    failFast = true
+    buildUponDefaultConfig = true
+    config = files("$rootDir/detekt.yml")
+    autoCorrect = !project.findProperty('CI') ?: false
+
+    reports {
+        html.enabled = true
+        txt.enabled = true
+        xml.enabled = false
+    }
+}

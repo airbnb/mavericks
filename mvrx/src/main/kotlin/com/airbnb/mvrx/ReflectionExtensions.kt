@@ -1,9 +1,5 @@
 package com.airbnb.mvrx
 
-import kotlin.reflect.KClass
-import kotlin.reflect.KFunction
-import kotlin.reflect.full.memberFunctions
-
 internal val primitiveWrapperMap = mapOf(
     Boolean::class.javaPrimitiveType to Boolean::class.java,
     Byte::class.javaPrimitiveType to Byte::class.javaObjectType,
@@ -16,10 +12,8 @@ internal val primitiveWrapperMap = mapOf(
 )
 
 internal fun isPrimitiveWrapperOf(targetClass: Class<*>, primitive: Class<*>): Boolean {
-    if (!primitive.isPrimitive) {
-        throw IllegalArgumentException("First argument has to be primitive type")
-    }
-    return primitiveWrapperMap.get(primitive) == targetClass
+    require(primitive.isPrimitive) { "First argument has to be primitive type" }
+    return primitiveWrapperMap[primitive] == targetClass
 }
 
 internal fun isAssignableTo(from: Class<*>, to: Class<*>): Boolean {
@@ -33,6 +27,3 @@ internal fun isAssignableTo(from: Class<*>, to: Class<*>): Boolean {
         isPrimitiveWrapperOf(from, to)
     } else false
 }
-
-@Suppress("UNCHECKED_CAST")
-internal fun <T : Any> KClass<T>.copyMethod(): KFunction<T> = this.memberFunctions.first { it.name == "copy" } as KFunction<T>

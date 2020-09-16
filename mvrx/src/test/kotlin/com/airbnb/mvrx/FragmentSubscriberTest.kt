@@ -9,16 +9,15 @@ import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 import org.junit.Assert.assertEquals
 import org.junit.Test
-import java.lang.IllegalStateException
 
-data class ViewSubscriberState(val foo: Int = 0) : MvRxState
+data class ViewSubscriberState(val foo: Int = 0) : MavericksState
 
-class ViewSubscriberViewModel(initialState: ViewSubscriberState) : TestMvRxViewModel<ViewSubscriberState>(initialState) {
+class ViewSubscriberViewModel(initialState: ViewSubscriberState) : TestMavericksViewModel<ViewSubscriberState>(initialState) {
     fun setFoo(foo: Int) = setState { copy(foo = foo) }
 }
 
-
-open class ViewSubscriberFragment : BaseMvRxFragment() {
+@Suppress("DEPRECATION")
+open class ViewSubscriberFragment : Fragment(), MavericksView {
     private val viewModel: ViewSubscriberViewModel by fragmentViewModel()
 
     var subscribeCallCount = 0
@@ -37,14 +36,14 @@ open class ViewSubscriberFragment : BaseMvRxFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.subscribe { _ -> subscribeCallCount++ }
-        viewModel.subscribe(deliveryMode = uniqueOnly("onCreate")) { _ -> subscribeUniqueOnlyCallCount++ }
+        viewModel.onEach { _ -> subscribeCallCount++ }
+        viewModel.onEach(uniqueOnly("onCreate")) { _ -> subscribeUniqueOnlyCallCount++ }
 
-        viewModel.selectSubscribe(ViewSubscriberState::foo) {
+        viewModel.onEach(ViewSubscriberState::foo) {
             selectSubscribeValue = it
             selectSubscribeCallCount++
         }
-        viewModel.selectSubscribe(ViewSubscriberState::foo, deliveryMode = uniqueOnly("onCreate")) {
+        viewModel.onEach(ViewSubscriberState::foo, uniqueOnly("onCreate")) {
             selectSubscribeUniqueOnlyValue = it
             selectSubscribeUniqueOnlyCallCount++
         }
@@ -57,8 +56,8 @@ open class ViewSubscriberFragment : BaseMvRxFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.subscribe { _ ->  viewCreatedSubscribeCallCount ++ }
-        viewModel.subscribe(deliveryMode = uniqueOnly("onCreateView")) { _ ->  viewCreatedUniqueOnlyCallCount ++ }
+        viewModel.onEach { _ -> viewCreatedSubscribeCallCount++ }
+        viewModel.onEach(uniqueOnly("onCreateView")) { _ -> viewCreatedUniqueOnlyCallCount++ }
     }
 
     fun setFoo(foo: Int) = viewModel.setFoo(foo)
@@ -315,7 +314,6 @@ class FragmentSubscriberTest : BaseTest() {
         }
     }
 
-
     @Test
     fun selectSubscribeOnConfigurationChangeWhenStateChanged() {
         val (controller, fragment) = createFragmentInTestActivity<FragmentWithStateChangeDuringOrientationChange>()
@@ -448,24 +446,26 @@ class FragmentSubscriberTest : BaseTest() {
         assertEquals(2, fragment.invalidateCallCount)
     }
 
-    class DuplicateUniqueSubscriberFragment : BaseMvRxFragment() {
+    @Suppress("DEPRECATION")
+    class DuplicateUniqueSubscriberFragment : Fragment(), MavericksView {
         private val viewModel: ViewSubscriberViewModel by fragmentViewModel()
 
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-            viewModel.subscribe(deliveryMode = uniqueOnly()) {  }
-            viewModel.subscribe(deliveryMode = uniqueOnly()) {  }
+            viewModel.onEach(uniqueOnly()) { }
+            viewModel.onEach(uniqueOnly()) { }
         }
 
-        override fun invalidate() { }
+        override fun invalidate() {}
     }
 
-    @Test(expected = IllegalStateException::class)
-    fun duplicateUniqueOnlySubscribeThrowIllegalStateException() {
-         createFragment<DuplicateUniqueSubscriberFragment, TestActivity>(containerId = CONTAINER_ID)
+    @Test(expected = RuntimeException::class)
+    fun duplicateUniqueOnlySubscribeCrashes() {
+        createFragment<DuplicateUniqueSubscriberFragment, TestActivity>(containerId = CONTAINER_ID)
     }
 
-    class ParentFragment : BaseMvRxFragment() {
+    @Suppress("DEPRECATION")
+    class ParentFragment : Fragment(), MavericksView {
 
         val viewModel: ViewSubscriberViewModel by fragmentViewModel()
 
@@ -475,7 +475,8 @@ class FragmentSubscriberTest : BaseTest() {
         }
     }
 
-    class ChildFragmentWithParentViewModel : BaseMvRxFragment() {
+    @Suppress("DEPRECATION")
+    class ChildFragmentWithParentViewModel : Fragment(), MavericksView {
 
         val viewModel: ViewSubscriberViewModel by parentFragmentViewModel()
 
@@ -491,7 +492,8 @@ class FragmentSubscriberTest : BaseTest() {
         assertEquals(parentFragment.viewModel, childFragment.viewModel)
     }
 
-    class ParentFragmentWithoutViewModel : BaseMvRxFragment() {
+    @Suppress("DEPRECATION")
+    class ParentFragmentWithoutViewModel : Fragment(), MavericksView {
 
         override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) = FrameLayout(requireContext())
 
@@ -516,7 +518,8 @@ class FragmentSubscriberTest : BaseTest() {
         assertEquals(childFragment1.viewModel, childFragment2.viewModel)
     }
 
-    class EmptyMvRxFragment : BaseMvRxFragment() {
+    @Suppress("DEPRECATION")
+    class EmptyMvRxFragment : Fragment(), MavericksView {
         override fun invalidate() {
         }
     }
@@ -535,7 +538,8 @@ class FragmentSubscriberTest : BaseTest() {
         assertEquals(childFragment1.viewModel, childFragment2.viewModel)
     }
 
-    class FragmentWithTarget : BaseMvRxFragment() {
+    @Suppress("DEPRECATION")
+    class FragmentWithTarget : Fragment(), MavericksView {
         val viewModel: ViewSubscriberViewModel by targetFragmentViewModel()
 
         var invalidateCount = 0
@@ -581,5 +585,24 @@ class FragmentSubscriberTest : BaseTest() {
         val (_, parentFragment) = createFragment<EmptyMvRxFragment, TestActivity>(containerId = CONTAINER_ID)
         val fragmentWithTarget = FragmentWithTarget()
         parentFragment.childFragmentManager.beginTransaction().add(fragmentWithTarget, "fragment-with-target").commitNow()
+    }
+
+    @Test
+    fun testUniqueOnly() {
+        val (controller, fragment) = createFragmentInTestActivity<ViewSubscriberFragment>()
+        fragment.setFoo(1)
+        assertEquals(2, fragment.selectSubscribeUniqueOnlyCallCount)
+
+        controller.pause()
+        controller.stop()
+        fragment.setFoo(2)
+        fragment.setFoo(1)
+        controller.start()
+        controller.resume()
+
+        // In MvRx 1.0, this would have been 3. If the value for a uniqueOnly() subscription changed
+        // and changed back while stopped, it would redeliver the value even though it was the same
+        // as what it received previously.
+        assertEquals(2, fragment.selectSubscribeUniqueOnlyCallCount)
     }
 }

@@ -1,33 +1,18 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
+import com.airbnb.mvrx.JacocoReportTask
+
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-android-extensions"
 apply plugin: "jacoco"
 apply plugin: "com.vanniktech.maven.publish"
 
 android {
-    compileSdkVersion 28
-    resourcePrefix 'mvrx_'
+    resourcePrefix "mvrx_"
 
     defaultConfig {
-        minSdkVersion 16
-        targetSdkVersion 28
-        consumerProguardFiles 'proguard-rules.pro'
+        consumerProguardFiles "proguard-rules.pro"
     }
-    buildToolsVersion "$buildToolsVersion"
-    lintOptions {
-        abortOnError true
-        textReport true
-        textOutput 'stdout'
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-        test.java.srcDirs += 'src/test/kotlin'
-    }
+
     testOptions {
         unitTests {
             includeAndroidResources = true
@@ -40,51 +25,27 @@ android {
     }
 }
 
-androidExtensions {
-    experimental = true
-}
-
 jacoco {
     toolVersion = "0.8.2"
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
-    implementation "androidx.appcompat:appcompat:$appCompatVersion"
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
-    kapt "androidx.lifecycle:lifecycle-compiler:$lifecycleVersion"
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    api "io.reactivex.rxjava2:rxjava:2.2.8"
+    api Libraries.rxAndroid
+    api Libraries.kotlinCoroutines
 
-    testImplementation "org.mockito:mockito-core:2.25.1"
-    testImplementation 'junit:junit:4.12'
-    testImplementation "org.robolectric:robolectric:$robolectricVersion"
+    implementation Libraries.appcompat
+    implementation Libraries.fragment
+    implementation Libraries.viewModelSavedState
+    implementation Libraries.lifecycleCommon
+    implementation Libraries.viewModelKtx
+    implementation Libraries.runtimeKtx
+
+    testImplementation TestLibraries.junit
+    testImplementation TestLibraries.kotlinCoroutinesTest
+    testImplementation TestLibraries.mockito
+    testImplementation TestLibraries.roboeletric
 }
 
-task coverage(type: JacocoReport, dependsOn: "testDebugUnitTest") {
-    group = "Reporting"
-    description = "Generate Jacoco coverage reports for Debug build"
-
-    reports {
-        xml.enabled = true
-        html.enabled = true
-    }
-
-    def excludes = [
-            '**/R.class',
-            '**/R$*.class',
-            '**/BuildConfig.*',
-            '**/Manifest*.*',
-    ]
-    def debugTree = fileTree(dir: "${buildDir}/intermediates/classes/debug", excludes: excludes)
-    def kotlinDebugTree = fileTree(dir: "${buildDir}/tmp/kotlin-classes/debug", excludes: excludes)
-    classDirectories.from([debugTree], [kotlinDebugTree])
-
-    sourceDirectories.from([
-            android.sourceSets.main.java.srcDirs,
-            "${project.projectDir}/src/main/kotlin"
-    ])
-    executionData.from("$buildDir/jacoco/testDebugUnitTest.exec")
+tasks.register("coverage", JacocoReportTask.class) {
+    coverage.dependsOn("testDebugUnitTest")
 }

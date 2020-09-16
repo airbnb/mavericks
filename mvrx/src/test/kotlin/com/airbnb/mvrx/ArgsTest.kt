@@ -1,6 +1,7 @@
 package com.airbnb.mvrx
 
 import android.os.Parcelable
+import androidx.fragment.app.Fragment
 import kotlinx.android.parcel.Parcelize
 import org.junit.Assert
 import org.junit.Test
@@ -8,11 +9,10 @@ import org.junit.Test
 @Parcelize
 data class MvrxArgsTestArgs(val count: Int = 0) : Parcelable
 
-
 @Parcelize
 data class MvrxArgsTestArgs2(val count: Int = 0) : Parcelable
 
-class MvRxArgsFragment : BaseMvRxFragment() {
+class MvRxArgsFragment : Fragment(), MavericksView {
     val args: MvrxArgsTestArgs by args()
 
     override fun invalidate() {}

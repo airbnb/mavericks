@@ -16,7 +16,7 @@
         android:paddingTop="24dp"
         android:textColor="@color/text_color"
         android:textSize="18sp"
-        tools:text="Title"/>
+        tools:text="Title" />
 
     <TextView
         android:id="@+id/subtitle"
@@ -27,18 +27,19 @@
         android:paddingTop="8dp"
         android:textColor="@color/text_color"
         android:textSize="14sp"
-        tools:text="Subtitle"/>
+        android:visibility="gone"
+        tools:text="Subtitle" />
 
     <Space
         android:layout_width="0dp"
-        android:layout_height="24dp"/>
+        android:layout_height="24dp" />
 
     <View
         android:layout_width="match_parent"
         android:layout_height="@dimen/divider"
         android:layout_marginLeft="@dimen/padding_horizontal"
         android:layout_marginRight="@dimen/padding_horizontal"
-        android:background="@color/divider"/>
+        android:background="@color/divider" />
 
 
 </merge>

@@ -2,7 +2,9 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <data>
+
         <variable
             name="dog"
             type="com.airbnb.mvrx.dogs.data.Dog" />
@@ -11,6 +13,7 @@
             name="handler"
             type="com.airbnb.mvrx.dogs.views.DogDetailFragmentHandler" />
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -34,6 +37,7 @@
             android:layout_height="0dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="16dp"
+            android:layout_marginRight="16dp"
             android:layout_marginBottom="8dp"
             app:layout_constraintBottom_toTopOf="@id/loveButton"
             app:layout_constraintEnd_toEndOf="parent"
@@ -69,6 +73,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
             android:textColor="@android:color/white"
             android:textSize="32sp"
@@ -85,14 +90,13 @@
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp"
             android:background="@drawable/adopt_button_background"
-            android:elevation="8dp"
             android:gravity="center"
             android:text="@string/love_dog"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:onClick="@{() -> handler.onLoveClicked()}"/>
+            android:onClick="@{() -> handler.onLoveClicked()}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

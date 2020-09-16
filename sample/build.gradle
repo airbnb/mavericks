@@ -1,54 +1,56 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
-apply plugin: 'kotlin-kapt'
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-android-extensions"
+apply plugin: "kotlin-kapt"
 
 android {
-    compileSdkVersion 28
     defaultConfig {
         applicationId "com.airbnb.sample"
-        minSdkVersion 21
-        targetSdkVersion 28
+        multiDexEnabled true
         versionCode 1
         versionName "0.0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-    buildToolsVersion "$buildToolsVersion"
+
     buildTypes {
         release {
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-project.pro'
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-project.pro"
         }
+    }
+    viewBinding {
+        enabled = true
     }
 }
 
-androidExtensions {
-    experimental = true
-}
 
 dependencies {
-    implementation project(':mvrx')
-    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    implementation "androidx.appcompat:appcompat:$appCompatVersion"
-    implementation "androidx.recyclerview:recyclerview:$recyclerViewVersion"
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
-    implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
-    implementation("com.airbnb.android:epoxy:$epoxyVersion") { exclude group: 'com.android.support' }
-    kapt "com.airbnb.android:epoxy-processor:$epoxyVersion"
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-    implementation "io.reactivex.rxjava2:rxjava:2.2.8"
-    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
-    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
-    implementation "com.squareup.retrofit2:converter-moshi:$retrofitVersion"
-    implementation "com.squareup.moshi:moshi:$moshiVersion"
-    implementation "com.squareup.moshi:moshi-kotlin:$moshiVersion"
-    kapt "com.squareup.moshi:moshi-kotlin-codegen:$moshiVersion"
-    implementation "androidx.navigation:navigation-fragment-ktx:$navVersion"
-    implementation "androidx.navigation:navigation-ui-ktx:$navVersion"
-    implementation "org.koin:koin-android:$koinVersion"
+    kapt AnnotationProcessors.epoxy
+    kapt AnnotationProcessors.moshi
 
-    testImplementation 'junit:junit:4.12'
+    implementation project(":mvrx")
+    implementation project(':mvrx-mocking')
+    // In real apps this should be debugImplementation so that the launcher isn't included in production!
+    implementation project(':launcher')
+
+    implementation Libraries.appcompat
+    implementation Libraries.constraintlayout
+    implementation(Libraries.epoxy) { exclude group: "com.android.support" }
+    implementation Libraries.koin
+    implementation Libraries.lifecycleCommon
+    implementation Libraries.moshi
+    implementation Libraries.moshiKotlin
+    implementation Libraries.multidex
+    implementation Libraries.navigationFragmentKtx
+    implementation Libraries.navigationUiKtx
+    implementation Libraries.recyclerview
+    implementation Libraries.retrofit
+    implementation Libraries.retrofitMoshi
+    implementation Libraries.retrofitRxJava
+    implementation Libraries.rxAndroid
+    implementation Libraries.rxJava
+
+    testImplementation TestLibraries.junit
 }

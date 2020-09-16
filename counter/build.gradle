@@ -1,27 +1,41 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-android-extensions"
 
 android {
-    compileSdkVersion 28
 
     defaultConfig {
-        applicationId "com.airbnb.mvrx.counter"
-        minSdkVersion 21
-        targetSdkVersion 28
+        applicationId 'com.airbnb.mvrx.counter'
         versionCode 1
-        versionName "1.0"
+        versionName '1.0'
+    }
+
+    signingConfigs {
+        release {
+            storeFile file("counter.keystore")
+            storePassword "counter"
+            keyAlias "counter-release"
+            keyPassword "counter"
+        }
+    }
+
+    buildTypes {
+        debug {
+            signingConfig signingConfigs.release
+        }
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-project.pro"
+        }
     }
 }
 
 dependencies {
-    implementation project(':mvrx')
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-    implementation "androidx.appcompat:appcompat:$appCompatVersion"
-    implementation "androidx.core:core-ktx:$androidXCoreKtxVersion"
-    implementation "androidx.lifecycle:lifecycle-extensions:$lifecycleVersion"
-    implementation "androidx.constraintlayout:constraintlayout:$constraintLayoutVersion"
+    implementation Libraries.appcompat
+    implementation project(":mvrx")
 
-    testImplementation 'junit:junit:4.12'
-    testImplementation project(':testing')
+    testImplementation TestLibraries.junit
+    testImplementation project(":testing")
 }

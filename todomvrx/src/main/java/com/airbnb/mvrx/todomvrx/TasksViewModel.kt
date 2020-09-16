@@ -1,8 +1,8 @@
 package com.airbnb.mvrx.todomvrx
 
 import com.airbnb.mvrx.Async
-import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.MvRxViewModelFactory
+import com.airbnb.mvrx.MavericksState
+import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.Uninitialized
 import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.todomvrx.core.MvRxViewModel
@@ -22,7 +22,7 @@ data class TasksState(
     val taskRequest: Async<Tasks> = Uninitialized,
     val isLoading: Boolean = false,
     val lastEditedTask: String? = null
-) : MvRxState
+) : MavericksState
 
 class TasksViewModel(initialState: TasksState, private val sources: List<TasksDataSource>) : MvRxViewModel<TasksState>(initialState) {
 
@@ -62,7 +62,7 @@ class TasksViewModel(initialState: TasksState, private val sources: List<TasksDa
         sources.forEach { it.deleteTask(id) }
     }
 
-    companion object : MvRxViewModelFactory<TasksViewModel, TasksState> {
+    companion object : MavericksViewModelFactory<TasksViewModel, TasksState> {
 
         override fun create(viewModelContext: ViewModelContext, state: TasksState): TasksViewModel {
             val database = ToDoDatabase.getInstance(viewModelContext.activity)
