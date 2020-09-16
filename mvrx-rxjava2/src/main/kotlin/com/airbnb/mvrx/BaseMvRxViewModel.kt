@@ -19,6 +19,7 @@ import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.disposables.Disposables
+import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -91,6 +92,39 @@ abstract class BaseMvRxViewModel<S : MavericksState>(
     fun Completable.execute(
         stateReducer: S.(Async<Unit>) -> S
     ) = toSingle { Unit }.execute(stateReducer)
+
+    /**
+     * Helper like [<T> Single<T>.execute] but with on demand IO thread Subscription
+     */
+    fun <T> Single<T>.executeOnIO(
+        stateReducer: S.(Async<T>) -> S
+    ) = toObservable()
+        .execute({ it }, null, stateReducer)
+
+    /**
+     * Helper like [<T, V> Single<T>.execute] but with on demand IO thread Subscription
+     */
+    fun <T, V> Single<T>.executeOnIO(
+        mapper: (T) -> V,
+        stateReducer: S.(Async<V>) -> S
+    ) = toObservable()
+        .subscribeOn(Schedulers.io())
+        .execute(mapper, null, stateReducer)
+
+    /**
+     * Helper like [<T> Observable<T>.execute] but with on demand IO thread Subscription
+     */
+    fun <T> Observable<T>.executeOnIO(
+        stateReducer: S.(Async<T>) -> S
+    ) = subscribeOn(Schedulers.io())
+        .execute({ it }, null, stateReducer)
+
+    /**
+     * Helper like [Completable.execute] but with on demand IO thread Subscription
+     */
+    fun Completable.executeOnIO(
+        stateReducer: S.(Async<Unit>) -> S
+    ) = toSingle { Unit }.executeOnIO(stateReducer)
 
     /**
      * Execute an [Observable] and wrap its progression with [Async] property reduced to the global state.
