@@ -778,14 +778,14 @@ class ViewModelSubscriberTest : BaseTest() {
     fun testCancelledIfOwnerDestroyed() {
         val job = viewModel.onEachInternal(owner) {}
         owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-        assertTrue(job.isCancelled)
+        assertTrue(job.isCompleted)
     }
 
     @Test
     fun testCancelledIfViewModelCleared() = runBlocking {
         val job = viewModel.onEachInternal(owner) {}
         viewModel.triggerCleared()
-        assertTrue(job.isCancelled)
+        assertTrue(job.isCompleted)
     }
 
     @Test
