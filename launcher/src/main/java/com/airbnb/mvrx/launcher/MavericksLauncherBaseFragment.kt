@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.fragment.app.Fragment
@@ -16,7 +15,7 @@ import com.airbnb.mvrx.MavericksView
 /**
  * Provides base UI (epoxy, toolbar, back handling) for fragments to extend.
  */
-abstract class MvRxLauncherBaseFragment : Fragment(), MavericksView {
+abstract class MavericksLauncherBaseFragment : Fragment(), MavericksView {
 
     protected lateinit var recyclerView: EpoxyRecyclerView
     protected lateinit var toolbar: Toolbar
@@ -46,7 +45,7 @@ abstract class MvRxLauncherBaseFragment : Fragment(), MavericksView {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        val view = inflater.inflate(R.layout.mvrx_fragment_base_launcher, container, false).apply {
+        val view = inflater.inflate(R.layout.mavericks_fragment_base_launcher, container, false).apply {
             recyclerView = findViewById(R.id.recycler_view)
             toolbar = findViewById(R.id.toolbar)
             coordinatorLayout = findViewById(R.id.coordinator_layout)
@@ -54,10 +53,8 @@ abstract class MvRxLauncherBaseFragment : Fragment(), MavericksView {
 
         recyclerView.setController(epoxyController)
 
-        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
-
         toolbar.setNavigationOnClickListener { activity?.onBackPressed() }
-        // We don't want a title shown. By default it adds "MvRx"
+        // We don't want a title shown. By default it adds "Mavericks"
         activity?.title = ""
 
         return view

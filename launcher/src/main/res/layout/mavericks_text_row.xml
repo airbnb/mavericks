@@ -8,10 +8,10 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/mvrx_padding_horizontal"
+        android:paddingLeft="@dimen/mavericks_padding_horizontal"
         android:paddingTop="16dp"
-        android:paddingRight="@dimen/mvrx_padding_horizontal"
-        android:textColor="@color/mvrx_text_color"
+        android:paddingRight="@dimen/mavericks_padding_horizontal"
+        android:textColor="@color/mavericks_text_color"
         android:textSize="17sp"
         tools:text="Some title" />
 
@@ -19,8 +19,8 @@
         android:id="@+id/subtitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/mvrx_padding_horizontal"
-        android:paddingRight="@dimen/mvrx_padding_horizontal"
+        android:paddingLeft="@dimen/mavericks_padding_horizontal"
+        android:paddingRight="@dimen/mavericks_padding_horizontal"
         android:textSize="13sp"
         tools:text="Some subtitle" />
 
@@ -32,8 +32,8 @@
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/mvrx_divider"
-        android:layout_marginLeft="@dimen/mvrx_padding_horizontal"
-        android:layout_marginRight="@dimen/mvrx_padding_horizontal" />
+        android:background="@color/mavericks_divider"
+        android:layout_marginLeft="@dimen/mavericks_padding_horizontal"
+        android:layout_marginRight="@dimen/mavericks_padding_horizontal" />
 
 </merge>

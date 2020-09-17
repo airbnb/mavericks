@@ -12,8 +12,8 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
 
         // Upload with:
-        // ./gradlew clean assemble androidSourcesJar androidJavadocsJar uploadArchives --no-daemon --no-parallel
-        classpath "com.vanniktech:gradle-maven-publish-plugin:0.11.1"
+        // ./gradlew clean assemble uploadArchives --no-daemon --no-parallel
+        classpath "com.vanniktech:gradle-maven-publish-plugin:0.12.0"
     }
 
     configurations.all {

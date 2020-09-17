@@ -22,7 +22,7 @@ class TextRow @JvmOverloads constructor(
     private val subtitleView: TextView
 
     init {
-        inflate(context, R.layout.mvrx_text_row, this)
+        inflate(context, R.layout.mavericks_text_row, this)
         titleView = findViewById(R.id.title)
         subtitleView = findViewById(R.id.subtitle)
         orientation = VERTICAL

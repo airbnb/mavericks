@@ -36,8 +36,6 @@ dependencies {
     implementation project(":mvrx-rxjava2")
     implementation project(':mvrx-mocking')
 
-    debugImplementation Libraries.debugDb
-
     testImplementation TestLibraries.junit
     testImplementation TestLibraries.mockitoKotlin
     testImplementation project(":testing")

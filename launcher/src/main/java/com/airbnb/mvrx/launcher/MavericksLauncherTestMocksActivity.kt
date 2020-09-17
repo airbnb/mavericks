@@ -4,8 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
-import com.airbnb.mvrx.launcher.MvRxLauncherTestMocksActivity.Companion.provideIntentToTestMock
+import androidx.fragment.app.FragmentActivity
+import com.airbnb.mvrx.launcher.MavericksLauncherTestMocksActivity.Companion.provideIntentToTestMock
 import com.airbnb.mvrx.mocking.MockedViewProvider
 import java.util.LinkedList
 
@@ -17,7 +17,7 @@ import java.util.LinkedList
  * Override [provideIntentToTestMock] in order to customize what activity is used to test each
  * mock.
  */
-class MvRxLauncherTestMocksActivity : AppCompatActivity() {
+class MavericksLauncherTestMocksActivity : FragmentActivity() {
 
     private val mockCount = mocksToShow.size
 
@@ -61,11 +61,11 @@ class MvRxLauncherTestMocksActivity : AppCompatActivity() {
         private const val REQUEST_CODE_TEST_FINISHED = 2
 
         /**
-         * Override this in order to customize what activity is used to test eachh
+         * Override this in order to customize what activity is used to test each
          * mock.
          */
         var provideIntentToTestMock: (Context, MockedViewProvider<*>) -> Intent = { context, mock ->
-            MvRxLauncherMockActivity.intent(context, mock, finishAfterLaunch = true)
+            MavericksLauncherMockActivity.intent(context, mock, finishAfterLaunch = true)
         }
     }
 }

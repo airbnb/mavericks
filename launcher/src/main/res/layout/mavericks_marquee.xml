@@ -7,10 +7,10 @@
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/mvrx_padding_horizontal"
-        android:paddingRight="@dimen/mvrx_padding_horizontal"
+        android:paddingLeft="@dimen/mavericks_padding_horizontal"
+        android:paddingRight="@dimen/mavericks_padding_horizontal"
         android:paddingTop="48dp"
-        android:textColor="@color/mvrx_text_color"
+        android:textColor="@color/mavericks_text_color"
         android:textSize="32sp"
         android:textStyle="bold"
         tools:text="Marquee" />
@@ -19,8 +19,8 @@
         android:id="@+id/subtitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingLeft="@dimen/mvrx_padding_horizontal"
-        android:paddingRight="@dimen/mvrx_padding_horizontal"
+        android:paddingLeft="@dimen/mavericks_padding_horizontal"
+        android:paddingRight="@dimen/mavericks_padding_horizontal"
         android:paddingTop="4dp"
         android:textSize="16sp" />
 

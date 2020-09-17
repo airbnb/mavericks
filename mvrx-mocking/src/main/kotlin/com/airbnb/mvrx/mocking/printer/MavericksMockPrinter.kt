@@ -16,31 +16,31 @@ import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.mocking.MockableMavericks
-import com.airbnb.mvrx.mocking.printer.MavericksMockPrinter.Companion.ACTION_COPY_MVRX_STATE
+import com.airbnb.mvrx.mocking.printer.MavericksMockPrinter.Companion.ACTION_COPY_MAVERICKS_STATE
 import com.airbnb.mvrx.withState
 import java.io.File
 
 /**
  * This registers a Broadcast receiver on the MavericksView (only in debug mode) that
- * listens for the intent action [ACTION_COPY_MVRX_STATE] to copy mvrx state to files on device.
+ * listens for the intent action [ACTION_COPY_MAVERICKS_STATE] to copy mavericks state to files on device.
  *
  * The resulting file names are printed to logcat so tooling can copy them from device.
  */
 class MavericksMockPrinter private constructor(
-    private val mvrxView: MavericksView
+    private val mavericksView: MavericksView
 ) : LifecycleObserver {
 
-    private val broadcastReceiver by lazy { ViewArgPrinter(mvrxView) }
+    private val broadcastReceiver by lazy { ViewArgPrinter(mavericksView) }
     private val context: Context
         get() {
             @Suppress("DEPRECATION")
-            return when (mvrxView) {
-                is View -> mvrxView.context
-                is Fragment -> mvrxView.requireContext()
+            return when (mavericksView) {
+                is View -> mavericksView.context
+                is Fragment -> mavericksView.requireContext()
                 is android.app.Fragment -> {
-                    mvrxView.activity ?: error("Fragment context is null")
+                    mavericksView.activity ?: error("Fragment context is null")
                 }
-                else -> error("Don't know how to get Context from mvrx view ${mvrxView.javaClass.simpleName}. Submit a PR to support your screen type.")
+                else -> error("Don't know how to get Context from mavericks view ${mavericksView.javaClass.simpleName}. Submit a PR to support your screen type.")
             }
         }
 
@@ -52,8 +52,8 @@ class MavericksMockPrinter private constructor(
         // To avoid leaking the view, it is removed when the lifecycle is destroyed.
         // If the lifecycle is already Destroyed when this is called, the observer will immediately
         // invoke the destroyed callback so the view is removed immediately as well.
-        if (viewsWithRegisteredReceivers.add(mvrxView)) {
-            mvrxView.lifecycle.addObserver(this)
+        if (viewsWithRegisteredReceivers.add(mavericksView)) {
+            mavericksView.lifecycle.addObserver(this)
         }
     }
 
@@ -69,11 +69,11 @@ class MavericksMockPrinter private constructor(
 
     @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     fun onDestroyed() {
-        viewsWithRegisteredReceivers.remove(mvrxView)
+        viewsWithRegisteredReceivers.remove(mavericksView)
     }
 
     companion object {
-        const val ACTION_COPY_MVRX_STATE = "ACTION_COPY_MVRX_STATE"
+        const val ACTION_COPY_MAVERICKS_STATE = "ACTION_COPY_MAVERICKS_STATE"
 
         /**
          * Tracks which views already have a receiver registered, to prevent registering the same
@@ -95,7 +95,7 @@ class MavericksMockPrinter private constructor(
 }
 
 /**
- * When an Intent with the [ACTION_COPY_MVRX_STATE] action is received, this class will:
+ * When an Intent with the [ACTION_COPY_MAVERICKS_STATE] action is received, this class will:
  *
  * 1. Extract configuration arguments from the Intent
  * 2. Lookup all ViewModel properties defined on the [MavericksView]
@@ -118,7 +118,7 @@ internal abstract class MavericksPrintStateBroadcastReceiver : BroadcastReceiver
 
     override fun onReceive(context: Context, intent: Intent) {
         Log.d(INFO_TAG, "$tag - Intent received $intent")
-        if (intent.action != ACTION_COPY_MVRX_STATE) {
+        if (intent.action != ACTION_COPY_MAVERICKS_STATE) {
             Log.d(INFO_TAG, "$tag - Unsupported action: ${intent.action}")
             return
         }
@@ -205,7 +205,7 @@ internal abstract class MavericksPrintStateBroadcastReceiver : BroadcastReceiver
     fun register(context: Context) {
         check(!isRegistered) { "Already registered" }
         isRegistered = true
-        context.registerReceiver(this, IntentFilter(ACTION_COPY_MVRX_STATE))
+        context.registerReceiver(this, IntentFilter(ACTION_COPY_MAVERICKS_STATE))
     }
 
     fun unregister(context: Context) {
@@ -284,13 +284,13 @@ private fun writeMock(
             stringTruncationThreshold
         )
     } catch (e: Throwable) {
-        Log.e(ERROR_TAG, "Error creating mvrx mock code for $objectName", e)
+        Log.e(ERROR_TAG, "Error creating mavericks mock code for $objectName", e)
     }
 }
 
 /**
  * Print out the code that is needed to construct the given object. This is useful for creating mock state or argument objects.
- * Use "adb logcat -s "MVRX_STATE" -v raw -v color" in the terminal to visualize the output nicely.
+ * Use "adb logcat -s "MAVERICKS_STATE" -v raw -v color" in the terminal to visualize the output nicely.
  *
  * @param listTruncationThreshold If greater then 0, any lists found will be truncated to this number of items. If 0 or less, no truncation will occur.
  * @param stringTruncationThreshold If greater then 0, any Strings found will be truncated to this number or characters. If 0 or less, no truncation will occur.
@@ -331,6 +331,6 @@ private fun <T : Any> printMockFile(
  * The command line tooling looks for output with these tags - so it is important that these are not changed
  * without also updating that script.
  */
-private const val RESULTS_TAG = "MVRX_PRINTER_RESULTS"
-private const val ERROR_TAG = "MVRX_PRINTER_ERROR"
-private const val INFO_TAG = "MVRX_PRINTER_INFO"
+private const val RESULTS_TAG = "MOCK_PRINTER_RESULTS"
+private const val ERROR_TAG = "MOCK_PRINTER_ERROR"
+private const val INFO_TAG = "MOCK_PRINTER_INFO"

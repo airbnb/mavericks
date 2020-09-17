@@ -1,5 +1,4 @@
 #!/usr/bin/env kscript
-@file:Suppress("Detekt.SpacingBetweenPackageAndImports")
 @file:Include("ShellAccess.kt")
 @file:Include("DirectoryUtils.kt")
 @file:Include("CommandLineArgs.kt")
@@ -11,19 +10,19 @@ import java.util.concurrent.TimeUnit
 import kotlin.system.exitProcess
 
 /**
- * Command line interface to copy mock MvRx state and arguments from a connected debug build.
+ * Command line interface to copy mock Mavericks state and arguments from a connected debug build.
  */
 @CommandLine.Command(
-    name = "MvRx Mock Printer",
+    name = "Mavericks Mock Printer",
     description = [
-        "Generate MvRx mocks. " +
-            "Creates a mock file for each active ViewModel and MvRxView in a connected debug app. " +
+        "Generate Mavericks mocks. " +
+            "Creates a mock file for each active ViewModel and MavericksView in a connected debug app. " +
             "The device must have debugging enabled. " +
             "Mocks are both copied to clipboard and written to temp files. " +
             "This is intended to be run from the root directory of your project. "
     ]
 )
-class MvrxPrinterApi : CommandLineArgs() {
+class MavericksPrinterApi : CommandLineArgs() {
 
     @CommandLine.Option(
         names = ["--includeRegexes"],
@@ -46,8 +45,8 @@ class MvrxPrinterApi : CommandLineArgs() {
     @CommandLine.Option(
         names = ["--copyToModule"],
         description = [
-            "Pass the module name of the expected MvRxView so that the generated mock files are copied to the same module automatically." +
-                " The mocks will be copied to the same package as the MvRxView, but nested under a 'mocks' sub package."
+            "Pass the module name of the expected MavericksView so that the generated mock files are copied to the same module automatically." +
+                " The mocks will be copied to the same package as the MavericksView, but nested under a 'mocks' sub package."
         ]
     )
     var copyToModule: String? = null
@@ -77,7 +76,7 @@ class MvrxPrinterApi : CommandLineArgs() {
     var stringTruncationThreshold: Int = 300
 }
 
-val printerApi = parseArgs<MvrxPrinterApi>()
+val printerApi = parseArgs<MavericksPrinterApi>()
 println("Generating mocks...")
 
 // Logcat is cleared because we use it to get file names, and we don't want to pick up files
@@ -91,10 +90,10 @@ println("Generating mocks...")
 
 // This is the main command to tell the Debug build to create mock files
 buildString {
-    // A broadcast receiver is registered with MvRx Fragments in debug builds that will listen for this action
+    // A broadcast receiver is registered with Mavericks Fragments in debug builds that will listen for this action
     // and then generate the mock files, save them to device, and print the file names to logcat so we know
     // which files to copy from device.
-    append("adb shell am broadcast -a \"ACTION_COPY_MVRX_STATE\"")
+    append("adb shell am broadcast -a \"ACTION_COPY_MAVERICKS_STATE\"")
 
     append(" --ei EXTRA_LIST_TRUNCATION_THRESHOLD ${printerApi.listTruncationThreshold}")
     append(" --ei EXTRA_STRING_TRUNCATION_THRESHOLD ${printerApi.stringTruncationThreshold}")
@@ -112,12 +111,12 @@ val outputtedFileNames = parseStateFileNamesFromLogcat()
 
 if (outputtedFileNames.isNullOrEmpty()) {
     println("No mocks found matching given options: $printerApi")
-    println("\nMake sure your Fragment is resumed, and check Logcat for tags containing 'MVRX_PRINTER' for details")
+    println("\nMake sure your Fragment is resumed, and check Logcat for tags containing 'Mavericks_PRINTER' for details")
     exitProcess(1)
 }
 
 println("Copying mock files to temp folder...\n")
-val tmpFolder = File(executionDirectory(), "mvrx_temp_mocks").apply {
+val tmpFolder = File(executionDirectory(), "mavericks_temp_mocks").apply {
     mkdir()
 }
 
@@ -161,7 +160,7 @@ if (printerApi.listTruncationThreshold > 0) {
 
 println("  - Run script with -h flag to see help and options.")
 
-getLogcatOutputForTag("MVRX_PRINTER_ERROR")
+getLogcatOutputForTag("MOCK_PRINTER_ERROR")
     .takeIf { it.isNotEmpty() }
     ?.let { errorOutput ->
         println("\n\nThese errors were also reported:\n")
@@ -188,13 +187,13 @@ fun parseStateFileNamesFromLogcat(): List<String>? = pollWithTimeout(timeoutMs =
     // and have this script miss them and think there are no screens to print
     Thread.sleep(2000)
 
-    getLogcatOutputForTag("MVRX_PRINTER_RESULTS")
+    getLogcatOutputForTag("MOCK_PRINTER_RESULTS")
         .takeIf { lines -> areAllViewsFinished(lines) }
         ?.filter { it.endsWith(".kt") }
 }
 
 /**
- * If multiple MvRxViews are started then we need to wait for all of them to finish before proceeding.
+ * If multiple MavericksViews are started then we need to wait for all of them to finish before proceeding.
  * Each view prints "started" when it begins processing and "done" when it is finished - this returns
  * true when every "started" tag has a matching "done"".
  */
@@ -261,7 +260,7 @@ fun File.extractPackagePath(): String? {
 
 fun getApplicationPackage(): String {
     val packageIndicator = "package="
-    val applicationPackage = getLogcatOutputForTag("MVRX_PRINTER_RESULTS")
+    val applicationPackage = getLogcatOutputForTag("MOCK_PRINTER_RESULTS")
         .lastOrNull { it.startsWith(packageIndicator) }
         ?.substringAfter(packageIndicator)
 

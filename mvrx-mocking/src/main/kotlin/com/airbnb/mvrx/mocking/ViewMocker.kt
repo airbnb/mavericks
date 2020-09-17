@@ -58,7 +58,7 @@ inline fun <reified T> mockVariants(): List<MockedViewProvider<T>> where T : Fra
  * Helper for pulling the default state mock out of a list of mocks.
  */
 fun <T : MockableMavericksView> List<MockedViewProvider<T>>.forDefaultState(): MockedViewProvider<T> {
-    return firstOrNull { it.mock.type == MvRxMock.Type.DefaultState }
+    return firstOrNull { it.mock.type == MavericksMock.Type.DefaultState }
         ?: error("No default state mock found")
 }
 
@@ -66,7 +66,7 @@ fun <T : MockableMavericksView> List<MockedViewProvider<T>>.forDefaultState(): M
  * Helper for pulling the default initialization mock out of a list of mocks.
  */
 fun <T : MockableMavericksView> List<MockedViewProvider<T>>.forDefaultInitialization(): MockedViewProvider<T> {
-    return firstOrNull { it.mock.type == MvRxMock.Type.DefaultInitialization }
+    return firstOrNull { it.mock.type == MavericksMock.Type.DefaultInitialization }
         ?: error("No default initialization mock found")
 }
 
@@ -127,7 +127,7 @@ fun <V : MockableMavericksView, A : Parcelable> getMockVariants(
     // This needs to be the FQN to completely define the view and make it creatable from reflection
     val viewName = view.javaClass.canonicalName ?: error("Null canonical name for $view")
 
-    lateinit var mocks: List<MvRxMock<out MockableMavericksView, out Parcelable>>
+    lateinit var mocks: List<MavericksMock<out MockableMavericksView, out Parcelable>>
     val elapsedMs: Long = measureTimeMillis {
         val mockData =
             MavericksViewMocks.getFrom(view).takeIf { it !== emptyMockPlaceholder.second } ?: return null
@@ -148,7 +148,7 @@ fun <V : MockableMavericksView, A : Parcelable> getMockVariants(
 
     return mocks.map { mvRxFragmentMock ->
         @Suppress("UNCHECKED_CAST")
-        val mockInfo = mvRxFragmentMock as MvRxMock<V, A>
+        val mockInfo = mvRxFragmentMock as MavericksMock<V, A>
 
         MockedViewProvider(
             viewName = viewName,
@@ -180,8 +180,12 @@ fun <V : MockableMavericksView, A : Parcelable> getMockVariants(
 private fun argumentsBundle(arguments: Parcelable, viewName: String): Bundle {
     @Suppress("Detekt.TooGenericExceptionCaught")
     return try {
-        Bundle().apply {
-            putParcelable(Mavericks.KEY_ARG, arguments)
+        if (arguments is Bundle) {
+            arguments
+        } else {
+            Bundle().apply {
+                putParcelable(Mavericks.KEY_ARG, arguments)
+            }
         }.makeClone()
     } catch (e: Throwable) {
         throw AssertionError(
@@ -206,7 +210,7 @@ private fun <T : Parcelable> T.makeClone(): T {
 data class MockedViewProvider<V : MavericksView>(
     val viewName: String,
     val createView: (MockBehavior) -> MockedView<V>,
-    val mock: MvRxMock<V, *>
+    val mock: MavericksMock<V, *>
 )
 
 /**
@@ -215,6 +219,6 @@ data class MockedViewProvider<V : MavericksView>(
 class MockedView<V : MavericksView>(
     val viewInstance: V,
     val viewName: String,
-    val mockData: MvRxMock<V, *>,
+    val mockData: MavericksMock<V, *>,
     val cleanupMockState: () -> Unit
 )

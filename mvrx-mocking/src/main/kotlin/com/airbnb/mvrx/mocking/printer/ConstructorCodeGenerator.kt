@@ -15,7 +15,7 @@ import kotlin.reflect.jvm.isAccessible
 
 /**
  * This utility is used to generate the code need to construct an object.
- * It is useful for printing out a MvRxState instance's
+ * It is useful for printing out a MavericksState instance's
  * constructor code when setting up a test for that state.
  *
  * It uses recursion to analyze the given object instance and
@@ -55,8 +55,9 @@ class ConstructorCodeGenerator<T : Any>(
 
         return when (this) {
             null -> "null"
-            is List<*> -> "listOf(${listItemsCode()})"
+            is List<*> -> "listOf(${iterableItemsCode()})"
             is Array<*> -> "arrayOf(${arrayItemsCode()})"
+            is Set<*> -> "setOf(${iterableItemsCode()})"
             is Map<*, *> -> getMapConstructor()
             else -> null
         } ?: run {
@@ -163,10 +164,9 @@ class ConstructorCodeGenerator<T : Any>(
     // We only truncate if all items in the list are the same type, otherwise we may lose important data.
     // One example case is polymorphic data from a server response.
     // When they are all the same type then we likely lose nothing important by removing items, and it simplifies the mock
-    private fun List<*>.listItemsCode(): String {
-        val result =
-            this.take(if (hasAllSameClassType()) listTruncationThreshold else Int.MAX_VALUE)
-                .joinToString(separator = ",\n") { "" + it.getConstructor() }
+    private fun Iterable<*>.iterableItemsCode(): String {
+        val result = this.take(if (hasAllSameClassType()) listTruncationThreshold else Int.MAX_VALUE)
+            .joinToString(separator = ",\n") { "" + it.getConstructor() }
         return "\n$result\n"
     }
 
@@ -179,7 +179,7 @@ class ConstructorCodeGenerator<T : Any>(
 
     private fun Array<*>.hasAllSameClassType(): Boolean = toList().hasAllSameClassType()
 
-    private fun List<*>.hasAllSameClassType(): Boolean {
+    private fun Iterable<*>.hasAllSameClassType(): Boolean {
         if (isEmpty()) return true
 
         // If they're all null, consider them the same type
@@ -189,6 +189,14 @@ class ConstructorCodeGenerator<T : Any>(
         if (any { it == null }) return false
 
         return all { first()!!::class == it!!::class }
+    }
+
+    private fun Iterable<*>.isEmpty(): Boolean {
+        return if (this is Collection<*>) {
+            this.isEmpty()
+        } else {
+            !this.iterator().hasNext()
+        }
     }
 
     private fun Map<*, *>.getMapConstructor(): String {

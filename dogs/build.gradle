@@ -21,7 +21,7 @@ dependencies {
     implementation Libraries.cardview
     implementation Libraries.constraintlayout
     implementation Libraries.coreKtx
-    implementation(Libraries.epoxy) { exclude group: "com.android.support" }
+    implementation Libraries.epoxy
     implementation Libraries.lottie
     implementation Libraries.navigationFragmentKtx
     implementation Libraries.navigationUiKtx

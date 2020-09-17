@@ -7,7 +7,7 @@ apply plugin: "jacoco"
 apply plugin: "com.vanniktech.maven.publish"
 
 android {
-    resourcePrefix 'mvrx_'
+    resourcePrefix 'mavericks_'
 
     defaultConfig {
         consumerProguardFiles 'proguard-rules.pro'
@@ -36,8 +36,10 @@ dependencies {
     api Libraries.kotlinCoroutines
 
     implementation Libraries.coreKtx
-    implementation(Libraries.epoxy) { exclude group: "com.android.support" }
+    implementation Libraries.epoxy
     kapt AnnotationProcessors.epoxy
+    implementation Libraries.recyclerview
+    implementation Libraries.coordinatorLayout
     implementation Libraries.kotlinReflect
     implementation Libraries.appcompat
     implementation Libraries.fragment

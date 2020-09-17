@@ -9,7 +9,7 @@ interface MockableMavericksView : MavericksView {
      * Override this to provide the mock states that should be used for testing this view.
      *
      * It is intended that functions such as [mockSingleViewModel] be used to provide the value
-     * of this function, instead of instantiating MvRxViewMocks directly
+     * of this function, instead of instantiating MavericksViewMocks directly
      *
      * You should NOT invoke this function directly. You can access the mocks for a view
      * via [MavericksViewMocks.getFrom] instead.

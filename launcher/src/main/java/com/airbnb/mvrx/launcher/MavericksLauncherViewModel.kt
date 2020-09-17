@@ -12,8 +12,8 @@ import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.ViewModelContext
-import com.airbnb.mvrx.launcher.MvRxLauncherActivity.Companion.PARAM_VIEW_PATTERN_TO_TEST
-import com.airbnb.mvrx.launcher.MvRxLauncherActivity.Companion.PARAM_VIEW_TO_OPEN
+import com.airbnb.mvrx.launcher.MavericksLauncherActivity.Companion.PARAM_VIEW_PATTERN_TO_TEST
+import com.airbnb.mvrx.launcher.MavericksLauncherActivity.Companion.PARAM_VIEW_TO_OPEN
 import com.airbnb.mvrx.mocking.MockedViewProvider
 import com.airbnb.mvrx.mocking.getMockVariants
 import kotlinx.coroutines.GlobalScope
@@ -30,14 +30,14 @@ data class MavericksLauncherState(
      * the [cachedMocks] can be used.
      */
     val allMocks: Async<List<MockedViewProvider<*>>> = Loading(),
-    /** The FQN name of the MvRxView that is currently selected for display. */
+    /** The FQN name of the MavericksView that is currently selected for display. */
     val selectedView: String? = null,
     /**
      * The currently selected mock. This is set when the user clicks into a mock.
      * Additionally, the value is saved and restored when mocks are loaded anew when the viewmodel is initialized.
      */
     val selectedMock: MockedViewProvider<*>? = null,
-    /** Details about the most recently used MvRxViews and mocks. The UI can use this to order information for relevance. */
+    /** Details about the most recently used MavericksViews and mocks. The UI can use this to order information for relevance. */
     val recentUsage: LauncherRecentUsage = LauncherRecentUsage(),
     /** A pattern to match views, provided by a deeplink, that should be tested once all mocks load. */
     val viewNamePatternToTest: String? = null,
@@ -133,7 +133,7 @@ sealed class QueryResult {
  * Specifies which views and mocks have been recently opened.
  */
 data class LauncherRecentUsage(
-    /** Ordered list of most recently used MvRxViews, by FQN. */
+    /** Ordered list of most recently used MavericksViews, by FQN. */
     val viewNames: List<String> = emptyList(),
     /** Ordered list of most recently used mocks. */
     val mockIdentifiers: List<LauncherMockIdentifier> = emptyList()
@@ -158,7 +158,7 @@ data class LauncherMockIdentifier(val viewName: String, val mockName: String) {
     )
 }
 
-class MvRxLauncherViewModel(
+class MavericksLauncherViewModel(
     private val initialState: MavericksLauncherState,
     private val sharedPrefs: SharedPreferences
 ) : MavericksViewModel<MavericksLauncherState>(initialState) {
@@ -167,7 +167,7 @@ class MvRxLauncherViewModel(
         loadViewsFromCache(initialState)
 
         GlobalScope.launch {
-            val mocks = MvRxGlobalMockLibrary.getMocks()
+            val mocks = MavericksGlobalMockLibrary.getMocks()
             log("loaded mocks from state")
             setState {
                 // The previously selected view (last time the app ran) may have been deleted or renamed.
@@ -213,7 +213,7 @@ class MvRxLauncherViewModel(
 
                     // Only set the selected mock if a deeplink wasn't used to open view,
                     // because otherwise they interfere with each other.
-                    if (this@MvRxLauncherViewModel.initialState.viewNameToOpen == null && this@MvRxLauncherViewModel.initialState.viewNamePatternToTest == null) {
+                    if (this@MavericksLauncherViewModel.initialState.viewNameToOpen == null && this@MavericksLauncherViewModel.initialState.viewNamePatternToTest == null) {
                         mocks?.findSelectedMock()?.let { selectedMock ->
                             log("Setting selected mock from cache: ${selectedMock.viewName}")
                             setState { copy(selectedMock = selectedMock) }
@@ -273,15 +273,15 @@ class MvRxLauncherViewModel(
         }
     }
 
-    companion object : MavericksViewModelFactory<MvRxLauncherViewModel, MavericksLauncherState> {
+    companion object : MavericksViewModelFactory<MavericksLauncherViewModel, MavericksLauncherState> {
 
         override fun create(
             viewModelContext: ViewModelContext,
             state: MavericksLauncherState
-        ): MvRxLauncherViewModel {
+        ): MavericksLauncherViewModel {
             log("Created viewmodel")
             val sharedPrefs = viewModelContext.sharedPrefs()
-            return MvRxLauncherViewModel(state, sharedPrefs)
+            return MavericksLauncherViewModel(state, sharedPrefs)
         }
 
         override fun initialState(viewModelContext: ViewModelContext): MavericksLauncherState? {
@@ -310,7 +310,7 @@ class MvRxLauncherViewModel(
         }
 
         private fun ViewModelContext.sharedPrefs(): SharedPreferences {
-            return activity.getSharedPreferences("MvRxLauncherCache", Context.MODE_PRIVATE)
+            return activity.getSharedPreferences("MavericksLauncherCache", Context.MODE_PRIVATE)
         }
 
         private const val KEY_VIEWS = "key_view_names"
@@ -339,5 +339,5 @@ private fun SharedPreferences.getList(key: String) =
     getString(key, null)?.split(LIST_SEPARATOR) ?: emptyList()
 
 internal fun log(msg: String) {
-    Log.d(MvRxLauncherViewModel::class.simpleName, msg)
+    Log.d(MavericksLauncherViewModel::class.simpleName, msg)
 }

@@ -79,7 +79,14 @@ class MockableMavericksViewModelConfig<S : MavericksState>(
 data class MockBehavior(
     val initialStateMocking: InitialStateMocking = InitialStateMocking.None,
     val blockExecutions: MavericksViewModelConfig.BlockExecutions = MavericksViewModelConfig.BlockExecutions.No,
-    val stateStoreBehavior: StateStoreBehavior = StateStoreBehavior.Normal
+    val stateStoreBehavior: StateStoreBehavior = StateStoreBehavior.Normal,
+    /**
+     * If true, when a view registers a ViewModel via a delegate the view will be subscribed
+     * to changes to the state view [MavericksView.postInvalidate]. This is the normal behavior of
+     * MvRx. This can be set to false so that a Fragment is not updated for state changes during
+     * tests.
+     */
+    val subscribeViewToStateUpdates: Boolean = true
 ) {
     /** Describes how a custom mocked state is applied to initialize a new ViewModel. */
     enum class InitialStateMocking {
@@ -111,7 +118,7 @@ data class MockBehavior(
 
     enum class StateStoreBehavior {
         /**
-         * Uses RealMvRxStateStore.
+         * Uses RealMavericksStateStore.
          */
         Normal,
 
@@ -223,7 +230,7 @@ open class MockMavericksViewModelConfigFactory(context: Context?, debugMode: Boo
 
     /**
      * Changes the current [MockBehavior] of all running ViewModels, if they were created when
-     * [mockBehavior] was non null. This forces the mock behavior of to this new value.
+     * [mockBehavior] was non null. This forces the mock behavior to this new value.
      *
      * This should be followed later by a corresponding call to [popMockBehaviorOverride] in order
      * to revert the mock behavior to its original value.

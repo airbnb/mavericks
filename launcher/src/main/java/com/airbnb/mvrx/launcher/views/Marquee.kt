@@ -20,7 +20,7 @@ class Marquee @JvmOverloads constructor(
     private val subtitleView: TextView
 
     init {
-        inflate(context, R.layout.mvrx_marquee, this)
+        inflate(context, R.layout.mavericks_marquee, this)
         titleView = findViewById(R.id.title)
         subtitleView = findViewById(R.id.subtitle)
         orientation = VERTICAL
