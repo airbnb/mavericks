@@ -6,8 +6,23 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlin.reflect.KProperty1
 
-@RestrictTo(RestrictTo.Scope.LIBRARY)
-internal fun <VM : MavericksViewModel<S>, S : MavericksState, A> VM.onEach1Internal(
+/**
+ * This name is obfuscated because @RestrictTo doesn't actually work. It would be named onEach.
+ * https://issuetracker.google.com/issues/168357308
+ */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+fun <VM : MavericksViewModel<S>, S : MavericksState> VM._internal(
+    owner: LifecycleOwner?,
+    deliveryMode: DeliveryMode = RedeliverOnStart,
+    action: suspend (S) -> Unit
+) = stateFlow.resolveSubscription(owner, deliveryMode, action)
+
+/**
+ * This name is obfuscated because @RestrictTo doesn't actually work. It would be named onEach.
+ * https://issuetracker.google.com/issues/168357308
+ */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+fun <VM : MavericksViewModel<S>, S : MavericksState, A> VM._internal1(
     owner: LifecycleOwner?,
     prop1: KProperty1<S, A>,
     deliveryMode: DeliveryMode = RedeliverOnStart,
@@ -19,15 +34,12 @@ internal fun <VM : MavericksViewModel<S>, S : MavericksState, A> VM.onEach1Inter
         action(a)
     }
 
-@RestrictTo(RestrictTo.Scope.LIBRARY)
-internal fun <VM : MavericksViewModel<S>, S : MavericksState> VM.onEachInternal(
-    owner: LifecycleOwner?,
-    deliveryMode: DeliveryMode = RedeliverOnStart,
-    action: suspend (S) -> Unit
-) = stateFlow.resolveSubscription(owner, deliveryMode, action)
-
-@RestrictTo(RestrictTo.Scope.LIBRARY)
-internal fun <VM : MavericksViewModel<S>, S : MavericksState, A, B> VM.onEach2Internal(
+/**
+ * This name is obfuscated because @RestrictTo doesn't actually work. It would be named onEach.
+ * https://issuetracker.google.com/issues/168357308
+ */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+fun <VM : MavericksViewModel<S>, S : MavericksState, A, B> VM._internal2(
     owner: LifecycleOwner?,
     prop1: KProperty1<S, A>,
     prop2: KProperty1<S, B>,
@@ -40,8 +52,12 @@ internal fun <VM : MavericksViewModel<S>, S : MavericksState, A, B> VM.onEach2In
         action(a, b)
     }
 
-@RestrictTo(RestrictTo.Scope.LIBRARY)
-internal fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C> VM.onEach3Internal(
+/**
+ * This name is obfuscated because @RestrictTo doesn't actually work. It would be named onEach.
+ * https://issuetracker.google.com/issues/168357308
+ */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C> VM._internal3(
     owner: LifecycleOwner?,
     prop1: KProperty1<S, A>,
     prop2: KProperty1<S, B>,
@@ -55,8 +71,12 @@ internal fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C> VM.onEach
         action(a, b, c)
     }
 
-@RestrictTo(RestrictTo.Scope.LIBRARY)
-internal fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D> VM.onEach4Internal(
+/**
+ * This name is obfuscated because @RestrictTo doesn't actually work. It would be named onEach.
+ * https://issuetracker.google.com/issues/168357308
+ */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D> VM._internal4(
     owner: LifecycleOwner?,
     prop1: KProperty1<S, A>,
     prop2: KProperty1<S, B>,
@@ -71,8 +91,12 @@ internal fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D> VM.onE
         action(a, b, c, d)
     }
 
-@RestrictTo(RestrictTo.Scope.LIBRARY)
-internal fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E> VM.onEach5Internal(
+/**
+ * This name is obfuscated because @RestrictTo doesn't actually work. It would be named onEach.
+ * https://issuetracker.google.com/issues/168357308
+ */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E> VM._internal5(
     owner: LifecycleOwner?,
     prop1: KProperty1<S, A>,
     prop2: KProperty1<S, B>,
@@ -88,8 +112,12 @@ internal fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E> VM.
         action(a, b, c, d, e)
     }
 
-@RestrictTo(RestrictTo.Scope.LIBRARY)
-internal fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E, F> VM.onEach6Internal(
+/**
+ * This name is obfuscated because @RestrictTo doesn't actually work. It would be named onEach.
+ * https://issuetracker.google.com/issues/168357308
+ */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E, F> VM._internal6(
     owner: LifecycleOwner?,
     prop1: KProperty1<S, A>,
     prop2: KProperty1<S, B>,
@@ -106,8 +134,12 @@ internal fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E, F> 
         action(a, b, c, d, e, f)
     }
 
-@RestrictTo(RestrictTo.Scope.LIBRARY)
-internal fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E, F, G> VM.onEach7Internal(
+/**
+ * This name is obfuscated because @RestrictTo doesn't actually work. It would be named onEach.
+ * https://issuetracker.google.com/issues/168357308
+ */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E, F, G> VM._internal7(
     owner: LifecycleOwner?,
     prop1: KProperty1<S, A>,
     prop2: KProperty1<S, B>,
@@ -125,14 +157,18 @@ internal fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E, F, 
         action(a, b, c, d, e, f, g)
     }
 
-@RestrictTo(RestrictTo.Scope.LIBRARY)
-internal fun <VM : MavericksViewModel<S>, S : MavericksState, T> VM.onAsyncInternal(
+/**
+ * This name is obfuscated because @RestrictTo doesn't actually work. It would be named onAsync.
+ * https://issuetracker.google.com/issues/168357308
+ */
+@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+fun <VM : MavericksViewModel<S>, S : MavericksState, T> VM._internalSF(
     owner: LifecycleOwner?,
     asyncProp: KProperty1<S, Async<T>>,
     deliveryMode: DeliveryMode = RedeliverOnStart,
     onFail: (suspend (Throwable) -> Unit)? = null,
     onSuccess: (suspend (T) -> Unit)? = null
-) = onEach1Internal(owner, asyncProp, deliveryMode.appendPropertiesToId(asyncProp)) { asyncValue ->
+) = _internal1(owner, asyncProp, deliveryMode.appendPropertiesToId(asyncProp)) { asyncValue ->
     if (onSuccess != null && asyncValue is Success) {
         onSuccess(asyncValue())
     } else if (onFail != null && asyncValue is Fail) {

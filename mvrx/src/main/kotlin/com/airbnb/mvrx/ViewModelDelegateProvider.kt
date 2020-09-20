@@ -93,7 +93,7 @@ class DefaultViewModelDelegateFactory : ViewModelDelegateFactory {
     ): Lazy<VM> where T : Fragment, T : MavericksView {
         return lifecycleAwareLazy(fragment) {
             viewModelProvider(RealMavericksStateFactory())
-                .apply { onEachInternal(fragment, action = { fragment.postInvalidate() }) }
+                .apply { _internal(fragment, action = { fragment.postInvalidate() }) }
         }
     }
 }

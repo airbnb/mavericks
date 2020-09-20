@@ -1,12 +1,12 @@
 package com.airbnb.mvrx.mocking
 
 import android.content.Context
+import android.content.pm.ApplicationInfo
 import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksStateStore
 import com.airbnb.mvrx.ScriptableStateStore
-import com.airbnb.mvrx.isDebuggable
 import com.airbnb.mvrx.mocking.MockableMavericks.initialize
 import com.airbnb.mvrx.mocking.printer.MavericksMockPrinter
 import com.airbnb.mvrx.mocking.printer.MockPrinterConfiguration
@@ -92,6 +92,8 @@ object MockableMavericks {
             context = context
         )
     }
+
+    private fun Context.isDebuggable(): Boolean = (0 != (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE))
 
     /**
      * Initializes the required [Mavericks.viewModelConfigFactory] and sets ViewModel debug and mock behavior for the app.

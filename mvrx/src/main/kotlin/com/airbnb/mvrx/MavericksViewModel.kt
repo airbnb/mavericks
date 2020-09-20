@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -263,7 +262,7 @@ abstract class MavericksViewModel<S : MavericksState>(
      */
     protected fun onEach(
         action: suspend (S) -> Unit
-    ) = onEachInternal(null, RedeliverOnStart, action)
+    ) = _internal(null, RedeliverOnStart, action)
 
     /**
      * Subscribe to state changes for a single property.
@@ -274,7 +273,7 @@ abstract class MavericksViewModel<S : MavericksState>(
     protected fun <A> onEach(
         prop1: KProperty1<S, A>,
         action: suspend (A) -> Unit
-    ) = onEach1Internal(null, prop1, action = action)
+    ) = _internal1(null, prop1, action = action)
 
     /**
      * Subscribe to state changes for two properties.
@@ -286,7 +285,7 @@ abstract class MavericksViewModel<S : MavericksState>(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         action: suspend (A, B) -> Unit
-    ) = onEach2Internal(null, prop1, prop2, action = action)
+    ) = _internal2(null, prop1, prop2, action = action)
 
     /**
      * Subscribe to state changes for three properties.
@@ -299,7 +298,7 @@ abstract class MavericksViewModel<S : MavericksState>(
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
         action: suspend (A, B, C) -> Unit
-    ) = onEach3Internal(null, prop1, prop2, prop3, action = action)
+    ) = _internal3(null, prop1, prop2, prop3, action = action)
 
     /**
      * Subscribe to state changes for four properties.
@@ -313,7 +312,7 @@ abstract class MavericksViewModel<S : MavericksState>(
         prop3: KProperty1<S, C>,
         prop4: KProperty1<S, D>,
         action: suspend (A, B, C, D) -> Unit
-    ) = onEach4Internal(null, prop1, prop2, prop3, prop4, action = action)
+    ) = _internal4(null, prop1, prop2, prop3, prop4, action = action)
 
     /**
      * Subscribe to state changes for five properties.
@@ -328,7 +327,7 @@ abstract class MavericksViewModel<S : MavericksState>(
         prop4: KProperty1<S, D>,
         prop5: KProperty1<S, E>,
         action: suspend (A, B, C, D, E) -> Unit
-    ) = onEach5Internal(null, prop1, prop2, prop3, prop4, prop5, action = action)
+    ) = _internal5(null, prop1, prop2, prop3, prop4, prop5, action = action)
 
     /**
      * Subscribe to state changes for six properties.
@@ -344,7 +343,7 @@ abstract class MavericksViewModel<S : MavericksState>(
         prop5: KProperty1<S, E>,
         prop6: KProperty1<S, F>,
         action: suspend (A, B, C, D, E, F) -> Unit
-    ) = onEach6Internal(null, prop1, prop2, prop3, prop4, prop5, prop6, action = action)
+    ) = _internal6(null, prop1, prop2, prop3, prop4, prop5, prop6, action = action)
 
     /**
      * Subscribe to state changes for seven properties.
@@ -361,7 +360,7 @@ abstract class MavericksViewModel<S : MavericksState>(
         prop6: KProperty1<S, F>,
         prop7: KProperty1<S, G>,
         action: suspend (A, B, C, D, E, F, G) -> Unit
-    ) = onEach7Internal(null, prop1, prop2, prop3, prop4, prop5, prop6, prop7, action = action)
+    ) = _internal7(null, prop1, prop2, prop3, prop4, prop5, prop6, prop7, action = action)
 
     /**
      * Subscribe to changes in an async property. There are optional parameters for onSuccess
@@ -376,7 +375,7 @@ abstract class MavericksViewModel<S : MavericksState>(
         asyncProp: KProperty1<S, Async<T>>,
         onFail: (suspend (Throwable) -> Unit)? = null,
         onSuccess: (suspend (T) -> Unit)? = null
-    ) = onAsyncInternal(null, asyncProp, RedeliverOnStart, onFail, onSuccess)
+    ) = _internalSF(null, asyncProp, RedeliverOnStart, onFail, onSuccess)
 
     @Suppress("EXPERIMENTAL_API_USAGE")
     internal fun <T : Any> Flow<T>.resolveSubscription(

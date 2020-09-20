@@ -246,7 +246,7 @@ class ViewModelSubscriberTest : BaseTest() {
     @Test
     fun testSubscribeExternal() {
         var callCount = 0
-        viewModel.onEachInternal(owner) { callCount++ }
+        viewModel._internal(owner) { callCount++ }
         assertEquals(1, callCount)
     }
 
@@ -258,7 +258,7 @@ class ViewModelSubscriberTest : BaseTest() {
     @Test
     fun testSelectSubscribe1External() {
         var callCount = 0
-        viewModel.onEach1Internal(owner, ViewModelTestState::foo) { callCount++ }
+        viewModel._internal1(owner, ViewModelTestState::foo) { callCount++ }
         assertEquals(1, callCount)
         viewModel.setFoo(1)
         assertEquals(2, callCount)
@@ -267,7 +267,7 @@ class ViewModelSubscriberTest : BaseTest() {
     @Test
     fun testSelectSubscribe2External() {
         var callCount = 0
-        viewModel.onEach2Internal(owner, ViewModelTestState::foo, ViewModelTestState::bar) { _, _ -> callCount++ }
+        viewModel._internal2(owner, ViewModelTestState::foo, ViewModelTestState::bar) { _, _ -> callCount++ }
         assertEquals(1, callCount)
         viewModel.setFoo(1)
         assertEquals(2, callCount)
@@ -278,7 +278,7 @@ class ViewModelSubscriberTest : BaseTest() {
     @Test
     fun testSelectSubscribe3External() {
         var callCount = 0
-        viewModel.onEach3Internal(
+        viewModel._internal3(
             owner,
             ViewModelTestState::foo,
             ViewModelTestState::bar,
@@ -296,7 +296,7 @@ class ViewModelSubscriberTest : BaseTest() {
     @Test
     fun testSelectSubscribe4External() {
         var callCount = 0
-        viewModel.onEach4Internal(
+        viewModel._internal4(
             owner,
             ViewModelTestState::foo,
             ViewModelTestState::bar,
@@ -317,7 +317,7 @@ class ViewModelSubscriberTest : BaseTest() {
     @Test
     fun testSelectSubscribe5External() {
         var callCount = 0
-        viewModel.onEach5Internal(
+        viewModel._internal5(
             owner,
             ViewModelTestState::foo,
             ViewModelTestState::bar,
@@ -341,7 +341,7 @@ class ViewModelSubscriberTest : BaseTest() {
     @Test
     fun testSelectSubscribe6External() {
         var callCount = 0
-        viewModel.onEach6Internal(
+        viewModel._internal6(
             owner,
             ViewModelTestState::foo,
             ViewModelTestState::bar,
@@ -368,7 +368,7 @@ class ViewModelSubscriberTest : BaseTest() {
     @Test
     fun testSelectSubscribe7External() {
         var callCount = 0
-        viewModel.onEach7Internal(
+        viewModel._internal7(
             owner,
             ViewModelTestState::foo,
             ViewModelTestState::bar,
@@ -515,7 +515,7 @@ class ViewModelSubscriberTest : BaseTest() {
         owner.lifecycle.currentState = Lifecycle.State.INITIALIZED
 
         var callCount = 0
-        viewModel.onEachInternal(owner) {
+        viewModel._internal(owner) {
             callCount++
         }
 
@@ -527,7 +527,7 @@ class ViewModelSubscriberTest : BaseTest() {
         owner.lifecycle.currentState = Lifecycle.State.CREATED
 
         var callCount = 0
-        viewModel.onEachInternal(owner) {
+        viewModel._internal(owner) {
             callCount++
         }
 
@@ -539,7 +539,7 @@ class ViewModelSubscriberTest : BaseTest() {
         owner.lifecycle.currentState = Lifecycle.State.STARTED
 
         var callCount = 0
-        viewModel.onEachInternal(owner) {
+        viewModel._internal(owner) {
             callCount++
         }
 
@@ -551,7 +551,7 @@ class ViewModelSubscriberTest : BaseTest() {
         owner.lifecycle.currentState = Lifecycle.State.RESUMED
 
         var callCount = 0
-        viewModel.onEachInternal(owner) {
+        viewModel._internal(owner) {
             callCount++
         }
 
@@ -563,7 +563,7 @@ class ViewModelSubscriberTest : BaseTest() {
         owner.lifecycle.currentState = Lifecycle.State.DESTROYED
 
         var callCount = 0
-        viewModel.onEachInternal(owner) {
+        viewModel._internal(owner) {
             callCount++
         }
 
@@ -575,7 +575,7 @@ class ViewModelSubscriberTest : BaseTest() {
         owner.lifecycle.currentState = Lifecycle.State.RESUMED
 
         var callCount = 0
-        viewModel.onEachInternal(owner) {
+        viewModel._internal(owner) {
             callCount++
         }
 
@@ -593,7 +593,7 @@ class ViewModelSubscriberTest : BaseTest() {
         owner.lifecycle.currentState = Lifecycle.State.RESUMED
 
         var callCount = 0
-        viewModel.onEachInternal(owner) {
+        viewModel._internal(owner) {
             callCount++
         }
 
@@ -611,7 +611,7 @@ class ViewModelSubscriberTest : BaseTest() {
         owner.lifecycle.currentState = Lifecycle.State.CREATED
 
         var callCount = 0
-        viewModel.onEachInternal(owner) {
+        viewModel._internal(owner) {
             callCount++
         }
 
@@ -625,7 +625,7 @@ class ViewModelSubscriberTest : BaseTest() {
         owner.lifecycle.currentState = Lifecycle.State.STARTED
 
         var callCount = 0
-        viewModel.onEachInternal(owner) {
+        viewModel._internal(owner) {
             callCount++
         }
 
@@ -642,7 +642,7 @@ class ViewModelSubscriberTest : BaseTest() {
     fun testSubscribeCalledOnRestart() {
         owner.lifecycle.currentState = Lifecycle.State.RESUMED
         var callCount = 0
-        viewModel.onEachInternal(owner) {
+        viewModel._internal(owner) {
             callCount++
         }
         assertEquals(1, callCount)
@@ -659,7 +659,7 @@ class ViewModelSubscriberTest : BaseTest() {
         owner.lifecycle.currentState = Lifecycle.State.STARTED
 
         var callCount = 0
-        viewModel.onEachInternal(owner, deliveryMode = UniqueOnly("id")) {
+        viewModel._internal(owner, deliveryMode = UniqueOnly("id")) {
             callCount++
         }
 
@@ -677,7 +677,7 @@ class ViewModelSubscriberTest : BaseTest() {
         owner.lifecycle.currentState = Lifecycle.State.STARTED
 
         var callCount = 0
-        viewModel.onEachInternal(owner, deliveryMode = UniqueOnly("id")) {
+        viewModel._internal(owner, deliveryMode = UniqueOnly("id")) {
             callCount++
         }
 
@@ -693,7 +693,7 @@ class ViewModelSubscriberTest : BaseTest() {
         var callCount = 0
         val success = "Hello World"
         val fail = IllegalStateException("Uh oh")
-        viewModel.onAsyncInternal(owner, ViewModelTestState::async, onFail = {
+        viewModel._internalSF(owner, ViewModelTestState::async, onFail = {
             callCount++
             assertEquals(fail, it)
         }) {
@@ -708,7 +708,7 @@ class ViewModelSubscriberTest : BaseTest() {
     @Test
     fun testAddToList() {
         var callCount = 0
-        viewModel.onEachInternal(owner) {
+        viewModel._internal(owner) {
             callCount++
         }
         assertEquals(1, callCount)
@@ -721,7 +721,7 @@ class ViewModelSubscriberTest : BaseTest() {
     @Test
     fun testStopsSubscriptionWhenCancelled() {
         var callCount = 0
-        viewModel.onEachInternal(owner) {
+        viewModel._internal(owner) {
             callCount++
         }
         viewModel.set { copy(list = list + 1) }
@@ -735,7 +735,7 @@ class ViewModelSubscriberTest : BaseTest() {
     @Test
     fun testReplace() {
         var callCount = 0
-        viewModel.onEachInternal(owner) {
+        viewModel._internal(owner) {
             callCount++
         }
         assertEquals(1, callCount)
@@ -748,7 +748,7 @@ class ViewModelSubscriberTest : BaseTest() {
     @Test
     fun testChangeValue() {
         var callCount = 0
-        viewModel.onEachInternal(owner) {
+        viewModel._internal(owner) {
             callCount++
         }
         assertEquals(1, callCount)
@@ -765,7 +765,7 @@ class ViewModelSubscriberTest : BaseTest() {
     @Test
     fun testNoEventEmittedIfSameStateIsSet() {
         var callCount = 0
-        viewModel.onEachInternal(owner) {
+        viewModel._internal(owner) {
             callCount++
         }
         assertEquals(1, callCount)
@@ -776,14 +776,14 @@ class ViewModelSubscriberTest : BaseTest() {
 
     @Test
     fun testCancelledIfOwnerDestroyed() {
-        val job = viewModel.onEachInternal(owner) {}
+        val job = viewModel._internal(owner) {}
         owner.lifecycle.handleLifecycleEvent(Lifecycle.Event.ON_DESTROY)
         assertTrue(job.isCompleted)
     }
 
     @Test
     fun testCancelledIfViewModelCleared() = runBlocking {
-        val job = viewModel.onEachInternal(owner) {}
+        val job = viewModel._internal(owner) {}
         viewModel.triggerCleared()
         assertTrue(job.isCompleted)
     }
