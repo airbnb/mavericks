@@ -69,6 +69,9 @@ abstract class MavericksViewModel<S : MavericksState>(
      * coroutines operations and chained with operators.
      *
      * This WILL emit the current state followed by all subsequent state updates.
+     *
+     * This is not a StateFlow to prevent the ViewModel from having synchronous access to state. withState { state -> } should
+     * be used as it is guaranteed to be run after all pending setState reducers have run.
      */
     val stateFlow: Flow<S>
         get() = stateStore.flow
