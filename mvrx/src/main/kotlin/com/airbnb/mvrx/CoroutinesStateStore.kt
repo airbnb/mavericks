@@ -16,11 +16,14 @@ import kotlinx.coroutines.selects.select
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.Executors
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 @Suppress("EXPERIMENTAL_API_USAGE")
 class CoroutinesStateStore<S : MavericksState>(
     initialState: S,
-    private val scope: CoroutineScope
+    private val scope: CoroutineScope,
+    private val contextOverride: CoroutineContext = EmptyCoroutineContext
 ) : MavericksStateStore<S> {
 
     private val setStateChannel = Channel<S.() -> S>(capacity = Channel.UNLIMITED)
@@ -72,7 +75,7 @@ class CoroutinesStateStore<S : MavericksState>(
     private fun setupTriggerFlushQueues(scope: CoroutineScope) {
         if (MavericksTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) return
 
-        scope.launch(flushDispatcher) {
+        scope.launch(flushDispatcher + contextOverride) {
             try {
                 while (isActive) {
                     flushQueuesOnce()
