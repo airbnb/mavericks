@@ -30,6 +30,9 @@ open class MavericksViewModelConfigFactory(
      * and [Dispatchers.Main.immediate].
      */
     val contextOverride: CoroutineContext = EmptyCoroutineContext,
+    /**
+     * Provide a context that will be used in the [CoroutinesStateStore]
+     */
     val storeContextOverride: CoroutineContext = EmptyCoroutineContext
 ) {
 

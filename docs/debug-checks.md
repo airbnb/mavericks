@@ -7,3 +7,17 @@ MvRx has a debug mode that enables some validation checks. When you integrate Mv
 * State types are not one of: ArrayList, SparseArray, LongSparseArray, SparseArrayCompat, ArrayMap, and HashMap.
 * State class visibility is public so it can be created and restored
 * Each instance of your State is not mutated once it is set on the viewmodel
+
+### Avoid slow operations in `withState`/`setState`
+As all `withState`/`setState` blocks are processed sequentially, it's highly recommended to avoid slow calls inside these blocks (blocking IO/cpu consuming calls). You can use Android [StrictMode](https://developer.android.com/reference/android/os/StrictMode) to detect such calls. StrictMode.ThreadPolicy can be injected into `MavericksViewModelConfigFactory.storeContextOverride`:
+```
+val threadPolicy = StrictMode.ThreadPolicy.Builder()
+    .detectNetwork()
+    .penaltyDialog()
+    .build()
+
+Mavericks.viewModelConfigFactory = MavericksViewModelConfigFactory(
+    this,
+    storeContextOverride = if (isDebuggable()) threadPolicy.asContextElement() else EmptyCoroutineContext
+)
+```
