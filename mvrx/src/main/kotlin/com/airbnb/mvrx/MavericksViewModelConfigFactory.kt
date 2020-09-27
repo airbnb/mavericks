@@ -31,7 +31,7 @@ open class MavericksViewModelConfigFactory(
      */
     val contextOverride: CoroutineContext = EmptyCoroutineContext,
     /**
-     * Provide a context that will be used in the [CoroutinesStateStore]
+     * Provide a context that will be used in the [CoroutinesStateStore]. All withState/setState calls will be executed in this context.
      */
     val storeContextOverride: CoroutineContext = EmptyCoroutineContext
 ) {
