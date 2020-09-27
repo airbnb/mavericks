@@ -2,7 +2,6 @@ package com.airbnb.mvrx
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
-import androidx.annotation.RestrictTo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
