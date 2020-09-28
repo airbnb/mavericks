@@ -30,8 +30,7 @@ class MockableMavericksViewModelConfig<S : MavericksState>(
     }
 
     private fun updateStateStore() {
-        val currentBehavior = currentMockBehavior
-        mockableStateStore.mockBehavior = currentBehavior
+        mockableStateStore.mockBehavior = currentMockBehavior
     }
 
     fun popBehaviorOverride() {
@@ -237,6 +236,10 @@ open class MockMavericksViewModelConfigFactory(context: Context?, debugMode: Boo
      */
     fun pushMockBehaviorOverride(mockBehavior: MockBehavior) {
         mockConfigs.values.forEach { it.pushBehaviorOverride(mockBehavior) }
+    }
+
+    fun pushMockBehaviorOverride(behaviorChange: (currentBehavior: MockBehavior) -> MockBehavior) {
+        mockConfigs.values.forEach { it.pushBehaviorOverride(behaviorChange(it.currentMockBehavior)) }
     }
 
     fun popMockBehaviorOverride() {
