@@ -85,8 +85,10 @@ private fun <VM : MavericksViewModel<S>, S : MavericksState> createDefaultViewMo
 }
 
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-class ViewModelDoesNotExistException(
-    viewModelClass: Class<*>,
-    viewModelContext: ViewModelContext,
-    key: String
-) : IllegalStateException("ViewModel of type ${viewModelClass.name} for ${viewModelContext.owner}[$key] does not exist yet!")
+open class ViewModelDoesNotExistException(message: String) : IllegalStateException(message) {
+    constructor(
+        viewModelClass: Class<*>,
+        viewModelContext: ViewModelContext,
+        key: String
+    ) : this("ViewModel of type ${viewModelClass.name} for ${viewModelContext.owner}[$key] does not exist yet!")
+}

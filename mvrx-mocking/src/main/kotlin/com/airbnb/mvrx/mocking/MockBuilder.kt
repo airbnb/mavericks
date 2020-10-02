@@ -264,6 +264,112 @@ fun <V : MockableMavericksView,
     build(this@mockFiveViewModels)
 }
 
+@Suppress("Detekt.ParameterListWrapping")
+@SuppressWarnings("Detekt.LongParameterList")
+fun <V : MockableMavericksView,
+    S1 : MavericksState,
+    VM1 : MavericksViewModel<S1>,
+    S2 : MavericksState,
+    VM2 : MavericksViewModel<S2>,
+    S3 : MavericksState,
+    VM3 : MavericksViewModel<S3>,
+    S4 : MavericksState,
+    VM4 : MavericksViewModel<S4>,
+    S5 : MavericksState,
+    VM5 : MavericksViewModel<S5>,
+    S6 : MavericksState,
+    VM6 : MavericksViewModel<S6>,
+    Args : Parcelable>
+    V.mockSixViewModels(
+    viewModel1Reference: KProperty1<V, VM1>,
+    defaultState1: S1,
+    viewModel2Reference: KProperty1<V, VM2>,
+    defaultState2: S2,
+    viewModel3Reference: KProperty1<V, VM3>,
+    defaultState3: S3,
+    viewModel4Reference: KProperty1<V, VM4>,
+    defaultState4: S4,
+    viewModel5Reference: KProperty1<V, VM5>,
+    defaultState5: S5,
+    viewModel6Reference: KProperty1<V, VM6>,
+    defaultState6: S6,
+    defaultArgs: Args?,
+    mockBuilder: SixViewModelMockBuilder<V, VM1, S1, VM2, S2, VM3, S3, VM4, S4, VM5, S5, VM6, S6, Args>.() -> Unit
+): MockBuilder<V, Args> = SixViewModelMockBuilder(
+    viewModel1Reference,
+    defaultState1,
+    viewModel2Reference,
+    defaultState2,
+    viewModel3Reference,
+    defaultState3,
+    viewModel4Reference,
+    defaultState4,
+    viewModel5Reference,
+    defaultState5,
+    viewModel6Reference,
+    defaultState6,
+    defaultArgs
+).apply {
+    mockBuilder()
+    build(this@mockSixViewModels)
+}
+
+@Suppress("Detekt.ParameterListWrapping")
+@SuppressWarnings("Detekt.LongParameterList")
+fun <V : MockableMavericksView,
+    S1 : MavericksState,
+    VM1 : MavericksViewModel<S1>,
+    S2 : MavericksState,
+    VM2 : MavericksViewModel<S2>,
+    S3 : MavericksState,
+    VM3 : MavericksViewModel<S3>,
+    S4 : MavericksState,
+    VM4 : MavericksViewModel<S4>,
+    S5 : MavericksState,
+    VM5 : MavericksViewModel<S5>,
+    S6 : MavericksState,
+    VM6 : MavericksViewModel<S6>,
+    S7 : MavericksState,
+    VM7 : MavericksViewModel<S7>,
+    Args : Parcelable>
+    V.mockSevenViewModels(
+    viewModel1Reference: KProperty1<V, VM1>,
+    defaultState1: S1,
+    viewModel2Reference: KProperty1<V, VM2>,
+    defaultState2: S2,
+    viewModel3Reference: KProperty1<V, VM3>,
+    defaultState3: S3,
+    viewModel4Reference: KProperty1<V, VM4>,
+    defaultState4: S4,
+    viewModel5Reference: KProperty1<V, VM5>,
+    defaultState5: S5,
+    viewModel6Reference: KProperty1<V, VM6>,
+    defaultState6: S6,
+    viewModel7Reference: KProperty1<V, VM7>,
+    defaultState7: S7,
+    defaultArgs: Args?,
+    mockBuilder: SevenViewModelMockBuilder<V, VM1, S1, VM2, S2, VM3, S3, VM4, S4, VM5, S5, VM6, S6, VM7, S7, Args>.() -> Unit
+): MockBuilder<V, Args> = SevenViewModelMockBuilder(
+    viewModel1Reference,
+    defaultState1,
+    viewModel2Reference,
+    defaultState2,
+    viewModel3Reference,
+    defaultState3,
+    viewModel4Reference,
+    defaultState4,
+    viewModel5Reference,
+    defaultState5,
+    viewModel6Reference,
+    defaultState6,
+    viewModel7Reference,
+    defaultState7,
+    defaultArgs
+).apply {
+    mockBuilder()
+    build(this@mockSevenViewModels)
+}
+
 /**
  * Defines a unique variation of a View's state for testing purposes.
  *

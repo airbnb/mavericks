@@ -18,20 +18,20 @@ import kotlin.system.measureTimeMillis
  * with the given arguments bundle if it exists. The bundle contains parcelable arguments under the
  * [Mavericks.KEY_ARG] key.
  */
-fun getMockVariants(
+fun <V : MockableMavericksView> getMockVariants(
     viewClassName: String,
-    viewProvider: (viewClass: Class<MockableMavericksView>, argumentsBundle: Bundle?) -> MockableMavericksView = { viewClass, argumentsBundle ->
+    viewProvider: (viewClass: Class<V>, argumentsBundle: Bundle?) -> V = { viewClass, argumentsBundle ->
         @Suppress("UNCHECKED_CAST")
         val view = viewClass.newInstance()
         if (view is Fragment) view.arguments = argumentsBundle
         view
     },
-    emptyMockPlaceholder: Pair<String, MavericksViewMocks<MockableMavericksView, Nothing>> = EmptyMocks::class.java.simpleName to EmptyMocks,
+    emptyMockPlaceholder: EmptyMavericksViewMocks = EmptyMocks,
     mockGroupIndex: Int? = null
-): List<MockedViewProvider<MockableMavericksView>>? {
+): List<MockedViewProvider<V>>? {
     @Suppress("UNCHECKED_CAST")
     return getMockVariants(
-        viewClass = Class.forName(viewClassName) as Class<MockableMavericksView>,
+        viewClass = Class.forName(viewClassName) as Class<V>,
         viewProvider = viewProvider,
         emptyMockPlaceholder = emptyMockPlaceholder,
         mockGroupIndex = mockGroupIndex
@@ -80,18 +80,18 @@ fun <T : MockableMavericksView> List<MockedViewProvider<T>>.forDefaultInitializa
  * with the given arguments bundle if it exists. The bundle contains parcelable arguments under the
  * [Mavericks.KEY_ARG] key.
  */
-fun getMockVariants(
-    viewClass: Class<MockableMavericksView>,
-    viewProvider: (viewClass: Class<MockableMavericksView>, argumentsBundle: Bundle?) -> MockableMavericksView = { viewClassFromProvider, argumentsBundle ->
+fun <V : MockableMavericksView> getMockVariants(
+    viewClass: Class<V>,
+    viewProvider: (viewClass: Class<V>, argumentsBundle: Bundle?) -> V = { viewClassFromProvider, argumentsBundle ->
         @Suppress("UNCHECKED_CAST")
         val view = viewClassFromProvider.newInstance()
         if (view is Fragment) view.arguments = argumentsBundle
         view
     },
-    emptyMockPlaceholder: Pair<String, MavericksViewMocks<MockableMavericksView, Nothing>> = EmptyMocks::class.java.simpleName to EmptyMocks,
+    emptyMockPlaceholder: EmptyMavericksViewMocks = EmptyMocks,
     mockGroupIndex: Int? = null
-): List<MockedViewProvider<MockableMavericksView>>? {
-    return getMockVariants<MockableMavericksView, Nothing>(
+): List<MockedViewProvider<V>>? {
+    return getMockVariants<V, Parcelable>(
         viewProvider = { _, argumentsBundle ->
             viewProvider(viewClass, argumentsBundle)
         },
@@ -120,7 +120,7 @@ fun getMockVariants(
  */
 fun <V : MockableMavericksView, A : Parcelable> getMockVariants(
     viewProvider: (arguments: A?, argumentsBundle: Bundle?) -> V,
-    emptyMockPlaceholder: Pair<String, MavericksViewMocks<MockableMavericksView, Nothing>> = EmptyMocks::class.java.simpleName to EmptyMocks,
+    emptyMockPlaceholder: EmptyMavericksViewMocks = EmptyMocks,
     mockGroupIndex: Int? = null
 ): List<MockedViewProvider<V>>? {
     val view = viewProvider(null, null)
@@ -129,12 +129,10 @@ fun <V : MockableMavericksView, A : Parcelable> getMockVariants(
 
     lateinit var mocks: List<MavericksMock<out MockableMavericksView, out Parcelable>>
     val elapsedMs: Long = measureTimeMillis {
-        val mockData =
-            MavericksViewMocks.getFrom(view).takeIf { it !== emptyMockPlaceholder.second } ?: return null
+        val mockData = MavericksViewMocks.getFrom(view).takeIf { it !== emptyMockPlaceholder } ?: return null
 
         mocks = if (mockGroupIndex != null) {
-            mockData.mockGroups.getOrNull(mockGroupIndex)
-                ?: error("Could not get mock group at index $mockGroupIndex for $viewName")
+            mockData.mockGroups.getOrNull(mockGroupIndex) ?: error("Could not get mock group at index $mockGroupIndex for $viewName")
         } else {
             mockData.mocks
         }
@@ -143,7 +141,7 @@ fun <V : MockableMavericksView, A : Parcelable> getMockVariants(
     println("Created mocks for $viewName in $elapsedMs ms")
 
     require(mocks.isNotEmpty()) {
-        "No mocks provided for $viewName. Use the placeholder '${emptyMockPlaceholder.first}' to skip adding mocks"
+        "No mocks provided for $viewName. Use the placeholder '${emptyMockPlaceholder::class.simpleName}' to skip adding mocks"
     }
 
     return mocks.map { mvRxFragmentMock ->
