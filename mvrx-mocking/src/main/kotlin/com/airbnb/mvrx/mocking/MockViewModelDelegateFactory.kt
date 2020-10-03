@@ -12,8 +12,8 @@ import com.airbnb.mvrx.RealMavericksStateFactory
 import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.ViewModelDelegateFactory
 import com.airbnb.mvrx.ViewModelDoesNotExistException
-import com.airbnb.mvrx._fragmentArgsProvider
 import com.airbnb.mvrx.lifecycleAwareLazy
+import com.airbnb.mvrx._internal
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
@@ -71,7 +71,7 @@ class MockViewModelDelegateFactory(
 
                 viewModel.apply {
                     if (mockBehavior.subscribeViewToStateUpdates) {
-                        onEachInternal(fragment, action = { fragment.postInvalidate() })
+                        _internal(fragment, action = { fragment.postInvalidate() })
                     }
                 }.also { vm ->
                     if (mockState != null && mockBehavior.initialStateMocking == MockBehavior.InitialStateMocking.Full) {
@@ -160,6 +160,9 @@ class MockViewModelDelegateFactory(
             viewModelProvider(stateFactory(mockState))
         }
     }
+
+    @Suppress("FunctionName")
+    private fun <T : Fragment> T._fragmentArgsProvider(): Any? = arguments?.get(Mavericks.KEY_ARG)
 
     private fun <S : MavericksState, T : MavericksView> getMockState(
         fragment: T,

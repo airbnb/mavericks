@@ -4,8 +4,7 @@ import androidx.annotation.RestrictTo
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
-@RestrictTo(RestrictTo.Scope.LIBRARY)
-class MavericksFactory<VM : MavericksViewModel<S>, S : MavericksState>(
+internal class MavericksFactory<VM : MavericksViewModel<S>, S : MavericksState>(
     private val viewModelClass: Class<out VM>,
     private val stateClass: Class<out S>,
     private val viewModelContext: ViewModelContext,

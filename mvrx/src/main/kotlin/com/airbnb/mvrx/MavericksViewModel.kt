@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -70,6 +69,9 @@ abstract class MavericksViewModel<S : MavericksState>(
      * coroutines operations and chained with operators.
      *
      * This WILL emit the current state followed by all subsequent state updates.
+     *
+     * This is not a StateFlow to prevent the ViewModel from having synchronous access to state. withState { state -> } should
+     * be used as it is guaranteed to be run after all pending setState reducers have run.
      */
     val stateFlow: Flow<S>
         get() = stateStore.flow
@@ -263,7 +265,7 @@ abstract class MavericksViewModel<S : MavericksState>(
      */
     protected fun onEach(
         action: suspend (S) -> Unit
-    ) = onEachInternal(null, RedeliverOnStart, action)
+    ) = _internal(null, RedeliverOnStart, action)
 
     /**
      * Subscribe to state changes for a single property.
@@ -274,7 +276,7 @@ abstract class MavericksViewModel<S : MavericksState>(
     protected fun <A> onEach(
         prop1: KProperty1<S, A>,
         action: suspend (A) -> Unit
-    ) = onEach1Internal(null, prop1, action = action)
+    ) = _internal1(null, prop1, action = action)
 
     /**
      * Subscribe to state changes for two properties.
@@ -286,7 +288,7 @@ abstract class MavericksViewModel<S : MavericksState>(
         prop1: KProperty1<S, A>,
         prop2: KProperty1<S, B>,
         action: suspend (A, B) -> Unit
-    ) = onEach2Internal(null, prop1, prop2, action = action)
+    ) = _internal2(null, prop1, prop2, action = action)
 
     /**
      * Subscribe to state changes for three properties.
@@ -299,7 +301,7 @@ abstract class MavericksViewModel<S : MavericksState>(
         prop2: KProperty1<S, B>,
         prop3: KProperty1<S, C>,
         action: suspend (A, B, C) -> Unit
-    ) = onEach3Internal(null, prop1, prop2, prop3, action = action)
+    ) = _internal3(null, prop1, prop2, prop3, action = action)
 
     /**
      * Subscribe to state changes for four properties.
@@ -313,7 +315,7 @@ abstract class MavericksViewModel<S : MavericksState>(
         prop3: KProperty1<S, C>,
         prop4: KProperty1<S, D>,
         action: suspend (A, B, C, D) -> Unit
-    ) = onEach4Internal(null, prop1, prop2, prop3, prop4, action = action)
+    ) = _internal4(null, prop1, prop2, prop3, prop4, action = action)
 
     /**
      * Subscribe to state changes for five properties.
@@ -328,7 +330,7 @@ abstract class MavericksViewModel<S : MavericksState>(
         prop4: KProperty1<S, D>,
         prop5: KProperty1<S, E>,
         action: suspend (A, B, C, D, E) -> Unit
-    ) = onEach5Internal(null, prop1, prop2, prop3, prop4, prop5, action = action)
+    ) = _internal5(null, prop1, prop2, prop3, prop4, prop5, action = action)
 
     /**
      * Subscribe to state changes for six properties.
@@ -344,7 +346,7 @@ abstract class MavericksViewModel<S : MavericksState>(
         prop5: KProperty1<S, E>,
         prop6: KProperty1<S, F>,
         action: suspend (A, B, C, D, E, F) -> Unit
-    ) = onEach6Internal(null, prop1, prop2, prop3, prop4, prop5, prop6, action = action)
+    ) = _internal6(null, prop1, prop2, prop3, prop4, prop5, prop6, action = action)
 
     /**
      * Subscribe to state changes for seven properties.
@@ -361,7 +363,7 @@ abstract class MavericksViewModel<S : MavericksState>(
         prop6: KProperty1<S, F>,
         prop7: KProperty1<S, G>,
         action: suspend (A, B, C, D, E, F, G) -> Unit
-    ) = onEach7Internal(null, prop1, prop2, prop3, prop4, prop5, prop6, prop7, action = action)
+    ) = _internal7(null, prop1, prop2, prop3, prop4, prop5, prop6, prop7, action = action)
 
     /**
      * Subscribe to changes in an async property. There are optional parameters for onSuccess
@@ -376,144 +378,10 @@ abstract class MavericksViewModel<S : MavericksState>(
         asyncProp: KProperty1<S, Async<T>>,
         onFail: (suspend (Throwable) -> Unit)? = null,
         onSuccess: (suspend (T) -> Unit)? = null
-    ) = onAsyncInternal(null, asyncProp, RedeliverOnStart, onFail, onSuccess)
-
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    fun onEachInternal(
-        owner: LifecycleOwner?,
-        deliveryMode: DeliveryMode = RedeliverOnStart,
-        action: suspend (S) -> Unit
-    ) = stateFlow.resolveSubscription(owner, deliveryMode, action)
-
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    fun <A> onEach1Internal(
-        owner: LifecycleOwner?,
-        prop1: KProperty1<S, A>,
-        deliveryMode: DeliveryMode = RedeliverOnStart,
-        action: suspend (A) -> Unit
-    ) = stateFlow
-        .map { MavericksTuple1(prop1.get(it)) }
-        .distinctUntilChanged()
-        .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1)) { (a) ->
-            action(a)
-        }
-
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    fun <A, B> onEach2Internal(
-        owner: LifecycleOwner?,
-        prop1: KProperty1<S, A>,
-        prop2: KProperty1<S, B>,
-        deliveryMode: DeliveryMode = RedeliverOnStart,
-        action: suspend (A, B) -> Unit
-    ) = stateFlow
-        .map { MavericksTuple2(prop1.get(it), prop2.get(it)) }
-        .distinctUntilChanged()
-        .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2)) { (a, b) ->
-            action(a, b)
-        }
-
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    fun <A, B, C> onEach3Internal(
-        owner: LifecycleOwner?,
-        prop1: KProperty1<S, A>,
-        prop2: KProperty1<S, B>,
-        prop3: KProperty1<S, C>,
-        deliveryMode: DeliveryMode = RedeliverOnStart,
-        action: suspend (A, B, C) -> Unit
-    ) = stateFlow
-        .map { MavericksTuple3(prop1.get(it), prop2.get(it), prop3.get(it)) }
-        .distinctUntilChanged()
-        .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3)) { (a, b, c) ->
-            action(a, b, c)
-        }
-
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    fun <A, B, C, D> onEach4Internal(
-        owner: LifecycleOwner?,
-        prop1: KProperty1<S, A>,
-        prop2: KProperty1<S, B>,
-        prop3: KProperty1<S, C>,
-        prop4: KProperty1<S, D>,
-        deliveryMode: DeliveryMode = RedeliverOnStart,
-        action: suspend (A, B, C, D) -> Unit
-    ) = stateFlow
-        .map { MavericksTuple4(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it)) }
-        .distinctUntilChanged()
-        .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4)) { (a, b, c, d) ->
-            action(a, b, c, d)
-        }
-
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    fun <A, B, C, D, E> onEach5Internal(
-        owner: LifecycleOwner?,
-        prop1: KProperty1<S, A>,
-        prop2: KProperty1<S, B>,
-        prop3: KProperty1<S, C>,
-        prop4: KProperty1<S, D>,
-        prop5: KProperty1<S, E>,
-        deliveryMode: DeliveryMode = RedeliverOnStart,
-        action: suspend (A, B, C, D, E) -> Unit
-    ) = stateFlow
-        .map { MavericksTuple5(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it)) }
-        .distinctUntilChanged()
-        .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4, prop5)) { (a, b, c, d, e) ->
-            action(a, b, c, d, e)
-        }
-
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    fun <A, B, C, D, E, F> onEach6Internal(
-        owner: LifecycleOwner?,
-        prop1: KProperty1<S, A>,
-        prop2: KProperty1<S, B>,
-        prop3: KProperty1<S, C>,
-        prop4: KProperty1<S, D>,
-        prop5: KProperty1<S, E>,
-        prop6: KProperty1<S, F>,
-        deliveryMode: DeliveryMode = RedeliverOnStart,
-        action: suspend (A, B, C, D, E, F) -> Unit
-    ) = stateFlow
-        .map { MavericksTuple6(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it), prop6.get(it)) }
-        .distinctUntilChanged()
-        .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4, prop5, prop6)) { (a, b, c, d, e, f) ->
-            action(a, b, c, d, e, f)
-        }
-
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    fun <A, B, C, D, E, F, G> onEach7Internal(
-        owner: LifecycleOwner?,
-        prop1: KProperty1<S, A>,
-        prop2: KProperty1<S, B>,
-        prop3: KProperty1<S, C>,
-        prop4: KProperty1<S, D>,
-        prop5: KProperty1<S, E>,
-        prop6: KProperty1<S, F>,
-        prop7: KProperty1<S, G>,
-        deliveryMode: DeliveryMode = RedeliverOnStart,
-        action: suspend (A, B, C, D, E, F, G) -> Unit
-    ) = stateFlow
-        .map { MavericksTuple7(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it), prop6.get(it), prop7.get(it)) }
-        .distinctUntilChanged()
-        .resolveSubscription(owner, deliveryMode.appendPropertiesToId(prop1, prop2, prop3, prop4, prop5, prop6, prop7)) { (a, b, c, d, e, f, g) ->
-            action(a, b, c, d, e, f, g)
-        }
-
-    @RestrictTo(RestrictTo.Scope.LIBRARY)
-    fun <T> onAsyncInternal(
-        owner: LifecycleOwner?,
-        asyncProp: KProperty1<S, Async<T>>,
-        deliveryMode: DeliveryMode = RedeliverOnStart,
-        onFail: (suspend (Throwable) -> Unit)? = null,
-        onSuccess: (suspend (T) -> Unit)? = null
-    ) = onEach1Internal(owner, asyncProp, deliveryMode.appendPropertiesToId(asyncProp)) { asyncValue ->
-        if (onSuccess != null && asyncValue is Success) {
-            onSuccess(asyncValue())
-        } else if (onFail != null && asyncValue is Fail) {
-            onFail(asyncValue.error)
-        }
-    }
+    ) = _internalSF(null, asyncProp, RedeliverOnStart, onFail, onSuccess)
 
     @Suppress("EXPERIMENTAL_API_USAGE")
-    private fun <T : Any> Flow<T>.resolveSubscription(
+    internal fun <T : Any> Flow<T>.resolveSubscription(
         lifecycleOwner: LifecycleOwner? = null,
         deliveryMode: DeliveryMode,
         action: suspend (T) -> Unit

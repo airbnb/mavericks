@@ -1,6 +1,5 @@
 package com.airbnb.mvrx
 
-import androidx.annotation.RestrictTo
 import kotlin.reflect.KProperty1
 
 /**
@@ -8,9 +7,7 @@ import kotlin.reflect.KProperty1
  * See: [RedeliverOnStart], [UniqueOnly].
  */
 sealed class DeliveryMode {
-
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    fun appendPropertiesToId(vararg properties: KProperty1<*, *>): DeliveryMode {
+    internal fun appendPropertiesToId(vararg properties: KProperty1<*, *>): DeliveryMode {
         return when (this) {
             is RedeliverOnStart -> RedeliverOnStart
             is UniqueOnly -> UniqueOnly(properties.joinToString(",", prefix = subscriptionId + "_") { it.name })

@@ -2,7 +2,6 @@ package com.airbnb.mvrx
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
-import androidx.annotation.RestrictTo
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -86,5 +85,4 @@ open class MavericksViewModelConfigFactory(
     protected operator fun CoroutineContext.plus(other: CoroutineContext?) = if (other == null) this else this + other
 }
 
-@RestrictTo(RestrictTo.Scope.LIBRARY)
-fun Context.isDebuggable(): Boolean = (0 != (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE))
+internal fun Context.isDebuggable(): Boolean = (0 != (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE))

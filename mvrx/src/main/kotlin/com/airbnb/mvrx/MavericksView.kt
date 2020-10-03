@@ -105,7 +105,7 @@ interface MavericksView : LifecycleOwner {
      * the next one is emitted.
      */
     fun <S : MavericksState> MavericksViewModel<S>.onEach(deliveryMode: DeliveryMode = RedeliverOnStart, action: suspend (S) -> Unit) =
-        onEachInternal(subscriptionLifecycleOwner, deliveryMode, action)
+        _internal(subscriptionLifecycleOwner, deliveryMode, action)
 
     /**
      * Subscribes to state changes for only a specific property and calls the action with
@@ -126,7 +126,7 @@ interface MavericksView : LifecycleOwner {
         prop1: KProperty1<S, A>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         action: suspend (A) -> Unit
-    ) = onEach1Internal(subscriptionLifecycleOwner, prop1, deliveryMode, action)
+    ) = _internal1(subscriptionLifecycleOwner, prop1, deliveryMode, action)
 
     /**
      * Subscribes to state changes for two properties.
@@ -147,7 +147,7 @@ interface MavericksView : LifecycleOwner {
         prop2: KProperty1<S, B>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         action: suspend (A, B) -> Unit
-    ) = onEach2Internal(subscriptionLifecycleOwner, prop1, prop2, deliveryMode, action)
+    ) = _internal2(subscriptionLifecycleOwner, prop1, prop2, deliveryMode, action)
 
     /**
      * Subscribes to state changes for three properties.
@@ -169,7 +169,7 @@ interface MavericksView : LifecycleOwner {
         prop3: KProperty1<S, C>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         action: suspend (A, B, C) -> Unit
-    ) = onEach3Internal(subscriptionLifecycleOwner, prop1, prop2, prop3, deliveryMode, action)
+    ) = _internal3(subscriptionLifecycleOwner, prop1, prop2, prop3, deliveryMode, action)
 
     /**
      * Subscribes to state changes for four properties.
@@ -192,7 +192,7 @@ interface MavericksView : LifecycleOwner {
         prop4: KProperty1<S, D>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         action: suspend (A, B, C, D) -> Unit
-    ) = onEach4Internal(subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, deliveryMode, action)
+    ) = _internal4(subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, deliveryMode, action)
 
     /**
      * Subscribes to state changes for five properties.
@@ -216,7 +216,7 @@ interface MavericksView : LifecycleOwner {
         prop5: KProperty1<S, E>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         action: suspend (A, B, C, D, E) -> Unit
-    ) = onEach5Internal(subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, prop5, deliveryMode, action)
+    ) = _internal5(subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, prop5, deliveryMode, action)
 
     /**
      * Subscribes to state changes for six properties.
@@ -241,7 +241,7 @@ interface MavericksView : LifecycleOwner {
         prop6: KProperty1<S, F>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         action: suspend (A, B, C, D, E, F) -> Unit
-    ) = onEach6Internal(subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, prop5, prop6, deliveryMode, action)
+    ) = _internal6(subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, prop5, prop6, deliveryMode, action)
 
     /**
      * Subscribes to state changes for seven properties.
@@ -267,7 +267,7 @@ interface MavericksView : LifecycleOwner {
         prop7: KProperty1<S, G>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         action: suspend (A, B, C, D, E, F, G) -> Unit
-    ) = onEach7Internal(subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, prop5, prop6, prop7, deliveryMode, action)
+    ) = _internal7(subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, prop5, prop6, prop7, deliveryMode, action)
 
     /**
      * Subscribe to changes in an async property. There are optional parameters for onSuccess
@@ -291,5 +291,5 @@ interface MavericksView : LifecycleOwner {
         deliveryMode: DeliveryMode = RedeliverOnStart,
         onFail: (suspend (Throwable) -> Unit)? = null,
         onSuccess: (suspend (T) -> Unit)? = null
-    ) = onAsyncInternal(subscriptionLifecycleOwner, asyncProp, deliveryMode, onFail, onSuccess)
+    ) = _internalSF(subscriptionLifecycleOwner, asyncProp, deliveryMode, onFail, onSuccess)
 }
