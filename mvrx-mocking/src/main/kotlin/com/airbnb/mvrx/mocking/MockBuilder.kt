@@ -604,10 +604,7 @@ internal constructor(
         asyncPropertyBlock: S1.() -> KProperty0<A>
     ) {
         val asyncProperty = state.asyncPropertyBlock()
-        // Split "myProperty" to "My property"
-        val asyncName =
-            asyncProperty.name.replace(Regex("[A-Z]")) { " ${it.value.toLowerCase()}" }.trim()
-                .capitalize()
+        val asyncName = asyncProperty.splitNameByCase()
 
         state("$asyncName loading") {
             viewModel1 {
@@ -632,10 +629,8 @@ internal constructor(
         asyncPropertyBlock: S2.() -> KProperty0<A>
     ) {
         val asyncProperty = state.asyncPropertyBlock()
-        // Split "myProperty" to "My property"
-        val asyncName =
-            asyncProperty.name.replace(Regex("[A-Z]")) { " ${it.value.toLowerCase()}" }.trim()
-                .capitalize()
+
+        val asyncName = asyncProperty.splitNameByCase()
 
         state("$asyncName loading") {
             viewModel2 {
@@ -649,6 +644,11 @@ internal constructor(
             }
         }
     }
+}
+
+// Split "myProperty" to "My property"
+private fun KProperty0<Any?>.splitNameByCase(): String {
+    return name.replace(Regex("[A-Z]")) { " ${it.value.toLowerCase()}" }.trim().capitalize()
 }
 
 /**
@@ -765,6 +765,83 @@ internal constructor(
                 defaultState3
             ).apply(statesBuilder).states
         )
+    }
+
+    /**
+     * Helper to mock the loading and failure state of an Async property on your state in the first view model.
+     * Creates two different mocked states stemmed from the given state - one where the async property is set to Loading
+     * and one where it is set to Fail.
+     */
+    fun <T, A : Async<T>> viewModel1StateForLoadingAndFailure(
+        state: S1 = defaultState1,
+        asyncPropertyBlock: S1.() -> KProperty0<A>
+    ) {
+        val asyncProperty = state.asyncPropertyBlock()
+        val asyncName = asyncProperty.splitNameByCase()
+
+        state("$asyncName loading") {
+            viewModel1 {
+                state.setLoading { asyncProperty }
+            }
+        }
+
+        state("$asyncName failed") {
+            viewModel1 {
+                state.setNetworkFailure { asyncProperty }
+            }
+        }
+    }
+
+    /**
+     * Helper to mock the loading and failure state of an Async property on your state in the second view model.
+     * Creates two different mocked states stemmed from the given state - one where the async property is set to Loading
+     * and one where it is set to Fail.
+     */
+    fun <T, A : Async<T>> viewModel2StateForLoadingAndFailure(
+        state: S2 = defaultState2,
+        asyncPropertyBlock: S2.() -> KProperty0<A>
+    ) {
+        val asyncProperty = state.asyncPropertyBlock()
+
+        val asyncName = asyncProperty.splitNameByCase()
+
+        state("$asyncName loading") {
+            viewModel2 {
+                state.setLoading { asyncProperty }
+            }
+        }
+
+        state("$asyncName failed") {
+            viewModel2 {
+                state.setNetworkFailure { asyncProperty }
+            }
+        }
+    }
+
+    /**
+     * Helper to mock the loading and failure state of an Async property on your state in the third view model.
+     * Creates two different mocked states stemmed from the given state - one where the async property is set to Loading
+     * and one where it is set to Fail.
+     */
+    fun <T, A : Async<T>> viewModel3StateForLoadingAndFailure(
+        state: S3 = defaultState3,
+        asyncPropertyBlock: S3.() -> KProperty0<A>
+    ) {
+        val asyncProperty = state.asyncPropertyBlock()
+
+        val asyncName = asyncProperty.splitNameByCase()
+
+        state("$asyncName loading") {
+            viewModel3 {
+                state.setLoading { asyncProperty }
+            }
+        }
+
+        state("$asyncName failed") {
+            viewModel3 {
+                state.setNetworkFailure { asyncProperty }
+            }
+        }
     }
 }
 

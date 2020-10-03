@@ -24,6 +24,9 @@ class MockableMavericksViewModelConfig<S : MavericksState>(
 
     private val mockBehaviorOverrides = LinkedList<MockBehavior>()
 
+    private val onExecuteListeners =
+        mutableSetOf<(MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit>()
+
     fun pushBehaviorOverride(mockBehavior: MockBehavior) {
         mockBehaviorOverrides.push(mockBehavior)
         updateStateStore()
@@ -40,6 +43,26 @@ class MockableMavericksViewModelConfig<S : MavericksState>(
         updateStateStore()
     }
 
+    fun addOnExecuteListener(listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit) {
+        onExecuteListeners.add(listener)
+    }
+
+    fun removeOnExecuteListener(listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit) {
+        onExecuteListeners.remove(listener)
+    }
+
+    fun clearOnExecuteListeners(): Unit = onExecuteListeners.clear()
+
+    override fun <S : MavericksState> onExecute(viewModel: MavericksViewModel<S>): BlockExecutions {
+        val blockExecutions = currentMockBehavior.blockExecutions
+
+        onExecuteListeners.forEach {
+            it(this, viewModel, blockExecutions)
+        }
+
+        return blockExecutions
+    }
+
     companion object {
         /**
          * Allows access to the mock configuration of a ViewModel.
@@ -52,16 +75,6 @@ class MockableMavericksViewModelConfig<S : MavericksState>(
         fun <S : MavericksState> access(viewModel: MavericksViewModel<S>): MockableMavericksViewModelConfig<S> {
             return viewModel.config as MockableMavericksViewModelConfig
         }
-    }
-
-    override fun <S : MavericksState> onExecute(viewModel: MavericksViewModel<S>): BlockExecutions {
-        val blockExecutions = currentMockBehavior.blockExecutions
-
-        if (blockExecutions != BlockExecutions.No) {
-            viewModel.reportExecuteCallToInteractionTest()
-        }
-
-        return blockExecutions
     }
 }
 
@@ -144,6 +157,12 @@ open class MockMavericksViewModelConfigFactory(context: Context?, debugMode: Boo
     private val applicationContext: Context? = context?.applicationContext
 
     private val mockConfigs = mutableMapOf<MavericksStateStore<*>, MockableMavericksViewModelConfig<*>>()
+
+    val currentConfigs: Map<MavericksStateStore<*>, MockableMavericksViewModelConfig<*>>
+        get() = mockConfigs.toMap()
+
+    private val onExecuteListeners =
+        mutableSetOf<(MockableMavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit>()
 
     /**
      * Determines what sort of mocked state store is created when [provideConfig] is called.
@@ -244,5 +263,18 @@ open class MockMavericksViewModelConfigFactory(context: Context?, debugMode: Boo
 
     fun popMockBehaviorOverride() {
         mockConfigs.values.forEach { it.popBehaviorOverride() }
+    }
+
+    /**
+     * Add a lambda that will be invoked whenever [MavericksViewModel.execute] is used.
+     */
+    fun addOnExecuteListener(listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit) {
+        onExecuteListeners.add(listener)
+        mockConfigs.values.forEach { it.addOnExecuteListener(listener) }
+    }
+
+    fun removeOnExecuteListener(listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit) {
+        onExecuteListeners.remove(listener)
+        mockConfigs.values.forEach { it.removeOnExecuteListener(listener) }
     }
 }
