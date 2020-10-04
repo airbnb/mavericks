@@ -13,8 +13,8 @@ import kotlinx.coroutines.CoroutineScope
 import java.util.LinkedList
 
 class MockableMavericksViewModelConfig<S : MavericksState>(
-    private val mockableStateStore: MockableMavericksStateStore<S>,
-    private val initialMockBehavior: MockBehavior,
+    val mockableStateStore: MockableMavericksStateStore<S>,
+    val initialMockBehavior: MockBehavior,
     coroutineScope: CoroutineScope,
     debugMode: Boolean
 ) : MavericksViewModelConfig<S>(debugMode = debugMode, stateStore = mockableStateStore, coroutineScope = coroutineScope) {
@@ -26,6 +26,10 @@ class MockableMavericksViewModelConfig<S : MavericksState>(
 
     private val onExecuteListeners =
         mutableSetOf<(MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit>()
+
+    fun pushBehaviorOverride(behaviorChange: (currentBehavior: MockBehavior) -> MockBehavior) {
+        pushBehaviorOverride(behaviorChange(currentMockBehavior))
+    }
 
     fun pushBehaviorOverride(mockBehavior: MockBehavior) {
         mockBehaviorOverrides.push(mockBehavior)
