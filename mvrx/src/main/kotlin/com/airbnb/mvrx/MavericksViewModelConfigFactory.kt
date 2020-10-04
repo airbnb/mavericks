@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * Factory for providing the [MavericksViewModelConfig] for each new ViewModel that is created.
@@ -27,13 +28,21 @@ open class MavericksViewModelConfigFactory(
      * Provide a default context for viewModelScope. It will be added after [SupervisorJob]
      * and [Dispatchers.Main.immediate].
      */
-    val contextOverride: CoroutineContext? = null
+    val contextOverride: CoroutineContext = EmptyCoroutineContext,
+    /**
+     * Provide a context that will be used in the [CoroutinesStateStore]. All withState/setState calls will be executed in this context.
+     */
+    val storeContextOverride: CoroutineContext = EmptyCoroutineContext
 ) {
 
     /**
      * Sets [debugMode] depending on whether the app was built with the Debuggable flag enabled.
      */
-    constructor(context: Context, contextOverride: CoroutineContext? = null) : this(context.isDebuggable(), contextOverride)
+    constructor(
+        context: Context,
+        contextOverride: CoroutineContext = EmptyCoroutineContext,
+        storeContextOverride: CoroutineContext = EmptyCoroutineContext
+    ) : this(context.isDebuggable(), contextOverride, storeContextOverride)
 
     private val onConfigProvidedListener =
         mutableListOf<(MavericksViewModel<*>, MavericksViewModelConfig<*>) -> Unit>()
@@ -60,7 +69,7 @@ open class MavericksViewModelConfigFactory(
         initialState: S
     ): MavericksViewModelConfig<S> {
         val scope = coroutineScope()
-        return object : MavericksViewModelConfig<S>(debugMode, CoroutinesStateStore(initialState, scope), scope) {
+        return object : MavericksViewModelConfig<S>(debugMode, CoroutinesStateStore(initialState, scope, storeContextOverride), scope) {
             override fun <S : MavericksState> onExecute(viewModel: MavericksViewModel<S>): BlockExecutions {
                 return BlockExecutions.No
             }
@@ -81,8 +90,6 @@ open class MavericksViewModelConfigFactory(
     fun removeOnConfigProvidedListener(callback: (MavericksViewModel<*>, MavericksViewModelConfig<*>) -> Unit) {
         onConfigProvidedListener.remove(callback)
     }
-
-    protected operator fun CoroutineContext.plus(other: CoroutineContext?) = if (other == null) this else this + other
 }
 
 internal fun Context.isDebuggable(): Boolean = (0 != (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE))

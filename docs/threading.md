@@ -39,3 +39,5 @@ fun invalidate() = withState(viewModel) { state ->
     // This block is run immediately and returns the final expression of this lambda.
 }
 ```
+
+By default Mavericks creates a shared dispatcher for processing `withState`/`setState` queue. You can set your own dispatcher (e.g. `Dispatchers.Default`) by injecting it into `MavericksViewModelConfigFactory.storeContextOverride`
