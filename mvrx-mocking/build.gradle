@@ -33,7 +33,7 @@ jacoco {
 dependencies {
     implementation Libraries.kotlinReflect
     implementation Libraries.appcompat
-    implementation project(':mvrx')
+    api project(':mvrx')
 
     testImplementation project(':testing')
     testImplementation TestLibraries.mockito
