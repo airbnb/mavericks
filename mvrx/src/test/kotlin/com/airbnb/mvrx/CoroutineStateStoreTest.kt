@@ -6,33 +6,23 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
+import org.junit.Assert.assertNull
 import org.junit.Test
-import java.util.concurrent.CountDownLatch
+import kotlin.time.ExperimentalTime
+import kotlin.time.seconds
 
 class AsyncStateStoreTest {
 
-    @Test(timeout = 10_000)
-    fun testFlowCompletedAfterScopeCancelled() = runBlocking {
+    @ExperimentalTime
+    @Test
+    fun testFlowNotCompletedAfterScopeCancelled() = runBlocking {
         val scope = CoroutineScope(Job())
         val store = CoroutinesStateStore(MavericksStateStoreTestState(), scope)
         val collectJob = scope.launch(Job()) { store.flow.collect() }
         scope.cancel()
-        collectJob.join()
-    }
-
-    @Test(timeout = 10_000)
-    fun testFlowCompletedAfterScopeCancelledEvenWithSlowJob() = runBlocking {
-        val scope = CoroutineScope(Job(coroutineContext[Job]))
-        val store = CoroutinesStateStore(MavericksStateStoreTestState(), scope)
-        val latch = CountDownLatch(1)
-        scope.launch {
-            latch.await()
-        }
-        val collectJob = scope.launch(Job()) {
-            store.flow.collect()
-        }
-        scope.cancel()
-        collectJob.join()
-        latch.countDown()
+        assertNull(withTimeoutOrNull(1.seconds) {
+            collectJob.join()
+        })
     }
 }

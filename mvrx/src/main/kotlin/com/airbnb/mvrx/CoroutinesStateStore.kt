@@ -1,7 +1,6 @@
 package com.airbnb.mvrx
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.Channel
@@ -50,6 +49,7 @@ class CoroutinesStateStore<S : MavericksState>(
     /**
      * Returns a [Flow] for this store's state. It will begin by immediately emitting
      * the latest set value and then continue with all subsequent updates.
+     * This flow never completes
      */
     override val flow: Flow<S>
         get() = flow {
@@ -64,9 +64,6 @@ class CoroutinesStateStore<S : MavericksState>(
 
     init {
         setupTriggerFlushQueues(scope)
-        scope.coroutineContext[Job]!!.invokeOnCompletion {
-            closeChannels()
-        }
     }
 
     /**
@@ -76,21 +73,10 @@ class CoroutinesStateStore<S : MavericksState>(
         if (MavericksTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) return
 
         scope.launch(flushDispatcher + contextOverride) {
-            try {
-                while (isActive) {
-                    flushQueuesOnce()
-                }
-            } finally {
-                closeChannels()
+            while (isActive) {
+                flushQueuesOnce()
             }
         }
-    }
-
-    /**
-     * Close [stateChannel]. It will complete state flow as well.
-     */
-    private fun closeChannels() {
-        stateChannel.close()
     }
 
     /**
