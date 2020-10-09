@@ -264,6 +264,112 @@ fun <V : MockableMavericksView,
     build(this@mockFiveViewModels)
 }
 
+@Suppress("Detekt.ParameterListWrapping")
+@SuppressWarnings("Detekt.LongParameterList")
+fun <V : MockableMavericksView,
+    S1 : MavericksState,
+    VM1 : MavericksViewModel<S1>,
+    S2 : MavericksState,
+    VM2 : MavericksViewModel<S2>,
+    S3 : MavericksState,
+    VM3 : MavericksViewModel<S3>,
+    S4 : MavericksState,
+    VM4 : MavericksViewModel<S4>,
+    S5 : MavericksState,
+    VM5 : MavericksViewModel<S5>,
+    S6 : MavericksState,
+    VM6 : MavericksViewModel<S6>,
+    Args : Parcelable>
+    V.mockSixViewModels(
+    viewModel1Reference: KProperty1<V, VM1>,
+    defaultState1: S1,
+    viewModel2Reference: KProperty1<V, VM2>,
+    defaultState2: S2,
+    viewModel3Reference: KProperty1<V, VM3>,
+    defaultState3: S3,
+    viewModel4Reference: KProperty1<V, VM4>,
+    defaultState4: S4,
+    viewModel5Reference: KProperty1<V, VM5>,
+    defaultState5: S5,
+    viewModel6Reference: KProperty1<V, VM6>,
+    defaultState6: S6,
+    defaultArgs: Args?,
+    mockBuilder: SixViewModelMockBuilder<V, VM1, S1, VM2, S2, VM3, S3, VM4, S4, VM5, S5, VM6, S6, Args>.() -> Unit
+): MockBuilder<V, Args> = SixViewModelMockBuilder(
+    viewModel1Reference,
+    defaultState1,
+    viewModel2Reference,
+    defaultState2,
+    viewModel3Reference,
+    defaultState3,
+    viewModel4Reference,
+    defaultState4,
+    viewModel5Reference,
+    defaultState5,
+    viewModel6Reference,
+    defaultState6,
+    defaultArgs
+).apply {
+    mockBuilder()
+    build(this@mockSixViewModels)
+}
+
+@Suppress("Detekt.ParameterListWrapping")
+@SuppressWarnings("Detekt.LongParameterList")
+fun <V : MockableMavericksView,
+    S1 : MavericksState,
+    VM1 : MavericksViewModel<S1>,
+    S2 : MavericksState,
+    VM2 : MavericksViewModel<S2>,
+    S3 : MavericksState,
+    VM3 : MavericksViewModel<S3>,
+    S4 : MavericksState,
+    VM4 : MavericksViewModel<S4>,
+    S5 : MavericksState,
+    VM5 : MavericksViewModel<S5>,
+    S6 : MavericksState,
+    VM6 : MavericksViewModel<S6>,
+    S7 : MavericksState,
+    VM7 : MavericksViewModel<S7>,
+    Args : Parcelable>
+    V.mockSevenViewModels(
+    viewModel1Reference: KProperty1<V, VM1>,
+    defaultState1: S1,
+    viewModel2Reference: KProperty1<V, VM2>,
+    defaultState2: S2,
+    viewModel3Reference: KProperty1<V, VM3>,
+    defaultState3: S3,
+    viewModel4Reference: KProperty1<V, VM4>,
+    defaultState4: S4,
+    viewModel5Reference: KProperty1<V, VM5>,
+    defaultState5: S5,
+    viewModel6Reference: KProperty1<V, VM6>,
+    defaultState6: S6,
+    viewModel7Reference: KProperty1<V, VM7>,
+    defaultState7: S7,
+    defaultArgs: Args?,
+    mockBuilder: SevenViewModelMockBuilder<V, VM1, S1, VM2, S2, VM3, S3, VM4, S4, VM5, S5, VM6, S6, VM7, S7, Args>.() -> Unit
+): MockBuilder<V, Args> = SevenViewModelMockBuilder(
+    viewModel1Reference,
+    defaultState1,
+    viewModel2Reference,
+    defaultState2,
+    viewModel3Reference,
+    defaultState3,
+    viewModel4Reference,
+    defaultState4,
+    viewModel5Reference,
+    defaultState5,
+    viewModel6Reference,
+    defaultState6,
+    viewModel7Reference,
+    defaultState7,
+    defaultArgs
+).apply {
+    mockBuilder()
+    build(this@mockSevenViewModels)
+}
+
 /**
  * Defines a unique variation of a View's state for testing purposes.
  *
@@ -498,10 +604,7 @@ internal constructor(
         asyncPropertyBlock: S1.() -> KProperty0<A>
     ) {
         val asyncProperty = state.asyncPropertyBlock()
-        // Split "myProperty" to "My property"
-        val asyncName =
-            asyncProperty.name.replace(Regex("[A-Z]")) { " ${it.value.toLowerCase()}" }.trim()
-                .capitalize()
+        val asyncName = asyncProperty.splitNameByCase()
 
         state("$asyncName loading") {
             viewModel1 {
@@ -526,10 +629,8 @@ internal constructor(
         asyncPropertyBlock: S2.() -> KProperty0<A>
     ) {
         val asyncProperty = state.asyncPropertyBlock()
-        // Split "myProperty" to "My property"
-        val asyncName =
-            asyncProperty.name.replace(Regex("[A-Z]")) { " ${it.value.toLowerCase()}" }.trim()
-                .capitalize()
+
+        val asyncName = asyncProperty.splitNameByCase()
 
         state("$asyncName loading") {
             viewModel2 {
@@ -543,6 +644,11 @@ internal constructor(
             }
         }
     }
+}
+
+// Split "myProperty" to "My property"
+private fun KProperty0<Any?>.splitNameByCase(): String {
+    return name.replace(Regex("[A-Z]")) { " ${it.value.toLowerCase()}" }.trim().capitalize()
 }
 
 /**
@@ -659,6 +765,83 @@ internal constructor(
                 defaultState3
             ).apply(statesBuilder).states
         )
+    }
+
+    /**
+     * Helper to mock the loading and failure state of an Async property on your state in the first view model.
+     * Creates two different mocked states stemmed from the given state - one where the async property is set to Loading
+     * and one where it is set to Fail.
+     */
+    fun <T, A : Async<T>> viewModel1StateForLoadingAndFailure(
+        state: S1 = defaultState1,
+        asyncPropertyBlock: S1.() -> KProperty0<A>
+    ) {
+        val asyncProperty = state.asyncPropertyBlock()
+        val asyncName = asyncProperty.splitNameByCase()
+
+        state("$asyncName loading") {
+            viewModel1 {
+                state.setLoading { asyncProperty }
+            }
+        }
+
+        state("$asyncName failed") {
+            viewModel1 {
+                state.setNetworkFailure { asyncProperty }
+            }
+        }
+    }
+
+    /**
+     * Helper to mock the loading and failure state of an Async property on your state in the second view model.
+     * Creates two different mocked states stemmed from the given state - one where the async property is set to Loading
+     * and one where it is set to Fail.
+     */
+    fun <T, A : Async<T>> viewModel2StateForLoadingAndFailure(
+        state: S2 = defaultState2,
+        asyncPropertyBlock: S2.() -> KProperty0<A>
+    ) {
+        val asyncProperty = state.asyncPropertyBlock()
+
+        val asyncName = asyncProperty.splitNameByCase()
+
+        state("$asyncName loading") {
+            viewModel2 {
+                state.setLoading { asyncProperty }
+            }
+        }
+
+        state("$asyncName failed") {
+            viewModel2 {
+                state.setNetworkFailure { asyncProperty }
+            }
+        }
+    }
+
+    /**
+     * Helper to mock the loading and failure state of an Async property on your state in the third view model.
+     * Creates two different mocked states stemmed from the given state - one where the async property is set to Loading
+     * and one where it is set to Fail.
+     */
+    fun <T, A : Async<T>> viewModel3StateForLoadingAndFailure(
+        state: S3 = defaultState3,
+        asyncPropertyBlock: S3.() -> KProperty0<A>
+    ) {
+        val asyncProperty = state.asyncPropertyBlock()
+
+        val asyncName = asyncProperty.splitNameByCase()
+
+        state("$asyncName loading") {
+            viewModel3 {
+                state.setLoading { asyncProperty }
+            }
+        }
+
+        state("$asyncName failed") {
+            viewModel3 {
+                state.setNetworkFailure { asyncProperty }
+            }
+        }
     }
 }
 
@@ -910,10 +1093,281 @@ internal constructor(
     }
 }
 
+class SixViewModelMockBuilder<
+    V : MockableMavericksView,
+    VM1 : MavericksViewModel<S1>,
+    S1 : MavericksState,
+    VM2 : MavericksViewModel<S2>,
+    S2 : MavericksState,
+    VM3 : MavericksViewModel<S3>,
+    S3 : MavericksState,
+    VM4 : MavericksViewModel<S4>,
+    S4 : MavericksState,
+    VM5 : MavericksViewModel<S5>,
+    S5 : MavericksState,
+    VM6 : MavericksViewModel<S6>,
+    S6 : MavericksState,
+    Args : Parcelable>
+internal constructor(
+    val vm1: KProperty1<V, VM1>,
+    val defaultState1: S1,
+    val vm2: KProperty1<V, VM2>,
+    val defaultState2: S2,
+    val vm3: KProperty1<V, VM3>,
+    val defaultState3: S3,
+    val vm4: KProperty1<V, VM4>,
+    val defaultState4: S4,
+    val vm5: KProperty1<V, VM5>,
+    val defaultState5: S5,
+    val vm6: KProperty1<V, VM6>,
+    val defaultState6: S6,
+    defaultArgs: Args?
+) : MockBuilder<V, Args>(
+    defaultArgs,
+    vm1.pairDefault(defaultState1),
+    vm2.pairDefault(defaultState2),
+    vm3.pairDefault(defaultState3),
+    vm4.pairDefault(defaultState4),
+    vm5.pairDefault(defaultState5),
+    vm6.pairDefault(defaultState6)
+) {
+
+    /**
+     * Provide state objects for each view model in the view.
+     *
+     * @param name Describes the UI these states put the view in. Should be unique.
+     * @param args The arguments that should be provided to the view.
+     *             This is only used if the view accesses arguments directly to get data that is not provided in the view model state.
+     *             In other cases it should be omitted. This must be provided if the view accesses args directly.
+     * @param statesBuilder A lambda that is used to define state objects for each view model. See [SixStatesBuilder]
+     */
+    fun state(
+        name: String,
+        args: (Args.() -> Args)? = null,
+        statesBuilder: SixStatesBuilder<V, S1, VM1, S2, VM2, S3, VM3, S4, VM4, S5, VM5, S6, VM6>.() -> Unit
+    ) {
+        addState(
+            name,
+            evaluateArgsLambda(args),
+            SixStatesBuilder(
+                vm1,
+                defaultState1,
+                vm2,
+                defaultState2,
+                vm3,
+                defaultState3,
+                vm4,
+                defaultState4,
+                vm5,
+                defaultState5,
+                vm6,
+                defaultState6
+            ).apply(statesBuilder).states
+        )
+    }
+}
+
+open class SixStatesBuilder<
+    V : MavericksView,
+    S1 : MavericksState,
+    VM1 : MavericksViewModel<S1>,
+    S2 : MavericksState,
+    VM2 : MavericksViewModel<S2>,
+    S3 : MavericksState,
+    VM3 : MavericksViewModel<S3>,
+    S4 : MavericksState,
+    VM4 : MavericksViewModel<S4>,
+    S5 : MavericksState,
+    VM5 : MavericksViewModel<S5>,
+    S6 : MavericksState,
+    VM6 : MavericksViewModel<S6>>
+internal constructor(
+    vm1: KProperty1<V, VM1>,
+    defaultState1: S1,
+    vm2: KProperty1<V, VM2>,
+    defaultState2: S2,
+    vm3: KProperty1<V, VM3>,
+    defaultState3: S3,
+    vm4: KProperty1<V, VM4>,
+    defaultState4: S4,
+    vm5: KProperty1<V, VM5>,
+    defaultState5: S5,
+    val vm6: KProperty1<V, VM6>,
+    val defaultState6: S6
+) : FiveStatesBuilder<V, S1, VM1, S2, VM2, S3, VM3, S4, VM4, S5, VM5>(
+    vm1,
+    defaultState1,
+    vm2,
+    defaultState2,
+    vm3,
+    defaultState3,
+    vm4,
+    defaultState4,
+    vm5,
+    defaultState5
+) {
+
+    init {
+        vm6 setStateTo defaultState6
+    }
+
+    /**
+     * Define a state to be used when mocking your sixth view model (as defined in the top level mock method).
+     * If this method isn't called, your default state will be used automatically.
+     * For convenience, the receiver of the lambda is the default state.
+     */
+    fun viewModel6(stateBuilder: S6.() -> S6) {
+        vm6 setStateTo defaultState6.stateBuilder()
+    }
+}
+
+class SevenViewModelMockBuilder<
+    V : MockableMavericksView,
+    VM1 : MavericksViewModel<S1>,
+    S1 : MavericksState,
+    VM2 : MavericksViewModel<S2>,
+    S2 : MavericksState,
+    VM3 : MavericksViewModel<S3>,
+    S3 : MavericksState,
+    VM4 : MavericksViewModel<S4>,
+    S4 : MavericksState,
+    VM5 : MavericksViewModel<S5>,
+    S5 : MavericksState,
+    VM6 : MavericksViewModel<S6>,
+    S6 : MavericksState,
+    VM7 : MavericksViewModel<S7>,
+    S7 : MavericksState,
+    Args : Parcelable>
+internal constructor(
+    val vm1: KProperty1<V, VM1>,
+    val defaultState1: S1,
+    val vm2: KProperty1<V, VM2>,
+    val defaultState2: S2,
+    val vm3: KProperty1<V, VM3>,
+    val defaultState3: S3,
+    val vm4: KProperty1<V, VM4>,
+    val defaultState4: S4,
+    val vm5: KProperty1<V, VM5>,
+    val defaultState5: S5,
+    val vm6: KProperty1<V, VM6>,
+    val defaultState6: S6,
+    val vm7: KProperty1<V, VM7>,
+    val defaultState7: S7,
+    defaultArgs: Args?
+) : MockBuilder<V, Args>(
+    defaultArgs,
+    vm1.pairDefault(defaultState1),
+    vm2.pairDefault(defaultState2),
+    vm3.pairDefault(defaultState3),
+    vm4.pairDefault(defaultState4),
+    vm5.pairDefault(defaultState5),
+    vm6.pairDefault(defaultState6),
+    vm7.pairDefault(defaultState7)
+) {
+
+    /**
+     * Provide state objects for each view model in the view.
+     *
+     * @param name Describes the UI these states put the view in. Should be unique.
+     * @param args The arguments that should be provided to the view.
+     *             This is only used if the view accesses arguments directly to get data that is not provided in the view model state.
+     *             In other cases it should be omitted. This must be provided if the view accesses args directly.
+     * @param statesBuilder A lambda that is used to define state objects for each view model. See [SevenStatesBuilder]
+     */
+    fun state(
+        name: String,
+        args: (Args.() -> Args)? = null,
+        statesBuilder: SevenStatesBuilder<V, S1, VM1, S2, VM2, S3, VM3, S4, VM4, S5, VM5, S6, VM6, S7, VM7>.() -> Unit
+    ) {
+        addState(
+            name,
+            evaluateArgsLambda(args),
+            SevenStatesBuilder(
+                vm1,
+                defaultState1,
+                vm2,
+                defaultState2,
+                vm3,
+                defaultState3,
+                vm4,
+                defaultState4,
+                vm5,
+                defaultState5,
+                vm6,
+                defaultState6,
+                vm7,
+                defaultState7
+            ).apply(statesBuilder).states
+        )
+    }
+}
+
+open class SevenStatesBuilder<
+    V : MavericksView,
+    S1 : MavericksState,
+    VM1 : MavericksViewModel<S1>,
+    S2 : MavericksState,
+    VM2 : MavericksViewModel<S2>,
+    S3 : MavericksState,
+    VM3 : MavericksViewModel<S3>,
+    S4 : MavericksState,
+    VM4 : MavericksViewModel<S4>,
+    S5 : MavericksState,
+    VM5 : MavericksViewModel<S5>,
+    S6 : MavericksState,
+    VM6 : MavericksViewModel<S6>,
+    S7 : MavericksState,
+    VM7 : MavericksViewModel<S7>>
+internal constructor(
+    vm1: KProperty1<V, VM1>,
+    defaultState1: S1,
+    vm2: KProperty1<V, VM2>,
+    defaultState2: S2,
+    vm3: KProperty1<V, VM3>,
+    defaultState3: S3,
+    vm4: KProperty1<V, VM4>,
+    defaultState4: S4,
+    vm5: KProperty1<V, VM5>,
+    defaultState5: S5,
+    vm6: KProperty1<V, VM6>,
+    defaultState6: S6,
+    val vm7: KProperty1<V, VM7>,
+    val defaultState7: S7
+) : SixStatesBuilder<V, S1, VM1, S2, VM2, S3, VM3, S4, VM4, S5, VM5, S6, VM6>(
+    vm1,
+    defaultState1,
+    vm2,
+    defaultState2,
+    vm3,
+    defaultState3,
+    vm4,
+    defaultState4,
+    vm5,
+    defaultState5,
+    vm6,
+    defaultState6
+) {
+
+    init {
+        vm7 setStateTo defaultState7
+    }
+
+    /**
+     * Define a state to be used when mocking your seventh view model (as defined in the top level mock method).
+     * If this method isn't called, your default state will be used automatically.
+     * For convenience, the receiver of the lambda is the default state.
+     */
+    fun viewModel7(stateBuilder: S7.() -> S7) {
+        vm7 setStateTo defaultState7.stateBuilder()
+    }
+}
+
 /**
  * This placeholder can be used as a NO-OP implementation of [MockableMavericksView.provideMocks].
  */
-object EmptyMocks : MavericksViewMocks<MockableMavericksView, Nothing>(allowCreationOfThisInstance = true) {
+object EmptyMocks : EmptyMavericksViewMocks()
+
+open class EmptyMavericksViewMocks : MavericksViewMocks<MockableMavericksView, Nothing>(allowCreationOfThisInstance = true) {
     override val mocks: List<MavericksMock<MockableMavericksView, out Nothing>> = emptyList()
     override val mockGroups: List<List<MavericksMock<MockableMavericksView, out Nothing>>> = emptyList()
 }

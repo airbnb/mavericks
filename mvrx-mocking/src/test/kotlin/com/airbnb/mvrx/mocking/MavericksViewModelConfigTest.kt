@@ -121,6 +121,28 @@ class MavericksViewModelConfigTest : BaseTest() {
         )
     }
 
+    @Test
+    fun pushMockBehaviorOverrideTransform() {
+        val originalBehavior = MockableMavericks.mockConfigFactory.mockBehavior
+        val vm = TestViewModel()
+
+        MockableMavericks.mockConfigFactory.pushMockBehaviorOverride { currentBehavior ->
+            currentBehavior.copy(stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous)
+        }
+
+        assertEquals(
+            originalBehavior.copy(stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous),
+            (vm.config.stateStore as MockableStateStore).mockBehavior
+        )
+
+        MockableMavericks.mockConfigFactory.popMockBehaviorOverride()
+
+        assertEquals(
+            originalBehavior,
+            (vm.config.stateStore as MockableStateStore).mockBehavior
+        )
+    }
+
     class TestViewModel : MavericksViewModel<TestState>(TestState())
 
     data class TestState(val num: Int = 0) : MavericksState

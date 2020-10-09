@@ -14,6 +14,7 @@ import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.launcher.MavericksLauncherActivity.Companion.PARAM_VIEW_PATTERN_TO_TEST
 import com.airbnb.mvrx.launcher.MavericksLauncherActivity.Companion.PARAM_VIEW_TO_OPEN
+import com.airbnb.mvrx.mocking.MockableMavericksView
 import com.airbnb.mvrx.mocking.MockedViewProvider
 import com.airbnb.mvrx.mocking.getMockVariants
 import kotlinx.coroutines.GlobalScope
@@ -209,7 +210,7 @@ class MavericksLauncherViewModel(
             // the view that is most likely to be needed first.
             .onEach { viewName ->
                 try {
-                    val mocks = getMockVariants(viewName)
+                    val mocks = getMockVariants<MockableMavericksView>(viewName)
 
                     // Only set the selected mock if a deeplink wasn't used to open view,
                     // because otherwise they interfere with each other.
@@ -284,7 +285,7 @@ class MavericksLauncherViewModel(
             return MavericksLauncherViewModel(state, sharedPrefs)
         }
 
-        override fun initialState(viewModelContext: ViewModelContext): MavericksLauncherState? {
+        override fun initialState(viewModelContext: ViewModelContext): MavericksLauncherState {
             val sharedPrefs = viewModelContext.sharedPrefs()
             val selectedView: String? = sharedPrefs.getString(KEY_SELECTED_VIEW, null)
             val recentViews = sharedPrefs.getList(KEY_RECENTLY_USED_VIEWS)

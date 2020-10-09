@@ -9,6 +9,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.isActive
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 interface MockableStateStore<S : Any> : ScriptableStateStore<S> {
     var mockBehavior: MockBehavior
@@ -27,10 +29,11 @@ interface MockableStateStore<S : Any> : ScriptableStateStore<S> {
 class MockableMavericksStateStore<S : MavericksState>(
     initialState: S,
     override var mockBehavior: MockBehavior,
-    val coroutineScope: CoroutineScope
+    val coroutineScope: CoroutineScope,
+    contextOverride: CoroutineContext = EmptyCoroutineContext
 ) : MockableStateStore<S> {
     private val scriptableStore = ScriptableMavericksStateStore(initialState)
-    private val realStore = CoroutinesStateStore(initialState, coroutineScope)
+    private val realStore = CoroutinesStateStore(initialState, coroutineScope, contextOverride)
     private val realImmediateStore = SynchronousMavericksStateStore(initialState, coroutineScope)
 
     private val onStateSetListeners = mutableListOf<(previousState: S, newState: S) -> Unit>()
