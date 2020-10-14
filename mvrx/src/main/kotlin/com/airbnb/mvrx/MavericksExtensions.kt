@@ -74,8 +74,9 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
 
         if (parentFragment == null) {
             // Using ViewModelDoesNotExistException so mocking framework can intercept and mock the viewmodel in this case.
-            throw ViewModelDoesNotExistException("There is no parent fragment for ${this::class.java.simpleName} " +
-                                                     "so view model ${viewModelClass.simpleName} could not be found.")
+            throw ViewModelDoesNotExistException(
+                "There is no parent fragment for ${this::class.java.simpleName} so view model ${viewModelClass.simpleName} could not be found."
+            )
         }
         var parent: Fragment? = parentFragment
         val key = keyFactory()
