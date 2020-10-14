@@ -1,6 +1,7 @@
 package com.airbnb.mvrx.mocking
 
 import android.content.Context
+import com.airbnb.mvrx.CoroutinesStateStore
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksViewModelConfig
 import com.airbnb.mvrx.MavericksViewModelConfigFactory
@@ -10,11 +11,14 @@ import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.ScriptableStateStore
 import com.airbnb.mvrx.mocking.printer.ViewModelStatePrinter
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import java.util.LinkedList
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 class MockableMavericksViewModelConfig<S : MavericksState>(
-    private val mockableStateStore: MockableMavericksStateStore<S>,
-    private val initialMockBehavior: MockBehavior,
+    val mockableStateStore: MockableMavericksStateStore<S>,
+    val initialMockBehavior: MockBehavior,
     coroutineScope: CoroutineScope,
     debugMode: Boolean
 ) : MavericksViewModelConfig<S>(debugMode = debugMode, stateStore = mockableStateStore, coroutineScope = coroutineScope) {
@@ -24,14 +28,20 @@ class MockableMavericksViewModelConfig<S : MavericksState>(
 
     private val mockBehaviorOverrides = LinkedList<MockBehavior>()
 
+    private val onExecuteListeners =
+        mutableSetOf<(MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit>()
+
+    fun pushBehaviorOverride(behaviorChange: (currentBehavior: MockBehavior) -> MockBehavior) {
+        pushBehaviorOverride(behaviorChange(currentMockBehavior))
+    }
+
     fun pushBehaviorOverride(mockBehavior: MockBehavior) {
         mockBehaviorOverrides.push(mockBehavior)
         updateStateStore()
     }
 
     private fun updateStateStore() {
-        val currentBehavior = currentMockBehavior
-        mockableStateStore.mockBehavior = currentBehavior
+        mockableStateStore.mockBehavior = currentMockBehavior
     }
 
     fun popBehaviorOverride() {
@@ -39,6 +49,26 @@ class MockableMavericksViewModelConfig<S : MavericksState>(
         // so it may not have an override set while other active configs may have one.
         mockBehaviorOverrides.pollFirst()
         updateStateStore()
+    }
+
+    fun addOnExecuteListener(listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit) {
+        onExecuteListeners.add(listener)
+    }
+
+    fun removeOnExecuteListener(listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit) {
+        onExecuteListeners.remove(listener)
+    }
+
+    fun clearOnExecuteListeners(): Unit = onExecuteListeners.clear()
+
+    override fun <S : MavericksState> onExecute(viewModel: MavericksViewModel<S>): BlockExecutions {
+        val blockExecutions = currentMockBehavior.blockExecutions
+
+        onExecuteListeners.forEach {
+            it(this, viewModel, blockExecutions)
+        }
+
+        return blockExecutions
     }
 
     companion object {
@@ -53,16 +83,6 @@ class MockableMavericksViewModelConfig<S : MavericksState>(
         fun <S : MavericksState> access(viewModel: MavericksViewModel<S>): MockableMavericksViewModelConfig<S> {
             return viewModel.config as MockableMavericksViewModelConfig
         }
-    }
-
-    override fun <S : MavericksState> onExecute(viewModel: MavericksViewModel<S>): BlockExecutions {
-        val blockExecutions = currentMockBehavior.blockExecutions
-
-        if (blockExecutions != BlockExecutions.No) {
-            viewModel.reportExecuteCallToInteractionTest()
-        }
-
-        return blockExecutions
     }
 }
 
@@ -135,16 +155,33 @@ data class MockBehavior(
     }
 }
 
-/**
- * @param context The application context. If provided this will be used to register a
- * [ViewModelStatePrinter] for each ViewModel to enable mock state printing.
- */
-open class MockMavericksViewModelConfigFactory(context: Context?, debugMode: Boolean = true) :
-    MavericksViewModelConfigFactory(debugMode) {
+open class MockMavericksViewModelConfigFactory(
+    /**
+     * The application context. If provided this will be used to register a
+     * [ViewModelStatePrinter] for each ViewModel to enable mock state printing.
+     */
+    context: Context?,
+    debugMode: Boolean = true,
+    /**
+     * Provide a default context for viewModelScope. It will be added after [SupervisorJob]
+     * and [Dispatchers.Main.immediate].
+     */
+    contextOverride: CoroutineContext = EmptyCoroutineContext,
+    /**
+     * Provide a context that will be used in the [CoroutinesStateStore]. All withState/setState calls will be executed in this context.
+     */
+    storeContextOverride: CoroutineContext = EmptyCoroutineContext
+) : MavericksViewModelConfigFactory(debugMode, contextOverride, storeContextOverride) {
 
     private val applicationContext: Context? = context?.applicationContext
 
     private val mockConfigs = mutableMapOf<MavericksStateStore<*>, MockableMavericksViewModelConfig<*>>()
+
+    val currentConfigs: Map<MavericksStateStore<*>, MockableMavericksViewModelConfig<*>>
+        get() = mockConfigs.toMap()
+
+    private val onExecuteListeners =
+        mutableSetOf<(MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit>()
 
     /**
      * Determines what sort of mocked state store is created when [provideConfig] is called.
@@ -197,7 +234,8 @@ open class MockMavericksViewModelConfigFactory(context: Context?, debugMode: Boo
         val stateStore = MockableMavericksStateStore(
             initialState = initialState,
             mockBehavior = mockBehavior,
-            coroutineScope = coroutineScope
+            coroutineScope = coroutineScope,
+            contextOverride = contextOverride
         )
 
         return MockableMavericksViewModelConfig(
@@ -215,6 +253,8 @@ open class MockMavericksViewModelConfigFactory(context: Context?, debugMode: Boo
                     viewModelStatePrinter.register(context)
                 }
             }
+
+            onExecuteListeners.forEach { config.addOnExecuteListener(it) }
 
             mockConfigs[stateStore] = config
             stateStore.addOnCancelListener { stateStore ->
@@ -239,7 +279,24 @@ open class MockMavericksViewModelConfigFactory(context: Context?, debugMode: Boo
         mockConfigs.values.forEach { it.pushBehaviorOverride(mockBehavior) }
     }
 
+    fun pushMockBehaviorOverride(behaviorChange: (currentBehavior: MockBehavior) -> MockBehavior) {
+        mockConfigs.values.forEach { it.pushBehaviorOverride(behaviorChange(it.currentMockBehavior)) }
+    }
+
     fun popMockBehaviorOverride() {
         mockConfigs.values.forEach { it.popBehaviorOverride() }
+    }
+
+    /**
+     * Add a lambda that will be invoked whenever [MavericksViewModel.execute] is used.
+     */
+    fun addOnExecuteListener(listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit) {
+        onExecuteListeners.add(listener)
+        mockConfigs.values.forEach { it.addOnExecuteListener(listener) }
+    }
+
+    fun removeOnExecuteListener(listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit) {
+        onExecuteListeners.remove(listener)
+        mockConfigs.values.forEach { it.removeOnExecuteListener(listener) }
     }
 }

@@ -1,5 +1,6 @@
 package com.airbnb.mvrx
 
+import android.os.Build
 import androidx.annotation.RestrictTo
 import java.lang.reflect.Modifier
 
@@ -77,21 +78,29 @@ internal fun <VM : MavericksViewModel<S>, S : MavericksState> createStateFromCon
             if (Modifier.isPublic(stateClass.modifiers)) {
                 stateClass.newInstance()
             } else {
-                stateClass.constructors.firstOrNull { it.parameterCount == 0 }?.let { c ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    stateClass.constructors.firstOrNull { it.parameterCount == 0 }
+                } else {
+                    // In older API's without access to parameter count, assume the last constructor
+                    // is the empty one, as generated kotlin byte code shows the last constructor to be the one using all default values.
+                    stateClass.constructors.lastOrNull()
+                }?.let { c ->
                     c.isAccessible = true
                     c.newInstance() as? S
                 }
             }
         } catch (@Suppress("TooGenericExceptionCaught") e: Throwable) {
             // Throw this exception if something we explicitly tried failed.
-            throw java.lang.IllegalStateException("Failed to create initial state!", e)
+            throw IllegalStateException("Failed to create initial state!", e)
         }
         // Throw this exception if we don't know which method to use to create the initial state.
         ?: throw IllegalStateException(
             "Attempt to create the MvRx state class ${stateClass.simpleName} has failed. One of the following must be true:" +
                 "\n 1) The state class has default values for every constructor property." +
-                "\n 2) The state class has a secondary constructor for ${args?.javaClass?.simpleName
-                    ?: "a fragment argument"}." +
+                "\n 2) The state class has a secondary constructor for ${
+                    args?.javaClass?.simpleName
+                        ?: "a fragment argument"
+                }." +
                 "\n 3) ${viewModelClass.simpleName} must have a companion object implementing MvRxFactory with an initialState function " +
                 "that does not return null. "
         )

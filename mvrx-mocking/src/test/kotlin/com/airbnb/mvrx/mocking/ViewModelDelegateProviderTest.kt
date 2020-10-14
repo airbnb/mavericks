@@ -6,6 +6,7 @@ import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.existingViewModel
 import com.airbnb.mvrx.fragmentViewModel
+import com.airbnb.mvrx.parentFragmentViewModel
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.robolectric.android.controller.ActivityController
@@ -72,6 +73,27 @@ class ViewModelDelegateProviderTest : BaseTest() {
         assertEquals(TestState(2), frag.existingVm.state())
     }
 
+    @Test
+    fun parentFragmentViewModelWithMockedState() {
+        val mockVariants = getMockVariants<Frag3, Nothing>(viewProvider = { _, _ ->
+            Frag3()
+        })
+
+        checkNotNull(mockVariants)
+
+        val mockBehavior = MockBehavior(
+            initialStateMocking = MockBehavior.InitialStateMocking.Full,
+            stateStoreBehavior = MockBehavior.StateStoreBehavior.Scriptable
+        )
+
+        val mockedView = mockVariants.first { it.mock.isDefaultState }.createView(mockBehavior)
+
+        val frag = mockedView.viewInstance
+        frag.addToActivity<Frag3, TestActivity>()
+
+        assertEquals(TestState(2), frag.parentFragmentVM.state())
+    }
+
     class Frag : Fragment(), MockableMavericksView {
         val fragmentVm: FragmentVM by fragmentViewModel()
         val activityVm: ActivityVM by activityViewModel()
@@ -98,6 +120,21 @@ class ViewModelDelegateProviderTest : BaseTest() {
 
         override fun provideMocks() = mockSingleViewModel(
             viewModelReference = Frag2::existingVm,
+            defaultState = TestState(2),
+            defaultArgs = null
+        ) {
+
+        }
+    }
+
+    class Frag3 : Fragment(), MockableMavericksView {
+        val parentFragmentVM: ActivityVM by parentFragmentViewModel()
+
+        override fun invalidate() {
+        }
+
+        override fun provideMocks() = mockSingleViewModel(
+            viewModelReference = Frag3::parentFragmentVM,
             defaultState = TestState(2),
             defaultArgs = null
         ) {
