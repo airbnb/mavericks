@@ -2,6 +2,7 @@ package com.airbnb.mvrx
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
+import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -32,7 +33,14 @@ open class MavericksViewModelConfigFactory(
     /**
      * Provide a context that will be used in the [CoroutinesStateStore]. All withState/setState calls will be executed in this context.
      */
-    val storeContextOverride: CoroutineContext = EmptyCoroutineContext
+    val storeContextOverride: CoroutineContext = EmptyCoroutineContext,
+    /**
+     * Provide a context that will be added to the coroutine scope when a subscription is registered (eg [MavericksView.onEach]).
+     *
+     * By default subscriptions use [MavericksView.subscriptionLifecycleOwner] and [LifecycleOwner.lifecycleScope] to
+     * retrieve a coroutine scope to launch the subscription in.
+     */
+    val subscriptionCoroutineContextOverride: CoroutineContext = EmptyCoroutineContext,
 ) {
 
     /**

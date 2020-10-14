@@ -1,12 +1,14 @@
 package com.airbnb.mvrx.mocking
 
 import android.content.Context
+import androidx.lifecycle.LifecycleOwner
 import com.airbnb.mvrx.CoroutinesStateStore
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksViewModelConfig
 import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksStateStore
+import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.ScriptableStateStore
 import com.airbnb.mvrx.mocking.printer.ViewModelStatePrinter
@@ -170,8 +172,15 @@ open class MockMavericksViewModelConfigFactory(
     /**
      * Provide a coroutine context that will be used in the [CoroutinesStateStore]. All withState/setState calls will be executed in this context.
      */
-    stateStoreCoroutineContext: CoroutineContext = EmptyCoroutineContext
-) : MavericksViewModelConfigFactory(debugMode, viewModelCoroutineContext, stateStoreCoroutineContext) {
+    stateStoreCoroutineContext: CoroutineContext = EmptyCoroutineContext,
+    /**
+     * Provide a context that will be added to the coroutine scope when a subscription is registered (eg [MavericksView.onEach]).
+     *
+     * By default subscriptions use [MavericksView.subscriptionLifecycleOwner] and [LifecycleOwner.lifecycleScope] to
+     * retrieve a coroutine scope to launch the subscription in.
+     */
+    subscriptionCoroutineContextOverride: CoroutineContext = EmptyCoroutineContext,
+) : MavericksViewModelConfigFactory(debugMode, viewModelCoroutineContext, stateStoreCoroutineContext, subscriptionCoroutineContextOverride) {
 
     private val applicationContext: Context? = applicationContext?.applicationContext
 

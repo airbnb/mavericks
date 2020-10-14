@@ -42,9 +42,12 @@ abstract class MavericksViewModel<S : MavericksState>(
     initialState: S
 ) {
 
+    // Use the same factory for the life of the viewmodel, as it might change after this viewmodel is created (especially during tests)
+    private val configFactory = Mavericks.viewModelConfigFactory
+
     @Suppress("LeakingThis")
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
-    val config: MavericksViewModelConfig<S> = Mavericks.viewModelConfigFactory.provideConfig(
+    val config: MavericksViewModelConfig<S> = configFactory.provideConfig(
         this,
         initialState
     )
@@ -414,7 +417,7 @@ abstract class MavericksViewModel<S : MavericksState>(
             flowWhenStarted(lifecycleOwner)
         }
 
-        val scope = lifecycleOwner?.lifecycleScope?.let { it + Mavericks.viewModelConfigFactory.contextOverride } ?: viewModelScope
+        val scope = lifecycleOwner?.lifecycleScope?.let { it + configFactory.subscriptionCoroutineContextOverride } ?: viewModelScope
         return scope.launch(start = CoroutineStart.UNDISPATCHED) {
             // Use yield to ensure flow collect coroutine is dispatched rather than invoked immediately.
             // This is necessary when Dispatchers.Main.immediate is used in scope.
