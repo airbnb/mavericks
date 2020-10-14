@@ -14,6 +14,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.dropWhile
@@ -25,6 +26,7 @@ import kotlinx.coroutines.plus
 import kotlinx.coroutines.yield
 import java.util.Collections
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.reflect.KProperty1
 
 /**
@@ -163,7 +165,8 @@ abstract class MavericksViewModel<S : MavericksState>(
     /**
      * Run a coroutine and wrap its progression with [Async] property reduced to the global state.
      *
-     * @param dispatcher The coroutine dispatcher that the coroutine will run on. Defaults to [Dispatchers.Main.immediate].
+     * @param dispatcher A custom coroutine dispatcher that the coroutine will run on. If null, uses the dispatcher in [viewModelScope],
+     *                  which defaults to [Dispatchers.Main.immediate] and can be overridden globally with [Mavericks.initialize].
      * @param retainValue A state property that, when set, will be called to retrieve an optional existing data value that will be retained across
      *                    subsequent Loading and Fail states. This is useful if you want to display the previously successful data when
      *                    refreshing.
@@ -171,7 +174,7 @@ abstract class MavericksViewModel<S : MavericksState>(
      *                and it likely a data class, an implementation may look like: `{ copy(response = it) }`.
      */
     fun <T : Any?> Deferred<T>.execute(
-        dispatcher: CoroutineDispatcher = Dispatchers.Main.immediate,
+        dispatcher: CoroutineDispatcher? = null,
         retainValue: KProperty1<S, Async<T>>? = null,
         reducer: S.(Async<T>) -> S
     ) = suspend { await() }.execute(dispatcher, retainValue, reducer)
@@ -179,7 +182,8 @@ abstract class MavericksViewModel<S : MavericksState>(
     /**
      * Run a coroutine and wrap its progression with [Async] property reduced to the global state.
      *
-     * @param dispatcher The coroutine dispatcher that the coroutine will run on. Defaults to [Dispatchers.Main.immediate].
+     * @param dispatcher A custom coroutine dispatcher that the coroutine will run on. If null, uses the dispatcher in [viewModelScope],
+     *                  which defaults to [Dispatchers.Main.immediate] and can be overridden globally with [Mavericks.initialize].
      * @param retainValue A state property that, when set, will be called to retrieve an optional existing data value that will be retained across
      *                    subsequent Loading and Fail states. This is useful if you want to display the previously successful data when
      *                    refreshing.
@@ -187,7 +191,7 @@ abstract class MavericksViewModel<S : MavericksState>(
      *                and it likely a data class, an implementation may look like: `{ copy(response = it) }`.
      */
     fun <T : Any?> (suspend () -> T).execute(
-        dispatcher: CoroutineDispatcher = Dispatchers.Main.immediate,
+        dispatcher: CoroutineDispatcher? = null,
         retainValue: KProperty1<S, Async<T>>? = null,
         reducer: S.(Async<T>) -> S
     ): Job {
@@ -202,7 +206,7 @@ abstract class MavericksViewModel<S : MavericksState>(
 
         setState { reducer(Loading(value = retainValue?.get(this)?.invoke())) }
 
-        return viewModelScope.launch(dispatcher) {
+        return viewModelScope.launch(dispatcher ?: EmptyCoroutineContext) {
             try {
                 val result = invoke()
                 setState { reducer(Success(result)) }
@@ -218,12 +222,13 @@ abstract class MavericksViewModel<S : MavericksState>(
     /**
      * Collect a Flow and wrap its progression with [Async] property reduced to the global state.
      *
-     * @param dispatcher The coroutine dispatcher that the coroutine will run on. Defaults to [Dispatchers.Main.immediate].
+     * @param dispatcher A custom coroutine dispatcher that the coroutine will run on. If null, uses the dispatcher in [viewModelScope],
+     *                  which defaults to [Dispatchers.Main.immediate] and can be overridden globally with [Mavericks.initialize].
      * @param reducer A reducer that is applied to the current state and should return the new state. Because the state is the receiver
      *                and it likely a data class, an implementation may look like: `{ copy(response = it) }`.
      */
     fun <T> Flow<T>.execute(
-        dispatcher: CoroutineDispatcher = Dispatchers.Main.immediate,
+        dispatcher: CoroutineDispatcher? = null,
         reducer: S.(Async<T>) -> S
     ): Job {
         val blockExecutions = config.onExecute(this@MavericksViewModel)
@@ -236,25 +241,34 @@ abstract class MavericksViewModel<S : MavericksState>(
         }
 
         setState { reducer(Loading()) }
-        return onEach {
-            setState { reducer(Success(it)) }
-        }.launchIn(viewModelScope + dispatcher)
+
+        return catch { error -> setState { reducer(Fail(error)) } }
+            .onEach {
+                setState { reducer(Success(it)) }
+            }.launchIn(viewModelScope + (dispatcher ?: EmptyCoroutineContext))
     }
 
     /**
      * Collect a Flow and update state each time it emits a value. This is functionally the same as wrapping onEach with a setState call.
      *
-     * @param dispatcher The coroutine dispatcher that the coroutine will run on. Defaults to [Dispatchers.Main.immediate].
+     * @param dispatcher A custom coroutine dispatcher that the coroutine will run on. If null, uses the dispatcher in [viewModelScope],
+     *                  which defaults to [Dispatchers.Main.immediate] and can be overridden globally with [Mavericks.initialize].
      * @param reducer A reducer that is applied to the current state and should return the new state. Because the state is the receiver
      *                and it likely a data class, an implementation may look like: `{ copy(response = it) }`.
      */
     fun <T> Flow<T>.setOnEach(
-        dispatcher: CoroutineDispatcher = Dispatchers.Main.immediate,
+        dispatcher: CoroutineDispatcher? = null,
         reducer: S.(T) -> S
     ): Job {
+        val blockExecutions = config.onExecute(this@MavericksViewModel)
+        if (blockExecutions != MavericksViewModelConfig.BlockExecutions.No) {
+            // Simulate infinite work
+            return viewModelScope.launch { delay(Long.MAX_VALUE) }
+        }
+
         return onEach {
             setState { reducer(it) }
-        }.launchIn(viewModelScope + dispatcher)
+        }.launchIn(viewModelScope + (dispatcher ?: EmptyCoroutineContext))
     }
 
     /**
@@ -399,7 +413,8 @@ abstract class MavericksViewModel<S : MavericksState>(
         } else {
             flowWhenStarted(lifecycleOwner)
         }
-        val scope = lifecycleOwner?.lifecycleScope ?: viewModelScope
+
+        val scope = lifecycleOwner?.lifecycleScope?.let { it + Mavericks.viewModelConfigFactory.contextOverride } ?: viewModelScope
         return scope.launch(start = CoroutineStart.UNDISPATCHED) {
             // Use yield to ensure flow collect coroutine is dispatched rather than invoked immediately.
             // This is necessary when Dispatchers.Main.immediate is used in scope.

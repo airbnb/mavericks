@@ -160,20 +160,20 @@ open class MockMavericksViewModelConfigFactory(
      * The application context. If provided this will be used to register a
      * [ViewModelStatePrinter] for each ViewModel to enable mock state printing.
      */
-    context: Context?,
+    applicationContext: Context?,
     debugMode: Boolean = true,
     /**
-     * Provide a default context for viewModelScope. It will be added after [SupervisorJob]
+     * Provide a default coroutine context for viewModelScope in all view models. It will be added after [SupervisorJob]
      * and [Dispatchers.Main.immediate].
      */
-    contextOverride: CoroutineContext = EmptyCoroutineContext,
+    viewModelCoroutineContext: CoroutineContext = EmptyCoroutineContext,
     /**
-     * Provide a context that will be used in the [CoroutinesStateStore]. All withState/setState calls will be executed in this context.
+     * Provide a coroutine context that will be used in the [CoroutinesStateStore]. All withState/setState calls will be executed in this context.
      */
-    storeContextOverride: CoroutineContext = EmptyCoroutineContext
-) : MavericksViewModelConfigFactory(debugMode, contextOverride, storeContextOverride) {
+    stateStoreCoroutineContext: CoroutineContext = EmptyCoroutineContext
+) : MavericksViewModelConfigFactory(debugMode, viewModelCoroutineContext, stateStoreCoroutineContext) {
 
-    private val applicationContext: Context? = context?.applicationContext
+    private val applicationContext: Context? = applicationContext?.applicationContext
 
     private val mockConfigs = mutableMapOf<MavericksStateStore<*>, MockableMavericksViewModelConfig<*>>()
 
@@ -248,8 +248,9 @@ open class MockMavericksViewModelConfigFactory(
             // we use it as an opportunity to register the mock printer on all view models.
             // This lets us capture singleton viewmodels as well.
             val viewModelStatePrinter = ViewModelStatePrinter(viewModel)
+            val enableMockPrinterBroadcastReceiver = MockableMavericks.enableMockPrinterBroadcastReceiver
             applicationContext?.let { context ->
-                if (MockableMavericks.enableMockPrinterBroadcastReceiver) {
+                if (enableMockPrinterBroadcastReceiver) {
                     viewModelStatePrinter.register(context)
                 }
             }
@@ -259,7 +260,7 @@ open class MockMavericksViewModelConfigFactory(
             mockConfigs[stateStore] = config
             stateStore.addOnCancelListener { stateStore ->
                 applicationContext?.let { context ->
-                    if (MockableMavericks.enableMockPrinterBroadcastReceiver) {
+                    if (enableMockPrinterBroadcastReceiver) {
                         viewModelStatePrinter.unregister(context)
                     }
                 }

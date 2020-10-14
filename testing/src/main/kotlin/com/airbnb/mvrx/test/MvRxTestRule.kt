@@ -61,7 +61,7 @@ class MvRxTestRule(
     private fun setupMocking() {
         val mocksEnabled = viewModelMockBehavior != null
         // Use a null context since we don't need mock printing during tests
-        MockableMavericks.initialize(debugMode = debugMode, mocksEnabled = mocksEnabled, context = null)
+        MockableMavericks.initialize(debugMode = debugMode, mocksEnabled = mocksEnabled, applicationContext = null)
 
         if (viewModelMockBehavior != null) {
             MockableMavericks.mockConfigFactory.mockBehavior = viewModelMockBehavior
