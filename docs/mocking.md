@@ -27,7 +27,7 @@ For more technical details, read the article series on how Airbnb developed this
 
 2. Initialize Mavericks via a call to `MockableMavericks.initialize` when your application is created. (This replaces the normal call to `Mavericks.initialize`)
 
-3. Use the `MockableMavericksView` interface in place of the normal `MavericksView` and override the `provideMocks` function to define mock states (guidance below)
+3. Use the `MockableMavericksView` interface in place of the normal `MavericksView` and override the `provideMocks` function to define mock states (guidance below). If you are using `mvrx-rxjava` you can have your classes implement both `MvRxView` and `MockableMavericksView`.
 
 4. To support generating mocks for an active screen, call the `registerMockPrinter` when the view is initialized (for example, in `onCreate` of the Fragment)
 
@@ -108,7 +108,7 @@ A Launcher activity is provided by default that allows you to browse and open yo
 
 ### Launching Mocked Screens
 
-To help you easily access your mocks, the mocking artifact ships with an Android Activity, `MavericksLauncherActivity`, that automatically aggregates all mocked Fragments in your App and displays them with their available mocks.
+To help you easily access your mocks, include the `mvrx-launcher` artifact and use `MavericksLauncherActivity`. This activity automatically aggregates all mocked Fragments in your App and displays them with their available mocks.
 
 ![Launcher Home](/images/mock_launcher_home.png) ![Launcher Detail Screen](/images/mock_launcher_detail_page.png) ![Fragment opened from launcher](/images/mock_launcher_opened_fragment.png)
 
