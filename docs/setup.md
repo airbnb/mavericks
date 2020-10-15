@@ -19,7 +19,7 @@ Mavericks.initialize(this)
 
 If you plan to use [Mavericks Mocking](/mocking.md), use this line instead:
 ```kotlin
-MavericksMocks.initialize(this)
+MockableMavericks.initialize(this)
 ```
 
 ### [Optional] Configure Global Mavericks Plugins
