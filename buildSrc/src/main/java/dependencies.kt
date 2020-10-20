@@ -2,7 +2,7 @@ object Versions {
     // Build tools and SDK
     const val buildTools = "29.0.3"
     const val compileSdk = 29
-    const val gradlePlugin = "4.0.0"
+    const val gradlePlugin = "4.1.0"
     const val kotlin = "1.4.10"
     const val minSdk = 16
     const val targetSdk = 29

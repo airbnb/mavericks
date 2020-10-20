@@ -137,7 +137,8 @@ object MockableMavericks {
          */
         viewModelCoroutineContext: CoroutineContext = EmptyCoroutineContext,
         /**
-         * Provide a coroutine context that will be used in the [CoroutinesStateStore]. All withState/setState calls will be executed in this context.
+         * Provide an additional context that will be used in the [CoroutinesStateStore]. All withState/setState calls will be executed in this context.
+         * By default these calls are executed with a shared thread pool dispatcher that is private to [CoroutinesStateStore]
          */
         stateStoreCoroutineContext: CoroutineContext = EmptyCoroutineContext,
         /**
