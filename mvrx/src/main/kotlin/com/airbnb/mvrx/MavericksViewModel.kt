@@ -246,9 +246,8 @@ abstract class MavericksViewModel<S : MavericksState>(
         setState { reducer(Loading()) }
 
         return catch { error -> setState { reducer(Fail(error)) } }
-            .onEach {
-                setState { reducer(Success(it)) }
-            }.launchIn(viewModelScope + (dispatcher ?: EmptyCoroutineContext))
+            .onEach { value -> setState { reducer(Success(value)) } }
+            .launchIn(viewModelScope + (dispatcher ?: EmptyCoroutineContext))
     }
 
     /**
@@ -417,7 +416,7 @@ abstract class MavericksViewModel<S : MavericksState>(
             flowWhenStarted(lifecycleOwner)
         }
 
-        val scope = lifecycleOwner?.lifecycleScope?.let { it + configFactory.subscriptionCoroutineContextOverride } ?: viewModelScope
+        val scope = (lifecycleOwner?.lifecycleScope ?: viewModelScope) + configFactory.subscriptionCoroutineContextOverride
         return scope.launch(start = CoroutineStart.UNDISPATCHED) {
             // Use yield to ensure flow collect coroutine is dispatched rather than invoked immediately.
             // This is necessary when Dispatchers.Main.immediate is used in scope.
