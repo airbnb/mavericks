@@ -15,7 +15,7 @@ class MavericksViewModelConfigTest : BaseTest() {
 
     @Test
     fun mockBehaviorIsConfigurableInBlock() {
-        val provider = MockMavericksViewModelConfigFactory(context = null)
+        val provider = MockMavericksViewModelConfigFactory(applicationContext = null)
 
         val originalBehavior = provider.mockBehavior
         val newBehavior =

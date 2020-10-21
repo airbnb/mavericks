@@ -2,15 +2,23 @@ package com.airbnb.mvrx.mocking
 
 import android.content.Context
 import android.content.pm.ApplicationInfo
+import androidx.lifecycle.LifecycleOwner
+import com.airbnb.mvrx.CoroutinesStateStore
+import com.airbnb.mvrx.DefaultViewModelDelegateFactory
 import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksStateStore
+import com.airbnb.mvrx.MavericksView
+import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.airbnb.mvrx.ScriptableStateStore
 import com.airbnb.mvrx.mocking.MockableMavericks.initialize
 import com.airbnb.mvrx.mocking.printer.MavericksMockPrinter
 import com.airbnb.mvrx.mocking.printer.MockPrinterConfiguration
 import com.airbnb.mvrx.mocking.printer.ViewModelStatePrinter
+import kotlinx.coroutines.Dispatchers
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * Entry point for setting up Mavericks for the app in a mockable way.
@@ -84,12 +92,12 @@ object MockableMavericks {
      *
      * Calling this subsequent times will replace the plugins with new instances.
      */
-    fun initialize(context: Context) {
-        val isDebuggable = context.isDebuggable()
+    fun initialize(applicationContext: Context) {
+        val isDebuggable = applicationContext.isDebuggable()
         initialize(
             mocksEnabled = isDebuggable,
             debugMode = isDebuggable,
-            context = context
+            applicationContext = applicationContext
         )
     }
 
@@ -109,22 +117,65 @@ object MockableMavericks {
      * system is automatically enabled.
      *
      * Calling this subsequent times will replace the plugins with new instances.
-     *
-     * @param debugMode True if debug checks should be enabled
-     * @param mocksEnabled True if ViewModel mocking should be enabled.
-     * @param context Application context. If provided this will be used to register a
-     * [ViewModelStatePrinter] for each ViewModel to support mock state printing.
      */
-    fun initialize(mocksEnabled: Boolean, debugMode: Boolean, context: Context?) {
+    fun initialize(
+        /**
+         * True if ViewModel mocking should be enabled.
+         */
+        mocksEnabled: Boolean,
+        /**
+         * True if debug checks should be enabled.
+         */
+        debugMode: Boolean,
+        /**
+         * Application context. If provided this will be used to register a [ViewModelStatePrinter] for each ViewModel to support mock state printing.
+         */
+        applicationContext: Context?,
+        /**
+         * Provide a default coroutine context for viewModelScope in all view models. It will be added after [SupervisorJob]
+         * and [Dispatchers.Main.immediate].
+         */
+        viewModelCoroutineContext: CoroutineContext = EmptyCoroutineContext,
+        /**
+         * Provide an additional context that will be used in the [CoroutinesStateStore]. All withState/setState calls will be executed in this context.
+         * By default these calls are executed with a shared thread pool dispatcher that is private to [CoroutinesStateStore]
+         */
+        stateStoreCoroutineContext: CoroutineContext = EmptyCoroutineContext,
+        /**
+         * Provide a context that will be added to the coroutine scope when a subscription is registered (eg [MavericksView.onEach]).
+         *
+         * By default subscriptions use [MavericksView.subscriptionLifecycleOwner] and [LifecycleOwner.lifecycleScope] to
+         * retrieve a coroutine scope to launch the subscription in.
+         */
+        subscriptionCoroutineContextOverride: CoroutineContext = EmptyCoroutineContext,
+    ) {
         enableMockPrinterBroadcastReceiver = mocksEnabled
         enableMavericksViewMocking = mocksEnabled
 
         if (mocksEnabled) {
-            val mockConfigFactory = MockMavericksViewModelConfigFactory(context?.applicationContext, debugMode)
-            val mockViewModelDelegateFactory = MockViewModelDelegateFactory(mockConfigFactory)
-            Mavericks.initialize(debugMode, mockConfigFactory, mockViewModelDelegateFactory)
+            val configFactory = MockMavericksViewModelConfigFactory(
+                applicationContext = applicationContext?.applicationContext,
+                debugMode = debugMode,
+                viewModelCoroutineContext = viewModelCoroutineContext,
+                stateStoreCoroutineContext = stateStoreCoroutineContext,
+                subscriptionCoroutineContextOverride = subscriptionCoroutineContextOverride
+            )
+            Mavericks.initialize(
+                debugMode,
+                configFactory,
+                MockViewModelDelegateFactory(configFactory)
+            )
         } else {
-            Mavericks.initialize(debugMode)
+            Mavericks.initialize(
+                debugMode,
+                MavericksViewModelConfigFactory(
+                    debugMode,
+                    viewModelCoroutineContext,
+                    stateStoreCoroutineContext,
+                    subscriptionCoroutineContextOverride
+                ),
+                DefaultViewModelDelegateFactory()
+            )
         }
     }
 

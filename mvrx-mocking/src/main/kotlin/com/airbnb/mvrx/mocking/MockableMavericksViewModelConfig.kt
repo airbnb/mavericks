@@ -1,12 +1,14 @@
 package com.airbnb.mvrx.mocking
 
 import android.content.Context
+import androidx.lifecycle.LifecycleOwner
 import com.airbnb.mvrx.CoroutinesStateStore
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksViewModelConfig
 import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksStateStore
+import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.ScriptableStateStore
 import com.airbnb.mvrx.mocking.printer.ViewModelStatePrinter
@@ -160,20 +162,27 @@ open class MockMavericksViewModelConfigFactory(
      * The application context. If provided this will be used to register a
      * [ViewModelStatePrinter] for each ViewModel to enable mock state printing.
      */
-    context: Context?,
+    applicationContext: Context?,
     debugMode: Boolean = true,
     /**
-     * Provide a default context for viewModelScope. It will be added after [SupervisorJob]
+     * Provide a default coroutine context for viewModelScope in all view models. It will be added after [SupervisorJob]
      * and [Dispatchers.Main.immediate].
      */
-    contextOverride: CoroutineContext = EmptyCoroutineContext,
+    viewModelCoroutineContext: CoroutineContext = EmptyCoroutineContext,
     /**
-     * Provide a context that will be used in the [CoroutinesStateStore]. All withState/setState calls will be executed in this context.
+     * Provide a coroutine context that will be used in the [CoroutinesStateStore]. All withState/setState calls will be executed in this context.
      */
-    storeContextOverride: CoroutineContext = EmptyCoroutineContext
-) : MavericksViewModelConfigFactory(debugMode, contextOverride, storeContextOverride) {
+    stateStoreCoroutineContext: CoroutineContext = EmptyCoroutineContext,
+    /**
+     * Provide a context that will be added to the coroutine scope when a subscription is registered (eg [MavericksView.onEach]).
+     *
+     * By default subscriptions use [MavericksView.subscriptionLifecycleOwner] and [LifecycleOwner.lifecycleScope] to
+     * retrieve a coroutine scope to launch the subscription in.
+     */
+    subscriptionCoroutineContextOverride: CoroutineContext = EmptyCoroutineContext,
+) : MavericksViewModelConfigFactory(debugMode, viewModelCoroutineContext, stateStoreCoroutineContext, subscriptionCoroutineContextOverride) {
 
-    private val applicationContext: Context? = context?.applicationContext
+    private val applicationContext: Context? = applicationContext?.applicationContext
 
     private val mockConfigs = mutableMapOf<MavericksStateStore<*>, MockableMavericksViewModelConfig<*>>()
 
@@ -248,8 +257,9 @@ open class MockMavericksViewModelConfigFactory(
             // we use it as an opportunity to register the mock printer on all view models.
             // This lets us capture singleton viewmodels as well.
             val viewModelStatePrinter = ViewModelStatePrinter(viewModel)
+            val enableMockPrinterBroadcastReceiver = MockableMavericks.enableMockPrinterBroadcastReceiver
             applicationContext?.let { context ->
-                if (MockableMavericks.enableMockPrinterBroadcastReceiver) {
+                if (enableMockPrinterBroadcastReceiver) {
                     viewModelStatePrinter.register(context)
                 }
             }
@@ -259,7 +269,7 @@ open class MockMavericksViewModelConfigFactory(
             mockConfigs[stateStore] = config
             stateStore.addOnCancelListener { stateStore ->
                 applicationContext?.let { context ->
-                    if (MockableMavericks.enableMockPrinterBroadcastReceiver) {
+                    if (enableMockPrinterBroadcastReceiver) {
                         viewModelStatePrinter.unregister(context)
                     }
                 }
