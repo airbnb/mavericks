@@ -1,6 +1,9 @@
 package com.airbnb.mvrx.launcher
 
 import androidx.annotation.WorkerThread
+import com.airbnb.mvrx.Async
+import com.airbnb.mvrx.Loading
+import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.mocking.MockableMavericksView
 import com.airbnb.mvrx.mocking.MockedViewProvider
 import com.airbnb.mvrx.mocking.getMockVariants
@@ -8,6 +11,16 @@ import dalvik.system.BaseDexClassLoader
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.conflate
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.scan
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import java.lang.reflect.Modifier
 
@@ -24,7 +37,44 @@ object MavericksGlobalMockLibrary {
      * TODO Access mocks from annotation generated code before falling back to dex approach.
      */
     @WorkerThread
-    fun getMocks() = viewsFromDex
+    fun getMocks(): List<MockedViewProvider<*>> = viewsFromDex
+
+    val mockableViewsFlow: StateFlow<Async<List<Class<out MockableMavericksView>>>> by lazy {
+        val classLoader = MavericksGlobalMockLibrary::class.java.classLoader as BaseDexClassLoader
+        val stateFlow = MutableStateFlow<Async<List<Class<out MockableMavericksView>>>>(Loading())
+
+        GlobalScope.launch {
+            getDexFiles(classLoader)
+                .asSequence()
+                .flatMap { dexFile ->
+                    @Suppress("DEPRECATION")
+                    dexFile.entries().asSequence()
+                }
+                .filterNot { dexFileEntry ->
+                    // These are optimizations to avoid having to check every class in the dex files.
+                    dexFileEntry.startsWith("java.") ||
+                        dexFileEntry.startsWith("android.") ||
+                        dexFileEntry.startsWith("androidx.")
+                    // TODO: Allow mavericks configuration to specify package name prefix whitelist, or
+                    //  more generally, naming whitelist to identify views, for faster initialization
+                }.partition { it.endsWith("Fragment") }
+                .let { (possibleFragmentEntries, otherEntries) ->
+                    // Prioritize checking "fragment" named classes first, since those are more likely to be matches
+                    possibleFragmentEntries + otherEntries
+                }
+                .mapNotNull { className ->
+                    getAsMavericksView(className, classLoader)
+                }
+                .scan(emptyList<Class<out MockableMavericksView>>()) { currentMockList, newMockableView ->
+                    currentMockList + newMockableView
+                }
+                .onEach { stateFlow.value = Loading(it) }
+
+            stateFlow.value = Success(stateFlow.value() ?: emptyList())
+        }
+
+        stateFlow
+    }
 
     /**
      * Uses dex analysis to detect all MavericksViews in the app.
@@ -67,6 +117,13 @@ private fun getMocksForClassName(
     className: String,
     classLoader: ClassLoader
 ): List<MockedViewProvider<*>>? {
+    return getAsMavericksView(className, classLoader)?.let { getMockVariants(it) }
+}
+
+private fun getAsMavericksView(
+    className: String,
+    classLoader: ClassLoader
+): Class<MockableMavericksView>? {
 
     val clazz = try {
         classLoader.loadClass(className)
@@ -74,10 +131,24 @@ private fun getMocksForClassName(
         return null
     }
 
-    return if (!Modifier.isAbstract(clazz.modifiers) && MockableMavericksView::class.java.isAssignableFrom(clazz)) {
+    return if (MockableMavericksView::class.java.isAssignableFrom(clazz) && !Modifier.isAbstract(clazz.modifiers)) {
         @Suppress("UNCHECKED_CAST")
-        (getMockVariants(clazz as Class<MockableMavericksView>))
+        clazz as Class<MockableMavericksView>
     } else {
         null
     }
 }
+
+private fun Class<*>.isMavericksView(): Boolean {
+    // Similar to "isAssignableFrom", but optimized by removing non class checks to speed up mock discovery
+    var cls: Class<*>? = this
+    while (cls != null) {
+        if (cls == mavericksClass) {
+            return true
+        }
+        cls = cls.superclass
+    }
+    return false
+}
+
+private val mavericksClass = MockableMavericksView::class.java

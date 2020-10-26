@@ -49,7 +49,6 @@ abstract class MavericksDelegateProvider<T, R> {
  * It allows global callbacks for when a view model is instantiated, with control over how the view model state
  * should be instantiated.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 interface ViewModelDelegateFactory {
     /**
      * Create a Lazy ViewModel for the given Fragment.

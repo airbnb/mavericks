@@ -1,9 +1,11 @@
 package com.airbnb.mvrx.launcher
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
+import com.airbnb.epoxy.EpoxyController
 import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.launcher.utils.buildIntent
 import com.airbnb.mvrx.launcher.utils.buildText
@@ -13,7 +15,9 @@ import com.airbnb.mvrx.launcher.utils.toastShort
 import com.airbnb.mvrx.launcher.views.loadingRow
 import com.airbnb.mvrx.launcher.views.marquee
 import com.airbnb.mvrx.launcher.views.textRow
+import com.airbnb.mvrx.mocking.MockableMavericksView
 import com.airbnb.mvrx.mocking.MockedViewProvider
+import com.airbnb.mvrx.mocking.getMockVariants
 import com.airbnb.mvrx.withState
 
 /**
@@ -77,13 +81,13 @@ class MavericksLauncherFragment : MavericksLauncherBaseFragment() {
         )
     }
 
-    private val MavericksLauncherState.mocksLoadedSoFar: List<MockedViewProvider<*>>?
-        get() = allMocks() ?: cachedMocks()
+    private val MavericksLauncherState.mavericksViewsLoadedSoFar: List<Class<out MockableMavericksView>>?
+        get() = allFragments() ?: cachedFragments()
 
     private val MavericksLauncherState.mocksForSelectedView: List<MockedViewProvider<*>>?
         get() {
-            val loadedMocks = mocksLoadedSoFar ?: return null
-            return if (selectedView != null) loadedMocks.filter { it.viewName == selectedView } else null
+            // TODO (eli_hart 10/26/20): Cache this lookup and/or represent it with Async?
+            return selectedView?.let { getMockVariants(it) }
         }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -102,7 +106,9 @@ class MavericksLauncherFragment : MavericksLauncherBaseFragment() {
                 // They are shown in order just long enough to verify they render and don't crash.
                 R.id.menu_mavericks_launcher_auto_run -> {
                     withState(viewModel) { state ->
-                        val mocks = state.mocksForSelectedView ?: state.mocksLoadedSoFar ?: return@withState
+                        val mocks = state.mocksForSelectedView
+                            ?: state.mavericksViewsLoadedSoFar?.flatMap { getMockVariants(it) ?: emptyList() }?.ifEmpty { null }
+                            ?: return@withState
                         testMocks(mocks)
                     }
                     true
@@ -114,7 +120,7 @@ class MavericksLauncherFragment : MavericksLauncherBaseFragment() {
 
     override fun epoxyController() = simpleController(viewModel) { state ->
         val context = context ?: return@simpleController
-        val loadedMocks = state.mocksLoadedSoFar
+        val loadedViews = state.mavericksViewsLoadedSoFar
 
         val deeplinkQuery = state.viewNamePatternToTest ?: state.viewNameToOpen
         if (deeplinkQuery != null) {
@@ -123,15 +129,13 @@ class MavericksLauncherFragment : MavericksLauncherBaseFragment() {
                 title("Loading \"$deeplinkQuery\"...")
             }
 
-            loadingRow { id("initial loader") }
+            loadingRow()
 
             // Waiting for mocks to load, when they do the matching views will be opened and this will be finished.
             return@simpleController
         }
 
-        val viewNameToMocks = loadedMocks
-            ?.groupBy { it.viewName }
-            ?.toSortedMap(viewUiOrderComparator(state))
+        val sortedViews = loadedViews?.sortedWith(viewUiOrderComparator(state))
 
         val mocksToShow = state.mocksForSelectedView
 
@@ -141,6 +145,7 @@ class MavericksLauncherFragment : MavericksLauncherBaseFragment() {
             // Get simple name portion of FQN, then remove suffixes that are unnecessarily verbose.
             // This simplifies the UI and makes it prettier.
             val selectedViewName = state.selectedView
+                ?.canonicalName
                 ?.split(".")
                 ?.lastOrNull()
                 ?.replace("mvrx", "", ignoreCase = true)
@@ -154,25 +159,33 @@ class MavericksLauncherFragment : MavericksLauncherBaseFragment() {
             // Format the class name nicely
             title((selectedViewName ?: activityName).splitCamelCase())
 
-            if (mocksToShow != null) {
-                subtitle("${mocksToShow.size} mocks")
-            } else if (viewNameToMocks != null) {
-                subtitle("${viewNameToMocks.size} screens")
+            if (state.selectedView != null) {
+                subtitle("${mocksToShow?.size ?: 0} mocks")
+            } else if (sortedViews != null) {
+                subtitle("${sortedViews.size} screens")
             }
         }
 
         if (state.selectedView == null) {
             // TODO more generic approach
             (activity as MavericksLauncherActivity).addCustomModels(this)
+            addFragmentModels(state, sortedViews, context)
+        } else {
+            addMocksForSelectedView(state, mocksToShow, context)
         }
+    }
 
-        if (loadedMocks == null || (state.selectedView != null && mocksToShow == null)) {
-            loadingRow { id("initial loader") }
-            return@simpleController
+    private fun EpoxyController.addMocksForSelectedView(state: MavericksLauncherState, mocksToShow: List<MockedViewProvider<*>>?, context: Context) {
+        if (mocksToShow == null || mocksToShow.isEmpty()) {
+            textRow {
+                id("no mocks")
+                title("This view has not implemented any mocks.")
+            }
+            return
         }
 
         mocksToShow
-            ?.sortedBy { mockedViewProvider ->
+            .sortedBy { mockedViewProvider ->
                 val recentIndex =
                     state.recentUsage.mockIdentifiers.indexOf(LauncherMockIdentifier(mockedViewProvider))
                 if (recentIndex == -1) {
@@ -181,7 +194,7 @@ class MavericksLauncherFragment : MavericksLauncherBaseFragment() {
                     recentIndex
                 }
             }
-            ?.forEach { mockedViewProvider ->
+            .forEach { mockedViewProvider ->
                 textRow {
                     id("view", mockedViewProvider.viewName, mockedViewProvider.mock.name)
                     title(mockedViewProvider.mock.name)
@@ -198,34 +211,43 @@ class MavericksLauncherFragment : MavericksLauncherBaseFragment() {
                         viewModel.setSelectedMock(mockedViewProvider)
                     }
                 }
-            } ?: run {
-            viewNameToMocks?.forEach { (viewName, mocks) ->
-                textRow {
-                    id("view entry", viewName)
-                    title(viewName.split(".").last())
+            }
+    }
 
-                    subtitle(buildText(context) {
-                        if (viewName in state.recentUsage.viewNames) {
-                            appendWithColor("Recent", R.color.mavericks_colorPrimary)
-                            append(" · ")
-                        }
-                        append("${mocks.size} mocks")
-                    })
+    private fun EpoxyController.addFragmentModels(
+        state: MavericksLauncherState,
+        sortedViews: List<Class<out MockableMavericksView>>?,
+        context: Context
+    ) {
 
-                    onClickListener { _ ->
-                        viewModel.setSelectedView(viewName)
-                        // If there are any custom rows on the screen that have edit texts the keyboard may be up,
-                        // and it won't make sense to keep showing it.
-                        view?.dismissSoftKeyboard()
+        sortedViews?.forEach { viewClass ->
+            val viewName = viewClass.canonicalName.orEmpty()
+
+            textRow {
+                id("view entry", viewName)
+                title(viewName.split(".").last())
+
+                subtitle(buildText(context) {
+                    if (viewName in state.recentUsage.viewNames) {
+                        appendWithColor("Recent", R.color.mavericks_colorPrimary)
                     }
+                })
+
+                onClickListener { _ ->
+                    viewModel.setSelectedView(viewClass)
+                    // If there are any custom rows on the screen that have edit texts the keyboard may be up,
+                    // and it won't make sense to keep showing it.
+                    view?.dismissSoftKeyboard()
                 }
             }
         }
 
-        if (state.allMocks() == null) {
-            loadingRow { id("loading additional mocks") }
+        if (state.allFragments() == null) {
+            loadingRow()
         }
     }
+
+    private fun EpoxyController.loadingRow() = loadingRow { id("loader") }
 
     private fun testMocks(mocks: List<MockedViewProvider<*>>) {
         toastShort("Testing ${mocks.size} mocks...")
@@ -274,15 +296,12 @@ internal fun String.splitCamelCase(): CharSequence {
     }
 }
 
-/** Assumes a FQN - returns the simple name. */
-internal val String.simpleName: String get() = substringAfterLast(".")
-
-internal fun viewUiOrderComparator(state: MavericksLauncherState): Comparator<String> {
-    return compareBy { viewName ->
+internal fun viewUiOrderComparator(state: MavericksLauncherState): Comparator<Class<out MockableMavericksView>> {
+    return compareBy { viewClass ->
         // Show recently used views first, otherwise compare alphabetically by view name
-        val recentViewIndex = state.recentUsage.viewNames.indexOf(viewName)
+        val recentViewIndex = state.recentUsage.viewNames.indexOf(viewClass.canonicalName)
         if (recentViewIndex == -1) {
-            viewName.simpleName
+            viewClass.simpleName
         } else {
             recentViewIndex.toString()
         }

@@ -17,22 +17,24 @@ import com.airbnb.mvrx.launcher.MavericksLauncherActivity.Companion.PARAM_VIEW_T
 import com.airbnb.mvrx.mocking.MockableMavericksView
 import com.airbnb.mvrx.mocking.MockedViewProvider
 import com.airbnb.mvrx.mocking.getMockVariants
-import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 data class MavericksLauncherState(
     /**
-     * Mocks that were loaded in previous app sessions will be restored from cache in this property.
-     * It will update incrementally as each cache entry is loaded.
+     * Fragments that were detected in previous app sessions will be restored from cache in this property.
      */
-    val cachedMocks: Async<List<MockedViewProvider<*>>> = Loading(),
+    val cachedFragments: Async<List<Class<out MockableMavericksView>>> = Loading(),
     /**
-     * All mocks that were detected in the app. This can be slow to load, so until it is [Success]
-     * the [cachedMocks] can be used.
+     * All mavericks views that were detected in the app. This can be slow to load, so until it is [Success]
+     * the [cachedFragments] can be used.
      */
-    val allMocks: Async<List<MockedViewProvider<*>>> = Loading(),
-    /** The FQN name of the MavericksView that is currently selected for display. */
-    val selectedView: String? = null,
+    val allFragments: Async<List<Class<out MockableMavericksView>>> = Loading(),
+    /** The MavericksView that is currently selected for display. */
+    val selectedView: Class<out MockableMavericksView>? = null,
     /**
      * The currently selected mock. This is set when the user clicks into a mock.
      * Additionally, the value is saved and restored when mocks are loaded anew when the viewmodel is initialized.
@@ -53,11 +55,11 @@ data class MavericksLauncherState(
      */
     val queryResult: QueryResult?
         get() {
-            val mocksToCheck = allMocks() ?: cachedMocks() ?: return null
+            val fragmentsToCheck = allFragments() ?: cachedFragments() ?: return null
 
             // We only return "NoMatch" once we are sure all mocks have loaded and we have checked
             // all of them. Until then we can look for matches in mocks as they load incrementally.
-            fun fallback(queryText: String) = if (allMocks is Incomplete) {
+            fun fallback(queryText: String) = if (allFragments is Incomplete) {
                 null
             } else {
                 QueryResult.NoMatch(queryText)
@@ -67,20 +69,24 @@ data class MavericksLauncherState(
                 viewNameToOpen != null -> {
                     // Look for the first View who's simple name contains the deeplink query
                     // We will just use it's default initial args and state
-                    val viewMatch = mocksToCheck.firstOrNull { mockedViewProvider ->
-                        mockedViewProvider.viewName.simpleName.contains(
-                            viewNameToOpen,
-                            ignoreCase = true
-                        ) && mockedViewProvider.mock.isDefaultInitialization
-                    }
-
-                    // Or if no view name matches we can look for a specific mock by name
-                    val mockMatch = mocksToCheck.firstOrNull { mockedViewProvider ->
-                        mockedViewProvider.mock.name.contains(
+                    val viewMatch = fragmentsToCheck.firstOrNull { viewClass ->
+                        viewClass.simpleName.contains(
                             viewNameToOpen,
                             ignoreCase = true
                         )
+                    }?.let { viewClass ->
+                        getMockVariants(viewClass)?.firstOrNull { it.mock.isDefaultInitialization }
                     }
+
+                    // Or if no view name matches we can look for a specific mock by name
+                    val mockMatch = fragmentsToCheck.asSequence()
+                        .flatMap { getMockVariants(it) ?: emptyList() }
+                        .firstOrNull { mockedViewProvider ->
+                            mockedViewProvider.mock.name.contains(
+                                viewNameToOpen,
+                                ignoreCase = true
+                            )
+                        }
 
                     (viewMatch ?: mockMatch)
                         ?.let { mock ->
@@ -92,12 +98,13 @@ data class MavericksLauncherState(
                     // Since we need to find all views that match the query we need to make
                     // sure they are all loaded first, and can't just look at incrementally
                     // loaded mocks from the cache.
-                    if (allMocks !is Success) return null
+                    if (allFragments !is Success) return null
 
                     fun String.match() =
                         contains(viewNamePatternToTest, ignoreCase = true)
 
-                    mocksToCheck
+                    fragmentsToCheck
+                        .flatMap { getMockVariants(it) ?: emptyList() }
                         .filter { it.viewName.match() || it.mock.name.match() }
                         .takeIf { it.isNotEmpty() }
                         ?.let { mocks ->
@@ -167,25 +174,33 @@ class MavericksLauncherViewModel(
     init {
         loadViewsFromCache(initialState)
 
-        GlobalScope.launch {
-            val mocks = MavericksGlobalMockLibrary.getMocks()
-            log("loaded mocks from state")
-            setState {
-                // The previously selected view (last time the app ran) may have been deleted or renamed.
-                val selectedViewExists = mocks.any { it.viewName == selectedView }
+        viewModelScope.launch {
+            MavericksGlobalMockLibrary.mockableViewsFlow.collectLatest { asyncMavericksViewClasses ->
+                setState { copy(allFragments = asyncMavericksViewClasses) }
 
-                copy(
-                    allMocks = Success(mocks),
-                    selectedView = if (selectedViewExists) selectedView else null
-                )
+                if (asyncMavericksViewClasses is Success) {
+                    log("loaded fragment classes from dex files")
+                    setState {
+                        // The previously selected view (last time the app ran) may have been deleted or renamed.
+                        val selectedViewExists = asyncMavericksViewClasses().any { it == selectedView }
+                        copy(
+                            selectedView = if (selectedViewExists) selectedView else null
+                        )
+                    }
+                }
             }
-
-            saveViewsToCache(mocks)
         }
     }
 
     /** Since parsing views from dex files is slow we can remember the last list of view names and load them directly. */
-    private fun loadViewsFromCache(initialState: MavericksLauncherState) = GlobalScope.launch {
+    private fun loadViewsFromCache(initialState: MavericksLauncherState) = viewModelScope.launch {
+        val cachedFragmentClasses = sharedPrefs.getList(KEY_VIEWS).mapNotNull { lookUpMavericksViewClass(it) }
+
+        setState {
+            copy(cachedFragments = Success(cachedFragmentClasses))
+        }
+        log("loaded fragments from cache")
+
         val selectedMockData: String? = sharedPrefs.getString(KEY_SELECTED_MOCK, null)
         log("Selected mock from cache: $selectedMockData")
 
@@ -199,54 +214,34 @@ class MavericksLauncherViewModel(
 
         // The goal with saving and restoring the selected mock is to launch the last used mock automatically, ASAP, with the expectation
         // that the developer will be needing to use it again (ie ongoing development on that screen.
-        // A few seconds can be a big deal here, so to be as instant as possible we sort the views to parse the recent one first,
-        // process them all in parallel with coroutines (with the recent mock kicked off first), and as soon as it is ready we update
-        // state, without waiting for the rest of the views to finish.
-        // This changes the loading time from ~5 seconds to nearly instantaneous (depends how complex the mocks are for the recent view).
-        sharedPrefs
-            .getList(KEY_VIEWS)
-            .sortedWith(viewUiOrderComparator(initialState))
-            // Mocks are loaded one at a time, in order recency, so we can prioritize loading
-            // the view that is most likely to be needed first.
-            .onEach { viewName ->
-                try {
-                    val mocks = getMockVariants<MockableMavericksView>(viewName)
 
-                    // Only set the selected mock if a deeplink wasn't used to open view,
-                    // because otherwise they interfere with each other.
-                    if (this@MavericksLauncherViewModel.initialState.viewNameToOpen == null && this@MavericksLauncherViewModel.initialState.viewNamePatternToTest == null) {
-                        mocks?.findSelectedMock()?.let { selectedMock ->
-                            log("Setting selected mock from cache: ${selectedMock.viewName}")
-                            setState { copy(selectedMock = selectedMock) }
-                        }
-                    }
-
-                    log("loaded mocks from cache: $viewName")
-                    setState {
-                        copy(cachedMocks = Success(cachedMocks().orEmpty() + mocks.orEmpty()))
-                    }
-                } catch (e: ClassNotFoundException) {
-                    // The stored view name might not exist anymore if a different flavor was built or a view was deleted
-                    log("Cache class not found: $viewName")
-                }
+        // Only set the selected mock if a deeplink wasn't used to open view,
+        // because otherwise they interfere with each other.
+        val state = this@MavericksLauncherViewModel.initialState
+        if (state.viewNameToOpen == null && state.viewNamePatternToTest == null) {
+            state.selectedView?.let { getMockVariants(it) }?.findSelectedMock()?.let { selectedMock ->
+                log("Setting selected mock from cache: ${selectedMock.viewName}")
+                setState { copy(selectedMock = selectedMock) }
             }
-    }
-
-    private fun saveViewsToCache(mockedViewProviders: List<MockedViewProvider<*>>) {
-        sharedPrefs.edit {
-            // Get fully qualified names and remove duplicates
-            putList(KEY_VIEWS, mockedViewProviders.map { it.viewName }.distinct())
         }
     }
 
-    fun setSelectedView(viewName: String?) {
+    private fun saveMavericksViewsToCache(allMavericksViews: List<Class<out MockableMavericksView>>) {
+        sharedPrefs.edit {
+            // Get fully qualified names and remove duplicates
+            putList(KEY_VIEWS, allMavericksViews.mapNotNull { it.canonicalName }.distinct())
+        }
+    }
+
+    fun setSelectedView(viewClass: Class<out MockableMavericksView>?) {
+        val viewName = viewClass?.canonicalName
         setState {
-            copy(selectedView = viewName, recentUsage = recentUsage.withViewAtTop(viewName))
+            copy(selectedView = viewClass, recentUsage = recentUsage.withViewAtTop(viewName))
         }
 
         sharedPrefs.edit {
             putString(KEY_SELECTED_VIEW, viewName)
-            log("Saving selected view to cache:  $viewName")
+            log("Saving selected view to cache: $viewName")
 
             if (viewName != null) {
                 val recentViews = sharedPrefs.getList(KEY_RECENTLY_USED_VIEWS)
@@ -287,7 +282,9 @@ class MavericksLauncherViewModel(
 
         override fun initialState(viewModelContext: ViewModelContext): MavericksLauncherState {
             val sharedPrefs = viewModelContext.sharedPrefs()
-            val selectedView: String? = sharedPrefs.getString(KEY_SELECTED_VIEW, null)
+            val selectedView: Class<out MockableMavericksView>? = sharedPrefs.getString(KEY_SELECTED_VIEW, null)?.let { viewClassName ->
+                lookUpMavericksViewClass(viewClassName)
+            }
             val recentViews = sharedPrefs.getList(KEY_RECENTLY_USED_VIEWS)
 
             val recentMocks = sharedPrefs.getList(KEY_RECENTLY_USED_MOCKS)
@@ -342,3 +339,8 @@ private fun SharedPreferences.getList(key: String) =
 internal fun log(msg: String) {
     Log.d(MavericksLauncherViewModel::class.simpleName, msg)
 }
+
+@Suppress("UNCHECKED_CAST")
+private fun lookUpMavericksViewClass(viewClassName: String): Class<out MockableMavericksView>? = runCatching {
+    Class.forName(viewClassName) as? Class<out MockableMavericksView>
+}.getOrNull()

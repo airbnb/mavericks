@@ -108,44 +108,7 @@ A Launcher activity is provided by default that allows you to browse and open yo
 
 ### Launching Mocked Screens
 
-To help you easily access your mocks, include the `mvrx-launcher` artifact and use `MavericksLauncherActivity`. This activity automatically aggregates all mocked Fragments in your App and displays them with their available mocks.
-
-![Launcher Home](/images/mock_launcher_home.png) ![Launcher Detail Screen](/images/mock_launcher_detail_page.png) ![Fragment opened from launcher](/images/mock_launcher_opened_fragment.png)
-
-You can select a Fragment and mock and it will be opened in a new Activity.
-
-To access this Launcher Activity, call `MavericksLauncherActivity.show(context)`.
-
-By default this loads each Fragment in a plain Activity, but if your Fragments expect a specific host Activity you can customize the Activity they are launched in by setting `MavericksLauncherMockActivity.activityToShowMock` to whichever Activity class you want.
-
-If you set a custom activity this way it should use the `MavericksLauncherMockActivity.showNextMockFromActivity` function to display the mocked view once the Activity is created. For example:
-
-```kotlin
-class LauncherActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        if (savedInstanceState == null) {
-                MavericksLauncherMockActivity.showNextMockFromActivity(
-                    activity = this,
-                    showView = { mavericksView ->
-                       // Use whatever custom code you want to show your Mavericks View
-                     }
-                )
-        }
-    }
-}
-```
-
-#### Automated testing of mocks from the launcher
-
-From the Launcher activity a "Test All" button is available in the Fragment toolbar that, when clicked, will open each mock in series to check for crashes upon initialization.
-
-This offers a sanity check that each mock can be opened and loaded without crashes.
-
-By default this opens each mock in the `MavericksLauncherTestMocksActivity` activity, but that behavior can be changed via setting a custom intent for `MavericksLauncherTestMocksActivity.provideIntentToTestMock`
-
-The testing offered by this is fairly naive and basic, but could be expanded with future work.
+Mavericks provides a built in entry point for accessing mocks via the [**mock launcher**](launcher.md).
 
 ### Custom Usage Of Mocks
 For a given mockable view, a `MockedViewProvider` is created for each mock. This contains a lambda (`createView`) you can invoke to create an instance of that view. It will be initialized with the arguments specified in the mock, and automatically have its ViewModels forced to the states defined in that mock.

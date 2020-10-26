@@ -15,6 +15,7 @@ import com.airbnb.mvrx.mocking.MavericksMock.Companion.DEFAULT_INITIALIZATION_NA
 import com.airbnb.mvrx.mocking.MavericksMock.Companion.DEFAULT_STATE_NAME
 import com.airbnb.mvrx.mocking.MavericksMock.Companion.RESTORED_STATE_NAME
 import java.util.concurrent.atomic.AtomicInteger
+import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
 import kotlin.reflect.KProperty1
@@ -64,7 +65,13 @@ inline fun <reified V : MockableMavericksView> V.combineMocks(
         get() {
             return mocks.map { (prefix, mocker) ->
                 mocker.mocks.map {
-                    it.copy(name = "$prefix : ${it.name}")
+                    MavericksMock(
+                        name = "$prefix : ${it.name}",
+                        argsProvider = it.argsProvider,
+                        statesProvider = it.statesProvider,
+                        forInitialization = it.forInitialization,
+                        type = it.type
+                    )
                 }
             }
         }
@@ -398,17 +405,10 @@ fun <V : MockableMavericksView,
  * 2. Each mock variant is only one line of code, and is easily maintained
  * 3. Each variant tests a single edge case
  */
-data class MavericksMock<V : MavericksView, Args : Parcelable> internal constructor(
+class MavericksMock<V : MavericksView, Args : Parcelable> @PublishedApi internal constructor(
     val name: String,
-    /**
-     * Returns the arguments that should be used to initialize the Mavericks view. If null, the view models will be
-     * initialized purely with the mock states instead.
-     */
-    val args: Args? = null,
-    /**
-     * The State to set on each ViewModel in the View. There should be a one to one match.
-     */
-    val states: List<MockState<V, *>> = emptyList(),
+    @PublishedApi internal val argsProvider: () -> Args?,
+    @PublishedApi internal val statesProvider: () -> List<MockState<V, *>>,
     /**
      * If true, this mock tests the view being created either from arguments or with the viewmodels'
      * default constructor (when [args] is null).
@@ -416,6 +416,17 @@ data class MavericksMock<V : MavericksView, Args : Parcelable> internal construc
     val forInitialization: Boolean = false,
     val type: Type = Type.Custom
 ) {
+
+    /**
+     * Returns the arguments that should be used to initialize the Mavericks view. If null, the view models will be
+     * initialized purely with the mock states instead.
+     */
+    val args: Args? by lazy { argsProvider() }
+
+    /**
+     * The State to set on each ViewModel in the View. There should be a one to one match.
+     */
+    val states: List<MockState<V, *>> by lazy { statesProvider() }
 
     /**
      * Find a mocked state value for the given view model property.
@@ -435,6 +446,26 @@ data class MavericksMock<V : MavericksView, Args : Parcelable> internal construc
         val viewModelToUse = states.firstOrNull { it.viewModelProperty.name == property.name }
         return viewModelToUse?.state
             ?: error("No state found for ViewModel property '${property.name}'. Available view models are ${states.map { it.viewModelProperty.name }}")
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as MavericksMock<*, *>
+
+        if (name != other.name) return false
+        if (forInitialization != other.forInitialization) return false
+        if (type != other.type) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + forInitialization.hashCode()
+        result = 31 * result + type.hashCode()
+        return result
     }
 
     val isDefaultInitialization: Boolean get() = type == Type.DefaultInitialization
@@ -507,8 +538,8 @@ class SingleViewModelMockBuilder<V : MockableMavericksView, Args : Parcelable, S
     fun state(name: String, args: (Args.() -> Args)? = null, stateBuilder: S.() -> S) {
         addState(
             name = name,
-            args = evaluateArgsLambda(args),
-            states = listOf(MockState(viewModelReference, defaultState.stateBuilder()))
+            argsProvider = evaluateArgsLambda(args),
+            statesProvider = { listOf(MockState(viewModelReference, defaultState.stateBuilder())) }
         )
     }
 
@@ -585,12 +616,14 @@ internal constructor(
         statesBuilder: TwoStatesBuilder<V, S1, VM1, S2, VM2>.() -> Unit
     ) {
         addState(
-            name, evaluateArgsLambda(args), TwoStatesBuilder(
-                vm1,
-                defaultState1,
-                vm2,
-                defaultState2
-            ).apply(statesBuilder).states
+            name, evaluateArgsLambda(args), {
+                TwoStatesBuilder(
+                    vm1,
+                    defaultState1,
+                    vm2,
+                    defaultState2
+                ).apply(statesBuilder).states
+            }
         )
     }
 
@@ -756,14 +789,16 @@ internal constructor(
         statesBuilder: ThreeStatesBuilder<V, S1, VM1, S2, VM2, S3, VM3>.() -> Unit
     ) {
         addState(
-            name, evaluateArgsLambda(args), ThreeStatesBuilder(
-                vm1,
-                defaultState1,
-                vm2,
-                defaultState2,
-                vm3,
-                defaultState3
-            ).apply(statesBuilder).states
+            name, evaluateArgsLambda(args), {
+                ThreeStatesBuilder(
+                    vm1,
+                    defaultState1,
+                    vm2,
+                    defaultState2,
+                    vm3,
+                    defaultState3
+                ).apply(statesBuilder).states
+            }
         )
     }
 
@@ -922,16 +957,18 @@ internal constructor(
         addState(
             name,
             evaluateArgsLambda(args),
-            FourStatesBuilder(
-                vm1,
-                defaultState1,
-                vm2,
-                defaultState2,
-                vm3,
-                defaultState3,
-                vm4,
-                defaultState4
-            ).apply(statesBuilder).states
+            {
+                FourStatesBuilder(
+                    vm1,
+                    defaultState1,
+                    vm2,
+                    defaultState2,
+                    vm3,
+                    defaultState3,
+                    vm4,
+                    defaultState4
+                ).apply(statesBuilder).states
+            }
         )
     }
 }
@@ -1029,18 +1066,20 @@ internal constructor(
         addState(
             name,
             evaluateArgsLambda(args),
-            FiveStatesBuilder(
-                vm1,
-                defaultState1,
-                vm2,
-                defaultState2,
-                vm3,
-                defaultState3,
-                vm4,
-                defaultState4,
-                vm5,
-                defaultState5
-            ).apply(statesBuilder).states
+            {
+                FiveStatesBuilder(
+                    vm1,
+                    defaultState1,
+                    vm2,
+                    defaultState2,
+                    vm3,
+                    defaultState3,
+                    vm4,
+                    defaultState4,
+                    vm5,
+                    defaultState5
+                ).apply(statesBuilder).states
+            }
         )
     }
 }
@@ -1149,20 +1188,22 @@ internal constructor(
         addState(
             name,
             evaluateArgsLambda(args),
-            SixStatesBuilder(
-                vm1,
-                defaultState1,
-                vm2,
-                defaultState2,
-                vm3,
-                defaultState3,
-                vm4,
-                defaultState4,
-                vm5,
-                defaultState5,
-                vm6,
-                defaultState6
-            ).apply(statesBuilder).states
+            {
+                SixStatesBuilder(
+                    vm1,
+                    defaultState1,
+                    vm2,
+                    defaultState2,
+                    vm3,
+                    defaultState3,
+                    vm4,
+                    defaultState4,
+                    vm5,
+                    defaultState5,
+                    vm6,
+                    defaultState6
+                ).apply(statesBuilder).states
+            }
         )
     }
 }
@@ -1282,22 +1323,24 @@ internal constructor(
         addState(
             name,
             evaluateArgsLambda(args),
-            SevenStatesBuilder(
-                vm1,
-                defaultState1,
-                vm2,
-                defaultState2,
-                vm3,
-                defaultState3,
-                vm4,
-                defaultState4,
-                vm5,
-                defaultState5,
-                vm6,
-                defaultState6,
-                vm7,
-                defaultState7
-            ).apply(statesBuilder).states
+            {
+                SevenStatesBuilder(
+                    vm1,
+                    defaultState1,
+                    vm2,
+                    defaultState2,
+                    vm3,
+                    defaultState3,
+                    vm4,
+                    defaultState4,
+                    vm5,
+                    defaultState5,
+                    vm6,
+                    defaultState6,
+                    vm7,
+                    defaultState7
+                ).apply(statesBuilder).states
+            }
         )
     }
 }
@@ -1436,6 +1479,10 @@ open class MavericksViewMocks<V : MockableMavericksView, Args : Parcelable> @Pub
 
         private var allowCreationForTesting: Boolean = false
 
+        private val provideMocksFunction: KFunction<*> by lazy {
+            MockableMavericksView::class.findFunction("provideMocks")
+        }
+
         /**
          * Tracks how many mock instances are being validly created. This allows our gating
          * to be done in a thread safe way.
@@ -1460,8 +1507,7 @@ open class MavericksViewMocks<V : MockableMavericksView, Args : Parcelable> @Pub
 
             numAllowedCreationsOfMocks.incrementAndGet()
 
-            val mocks =
-                view.call<MavericksViewMocks<out MockableMavericksView, out Parcelable>>("provideMocks")
+            val mocks = provideMocksFunction.call(view) as MavericksViewMocks<out MockableMavericksView, out Parcelable>
 
             require(numAllowedCreationsOfMocks.decrementAndGet() >= 0) {
                 "numAllowedCreationsOfMocks is negative"
@@ -1494,8 +1540,6 @@ open class MockBuilder<V : MockableMavericksView, Args : Parcelable> internal co
         // at this point, so we need to add it anyway.
         addState(
             name = DEFAULT_INITIALIZATION_NAME,
-            args = defaultArgs,
-            states = defaultStates,
             forInitialization = true,
             type = MavericksMock.Type.DefaultInitialization
         )
@@ -1503,14 +1547,11 @@ open class MockBuilder<V : MockableMavericksView, Args : Parcelable> internal co
         if (defaultStates.isNotEmpty()) {
             addState(
                 name = DEFAULT_STATE_NAME,
-                args = defaultArgs,
-                states = defaultStates,
                 type = MavericksMock.Type.DefaultState
             )
             addState(
                 name = RESTORED_STATE_NAME,
-                args = defaultArgs,
-                states = defaultStates.map { it.copy(state = it.state.toRestoredState()) },
+                statesProvider = { defaultStates.map { it.copy(state = it.state.toRestoredState()) } },
                 type = MavericksMock.Type.ProcessRecreation
             )
         }
@@ -1524,31 +1565,31 @@ open class MockBuilder<V : MockableMavericksView, Args : Parcelable> internal co
      * @param name Describes what state these arguments put the view in. Should be unique.
      */
     fun args(name: String, builder: Args.() -> Args) {
-        addState(name, evaluateArgsLambda(builder), defaultStates, forInitialization = true)
+        addState(name, argsProvider = evaluateArgsLambda(builder), forInitialization = true)
     }
 
-    internal fun evaluateArgsLambda(builder: (Args.() -> Args)?): Args? {
+    internal fun evaluateArgsLambda(builder: (Args.() -> Args)?): () -> Args? {
         if (builder == null) {
-            return defaultArgs
+            return { defaultArgs }
         }
 
         requireNotNull(defaultArgs) { "Args cannot be provided unless you have set a default value for them in the top level mock method" }
 
-        return builder.invoke(defaultArgs)
+        return { builder.invoke(defaultArgs) }
     }
 
     protected fun addState(
         name: String,
-        args: Args? = defaultArgs,
-        states: List<MockState<V, *>>,
+        argsProvider: () -> Args? = { defaultArgs },
+        statesProvider: () -> List<MockState<V, *>> = { defaultStates },
         forInitialization: Boolean = false,
         type: MavericksMock.Type = MavericksMock.Type.Custom
     ) {
         mocks.add(
             MavericksMock(
                 name = name,
-                args = args,
-                states = states,
+                argsProvider = argsProvider,
+                statesProvider = statesProvider,
                 forInitialization = forInitialization,
                 type = type
             )
