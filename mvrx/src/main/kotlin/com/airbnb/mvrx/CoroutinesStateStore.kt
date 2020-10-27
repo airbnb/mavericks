@@ -26,7 +26,7 @@ class CoroutinesStateStore<S : MavericksState>(
 
     private val stateSharedFlow = MutableSharedFlow<S>(
         replay = 1,
-        extraBufferCapacity = 64,
+        extraBufferCapacity = SubscriberBufferSize,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     ).apply { tryEmit(initialState) }
 
@@ -113,5 +113,11 @@ class CoroutinesStateStore<S : MavericksState>(
 
     companion object {
         private val flushDispatcher = Executors.newCachedThreadPool().asCoroutineDispatcher()
+
+        /**
+         * The buffer size that will be allocated by [MutableSharedFlow] for each subscriber.
+         * If it falls behind by more than 64 state updates, it will start dropping the oldest values.
+         */
+        internal const val SubscriberBufferSize = 64
     }
 }

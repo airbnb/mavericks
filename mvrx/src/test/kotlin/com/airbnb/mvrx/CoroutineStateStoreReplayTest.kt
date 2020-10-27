@@ -26,7 +26,7 @@ class CoroutineStateStoreReplayTest {
         repeat(1000) {
             // The store's backing SharedFlow has a buffer of 64 elements per subscriber. After that, it will drop
             // the oldest messages.
-            singleReplayTestIteration(N = 64, subscribers = 10)
+            singleReplayTestIteration(N = CoroutinesStateStore.SubscriberBufferSize, subscribers = 10)
         }
         Unit
     }
