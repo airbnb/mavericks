@@ -4,6 +4,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 /**
  * A [MavericksStateStore] which ignores standard calls to [set]. Instead it can be scripted via calls to
@@ -20,9 +21,10 @@ class ScriptableMavericksStateStore<S : Any>(initialState: S) : ScriptableStateS
         onBufferOverflow = BufferOverflow.SUSPEND,
     ).apply { tryEmit(initialState) }
 
+    @Volatile
     override var state = initialState
 
-    override val flow: Flow<S> = stateSharedFlow.asSharedFlow()
+    override val flow: Flow<S> = stateSharedFlow.asSharedFlow().distinctUntilChanged()
 
     override fun get(block: (S) -> Unit) {
         block(state)

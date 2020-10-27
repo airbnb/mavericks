@@ -6,6 +6,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 
 /**
  * This acts as a functional state store, but all updates happen synchronously.
@@ -21,7 +22,7 @@ class SynchronousMavericksStateStore<S : Any>(initialState: S) : MavericksStateS
         onBufferOverflow = BufferOverflow.SUSPEND,
     ).apply { tryEmit(initialState) }
 
-    override val flow: Flow<S> = stateSharedFlow.asSharedFlow()
+    override val flow: Flow<S> = stateSharedFlow.asSharedFlow().distinctUntilChanged()
 
     @Volatile
     override var state: S = initialState

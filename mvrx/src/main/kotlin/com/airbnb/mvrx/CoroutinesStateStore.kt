@@ -32,6 +32,7 @@ class CoroutinesStateStore<S : MavericksState>(
         onBufferOverflow = BufferOverflow.SUSPEND,
     ).apply { tryEmit(initialState) }
 
+    @Volatile
     override var state = initialState
 
     /**
