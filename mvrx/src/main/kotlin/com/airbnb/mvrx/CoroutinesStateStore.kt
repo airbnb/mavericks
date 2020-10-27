@@ -2,23 +2,19 @@ package com.airbnb.mvrx
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.asCoroutineDispatcher
-import kotlinx.coroutines.channels.BroadcastChannel
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.consume
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.selects.select
-import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
-@Suppress("EXPERIMENTAL_API_USAGE")
 class CoroutinesStateStore<S : MavericksState>(
     initialState: S,
     private val scope: CoroutineScope,
@@ -28,39 +24,24 @@ class CoroutinesStateStore<S : MavericksState>(
     private val setStateChannel = Channel<S.() -> S>(capacity = Channel.UNLIMITED)
     private val withStateChannel = Channel<(S) -> Unit>(capacity = Channel.UNLIMITED)
 
-    /**
-     * This combination of BroadcastChannel, mutable state property and flow was arrived
-     * at after multiple attempts. This code needs to:
-     * 1) Multicast
-     * 2) Never fail to deliver an intermediate state to subscribers even if updates are fast or
-     *    some subscribers are slow.
-     * 3) Be able to provide an initial value.
-     *
-     * StateFlow can't be used because it conflates new sets. If you set its value in a tight
-     * loop and listen to changes on a flow, you will miss values. ConflatedBroadcastChannel
-     * alone has the same issue.
-     *
-     * A normal Channel can't be used because it isn't multicast.
-     */
-    private val stateChannel = BroadcastChannel<S>(capacity = Channel.BUFFERED)
-    private val updateMutex = Mutex()
-    override var state = initialState
+    private val stateSharedFlow = MutableSharedFlow<S>(
+        replay = 1,
+        extraBufferCapacity = 64,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+    ).apply { tryEmit(initialState) }
+
+    override val state: S get() = stateSharedFlow.replayCache.first()
 
     /**
      * Returns a [Flow] for this store's state. It will begin by immediately emitting
      * the latest set value and then continue with all subsequent updates.
+     *
+     * This doesn't need distinctUntilChanged() because the de-dupinng is done once
+     * for all subscriptions in [flushQueuesOnce].
+     *
      * This flow never completes
      */
-    override val flow: Flow<S>
-        get() = flow {
-            val (initialState, subscription) = updateMutex.withLock {
-                state to stateChannel.openSubscription()
-            }
-            subscription.consume {
-                emit(initialState)
-                emitAll(this)
-            }
-        }
+    override val flow: Flow<S> = stateSharedFlow.asSharedFlow()
 
     init {
         setupTriggerFlushQueues(scope)
@@ -101,10 +82,7 @@ class CoroutinesStateStore<S : MavericksState>(
             setStateChannel.onReceive { reducer ->
                 val newState = state.reducer()
                 if (newState != state) {
-                    updateMutex.withLock {
-                        state = newState
-                        stateChannel.send(newState)
-                    }
+                    stateSharedFlow.emit(newState)
                 }
             }
             withStateChannel.onReceive { block ->
