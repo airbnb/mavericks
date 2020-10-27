@@ -18,7 +18,7 @@ class SynchronousMavericksStateStore<S : Any>(initialState: S) : MavericksStateS
 
     private val stateSharedFlow = MutableSharedFlow<S>(
         replay = 1,
-        extraBufferCapacity = 64,
+        extraBufferCapacity = 63,
         onBufferOverflow = BufferOverflow.SUSPEND,
     ).apply { tryEmit(initialState) }
 

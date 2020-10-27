@@ -122,7 +122,10 @@ class CoroutinesStateStore<S : MavericksState>(
          * The buffer size that will be allocated by [MutableSharedFlow].
          * If it falls behind by more than 64 state updates, it will start suspending.
          * Slow consumers should consider using `stateFlow.buffer(onBufferOverflow = BufferOverflow.DROP_OLDEST)`.
+         *
+         * The internally allocated buffer is replay + extraBufferCapacity but always allocates 2^n space.
+         * We use replay=1 so buffer = 64-1.
          */
-        internal const val SubscriberBufferSize = 64
+        internal const val SubscriberBufferSize = 63
     }
 }
