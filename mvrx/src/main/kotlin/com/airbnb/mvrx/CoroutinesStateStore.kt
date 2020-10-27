@@ -11,6 +11,8 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.selects.select
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import java.util.concurrent.Executors
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
@@ -27,10 +29,10 @@ class CoroutinesStateStore<S : MavericksState>(
     private val stateSharedFlow = MutableSharedFlow<S>(
         replay = 1,
         extraBufferCapacity = SubscriberBufferSize,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        onBufferOverflow = BufferOverflow.SUSPEND,
     ).apply { tryEmit(initialState) }
 
-    override val state: S get() = stateSharedFlow.replayCache.first()
+    override var state = initialState
 
     /**
      * Returns a [Flow] for this store's state. It will begin by immediately emitting
@@ -82,6 +84,7 @@ class CoroutinesStateStore<S : MavericksState>(
             setStateChannel.onReceive { reducer ->
                 val newState = state.reducer()
                 if (newState != state) {
+                    state = newState
                     stateSharedFlow.emit(newState)
                 }
             }
@@ -115,8 +118,9 @@ class CoroutinesStateStore<S : MavericksState>(
         private val flushDispatcher = Executors.newCachedThreadPool().asCoroutineDispatcher()
 
         /**
-         * The buffer size that will be allocated by [MutableSharedFlow] for each subscriber.
-         * If it falls behind by more than 64 state updates, it will start dropping the oldest values.
+         * The buffer size that will be allocated by [MutableSharedFlow].
+         * If it falls behind by more than 64 state updates, it will start suspending.
+         * Slow consumers should consider using `stateFlow.buffer(onBufferOverflow = BufferOverflow.DROP_OLDEST)`.
          */
         internal const val SubscriberBufferSize = 64
     }

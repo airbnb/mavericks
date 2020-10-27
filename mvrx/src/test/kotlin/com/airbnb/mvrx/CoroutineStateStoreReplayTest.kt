@@ -23,11 +23,15 @@ class CoroutineStateStoreReplayTest {
 
     @Test
     fun replayTest() = runBlocking {
-        repeat(1000) {
-            // The store's backing SharedFlow has a buffer of 64 elements per subscriber. After that, it will drop
-            // the oldest messages.
-            singleReplayTestIteration(N = CoroutinesStateStore.SubscriberBufferSize, subscribers = 10)
+        repeat(100) {
+            singleReplayTestIteration(N = 5000, subscribers = 10)
         }
+        Unit
+    }
+
+    @Test
+    fun replayLargeTest() = runBlocking {
+        singleReplayTestIteration(N = 100_000, subscribers = 10)
         Unit
     }
 
