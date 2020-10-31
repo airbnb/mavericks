@@ -22,7 +22,7 @@ object Versions {
 
     // Libraries
     const val autoValue = "1.6.6"
-    const val kotlinCoroutines = "1.3.9"
+    const val kotlinCoroutines = "1.4.0"
     const val dagger = "2.27"
     const val daggerAssisted = "0.5.2"
     const val epoxy = "4.0.0"
