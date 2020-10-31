@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName")
+
 package com.airbnb.mvrx
 
 import androidx.annotation.RestrictTo
