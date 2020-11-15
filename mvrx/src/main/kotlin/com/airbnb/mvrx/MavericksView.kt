@@ -12,12 +12,12 @@ import kotlin.reflect.KProperty1
 
 // Set of [MavericksView identity hash codes that have a pending invalidate.
 private val pendingInvalidates = HashSet<Int>()
-private val handler = Handler(Looper.getMainLooper(), Handler.Callback { message ->
+private val handler = Handler(Looper.getMainLooper()) { message ->
     val view = message.obj as MavericksView
     pendingInvalidates.remove(System.identityHashCode(view))
     if (view.lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) view.invalidate()
     true
-})
+}
 
 /**
  * If any callbacks to run [MavericksView.invalidate] have been posted with [MavericksView.postInvalidate]

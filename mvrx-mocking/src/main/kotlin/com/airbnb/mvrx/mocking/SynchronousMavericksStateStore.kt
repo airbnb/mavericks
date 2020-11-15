@@ -1,6 +1,7 @@
 package com.airbnb.mvrx.mocking
 
 import androidx.annotation.RestrictTo
+import com.airbnb.mvrx.InternalMavericksApi
 import com.airbnb.mvrx.MavericksStateStore
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
  * synchronously.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+@InternalMavericksApi
 class SynchronousMavericksStateStore<S : Any>(initialState: S) : MavericksStateStore<S> {
 
     private val stateSharedFlow = MutableSharedFlow<S>(

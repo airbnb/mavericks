@@ -13,6 +13,7 @@ import java.io.Serializable
  * of two separate ones. The logic for providing the correct scope is inside the method.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
+@InternalMavericksApi
 object MavericksViewModelProvider {
     /**
      * MvRx specific ViewModelProvider used for creating a BaseMavericksViewModel scoped to either a [Fragment] or [FragmentActivity].
