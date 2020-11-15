@@ -50,6 +50,7 @@ abstract class MavericksDelegateProvider<T, R> {
  * should be instantiated.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+@InternalMavericksApi
 interface ViewModelDelegateFactory {
     /**
      * Create a Lazy ViewModel for the given Fragment.

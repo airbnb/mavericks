@@ -13,6 +13,7 @@ import kotlin.reflect.KProperty1
  * https://issuetracker.google.com/issues/168357308
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+@InternalMavericksApi
 fun <VM : MavericksViewModel<S>, S : MavericksState> VM._internal(
     owner: LifecycleOwner?,
     deliveryMode: DeliveryMode = RedeliverOnStart,
@@ -24,6 +25,7 @@ fun <VM : MavericksViewModel<S>, S : MavericksState> VM._internal(
  * https://issuetracker.google.com/issues/168357308
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+@InternalMavericksApi
 fun <VM : MavericksViewModel<S>, S : MavericksState, A> VM._internal1(
     owner: LifecycleOwner?,
     prop1: KProperty1<S, A>,
@@ -41,6 +43,7 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, A> VM._internal1(
  * https://issuetracker.google.com/issues/168357308
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+@InternalMavericksApi
 fun <VM : MavericksViewModel<S>, S : MavericksState, A, B> VM._internal2(
     owner: LifecycleOwner?,
     prop1: KProperty1<S, A>,
@@ -59,6 +62,7 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, A, B> VM._internal2(
  * https://issuetracker.google.com/issues/168357308
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+@InternalMavericksApi
 fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C> VM._internal3(
     owner: LifecycleOwner?,
     prop1: KProperty1<S, A>,
@@ -78,6 +82,7 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C> VM._internal3(
  * https://issuetracker.google.com/issues/168357308
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+@InternalMavericksApi
 fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D> VM._internal4(
     owner: LifecycleOwner?,
     prop1: KProperty1<S, A>,
@@ -98,6 +103,7 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D> VM._internal4(
  * https://issuetracker.google.com/issues/168357308
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+@InternalMavericksApi
 fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E> VM._internal5(
     owner: LifecycleOwner?,
     prop1: KProperty1<S, A>,
@@ -119,6 +125,7 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E> VM._internal
  * https://issuetracker.google.com/issues/168357308
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+@InternalMavericksApi
 fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E, F> VM._internal6(
     owner: LifecycleOwner?,
     prop1: KProperty1<S, A>,
@@ -141,6 +148,7 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E, F> VM._inter
  * https://issuetracker.google.com/issues/168357308
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+@InternalMavericksApi
 fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E, F, G> VM._internal7(
     owner: LifecycleOwner?,
     prop1: KProperty1<S, A>,
@@ -164,6 +172,7 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E, F, G> VM._in
  * https://issuetracker.google.com/issues/168357308
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+@InternalMavericksApi
 fun <VM : MavericksViewModel<S>, S : MavericksState, T> VM._internalSF(
     owner: LifecycleOwner?,
     asyncProp: KProperty1<S, Async<T>>,

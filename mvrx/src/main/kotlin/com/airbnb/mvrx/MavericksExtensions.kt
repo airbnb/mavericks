@@ -17,6 +17,7 @@ import kotlin.reflect.KProperty
  */
 @Suppress("FunctionName")
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+@InternalMavericksApi
 fun <T : Fragment> T._fragmentArgsProvider(): Any? = arguments?.get(Mavericks.KEY_ARG)
 
 /**
