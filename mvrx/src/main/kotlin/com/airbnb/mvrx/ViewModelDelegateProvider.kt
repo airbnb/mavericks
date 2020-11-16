@@ -1,6 +1,5 @@
 package com.airbnb.mvrx
 
-import androidx.annotation.RestrictTo
 import androidx.fragment.app.Fragment
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty

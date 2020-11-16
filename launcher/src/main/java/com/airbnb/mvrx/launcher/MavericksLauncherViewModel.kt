@@ -18,9 +18,6 @@ import com.airbnb.mvrx.mocking.MockableMavericksView
 import com.airbnb.mvrx.mocking.MockedViewProvider
 import com.airbnb.mvrx.mocking.getMockVariants
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onCompletion
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 data class MavericksLauncherState(
