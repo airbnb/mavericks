@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="mavericks_padding_horizontal">20dp</dimen>
+    <dimen name="mavericks_divider">1dp</dimen>
+</resources>

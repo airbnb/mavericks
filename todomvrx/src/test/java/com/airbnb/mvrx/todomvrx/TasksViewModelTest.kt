@@ -6,12 +6,16 @@ import com.airbnb.mvrx.test.MvRxTestRule
 import com.airbnb.mvrx.todomvrx.data.Task
 import com.airbnb.mvrx.todomvrx.data.source.TasksDataSource
 import com.airbnb.mvrx.withState
+import com.nhaarman.mockitokotlin2.atLeastOnce
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
 import io.reactivex.Single
 import io.reactivex.subjects.SingleSubject
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.ClassRule
 import org.junit.Test
@@ -23,11 +27,13 @@ class TasksViewModelTest {
     private lateinit var viewModel: TasksViewModel
     private lateinit var tasks: List<Task>
 
-    @Before fun setupTasksList() {
+    @Before
+    fun setupTasksList() {
         tasks = listOf(task1, task2, task3)
     }
 
-    @Test fun refreshTasks_success() {
+    @Test
+    fun refreshTasks_success() {
         // use subject to be able to verify the loading state before any emissions
         val tasksSubject = SingleSubject.create<List<Task>>()
         whenever(dataSource.getTasks()).thenReturn(tasksSubject)
@@ -54,7 +60,8 @@ class TasksViewModelTest {
         withState(viewModel) { assertEquals(it.isLoading, false) }
     }
 
-    @Test fun refreshTasks_failure() {
+    @Test
+    fun refreshTasks_failure() {
         whenever(dataSource.getTasks()).thenReturn(Single.error(Exception("Server not found")))
 
         // given the viewmodel with default state
@@ -70,7 +77,8 @@ class TasksViewModelTest {
         }
     }
 
-    @Test fun upsertTask_insert() {
+    @Test
+    fun upsertTask_insert() {
         // make `getTasks` emit nothing to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.never())
 
@@ -97,7 +105,8 @@ class TasksViewModelTest {
         verify(dataSource).upsertTask(task4)
     }
 
-    @Test fun upsertTask_update() {
+    @Test
+    fun upsertTask_update() {
         // make `getTasks` emit nothing to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.never())
 
@@ -125,7 +134,8 @@ class TasksViewModelTest {
         verify(dataSource).upsertTask(updatedTask)
     }
 
-    @Test fun setComplete() {
+    @Test
+    fun setComplete() {
         // make `getTasks` emit nothing to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.never())
 
@@ -151,7 +161,8 @@ class TasksViewModelTest {
         verify(dataSource).setComplete("task_1", true)
     }
 
-    @Test fun setComplete_noTaskInList() {
+    @Test
+    fun setComplete_noTaskInList() {
         // make `getTasks` emit nothing to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.never())
 
@@ -176,7 +187,8 @@ class TasksViewModelTest {
         verify(dataSource).setComplete("task_5", true)
     }
 
-    @Test fun setComplete_taskIsAlreadyCompleted() {
+    @Test
+    fun setComplete_taskIsAlreadyCompleted() {
         // make `getTasks` emit nothing to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.never())
 
@@ -201,7 +213,8 @@ class TasksViewModelTest {
         verify(dataSource).setComplete("task_2", true)
     }
 
-    @Test fun clearCompletedTasks() {
+    @Test
+    fun clearCompletedTasks() {
         // make `getTasks` emit nothing to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.never())
 
@@ -225,10 +238,11 @@ class TasksViewModelTest {
         }
 
         // verify the data source has cleared completed tasks
-        verify(dataSource).clearCompletedTasks()
+        verify(dataSource, atLeastOnce()).clearCompletedTasks()
     }
 
-    @Test fun deleteTask() {
+    @Test
+    fun deleteTask() {
         // make `getTasks` emit nothing to use tasks from the initial state
         whenever(dataSource.getTasks()).thenReturn(Single.never())
 

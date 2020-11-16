@@ -2,12 +2,14 @@ package com.airbnb.mvrx.sample.views
 
 import android.content.Context
 import android.util.AttributeSet
-import android.view.View
 import android.widget.LinearLayout
-import android.widget.TextView
+import androidx.core.content.withStyledAttributes
+import androidx.core.view.isVisible
 import com.airbnb.epoxy.ModelView
 import com.airbnb.epoxy.TextProp
 import com.airbnb.mvrx.sample.R
+import com.airbnb.mvrx.sample.databinding.MarqueeBinding
+import com.airbnb.mvrx.sample.utils.viewBinding
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)
 class Marquee @JvmOverloads constructor(
@@ -15,25 +17,23 @@ class Marquee @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
-
-    private val titleView: TextView
-    private val subtitleView: TextView
+    private val binding by viewBinding<MarqueeBinding>()
 
     init {
-        inflate(context, R.layout.marquee, this)
-        titleView = findViewById(R.id.title)
-        subtitleView = findViewById(R.id.subtitle)
         orientation = VERTICAL
+        context.withStyledAttributes(attrs, R.styleable.Marquee) {
+            if (hasValue(R.styleable.Marquee_android_title)) setTitle(getText(R.styleable.Marquee_android_title))
+        }
     }
 
     @TextProp
     fun setTitle(title: CharSequence) {
-        titleView.text = title
+        binding.title.text = title
     }
 
     @TextProp
     fun setSubtitle(subtitle: CharSequence?) {
-        subtitleView.visibility = if (subtitle.isNullOrBlank()) View.GONE else View.VISIBLE
-        subtitleView.text = subtitle
+        binding.subtitle.isVisible = subtitle.isNullOrBlank().not()
+        binding.subtitle.text = subtitle
     }
 }

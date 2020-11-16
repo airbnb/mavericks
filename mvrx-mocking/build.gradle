@@ -1,0 +1,51 @@
+import com.airbnb.mvrx.JacocoReportTask
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: "jacoco"
+apply plugin: "com.vanniktech.maven.publish"
+apply plugin: 'kotlin-android-extensions'
+
+android {
+    resourcePrefix 'mvrx_'
+
+    defaultConfig {
+        consumerProguardFiles 'proguard-rules.pro'
+    }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+            all {
+                jacoco {
+                    includeNoLocationClasses = true
+                }
+            }
+        }
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.2"
+}
+
+dependencies {
+    implementation Libraries.kotlinReflect
+    implementation Libraries.appcompat
+    api project(':mvrx')
+
+    testImplementation project(':testing')
+    testImplementation TestLibraries.mockito
+    testImplementation TestLibraries.junit
+    testImplementation TestLibraries.roboeletric
+    testImplementation TestLibraries.kotlinCoroutinesTest
+
+    // Including autovalue just for the AutoValue type printer test
+    testImplementation Libraries.autoValue
+    kaptTest AnnotationProcessors.autoValue
+}
+
+tasks.register("coverage", JacocoReportTask.class) {
+    coverage.dependsOn("testDebugUnitTest")
+}

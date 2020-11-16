@@ -1,5 +1,8 @@
 // Libraries
 include ":mvrx"
+include ":mvrx-rxjava2"
+include ':mvrx-mocking'
+include ':launcher'
 include ":testing"
 
 // Samples

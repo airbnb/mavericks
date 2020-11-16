@@ -1,9 +1,9 @@
 package com.airbnb.mvrx.dogs
 
 import com.airbnb.mvrx.Async
-import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.Uninitialized
 import com.airbnb.mvrx.dogs.data.Dog
+import com.airbnb.mvrx.MvRxState
 
 data class DogState(
     val dogs: Async<List<Dog>> = Uninitialized,

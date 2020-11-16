@@ -7,19 +7,19 @@
     <fragment
         android:id="@+id/tasksFragment"
         android:name="com.airbnb.mvrx.todomvrx.TaskListFragment"
-        android:label="TO-DO MvRx"/>
+        android:label="TO-DO MvRx" />
     <fragment
         android:id="@+id/statisticsFragment"
         android:name="com.airbnb.mvrx.todomvrx.StatisticsFragment"
-        android:label="Statistics"/>
+        android:label="Statistics" />
 
     <fragment
         android:id="@+id/addEditFragment"
         android:name="com.airbnb.mvrx.todomvrx.AddEditTaskFragment"
-        android:label="TO-DO MvRx"/>
+        android:label="TO-DO MvRx" />
 
     <fragment
         android:id="@+id/detailFragment"
         android:name="com.airbnb.mvrx.todomvrx.TaskDetailFragment"
-        android:label="TO-DO MvRx"/>
+        android:label="TO-DO MvRx" />
 </navigation>

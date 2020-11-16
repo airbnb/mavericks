@@ -10,6 +10,7 @@ android {
         versionCode 1
         versionName "0.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
 
     buildTypes {
@@ -42,6 +43,8 @@ dependencies {
     implementation Libraries.fragmentKtx
     implementation Libraries.rxJava
     implementation Libraries.viewModelKtx
+    implementation Libraries.multidex
+
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(":mvrx")
 
@@ -51,6 +54,7 @@ dependencies {
     androidTestImplementation InstrumentedTestLibraries.espresso
     androidTestImplementation InstrumentedTestLibraries.junit
 
+    testImplementation project(":testing")
     testImplementation TestLibraries.junit
     testImplementation TestLibraries.mockk
 }

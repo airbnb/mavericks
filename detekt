@@ -1,2 +1,0 @@
-#!/bin/bash
-java -jar libs/detekt-cli-1.0.0-RC8-all.jar -i . -c detekt.yml -f  ".*/androidTest/.*,.*/test/.*,.*/build/.*,.*/ignore/.*" -p libs/detekt-formatting-1.0.0-RC8.jar

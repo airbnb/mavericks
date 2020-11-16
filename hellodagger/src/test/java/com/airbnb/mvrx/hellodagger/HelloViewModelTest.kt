@@ -1,29 +1,29 @@
 package com.airbnb.mvrx.hellodagger
 
+import com.airbnb.mvrx.Success
+import com.airbnb.mvrx.test.MvRxTestRule
 import com.airbnb.mvrx.withState
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
-import io.reactivex.Observable
+import kotlinx.coroutines.flow.flowOf
+import org.junit.Assert.assertEquals
+import org.junit.Rule
 import org.junit.Test
 
 internal class HelloViewModelTest {
 
-    private val repo = mockk<HelloRepository> {
-        every { sayHello() } returns Observable.just("Hello!")
-    }
+    @get:Rule
+    val mvrxRule = MvRxTestRule()
 
-    private val initialState = HelloState()
 
     @Test
-    fun `fetches message when created`() {
-        val viewModel = HelloViewModel(initialState, repo)
-
-        verify(exactly = 1) { repo.sayHello() }
-
+    fun `fetches message when created`()  {
+        val repo = mockk<HelloRepository> {
+            every { sayHello() } returns flowOf("Hello!")
+        }
+        val viewModel = HelloViewModel(HelloState(), repo)
         withState(viewModel) { state ->
-            assert(state.message() == "Hello!")
+            assertEquals(Success("Hello!"), state.message)
         }
     }
-
 }

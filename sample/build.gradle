@@ -4,7 +4,6 @@ apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
 
 android {
-
     defaultConfig {
         applicationId "com.airbnb.sample"
         multiDexEnabled true
@@ -21,6 +20,10 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-project.pro"
         }
     }
+
+    viewBinding {
+        enabled = true
+    }
 }
 
 
@@ -28,9 +31,14 @@ dependencies {
     kapt AnnotationProcessors.epoxy
     kapt AnnotationProcessors.moshi
 
+    implementation project(":mvrx")
+    implementation project(':mvrx-mocking')
+    // In real apps this should be debugImplementation so that the launcher isn't included in production!
+    implementation project(':launcher')
+
     implementation Libraries.appcompat
     implementation Libraries.constraintlayout
-    implementation (Libraries.epoxy) { exclude group: "com.android.support" }
+    implementation(Libraries.epoxy) { exclude group: "com.android.support" }
     implementation Libraries.koin
     implementation Libraries.lifecycleCommon
     implementation Libraries.moshi
@@ -44,7 +52,6 @@ dependencies {
     implementation Libraries.retrofitRxJava
     implementation Libraries.rxAndroid
     implementation Libraries.rxJava
-    implementation project(":mvrx")
 
     testImplementation TestLibraries.junit
 }

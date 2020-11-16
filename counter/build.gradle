@@ -37,6 +37,7 @@ dependencies {
     implementation Libraries.constraintlayout
     implementation Libraries.coreKtx
     implementation Libraries.lifecycleCommon
+
     implementation project(":mvrx")
 
     testImplementation TestLibraries.junit

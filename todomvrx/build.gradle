@@ -11,6 +11,7 @@ android {
         versionName "0.0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
 }
 
@@ -21,7 +22,7 @@ dependencies {
 
     implementation Libraries.appcompat
     implementation Libraries.constraintlayout
-    implementation (Libraries.epoxy) { exclude group: "com.android.support" }
+    implementation(Libraries.epoxy) { exclude group: "com.android.support" }
     implementation Libraries.espressoIdlingResource
     implementation Libraries.lifecycleCommon
     implementation Libraries.navigationFragmentKtx
@@ -31,9 +32,9 @@ dependencies {
     implementation Libraries.roomRxJava
     implementation Libraries.rxAndroid
     implementation Libraries.rxJava
-    implementation project(":mvrx")
-
-    debugImplementation Libraries.debugDb
+    implementation Libraries.multidex
+    implementation project(":mvrx-rxjava2")
+    implementation project(':mvrx-mocking')
 
     testImplementation TestLibraries.junit
     testImplementation TestLibraries.mockitoKotlin

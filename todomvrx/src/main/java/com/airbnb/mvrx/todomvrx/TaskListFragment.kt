@@ -17,12 +17,12 @@
 package com.airbnb.mvrx.todomvrx
 
 import android.os.Bundle
-import androidx.appcompat.widget.PopupMenu
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
-import com.airbnb.mvrx.MvRxState
+import androidx.appcompat.widget.PopupMenu
+import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
 import com.airbnb.mvrx.todomvrx.core.MvRxViewModel
@@ -34,7 +34,7 @@ import com.airbnb.mvrx.todomvrx.views.header
 import com.airbnb.mvrx.todomvrx.views.horizontalLoader
 import com.airbnb.mvrx.todomvrx.views.taskItemView
 
-data class TaskListState(val filter: TaskListFilter = TaskListFilter.All) : MvRxState
+data class TaskListState(val filter: TaskListFilter = TaskListFilter.All) : MavericksState
 
 class TaskListViewModel(initialState: TaskListState) : MvRxViewModel<TaskListState>(initialState) {
     fun setFilter(filter: TaskListFilter) = setState { copy(filter = filter) }
@@ -88,11 +88,13 @@ class TaskListFragment : BaseFragment() {
         } else if (!(state.isLoading && state.tasks.isEmpty())) {
             header {
                 id("header")
-                title(when (taskListState.filter) {
-                    TaskListFilter.All -> R.string.label_all
-                    TaskListFilter.Active -> R.string.label_active
-                    TaskListFilter.Completed -> R.string.label_completed
-                })
+                title(
+                    when (taskListState.filter) {
+                        TaskListFilter.All -> R.string.label_all
+                        TaskListFilter.Active -> R.string.label_active
+                        TaskListFilter.Completed -> R.string.label_completed
+                    }
+                )
             }
 
             state.tasks

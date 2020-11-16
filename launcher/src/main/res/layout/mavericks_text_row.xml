@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/mavericks_padding_horizontal"
+        android:paddingTop="16dp"
+        android:paddingRight="@dimen/mavericks_padding_horizontal"
+        android:textColor="@color/mavericks_text_color"
+        android:textSize="17sp"
+        tools:text="Some title" />
+
+    <TextView
+        android:id="@+id/subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/mavericks_padding_horizontal"
+        android:paddingRight="@dimen/mavericks_padding_horizontal"
+        android:textSize="13sp"
+        tools:text="Some subtitle" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <View
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/mavericks_divider"
+        android:layout_marginLeft="@dimen/mavericks_padding_horizontal"
+        android:layout_marginRight="@dimen/mavericks_padding_horizontal" />
+
+</merge>

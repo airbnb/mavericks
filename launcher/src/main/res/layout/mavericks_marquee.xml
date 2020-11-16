@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:parentTag="android.widget.LinearLayout">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/mavericks_padding_horizontal"
+        android:paddingRight="@dimen/mavericks_padding_horizontal"
+        android:paddingTop="48dp"
+        android:textColor="@color/mavericks_text_color"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        tools:text="Marquee" />
+
+    <TextView
+        android:id="@+id/subtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/mavericks_padding_horizontal"
+        android:paddingRight="@dimen/mavericks_padding_horizontal"
+        android:paddingTop="4dp"
+        android:textSize="16sp" />
+
+    <Space
+        android:layout_width="0dp"
+        android:layout_height="24dp" />
+
+</merge>

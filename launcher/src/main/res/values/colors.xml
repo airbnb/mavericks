@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="mavericks_colorPrimary">#008577</color>
+    <color name="mavericks_colorPrimaryDark">#00574B</color>
+    <color name="mavericks_colorAccent">#D81B60</color>
+    <color name="mavericks_divider">#dadada</color>
+    <color name="mavericks_text_color">#484848</color>
+</resources>

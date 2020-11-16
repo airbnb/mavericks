@@ -1,0 +1,12 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.airbnb.mvrx.launcher">
+
+    <application>
+        <!-- This is exported so users can launch it from the command line. It should only be included in debug builds. -->
+        <activity
+            android:name=".MavericksLauncherActivity"
+            android:exported="true" />
+        <activity android:name=".MavericksLauncherMockActivity" />
+        <activity android:name=".MavericksLauncherTestMocksActivity" />
+    </application>
+</manifest>

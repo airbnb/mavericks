@@ -3,7 +3,6 @@ import com.airbnb.mvrx.JacocoReportTask
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 apply plugin: "kotlin-android-extensions"
-apply plugin: "kotlin-kapt"
 apply plugin: "jacoco"
 apply plugin: "com.vanniktech.maven.publish"
 
@@ -31,15 +30,18 @@ jacoco {
 }
 
 dependencies {
-    kapt AnnotationProcessors.lifecycle
-
     api Libraries.rxAndroid
-    api Libraries.rxJava
+    api Libraries.kotlinCoroutines
 
     implementation Libraries.appcompat
+    implementation Libraries.fragment
+    implementation Libraries.viewModelSavedState
     implementation Libraries.lifecycleCommon
+    implementation Libraries.viewModelKtx
+    implementation Libraries.runtimeKtx
 
     testImplementation TestLibraries.junit
+    testImplementation TestLibraries.kotlinCoroutinesTest
     testImplementation TestLibraries.mockito
     testImplementation TestLibraries.roboeletric
 }

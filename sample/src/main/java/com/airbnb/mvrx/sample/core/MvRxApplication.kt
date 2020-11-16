@@ -1,6 +1,9 @@
 package com.airbnb.mvrx.sample.core
 
 import android.app.Application
+import com.airbnb.mvrx.launcher.MavericksLauncherMockActivity
+import com.airbnb.mvrx.mocking.MockableMavericks
+import com.airbnb.mvrx.sample.LauncherActivity
 import com.airbnb.mvrx.sample.network.DadJokeService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -15,6 +18,10 @@ class MvRxApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        MockableMavericks.initialize(this)
+        // Override the default activity for showing mocks from the launcher
+        MavericksLauncherMockActivity.activityToShowMock = LauncherActivity::class
+
         startKoin {
             androidContext(this@MvRxApplication)
             modules(dadJokeServiceModule)
@@ -25,16 +32,16 @@ class MvRxApplication : Application() {
 private val dadJokeServiceModule = module {
     factory {
         Moshi.Builder()
-                .add(KotlinJsonAdapterFactory())
-                .build()
+            .add(KotlinJsonAdapterFactory())
+            .build()
     }
 
     factory {
         Retrofit.Builder()
-                .baseUrl("https://icanhazdadjoke.com/")
-                .addConverterFactory(MoshiConverterFactory.create(get<Moshi>()))
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                .build()
+            .baseUrl("https://icanhazdadjoke.com/")
+            .addConverterFactory(MoshiConverterFactory.create(get<Moshi>()))
+            .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+            .build()
     }
 
     single {

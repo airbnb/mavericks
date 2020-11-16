@@ -1,7 +1,6 @@
 import com.airbnb.mvrx.AndroidMetaModulePlugin
 
 buildscript {
-
     repositories {
         google()
         jcenter()
@@ -12,8 +11,8 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${Versions.kotlin}"
 
         // Upload with:
-        // ./gradlew clean uploadArchives --no-daemon --no-parallel
-        classpath "com.vanniktech:gradle-maven-publish-plugin:0.11.1"
+        // ./gradlew clean assemble uploadArchives --no-daemon --no-parallel
+        classpath "com.vanniktech:gradle-maven-publish-plugin:0.12.0"
     }
 
     configurations.all {
@@ -23,6 +22,12 @@ buildscript {
         }
     }
 }
+
+plugins {
+    id("io.gitlab.arturbosch.detekt").version("1.9.1")
+}
+
+apply plugin: 'io.gitlab.arturbosch.detekt'
 
 plugins.apply(AndroidMetaModulePlugin.class)
 
@@ -35,4 +40,19 @@ allprojects {
         jcenter()
         maven { url "https://jitpack.io" }
     }
+
+    tasks.whenTaskAdded { task ->
+        if (task.name.startsWith("lint")) {
+            task.doFirst {
+                android.lintOptions.abortOnError true
+                android.lintOptions.textReport true
+                android.lintOptions.textOutput "stdout"
+                android.lintOptions.lintConfig = file("../lint.xml")
+            }
+        }
+    }
+}
+
+subprojects {
+    apply from: "$rootDir/detekt.gradle"
 }

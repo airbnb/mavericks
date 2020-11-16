@@ -1,0 +1,5 @@
+#!/bin/bash
+# Run this script any time there are changes to the mock printer script.
+# It will repackage the binary and make sure it is given executable permissions.
+kscript --package MavericksMockPrinter.kts
+chmod +x MavericksMockPrinter

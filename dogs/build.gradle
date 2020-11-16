@@ -21,12 +21,12 @@ dependencies {
     implementation Libraries.cardview
     implementation Libraries.constraintlayout
     implementation Libraries.coreKtx
-    implementation (Libraries.epoxy) { exclude group: "com.android.support" }
+    implementation Libraries.epoxy
     implementation Libraries.lottie
     implementation Libraries.navigationFragmentKtx
     implementation Libraries.navigationUiKtx
     implementation Libraries.picasso
-    implementation project(":mvrx")
+    implementation project(":mvrx-rxjava2")
 
     testImplementation TestLibraries.junit
     testImplementation project(":testing")
