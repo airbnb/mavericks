@@ -10,6 +10,7 @@
 * [**Fragment Arguments**](fragment-arguments.md)
 * [**Persist State**](persist-state.md)
 * [**Mavericks Mocking**](mocking.md)
+    * [**Launching Mocks**](launcher.md)
 * [**Mavericks + Coroutines**](coroutines.md)
 * [**Mavericks + RxJava2**](rxjava2.md)
 * [**Mavericks + View Binding**](view-binding.md)

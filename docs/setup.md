@@ -40,10 +40,10 @@ This checks whether your application was built as a debuggable build, and if so 
 You also may override `MavericksViewModelConfigFactory.storeContextOverride` that StateStore uses internally (see [threading](https://github.com/airbnb/Mavericks/wiki#threading-in-mvrx) and [debug-checks](https://github.com/airbnb/Mavericks/wiki#debug-checks) for more details)
 
 #### [Optional] Configuration with Mocking Support
-If you would like to take advantage of [Mavericks's mocking system](https://github.com/airbnb/Mavericks/wiki/Mavericks-Mocking-System) at all you should instead initialize the global settings via the `MavericksMocks` object in your application's initialization.
+If you would like to take advantage of [Mavericks's mocking system](https://github.com/airbnb/Mavericks/wiki/Mavericks-Mocking-System) at all you should instead initialize the global settings via the `MockableMavericks` object in your application's initialization.
 ```kotlin
-MavericksMocks.initialize(applicationContext)
+MockableMavericks.initialize(applicationContext)
 ```
 
-This can be done _instead_ of `Mavericks.viewModelConfigFactory`, as this will set a mockable debug version of `MavericksViewModelConfigFactory` if your app was built as a debuggable build. If your app was not built debuggable (ie for production), then `MavericksMocks.initialize` will simply set up a non debug version of `MavericksViewModelConfigFactory` for you.
+This can be done _instead_ of `Mavericks.viewModelConfigFactory`, as this will set a mockable debug version of `MavericksViewModelConfigFactory` if your app was built as a debuggable build. If your app was not built debuggable (ie for production), then `MockableMavericks.initialize` will simply set up a non debug version of `MavericksViewModelConfigFactory` for you.
 

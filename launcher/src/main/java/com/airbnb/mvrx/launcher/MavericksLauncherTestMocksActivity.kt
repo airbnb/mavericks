@@ -41,7 +41,7 @@ class MavericksLauncherTestMocksActivity : FragmentActivity() {
         val nextMock = mocksToShow.poll() ?: run {
             AlertDialog.Builder(this)
                 .setTitle("Complete")
-                .setMessage("$mockCount mocks were tested for crashes, and none were found!")
+                .setMessage("$mockCount mocks were tested were crashes, and no crashes were found!")
                 .setPositiveButton("OK") { _, _ ->
                     finish()
                 }

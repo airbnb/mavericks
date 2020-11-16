@@ -90,8 +90,14 @@ internal fun <R> KFunction<R>.callNamed(
 
 /** Helper to call a function reflectively. */
 internal inline fun <reified T> Any.call(functionName: String, vararg args: Any?): T {
-    val function = this::class.functions.find { it.name == functionName }
-        ?: error("No function found with name $functionName in class ${this.javaClass.name}")
+    return findFunction(functionName).call(this, *args) as T
+}
 
-    return function.call(this, *args) as T
+internal fun Any.findFunction(functionName: String): KFunction<*> {
+    return this::class.findFunction(functionName)
+}
+
+internal fun KClass<*>.findFunction(functionName: String): KFunction<*> {
+    return functions.find { it.name == functionName }
+        ?: error("No function found with name $functionName in class $simpleName")
 }
