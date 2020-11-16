@@ -782,13 +782,6 @@ class ViewModelSubscriberTest : BaseTest() {
     }
 
     @Test
-    fun testCancelledIfViewModelCleared() = runBlocking {
-        val job = viewModel._internal(owner) {}
-        viewModel.triggerCleared()
-        assertTrue(job.isCompleted)
-    }
-
-    @Test
     fun testStateFlowReceivesAllStates() = runBlockingTest {
         val receivedValues = mutableListOf<Int>()
         val subscribeJob = viewModel.stateFlow.onEach {

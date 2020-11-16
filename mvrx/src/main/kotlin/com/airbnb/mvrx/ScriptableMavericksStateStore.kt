@@ -1,12 +1,10 @@
 package com.airbnb.mvrx
 
-import kotlinx.coroutines.channels.BroadcastChannel
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.channels.consumeEach
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.buffer
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flow
 
 /**
  * A [MavericksStateStore] which ignores standard calls to [set]. Instead it can be scripted via calls to
@@ -17,14 +15,16 @@ import kotlinx.coroutines.flow.flow
 @Suppress("EXPERIMENTAL_API_USAGE")
 class ScriptableMavericksStateStore<S : Any>(initialState: S) : ScriptableStateStore<S> {
 
-    private val stateChannel = BroadcastChannel<S>(capacity = Channel.BUFFERED)
+    private val stateSharedFlow = MutableSharedFlow<S>(
+        replay = 1,
+        extraBufferCapacity = CoroutinesStateStore.SubscriberBufferSize,
+        onBufferOverflow = BufferOverflow.SUSPEND,
+    ).apply { tryEmit(initialState) }
+
+    @Volatile
     override var state = initialState
 
-    override val flow: Flow<S>
-        get() = flow {
-            emit(state)
-            stateChannel.consumeEach { emit(it) }
-        }.buffer(1).distinctUntilChanged()
+    override val flow: Flow<S> = stateSharedFlow.asSharedFlow().distinctUntilChanged()
 
     override fun get(block: (S) -> Unit) {
         block(state)
@@ -36,7 +36,7 @@ class ScriptableMavericksStateStore<S : Any>(initialState: S) : ScriptableStateS
 
     override fun next(state: S) {
         this.state = state
-        stateChannel.offer(state)
+        stateSharedFlow.tryEmit(state)
     }
 }
 

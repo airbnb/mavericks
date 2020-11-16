@@ -5,6 +5,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
@@ -35,7 +36,7 @@ class MavericksViewModelTest : BaseTest() {
     @Test
     fun testAsyncSuccess() = runInViewModelBlocking(
         BaseMavericksViewModelTestState(asyncInt = Uninitialized),
-        BaseMavericksViewModelTestState(asyncInt = Loading<Int>()),
+        BaseMavericksViewModelTestState(asyncInt = Loading()),
         BaseMavericksViewModelTestState(asyncInt = Success(5))
     ) {
         suspend {
@@ -46,9 +47,9 @@ class MavericksViewModelTest : BaseTest() {
     @Test
     fun testAsyncSuccessWithRetainValue() = runInViewModelBlocking(
         BaseMavericksViewModelTestState(asyncInt = Uninitialized),
-        BaseMavericksViewModelTestState(asyncInt = Loading<Int>()),
+        BaseMavericksViewModelTestState(asyncInt = Loading()),
         BaseMavericksViewModelTestState(asyncInt = Success(5)),
-        BaseMavericksViewModelTestState(asyncInt = Loading<Int>(value = 5)),
+        BaseMavericksViewModelTestState(asyncInt = Loading(value = 5)),
         BaseMavericksViewModelTestState(asyncInt = Success(7))
     ) {
         suspend {
@@ -62,7 +63,7 @@ class MavericksViewModelTest : BaseTest() {
     @Test
     fun testAsyncFail() = runInViewModelBlocking(
         BaseMavericksViewModelTestState(asyncInt = Uninitialized),
-        BaseMavericksViewModelTestState(asyncInt = Loading<Int>()),
+        BaseMavericksViewModelTestState(asyncInt = Loading()),
         BaseMavericksViewModelTestState(asyncInt = Fail(exception))
     ) {
         suspend {
@@ -73,9 +74,9 @@ class MavericksViewModelTest : BaseTest() {
     @Test
     fun testAsyncFailWithRetainValue() = runInViewModelBlocking(
         BaseMavericksViewModelTestState(asyncInt = Uninitialized),
-        BaseMavericksViewModelTestState(asyncInt = Loading<Int>()),
+        BaseMavericksViewModelTestState(asyncInt = Loading()),
         BaseMavericksViewModelTestState(asyncInt = Success(5)),
-        BaseMavericksViewModelTestState(asyncInt = Loading<Int>(value = 5)),
+        BaseMavericksViewModelTestState(asyncInt = Loading(value = 5)),
         BaseMavericksViewModelTestState(asyncInt = Fail(exception, value = 5))
     ) {
         suspend {
@@ -89,31 +90,31 @@ class MavericksViewModelTest : BaseTest() {
     @Test
     fun testDeferredSuccess() = runInViewModelBlocking(
         BaseMavericksViewModelTestState(asyncInt = Uninitialized),
-        BaseMavericksViewModelTestState(asyncInt = Loading<Int>()),
+        BaseMavericksViewModelTestState(asyncInt = Loading()),
         BaseMavericksViewModelTestState(asyncInt = Success(5))
     ) {
-        val deferedValue = CompletableDeferred<Int>()
-        deferedValue.execute { copy(asyncInt = it) }
+        val deferredValue = CompletableDeferred<Int>()
+        deferredValue.execute { copy(asyncInt = it) }
         delay(1000)
-        deferedValue.complete(5)
+        deferredValue.complete(5)
     }
 
     @Test
     fun testDeferredFail() = runInViewModelBlocking(
         BaseMavericksViewModelTestState(asyncInt = Uninitialized),
-        BaseMavericksViewModelTestState(asyncInt = Loading<Int>()),
+        BaseMavericksViewModelTestState(asyncInt = Loading()),
         BaseMavericksViewModelTestState(asyncInt = Fail(exception))
     ) {
-        val deferedValue = CompletableDeferred<Int>()
-        deferedValue.execute { copy(asyncInt = it) }
+        val deferredValue = CompletableDeferred<Int>()
+        deferredValue.execute { copy(asyncInt = it) }
         delay(1000)
-        deferedValue.completeExceptionally(exception)
+        deferredValue.completeExceptionally(exception)
     }
 
     @Test
     fun testFlowExecute() = runInViewModelBlocking(
         BaseMavericksViewModelTestState(asyncInt = Uninitialized),
-        BaseMavericksViewModelTestState(asyncInt = Loading<Int>()),
+        BaseMavericksViewModelTestState(asyncInt = Loading()),
         BaseMavericksViewModelTestState(asyncInt = Success(1)),
         BaseMavericksViewModelTestState(asyncInt = Success(2))
     ) {

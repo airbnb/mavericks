@@ -34,7 +34,7 @@ class MockableMavericksStateStore<S : MavericksState>(
 ) : MockableStateStore<S> {
     private val scriptableStore = ScriptableMavericksStateStore(initialState)
     private val realStore = CoroutinesStateStore(initialState, coroutineScope, contextOverride)
-    private val realImmediateStore = SynchronousMavericksStateStore(initialState, coroutineScope)
+    private val realImmediateStore = SynchronousMavericksStateStore(initialState)
 
     private val onStateSetListeners = mutableListOf<(previousState: S, newState: S) -> Unit>()
 

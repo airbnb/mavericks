@@ -10,7 +10,7 @@ import org.junit.Test
 class SynchronousMavericksStateStoreTest {
     @Test
     fun setAndGetStateSynchronously() {
-        val store = SynchronousMavericksStateStore(TestState(), testCoroutineScope())
+        val store = SynchronousMavericksStateStore(TestState())
         store.set { TestState(5) }
         store.get { state ->
             assertEquals(5, state.num)
@@ -19,7 +19,7 @@ class SynchronousMavericksStateStoreTest {
 
     @Test
     fun flowWorks() = runBlocking {
-        val store = SynchronousMavericksStateStore(TestState(), testCoroutineScope())
+        val store = SynchronousMavericksStateStore(TestState())
         store.set { TestState(5) }
 
         val flowResult = store.flow.firstOrNull()
