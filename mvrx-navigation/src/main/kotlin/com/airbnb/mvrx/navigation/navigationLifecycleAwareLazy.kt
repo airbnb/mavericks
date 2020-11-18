@@ -32,15 +32,15 @@ class navigationLifecycleAwareLazy<out T>(
     internal val lifecycleObserver: DefaultLifecycleObserver =
         object : DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
-                super.onStart(owner)
                 try {
                     if (!isInitialized()) value
                     owner.lifecycle.removeObserver(this)
                 } catch (cause: IllegalStateException) {
                     throw IllegalStateException(
                         """
-                            During device re-configuration or launch after process death the navController is not accessible until onViewCreated.
-                             Try moving any ViewModel access to onViewCreated or later and use subscriptionLifecycleOwner for any subscriptions.
+                            During device re-configuration or launch after process death the NavController is not accessible and thus any
+                            Nav Graph ViewModel is not accessible. You will need to moving any ViewModel access to onViewCreated or later 
+                            in the fragment views lifecycle to ensure the ViewModel can be accessed. 
                         """.trimIndent(),
                         cause
                     )
