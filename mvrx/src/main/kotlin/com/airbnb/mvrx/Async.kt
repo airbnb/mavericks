@@ -59,6 +59,7 @@ data class Success<out T>(private val value: T) : Async<T>(complete = true, shou
      * @see Async.getMetadata
      */
     @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+    @InternalMavericksApi
     var metadata: Any? = null
 }
 

@@ -9,6 +9,7 @@ import com.airbnb.mvrx.test.MvRxTestRule;
  * this is Java because the flag is package private.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
+@InternalMavericksApi
 public class MvRxTestOverridesProxy {
 
     public static void forceDisableLifecycleAwareObserver(Boolean disableLifecycleAwareObserver) {

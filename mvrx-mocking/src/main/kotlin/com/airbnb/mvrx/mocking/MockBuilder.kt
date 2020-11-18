@@ -7,6 +7,7 @@ import android.util.Log
 import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
 import com.airbnb.mvrx.Async
+import com.airbnb.mvrx.InternalMavericksApi
 import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksState
@@ -1470,6 +1471,7 @@ open class MavericksViewMocks<V : MockableMavericksView, Args : Parcelable> @Pub
          * can only be created via [getFrom].
          */
         @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+        @InternalMavericksApi
         fun <R> allowCreationForTesting(block: () -> R): R {
             allowCreationForTesting = true
             val result: R = block()

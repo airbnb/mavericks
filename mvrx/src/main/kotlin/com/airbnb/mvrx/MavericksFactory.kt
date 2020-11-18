@@ -84,6 +84,7 @@ private fun <VM : MavericksViewModel<S>, S : MavericksState> createDefaultViewMo
 }
 
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
+@InternalMavericksApi
 open class ViewModelDoesNotExistException(message: String) : IllegalStateException(message) {
     constructor(
         viewModelClass: Class<*>,
