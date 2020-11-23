@@ -44,6 +44,13 @@ class SecondTestNavigationFragment : BaseFirstTestNavigationFragment() {
         const val TEST_VALUE = "consumer"
     }
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (HostFragment.accessViewModelInOnCreate) {
+            viewModel.updateConsumer("create-consumer")
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.updateConsumer(TEST_VALUE)

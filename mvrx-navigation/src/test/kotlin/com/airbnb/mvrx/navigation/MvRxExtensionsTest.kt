@@ -23,6 +23,7 @@ class MvRxExtensionsTest {
 
     @Before
     fun setup() {
+        HostFragment.accessViewModelInOnCreate = false
         Mavericks.viewModelDelegateFactory = factory
     }
 
@@ -47,6 +48,35 @@ class MvRxExtensionsTest {
     @Test
     fun `can viewModel be created and restored when activity is re-created`() {
 
+        launchFragmentInContainer(instantiate = { HostFragment() }).also { fragmentScenario ->
+            fragmentScenario
+                .onFragment { fragment ->
+                    val navController = Navigation.findNavController(fragment.requireView())
+                    navController.navigate(R.id.action_store_to_consumer)
+
+                    val viewModel = fragment.viewModel
+                    requireNotNull(viewModel) {
+                        "ViewModel was not created by navigation graph viewModels"
+                    }
+                }
+                .recreate()
+                .onFragment { fragment ->
+
+                    val viewModel = fragment.viewModel
+                    requireNotNull(viewModel) {
+                        "ViewModel was not created by navigation graph viewModels"
+                    }
+                    withState(viewModel) { state ->
+                        assert(state.producer == FirstTestNavigationFragment.TEST_VALUE)
+                        assert(state.consumer == SecondTestNavigationFragment.TEST_VALUE)
+                    }
+                }
+        }
+    }
+
+    @Test(expected = IllegalNavigationStateException::class)
+    fun `accessing the viewModel before onViewCreate after an Activity is recreated will result in an IllegalNavigationStateException`() {
+        HostFragment.accessViewModelInOnCreate = true
         launchFragmentInContainer(instantiate = { HostFragment() }).also { fragmentScenario ->
             fragmentScenario
                 .onFragment { fragment ->

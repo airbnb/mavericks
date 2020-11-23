@@ -9,8 +9,11 @@ import com.airbnb.mvrx.navigation.test.R
 
 class HostFragment : Fragment(R.layout.mvrx_fragment_host) {
 
-    var viewModel: NavigationViewModel? = null
+    companion object {
+        var accessViewModelInOnCreate = false
+    }
 
+    var viewModel: NavigationViewModel? = null
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val navHostFragment: Fragment = NavHostFragment.create(R.navigation.test_graph)

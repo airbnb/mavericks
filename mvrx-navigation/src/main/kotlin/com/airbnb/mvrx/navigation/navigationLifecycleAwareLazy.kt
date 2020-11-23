@@ -36,14 +36,7 @@ class navigationLifecycleAwareLazy<out T>(
                     if (!isInitialized()) value
                     owner.lifecycle.removeObserver(this)
                 } catch (cause: IllegalStateException) {
-                    throw IllegalStateException(
-                        """
-                            During device re-configuration or launch after process death the NavController is not accessible and thus any
-                            Nav Graph ViewModel is not accessible. You will need to moving any ViewModel access to onViewCreated or later 
-                            in the fragment views lifecycle to ensure the ViewModel can be accessed. 
-                        """.trimIndent(),
-                        cause
-                    )
+                    throw createNavControllerException(cause)
                 }
             }
         }
@@ -68,7 +61,12 @@ class navigationLifecycleAwareLazy<out T>(
                 if (_v2 !== UninitializedValue) {
                     @Suppress("UNCHECKED_CAST") (_v2 as T)
                 } else {
-                    val typedValue = initializer!!()
+                    val typedValue =
+                        try {
+                            initializer!!()
+                        } catch (cause: Throwable) {
+                            throw createNavControllerException(cause)
+                        }
                     _value = typedValue
                     initializer = null
                     typedValue
@@ -79,4 +77,18 @@ class navigationLifecycleAwareLazy<out T>(
     override fun isInitialized(): Boolean = _value !== UninitializedValue
 
     override fun toString(): String = if (isInitialized()) value.toString() else "Lazy value not initialized yet."
+
+    private fun createNavControllerException(cause: Throwable): IllegalStateException =
+        IllegalNavigationStateException(
+            """
+            NavController is not always accessible before onViewCreated.
+            
+            During device re-configuration or launch after process death the NavController is not accessible and thus any
+            Nav Graph ViewModel is also not accessible. You will need to moving any ViewModel access to onViewCreated or later 
+            in the fragment views lifecycle to ensure the ViewModel can be accessed. 
+            """.trimIndent(),
+            cause
+        )
 }
+
+class IllegalNavigationStateException(message: String, cause: Throwable) : IllegalStateException(message, cause)
