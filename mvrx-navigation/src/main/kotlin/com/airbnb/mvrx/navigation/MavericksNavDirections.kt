@@ -8,7 +8,7 @@ import com.airbnb.mvrx.Mavericks
 import java.io.Serializable
 
 /**
- * [MvRxNavDirections.create] must be used to pick between a [Parcelable] or [Serializable]
+ * [MavericksNavDirections.create] must be used to pick between a [Parcelable] or [Serializable]
  * data argument.
  *
  * @param actionId - the navigation graph action ID.
@@ -25,17 +25,17 @@ import java.io.Serializable
  *      android:label="{mvrx:arg:title}">
  *
  *       <argument
- *          android:name="mvrx:arg"
+ *          android:name="mavericks:arg"
  *          app:argType="com.example.ExampleNavArgs" />
  *
  *       <argument
- *          android:name="mvrx:arg:title"
+ *          android:name="mavericks:arg:title"
  *          app:argType="string" />
  *
  *   </fragment>
  * ```
  */
-class MvRxNavDirections private constructor(
+class MavericksNavDirections private constructor(
     @IdRes private val actionId: Int,
     private val parcelable: Parcelable? = null,
     private val serializable: Serializable? = null,
@@ -43,16 +43,16 @@ class MvRxNavDirections private constructor(
 ) : NavDirections {
 
     companion object {
-        const val KEY_ARG_TITLE = "mvrx:arg:title"
-        fun create(@IdRes actionId: Int, title: String?, data: Parcelable): MvRxNavDirections =
-            MvRxNavDirections(
+        const val KEY_ARG_TITLE = "mavericks:arg:title"
+        fun create(@IdRes actionId: Int, data: Parcelable, title: String? = null): MavericksNavDirections =
+            MavericksNavDirections(
                 actionId = actionId,
                 title = title,
                 parcelable = data
             )
 
-        fun create(@IdRes actionId: Int, title: String?, data: Serializable): MvRxNavDirections =
-            MvRxNavDirections(
+        fun create(@IdRes actionId: Int, data: Serializable, title: String? = null): MavericksNavDirections =
+            MavericksNavDirections(
                 actionId = actionId,
                 title = title,
                 serializable = data

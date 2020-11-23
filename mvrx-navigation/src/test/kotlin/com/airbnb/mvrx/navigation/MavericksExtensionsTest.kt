@@ -15,7 +15,7 @@ import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [28]) // SDK 29 required Java 9+
-class MvRxExtensionsTest {
+class MavericksExtensionsTest {
 
     @get:Rule
     val mvrxRule = MvRxTestRule()
