@@ -1465,6 +1465,16 @@ open class MavericksViewMocks<V : MockableMavericksView, Args : Parcelable> @Pub
         mocksWithState.validateUniqueNames()
     }
 
+    interface ViewMocksProvider {
+        fun mavericksViewMocks(view: MockableMavericksView): MavericksViewMocks<out MockableMavericksView, out Parcelable>
+    }
+
+    object DefaultViewMocksProvider : ViewMocksProvider {
+        override fun mavericksViewMocks(view: MockableMavericksView): MavericksViewMocks<out MockableMavericksView, out Parcelable> {
+            return provideMocksFunction.call(view) as MavericksViewMocks<out MockableMavericksView, out Parcelable>
+        }
+    }
+
     companion object {
         /**
          * Exposed for internal tests to allow us to workaround the requirement that this class
@@ -1486,13 +1496,19 @@ open class MavericksViewMocks<V : MockableMavericksView, Args : Parcelable> @Pub
         }
 
         /**
+         * A Provider of [MavericksViewMocks] will be used to retrieve mocks first before calling [MockableMavericksView.provideMocks].
+         */
+        var mockProvider: ViewMocksProvider = DefaultViewMocksProvider
+
+        /**
          * Tracks how many mock instances are being validly created. This allows our gating
          * to be done in a thread safe way.
          */
         private val numAllowedCreationsOfMocks = AtomicInteger(0)
 
         /**
-         * Retrieves the mocks from a view provided by [MockableMavericksView.provideMocks].
+         * Retrieves the mocks from a view provided by [mockProvider].
+         * If not set will default to [DefaultViewMocksProvider]
          *
          * All access to mocks is gated behind this function so that it can enforce that
          * mocks are only used in debug mode, and so that this function can access mocks
@@ -1509,7 +1525,7 @@ open class MavericksViewMocks<V : MockableMavericksView, Args : Parcelable> @Pub
 
             numAllowedCreationsOfMocks.incrementAndGet()
 
-            val mocks = provideMocksFunction.call(view) as MavericksViewMocks<out MockableMavericksView, out Parcelable>
+            val mocks = mockProvider.mavericksViewMocks(view)
 
             require(numAllowedCreationsOfMocks.decrementAndGet() >= 0) {
                 "numAllowedCreationsOfMocks is negative"
