@@ -6,6 +6,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Deferred
@@ -156,6 +157,16 @@ abstract class MavericksViewModel<S : MavericksState>(
         } else {
             stateStore.set(reducer)
         }
+    }
+
+    /**
+     * Calling this function suspends until all pending setState reducers are run and then returns the latest state.
+     * As a result, it is safe to call setState { } and assume that the result from a subsequent awaitState() call will have that state.
+     */
+    suspend fun awaitState(): S {
+        val deferredState = CompletableDeferred<S>()
+        withState(deferredState::complete)
+        return deferredState.await()
     }
 
     /**

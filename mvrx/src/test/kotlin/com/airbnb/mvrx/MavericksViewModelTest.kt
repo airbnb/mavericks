@@ -5,7 +5,6 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
@@ -21,6 +20,8 @@ class MavericksViewModelTestViewModel : MavericksViewModel<BaseMavericksViewMode
     suspend fun runInViewModel(block: suspend MavericksViewModelTestViewModel.() -> Unit) {
         block()
     }
+
+    fun setInt(int: Int) = setState { copy(int = int) }
 }
 
 @ExperimentalCoroutinesApi
@@ -128,6 +129,16 @@ class MavericksViewModelTest : BaseTest() {
         BaseMavericksViewModelTestState(int = 2)
     ) {
         flowOf(1, 2).setOnEach { copy(int = it) }
+    }
+
+    @Test
+    fun testAwaitState() = runInViewModelBlocking(
+        BaseMavericksViewModelTestState(int = 0),
+        BaseMavericksViewModelTestState(int = 1),
+        ) {
+        setInt(1)
+        val state = awaitState()
+        assertEquals(1, state.int)
     }
 
     private fun runInViewModelBlocking(
