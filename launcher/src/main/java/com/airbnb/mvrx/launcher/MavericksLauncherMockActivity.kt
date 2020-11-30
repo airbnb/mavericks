@@ -60,6 +60,11 @@ class MavericksLauncherMockActivity : MavericksBaseLauncherActivity() {
         var activityToShowMock: KClass<out Activity> = MavericksLauncherMockActivity::class
 
         /**
+         * Specify a function to call before finishing each mock when running a test all scenario.
+         */
+        var onMockLoaded: (activity: Activity, MockedViewProvider<*>, MockedView<*>) -> Unit = { _, _, _ -> }
+
+        /**
          * Creates an intent to show the given mock, by setting [nextMockToShow].
          *
          * By default this uses [MavericksLauncherMockActivity], however, you can change
@@ -153,7 +158,10 @@ class MavericksLauncherMockActivity : MavericksBaseLauncherActivity() {
                         mock.mock.isDefaultInitialization || mock.mock.isForProcessRecreation
                     val finishAfterMs: Long = if (isInitializing) 3000 else 500
 
-                    Handler().postDelayed({ activity.finish() }, finishAfterMs)
+                    Handler().postDelayed({
+                                              onMockLoaded(activity, mock, mockedView)
+                                              activity.finish()
+                                          }, finishAfterMs)
                 }
             } catch (e: Throwable) {
                 Log.e(
