@@ -1,8 +1,11 @@
 package com.airbnb.mvrx
 
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -10,6 +13,7 @@ import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import kotlin.reflect.KProperty1
 
 data class BaseMavericksViewModelTestState(
     val asyncInt: Async<Int> = Uninitialized,
@@ -22,6 +26,34 @@ class MavericksViewModelTestViewModel : MavericksViewModel<BaseMavericksViewMode
     }
 
     fun setInt(int: Int) = setState { copy(int = int) }
+
+    fun <T : Any?> (suspend () -> T).executePublic (
+        dispatcher: CoroutineDispatcher? = null,
+        retainValue: KProperty1<BaseMavericksViewModelTestState, Async<T>>? = null,
+        reducer: BaseMavericksViewModelTestState.(Async<T>) -> BaseMavericksViewModelTestState
+    ) {
+        execute(dispatcher, retainValue, reducer)
+    }
+
+    fun <T> Flow<T>.executePublic(
+        dispatcher: CoroutineDispatcher? = null,
+        reducer: BaseMavericksViewModelTestState.(Async<T>) -> BaseMavericksViewModelTestState
+    ) {
+        execute(dispatcher, reducer)
+    }
+
+    fun <T> Deferred<T>.executePublic(
+        dispatcher: CoroutineDispatcher? = null,
+        retainValue: KProperty1<BaseMavericksViewModelTestState, Async<T>>? = null,
+        reducer: BaseMavericksViewModelTestState.(Async<T>) -> BaseMavericksViewModelTestState
+    ) = suspend { await() }.execute(dispatcher, retainValue, reducer)
+
+    fun <T> Flow<T>.setOnEachPublic(
+        dispatcher: CoroutineDispatcher? = null,
+        reducer: BaseMavericksViewModelTestState.(T) -> BaseMavericksViewModelTestState
+    ) {
+        setOnEach(dispatcher, reducer)
+    }
 }
 
 @ExperimentalCoroutinesApi
@@ -42,7 +74,7 @@ class MavericksViewModelTest : BaseTest() {
     ) {
         suspend {
             5
-        }.execute { copy(asyncInt = it) }
+        }.executePublic { copy(asyncInt = it) }
     }
 
     @Test
@@ -55,10 +87,10 @@ class MavericksViewModelTest : BaseTest() {
     ) {
         suspend {
             5
-        }.execute(retainValue = BaseMavericksViewModelTestState::asyncInt) { copy(asyncInt = it) }
+        }.executePublic(retainValue = BaseMavericksViewModelTestState::asyncInt) { copy(asyncInt = it) }
         suspend {
             7
-        }.execute(retainValue = BaseMavericksViewModelTestState::asyncInt) { copy(asyncInt = it) }
+        }.executePublic(retainValue = BaseMavericksViewModelTestState::asyncInt) { copy(asyncInt = it) }
     }
 
     @Test
@@ -69,7 +101,7 @@ class MavericksViewModelTest : BaseTest() {
     ) {
         suspend {
             throw exception
-        }.execute(retainValue = BaseMavericksViewModelTestState::asyncInt) { copy(asyncInt = it) }
+        }.executePublic(retainValue = BaseMavericksViewModelTestState::asyncInt) { copy(asyncInt = it) }
     }
 
     @Test
@@ -82,10 +114,10 @@ class MavericksViewModelTest : BaseTest() {
     ) {
         suspend {
             5
-        }.execute(retainValue = BaseMavericksViewModelTestState::asyncInt) { copy(asyncInt = it) }
+        }.executePublic(retainValue = BaseMavericksViewModelTestState::asyncInt) { copy(asyncInt = it) }
         suspend {
             throw exception
-        }.execute(retainValue = BaseMavericksViewModelTestState::asyncInt) { copy(asyncInt = it) }
+        }.executePublic(retainValue = BaseMavericksViewModelTestState::asyncInt) { copy(asyncInt = it) }
     }
 
     @Test
@@ -95,7 +127,7 @@ class MavericksViewModelTest : BaseTest() {
         BaseMavericksViewModelTestState(asyncInt = Success(5))
     ) {
         val deferredValue = CompletableDeferred<Int>()
-        deferredValue.execute { copy(asyncInt = it) }
+        deferredValue.executePublic { copy(asyncInt = it) }
         delay(1000)
         deferredValue.complete(5)
     }
@@ -107,7 +139,7 @@ class MavericksViewModelTest : BaseTest() {
         BaseMavericksViewModelTestState(asyncInt = Fail(exception))
     ) {
         val deferredValue = CompletableDeferred<Int>()
-        deferredValue.execute { copy(asyncInt = it) }
+        deferredValue.executePublic { copy(asyncInt = it) }
         delay(1000)
         deferredValue.completeExceptionally(exception)
     }
@@ -119,7 +151,7 @@ class MavericksViewModelTest : BaseTest() {
         BaseMavericksViewModelTestState(asyncInt = Success(1)),
         BaseMavericksViewModelTestState(asyncInt = Success(2))
     ) {
-        flowOf(1, 2).execute { copy(asyncInt = it) }
+        flowOf(1, 2).executePublic { copy(asyncInt = it) }
     }
 
     @Test
@@ -128,7 +160,7 @@ class MavericksViewModelTest : BaseTest() {
         BaseMavericksViewModelTestState(int = 1),
         BaseMavericksViewModelTestState(int = 2)
     ) {
-        flowOf(1, 2).setOnEach { copy(int = it) }
+        flowOf(1, 2).setOnEachPublic { copy(int = it) }
     }
 
     @Test
