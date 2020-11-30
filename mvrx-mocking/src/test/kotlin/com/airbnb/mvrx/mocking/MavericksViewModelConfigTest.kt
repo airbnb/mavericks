@@ -63,7 +63,7 @@ class MavericksViewModelConfigTest : BaseTest() {
             providedConfig = config
         }
 
-        Mavericks.viewModelConfigFactory!!.addOnConfigProvidedListener(onConfigProvided)
+        Mavericks.viewModelConfigFactory.addOnConfigProvidedListener(onConfigProvided)
         val vm = TestViewModel()
 
         assertEquals(vm, providedVm)
@@ -80,8 +80,8 @@ class MavericksViewModelConfigTest : BaseTest() {
             providedConfig = config
         }
 
-        Mavericks.viewModelConfigFactory!!.addOnConfigProvidedListener(onConfigProvided)
-        Mavericks.viewModelConfigFactory!!.removeOnConfigProvidedListener(onConfigProvided)
+        Mavericks.viewModelConfigFactory.addOnConfigProvidedListener(onConfigProvided)
+        Mavericks.viewModelConfigFactory.removeOnConfigProvidedListener(onConfigProvided)
         TestViewModel()
 
         assertNull(providedConfig)

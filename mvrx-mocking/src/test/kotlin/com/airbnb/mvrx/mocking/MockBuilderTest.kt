@@ -25,6 +25,7 @@ import kotlin.reflect.KClass
 
 class MockBuilderTest : BaseTest() {
 
+    @Suppress("DEPRECATION")
     @Rule
     @JvmField
     val expectedException: ExpectedException = ExpectedException.none()
@@ -44,7 +45,7 @@ class MockBuilderTest : BaseTest() {
         fragment = TestFragment()
     }
 
-    fun <Args : Parcelable> mockNoViewModels(
+    private fun <Args : Parcelable> mockNoViewModels(
         defaultArgs: Args?,
         block: MockBuilder<TestFragment, Args>.() -> Unit
     ): MockBuilder<TestFragment, Args> = fragment.run {
@@ -53,7 +54,7 @@ class MockBuilderTest : BaseTest() {
         }
     }
 
-    fun <Args : Parcelable> mockSingleViewModel(
+    private fun <Args : Parcelable> mockSingleViewModel(
         defaultArgs: Args?,
         block: SingleViewModelMockBuilder<TestFragment, Args, State>.() -> Unit
     ): MockBuilder<TestFragment, Args> = fragment.run {
@@ -62,7 +63,7 @@ class MockBuilderTest : BaseTest() {
         }
     }
 
-    fun <Args : Parcelable> mockTwoViewModels(
+    private fun <Args : Parcelable> mockTwoViewModels(
         defaultArgs: Args? = null,
         block: TwoViewModelMockBuilder<TestFragment, TestViewModel, State, TestViewModel, State, Args>.() -> Unit
     ): MockBuilder<TestFragment, Args> = fragment.run {
@@ -78,7 +79,7 @@ class MockBuilderTest : BaseTest() {
         }
     }
 
-    fun <Args : Parcelable> mockThreeViewModels(
+    private fun <Args : Parcelable> mockThreeViewModels(
         defaultArgs: Args? = null,
         block: ThreeViewModelMockBuilder<TestFragment, TestViewModel, State, TestViewModel, State, TestViewModel, State, Args>.() -> Unit
     ): MockBuilder<TestFragment, Args> = fragment.run {
@@ -373,7 +374,7 @@ class MockBuilderTest : BaseTest() {
         // Trying to set a value on the async property when it is uninitialized should give a clear error message
         val state = baseState.copy(asyncBookingDetails = Uninitialized)
 
-        val mocks = mockSingleViewModel(null) {
+        mockSingleViewModel(null) {
             state("my state") {
                 state.set { ::asyncBookingDetails { success { ::disclaimerInfo { ::text } } } }
                     .with { "hello" }
@@ -390,7 +391,7 @@ class MockBuilderTest : BaseTest() {
         // Trying to set a value on a null property should give a clear warning
         val state = baseState.copy(bookingDetails = BookingDetails(disclaimerInfo = null))
 
-        val mocks = mockSingleViewModel(null) {
+        mockSingleViewModel(null) {
             state("my state") {
                 state.set { ::bookingDetails { ::disclaimerInfo { ::text } } }.with { "hello" }
             }
