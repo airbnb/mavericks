@@ -159,9 +159,9 @@ class MavericksLauncherMockActivity : MavericksBaseLauncherActivity() {
                     val finishAfterMs: Long = if (isInitializing) 3000 else 500
 
                     Handler().postDelayed({
-                                              onMockLoaded(activity, mock, mockedView)
-                                              activity.finish()
-                                          }, finishAfterMs)
+                      onMockLoaded(activity, mock, mockedView)
+                      activity.finish()
+                  }, finishAfterMs)
                 }
             } catch (e: Throwable) {
                 Log.e(
