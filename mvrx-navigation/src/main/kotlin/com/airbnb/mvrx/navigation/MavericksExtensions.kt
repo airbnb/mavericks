@@ -16,6 +16,7 @@ import com.airbnb.mvrx.MavericksViewModelProvider
 import com.airbnb.mvrx.RealMavericksStateFactory
 import com.airbnb.mvrx.ViewModelDelegateFactory
 import com.airbnb.mvrx._fragmentArgsProvider
+import com.airbnb.mvrx._internal
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
@@ -122,7 +123,7 @@ class DefaultNavigationViewModelDelegateFactory(
             val backStackEntry = fragment.findNavController().getBackStackEntry(navGraphId)
 
             viewModelProvider(RealMavericksStateFactory(), backStackEntry)
-                .apply { onEachInternal(fragment, action = { fragment.postInvalidate() }) }
+                .apply { _internal(fragment, action = { fragment.postInvalidate() }) }
         }
     }
 }

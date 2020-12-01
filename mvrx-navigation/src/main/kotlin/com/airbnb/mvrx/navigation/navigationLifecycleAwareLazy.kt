@@ -3,7 +3,6 @@
 package com.airbnb.mvrx.navigation
 
 import androidx.annotation.RestrictTo
-import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import java.io.Serializable
@@ -28,9 +27,8 @@ class navigationLifecycleAwareLazy<out T>(
     // final field is required to enable safe publication of constructed instance
     private val lock = this
 
-    @VisibleForTesting
-    internal val lifecycleObserver: DefaultLifecycleObserver =
-        object : DefaultLifecycleObserver {
+    init {
+        owner.lifecycle.addObserver(object : DefaultLifecycleObserver {
             override fun onStart(owner: LifecycleOwner) {
                 try {
                     if (!isInitialized()) value
@@ -39,10 +37,7 @@ class navigationLifecycleAwareLazy<out T>(
                     throw createNavControllerException(cause)
                 }
             }
-        }
-
-    init {
-        owner.lifecycle.addObserver(lifecycleObserver)
+        })
     }
 
     @Suppress("LocalVariableName")

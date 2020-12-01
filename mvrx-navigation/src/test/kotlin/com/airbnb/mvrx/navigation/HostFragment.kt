@@ -15,7 +15,6 @@ class HostFragment : Fragment(R.layout.mvrx_fragment_host) {
 
     var viewModel: NavigationViewModel? = null
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         val navHostFragment: Fragment = NavHostFragment.create(R.navigation.test_graph)
         childFragmentManager.commit {
             replace(R.id.container, navHostFragment)
