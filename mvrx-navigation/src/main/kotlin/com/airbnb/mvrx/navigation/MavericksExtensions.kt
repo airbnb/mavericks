@@ -69,10 +69,12 @@ internal inline fun <T, reified VM : MavericksViewModel<S>, reified S : Maverick
             if (viewModelDelegateFactory !is NavigationViewModelDelegateFactory) {
                 throw IllegalStateException(
                     """
-                    Navigation ViewModels require that MvRx.viewModelDelegateFactory use an implementation of NavigationViewModelDelegateFactory.
+                    Navigation ViewModels require that Mavericks.viewModelDelegateFactory have an implementation of NavigationViewModelDelegateFactory.
                      
-                     To setup the default factory configure MvRx with the default NavigationViewModelDelegateFactory.
-                     MvRx.viewModelDelegateFactory = DefaultNavigationViewModelDelegateFactory()
+                     To setup the default factory configuration, you can use the default factory DefaultNavigationViewModelDelegateFactory.
+                     DefaultNavigationViewModelDelegateFactory also implements DefaultViewModelDelegateFactory by default.
+                     
+                     Mavericks.viewModelDelegateFactory = DefaultNavigationViewModelDelegateFactory()
                 """.trimIndent()
                 )
             }
@@ -103,7 +105,7 @@ interface NavigationViewModelDelegateFactory : ViewModelDelegateFactory {
 }
 
 class DefaultNavigationViewModelDelegateFactory(
-    private val defaultViewModelDelegateFactory: DefaultViewModelDelegateFactory = DefaultViewModelDelegateFactory()
+    private val defaultViewModelDelegateFactory: ViewModelDelegateFactory = DefaultViewModelDelegateFactory()
 ) : NavigationViewModelDelegateFactory,
     ViewModelDelegateFactory by defaultViewModelDelegateFactory {
 
