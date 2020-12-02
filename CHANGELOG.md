@@ -1,6 +1,16 @@
 # Change log
 
-## Version 2.0.0
+## Version 2.0.0-beta3
+
+Changes since beta 2
+- Make MavericksViewModel extension functions protected (#488)
+- Add MavericksViewModel.awaitState (#487) to access current ViewModel state via a suspend function
+- Mark all @RestrictTo APIs with @InternalMavericksApi (#480)
+- Api additions to the mocking framework (#475) (#477)
+- Migrated CoroutinesStateStore to SharedFlow (#469)
+- Launcher and mock speed optimizations (#468)
+
+## Version 2.0.0-beta2
 ### Breaking Changes
 - The order of nested with and set states has changed slightly. It now matches the original intention.
 If you had code like:
@@ -28,6 +38,7 @@ Now, it will run:
 - If your MvRxView/Fragment does not use any ViewModels, invalidate() will NOT be called in onStart(). In MvRx 1.x, invalidate would be called even if MvRx was not used at all. If you would like to maintain the original behavior, call `postInvalidate()` from onStart in your base Fragment class.
 - BaseMvRxViewModel no longer extends Jetpack ViewModel
 - viewModelScope is now a property on BaseMvRxViewModel, not the Jetpack extension function for ViewModel. Functionally, this is the same but the previous viewModelScope import will now be unused.
+- If you had been using any restricted internal mvrx library functions your build may break as they have been renamed (you shouldn't be doing this, but in case you are...)
 
 ## Version 1.5.1
 - Fix incorrectly failing debug assertions for state class being a data class when a property has internal visibility
