@@ -46,14 +46,11 @@ dependencies {
     testImplementation TestLibraries.mockito
     testImplementation TestLibraries.roboeletric
 
-    // module specific dependencies that don't need to be shared via a common dependencies file.
-    def nav_version = "2.3.0"
-    api "androidx.navigation:navigation-fragment-ktx:$nav_version"
-    api "androidx.navigation:navigation-ui-ktx:$nav_version"
+    api Libraries.navigationUiKtx
+    api Libraries.navigationFragmentKtx
 
-    def fragment_version = "1.2.5"
-    testImplementation "androidx.fragment:fragment-ktx:$fragment_version"
-    testImplementation "androidx.fragment:fragment-testing:$fragment_version"
+    testImplementation Libraries.fragmentKtx
+    testImplementation Libraries.fragmentTesting
 }
 
 jacoco {
