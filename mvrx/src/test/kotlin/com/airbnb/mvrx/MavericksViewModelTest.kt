@@ -6,6 +6,7 @@ import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -37,9 +38,10 @@ class MavericksViewModelTestViewModel : MavericksViewModel<BaseMavericksViewMode
 
     fun <T> Flow<T>.executePublic(
         dispatcher: CoroutineDispatcher? = null,
+        retainValue: KProperty1<BaseMavericksViewModelTestState, Async<T>>? = null,
         reducer: BaseMavericksViewModelTestState.(Async<T>) -> BaseMavericksViewModelTestState
     ) {
-        execute(dispatcher, reducer)
+        execute(dispatcher, retainValue, reducer)
     }
 
     fun <T> Deferred<T>.executePublic(
@@ -152,6 +154,19 @@ class MavericksViewModelTest : BaseTest() {
         BaseMavericksViewModelTestState(asyncInt = Success(2))
     ) {
         flowOf(1, 2).executePublic { copy(asyncInt = it) }
+    }
+
+    @Test
+    fun testFlowExecuteWithRetainValue() = runInViewModelBlocking(
+        BaseMavericksViewModelTestState(asyncInt = Uninitialized),
+        BaseMavericksViewModelTestState(asyncInt = Loading()),
+        BaseMavericksViewModelTestState(asyncInt = Success(5)),
+        BaseMavericksViewModelTestState(asyncInt = Fail(exception, value = 5))
+    ) {
+        flow {
+            emit(5)
+            throw exception
+        }.executePublic(retainValue = BaseMavericksViewModelTestState::asyncInt) { copy(asyncInt = it) }
     }
 
     @Test
