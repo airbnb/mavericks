@@ -1,7 +1,8 @@
 # Change log
 
 ## Version 2.0.0-beta4
-- FragmentViewModelContext now allows for custom ViewModelStoreOwner and/or SavedStateRegistry that are different from the fragment ones in FragmentViewModelContext.
+- FragmentViewModelContext now allows for custom ViewModelStoreOwner and/or SavedStateRegistry that are different from the fragment ones in FragmentViewModelContext. (#443)
+- Add mvrx-navigation artifact to support AndroidX Navigation destination ViewModels `navGraphViewModel(R.id.my_graph)` (#443)
 
 ## Version 2.0.0-beta3
 
