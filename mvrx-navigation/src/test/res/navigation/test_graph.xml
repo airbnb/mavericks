@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/test_graph"
+    app:startDestination="@id/storeFragment"
+    tools:ignore="ResourceName,UnusedNavigation">
+
+    <fragment
+        android:id="@+id/storeFragment"
+        android:name="com.airbnb.mvrx.navigation.FirstTestNavigationFragment"
+        android:label="ViewModelStoreTestFragment">
+        <action
+            android:id="@+id/action_store_to_consumer"
+            app:destination="@id/consumerFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/consumerFragment"
+        android:name="com.airbnb.mvrx.navigation.SecondTestNavigationFragment"
+        android:label="TestConsumerNavigationFragment" />
+
+</navigation>
