@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/fragment_a">
+
+    <fragment
+        android:id="@+id/fragment_a"
+        android:name="com.airbnb.mvrx.sample.navigation.FlowFragmentA">
+        <action
+            android:id="@+id/action_fragment_a_to_fragment_b"
+            app:destination="@id/fragment_b" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_b"
+        android:name="com.airbnb.mvrx.sample.navigation.FlowFragmentB" />
+
+</navigation>

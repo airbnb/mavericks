@@ -59,7 +59,7 @@ class navigationLifecycleAwareLazy<out T>(
                     val typedValue =
                         try {
                             initializer!!()
-                        } catch (cause: Throwable) {
+                        } catch (@SuppressWarnings("Detekt.TooGenericExceptionCaught") cause: Throwable) {
                             throw createNavControllerException(cause)
                         }
                     _value = typedValue

@@ -36,19 +36,16 @@ android {
 }
 
 dependencies {
-
-    implementation project(":mvrx")
-    implementation project(":testing")
+    api project(":mvrx")
     implementation Libraries.lifecycleCommon
-
-    testImplementation Libraries.rxAndroid
-    testImplementation TestLibraries.junit
-    testImplementation TestLibraries.mockito
-    testImplementation TestLibraries.roboeletric
 
     api Libraries.navigationUiKtx
     api Libraries.navigationFragmentKtx
 
+    testImplementation project(":testing")
+    testImplementation TestLibraries.junit
+    testImplementation TestLibraries.mockito
+    testImplementation TestLibraries.roboeletric
     testImplementation Libraries.fragmentKtx
     testImplementation Libraries.fragmentTesting
 }

@@ -26,7 +26,7 @@ val foo = Success(5)
 println(foo()) // 5
 ```
 
-### Using Async for asynchronous actions (network, db, etc.)
+### Using Async for asynchronous actions (network, db, etc.) with `execute`
 `MavericksViewModel` ships an `execute(...)` extension on common asynchronous types such as `suspend () -> T`, `Flow<T>`, and `Deferred<T>`. The `mvrx-rxjava2` artifact has extensions for `Observable<T>`, `Single<T>`, and `Completable<T>`.
 
 When you call `execute` on one of these types, it will begin executing it, immediately emit `Loading`, and then emit `Success` or `Fail` when it succeeds, emits a new value, or fails.
@@ -49,7 +49,8 @@ In this case:
 * If the ViewModel is cleared before `fetchTemperature()` completes, the API request is cancelled
 
 
-#### Subscribing to Async properties
+
+### Subscribing to Async properties
 If your state property is `Async`, you can use `onAsync` instead of `onEach` to subscribe to state changes.
 
 You use it like:
@@ -68,7 +69,7 @@ onAsync(
 )
 ```
 
-#### Retaining data across reloads
+### Retaining data across reloads with `retainValue`
 You may have a model where you want to refresh data and show the last successful data in addition to the loading/failure state of the refresh. To do this, use the optional `retainValue` parameter for `execute` and MvRx will automatically persist the value stored in that property to subsequent `Loading` or `Fail` states.
 
 ```kotlin
@@ -81,3 +82,4 @@ In the previous example, if you called `fetchData()` again when data is `Success
 * `Success(6)`
 
 Your UI can check for `data is Loading` to determine whether to show a loading indicator yet call `data()` to render the most recent value while the new data loads.
+You can also use `viewModel.onAsync` with on `onFail` block to show a snackbar or error message when the refresh failed without having to take away the first set of data that you already displayed.

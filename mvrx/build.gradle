@@ -29,6 +29,7 @@ android {
             all {
                 jacoco {
                     includeNoLocationClasses = true
+                    jacoco.excludes = ['jdk.internal.*']
                 }
             }
         }
