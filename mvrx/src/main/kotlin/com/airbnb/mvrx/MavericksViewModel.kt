@@ -227,11 +227,15 @@ abstract class MavericksViewModel<S : MavericksState>(
      *
      * @param dispatcher A custom coroutine dispatcher that the coroutine will run on. If null, uses the dispatcher in [viewModelScope],
      *                  which defaults to [Dispatchers.Main.immediate] and can be overridden globally with [Mavericks.initialize].
+     * @param retainValue A state property that, when set, will be called to retrieve an optional existing data value that will be retained across
+     *                    subsequent Loading and Fail states. This is useful if you want to display the previously successful data when
+     *                    refreshing.
      * @param reducer A reducer that is applied to the current state and should return the new state. Because the state is the receiver
      *                and it likely a data class, an implementation may look like: `{ copy(response = it) }`.
      */
     fun <T> Flow<T>.execute(
         dispatcher: CoroutineDispatcher? = null,
+        retainValue: KProperty1<S, Async<T>>? = null,
         reducer: S.(Async<T>) -> S
     ): Job {
         val blockExecutions = config.onExecute(this@MavericksViewModel)
@@ -243,7 +247,7 @@ abstract class MavericksViewModel<S : MavericksState>(
             return viewModelScope.launch { delay(Long.MAX_VALUE) }
         }
 
-        setState { reducer(Loading()) }
+        setState { reducer(Loading(value = retainValue?.get(this)?.invoke())) }
 
         return catch { error -> setState { reducer(Fail(error)) } }
             .onEach { value -> setState { reducer(Success(value)) } }
