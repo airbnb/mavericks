@@ -45,7 +45,7 @@ Previously, you needed to pass `debugMode` into your `BaseMvRxViewModel` super c
 
 #### Update BaseMvRxFragment
 
-With MvRx 1.x, you had to make your base Fragment class extend `BaseMvRxViewModel`. Now, you can make it just implement `MavericksView`. The rxjava2 artifact still ships with `BaseMvRxFragment` but it is deprecated and everything will continue to work with the `MavericksView` interface. 
+With MvRx 1.x, you had to make your base Fragment class extend `BaseMvRxFragment `. Now, you can make it just implement `MavericksView`. The rxjava2 artifact still ships with `BaseMvRxFragment` but it is deprecated and everything will continue to work with the `MavericksView` interface. 
 
 #### Update tests
 

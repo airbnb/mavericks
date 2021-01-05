@@ -62,7 +62,7 @@ From within a viewModel, you call `setState { copy(yourProp = newValue) }`. If t
 1. The lambda is _not_ executed synchronously. It is put on a queue and run on a background thread. See [threading](threading.md) for more information
 
 #### Handling async/db/network operations
-Handling asynchronous operations with easy was one of the primary goals of Mavericks. Check out [the docs](async.md) for `Async<T>` and `execute(...)` to learn more.
+Handling asynchronous operations with ease was one of the primary goals of Mavericks. Check out [the docs](async.md) for `Async<T>` and `execute(...)` to learn more.
 
 #### Subscribing to state changes
 You can subscribe to state changes in your ViewModel. You may want to do this for analytics, for example. This usually done in the `init { ... }` block.
@@ -103,7 +103,7 @@ By implementing `MavericksView`, you:
 1. `fragmentViewModel()` scopes the ViewModel to the Fragment. It will be accessible to children fragments but parent or sibling fragments would get a different instance.
 1. `parentFragmentViewModel()` walks up the parent fragment tree until it finds one that has already created a ViewModel of the desired type. If none is found, it will automatically create one scoped to the highest parent fragment.
 1. `existingViewModel()` Same as `activityViewModel()` except it throws if the ViewModel was not already created by somebody else.
-1. `navGraphViewModel(navGraphId: Int)` scopes to the ViewModel to the [Jetpack Navigation](https://developer.android.com/guide/navigation) graph with that id. This requires the mvrx-navigation artifact ([docs](jetpack-navigation.md)).
+1. `navGraphViewModel(navGraphId: Int)` scopes the ViewModel to the [Jetpack Navigation](https://developer.android.com/guide/navigation) graph with that id. This requires the mvrx-navigation artifact ([docs](jetpack-navigation.md)).
 
 If you want multiple ViewModels of the same type, you can pass a `keyFactory` into any of the delegates.
 

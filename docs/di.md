@@ -2,7 +2,7 @@
 
 Mavericks provides the configuration required to integrate into whatever dependency injection system you use.
 
-Dagger is the most commonly used dependency injection framework and used by . For that reason, Dagger is the recommended dependency injection framework for new apps using Mavericks.  
+Dagger is the most commonly used dependency injection framework and used by Airbnb and Tonal. For that reason, Dagger is the recommended dependency injection framework for new apps using Mavericks.  
 
 ## Dagger
 
