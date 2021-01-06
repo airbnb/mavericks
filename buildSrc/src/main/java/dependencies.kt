@@ -25,7 +25,7 @@ object Versions {
     const val dagger = "2.27"
     const val daggerAssisted = "0.5.2"
     const val epoxy = "4.0.0"
-    const val hilt = "2.28-alpha"
+    const val hilt = "HEAD-SNAPSHOT" // cause hilt @AssistedInject is not yet published as of time of writing.
     const val koin = "2.0.1"
     const val kotlinCoroutines = "1.4.1"
     const val lottie = "3.4.0"

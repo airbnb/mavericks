@@ -1,6 +1,6 @@
 package com.airbnb.mvrx.hellohilt.di
 
-import com.airbnb.mvrx.hellohilt.base.BaseViewModel
+import com.airbnb.mvrx.MavericksViewModel
 import dagger.MapKey
 import kotlin.reflect.KClass
 
@@ -10,4 +10,4 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.RUNTIME)
 @Target(AnnotationTarget.FUNCTION)
 @MapKey
-annotation class ViewModelKey(val value: KClass<out BaseViewModel<*>>)
+annotation class ViewModelKey(val value: KClass<out MavericksViewModel<*>>)

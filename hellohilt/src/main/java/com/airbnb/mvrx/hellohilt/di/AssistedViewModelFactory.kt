@@ -1,7 +1,7 @@
 package com.airbnb.mvrx.hellohilt.di
 
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MvRxState
-import com.airbnb.mvrx.hellohilt.base.BaseViewModel
 
 /*
  * Serves as a supertype for AssistedInject factories in ViewModels.
@@ -20,7 +20,7 @@ import com.airbnb.mvrx.hellohilt.base.BaseViewModel
  * implementing AssistedViewModelFactory.
  *
  * class MyViewModel @AssistedInject constructor(...): BaseMvRxViewModel<MyState>(...) {
- *   @AssistedInject.Factory
+ *   @AssistedFactory
  *   interface Factory : AssistedViewModelFactory<MyViewModel, MyState> {
  *     override fun create(state: MyState): MyViewModel
  *   }
@@ -33,9 +33,7 @@ import com.airbnb.mvrx.hellohilt.base.BaseViewModel
  * @AssistedModule(includes = [AssistedInject_MyAppModule::class])
  * @Module
  * interface MyAppModule {
- *   @Binds
- *   @IntoMap
- *   @ViewModelKey(MyViewModel::class)
+ *   @[Binds IntoMap ViewModelKey(MyViewModel::class)]
  *   fun myViewModelFactory(factory: MyViewModel.Factory): AssistedViewModelFactory<*, *>
  * }
  *
@@ -45,14 +43,18 @@ import com.airbnb.mvrx.hellohilt.base.BaseViewModel
  *
  * The generated map can then be injected wherever it is required.
  *
- * interface AppComponent {
- *   fun viewModelFactories(): Map<Class<out BaseViewModel<*>>, AssistedViewModelFactory<*, *>>
+ * @EntryPoint
+ * @InstallIn(SingletonComponent::class) // ActivityComponent::class or FragmentComponent::class if required.
+ * interface HiltMavericksEntryPoint {
+ *  val viewModelFactories: Map<Class<out MavericksViewModel<*>>, AssistedViewModelFactory<*, *>>
  * }
  *
+ * **NOTE**: If you want multiple `EntryPoint`s for different scopes then your @[Binds ViewModelKey(clazz:class)] will need also have a @Qualifier.
+ *
  * class SomeClass @Inject constructor(
- *   val viewModelFactories: Map<Class<out BaseViewModel<*>>, AssistedViewModelFactory<*, *>>
+ *   val viewModelFactories: Map<Class<out MavericksViewModel<*>>, AssistedViewModelFactory<*, *>>
  * )
  */
-interface AssistedViewModelFactory<VM : BaseViewModel<S>, S : MvRxState> {
+interface AssistedViewModelFactory<VM : MavericksViewModel<S>, S : MvRxState> {
     fun create(state: S): VM
 }

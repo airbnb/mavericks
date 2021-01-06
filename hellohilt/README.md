@@ -1,6 +1,35 @@
 # Dagger Usage Sample for MvRx
 
-This module contains a sample app to demonstrate how to ease the usage of Dagger and AssistedInject in apps using MvRx.
+This module contains a sample app demonstrating how to setup Hilt and AssistedInject in an app using MvRx.
+
+**NOTE** Hilts bundled implementation of AssistedInject is as time of writing not released.
+So, you will need to use the Snapshot release until Dagger 2.x is released with AssistedInject.
+
+// build.gradle
+buildscript {
+    repositories {
+        google()
+        jcenter()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    }
+    dependencies {
+        classpath "com.google.dagger:hilt-android-gradle-plugin:HEAD-SNAPSHOT"
+        // rest of classpath(s)…
+    }
+}
+
+// module/build.gradle
+```groovy
+repositories {
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+}
+
+dependencies {
+    def hiltVersion = "HEAD-SNAPSHOT"
+    kapt "com.google.dagger:hilt-android-compiler:${hiltVersion}"
+    implementation "com.google.dagger:hilt-android:${hiltVersion}"
+}
+```
 
 ## Key Features
 
@@ -10,15 +39,11 @@ This module contains a sample app to demonstrate how to ease the usage of Dagger
 
 * **Multibinding setup for AssistedInject Factories**
 
-  Every ViewModel using AssistedInject needs a Factory interface annotated with `@AssistedInject.Factory`. These factories are grouped together under a common parent type [AssistedViewModelFactory](src/main/java/com/airbnb/mvrx/hellohilt/di/AssistedViewModelFactory.kt) to enable a Multibinding Dagger setup.
-
-* **Removing boilerplate from a MvRxViewModelFactory**
-
-  An `MvRxViewModelFactory` is different than an AssistedInject Factory, and is still needed. Using this AssistedInject multibinding setup, most ViewModels will share the same boilerplate logic in their `MvRxViewModelFactory`'s. A [DaggerMvRxViewModelFactory](src/main/java/com/airbnb/mvrx/hellohilt/di/DaggerMvRxViewModelFactory.kt) has been added to eliminate this boilerplate.
+  Every ViewModel using AssistedInject needs a Factory interface annotated with `@AssistedFactory`. These factories are grouped together under a common parent type [AssistedViewModelFactory](src/main/java/com/airbnb/mvrx/hellohilt/di/AssistedViewModelFactory.kt) to enable a Multibinding Dagger setup.
 
 ## Example
 
-* Create your ViewModel with an @AssistedInject constructor, an AssistedInject Factory implementing `AssistedViewModelFactory`, and a companion object implementing `DaggerMvRxViewModelFactory`.
+* Create your ViewModel with an ``@AssistedInject` constructor, an `@AssistedFactory` implementing `AssistedViewModelFactory`, and a companion object implementing `DaggerMvRxViewModelFactory`.
 
 ```kotlin
 class MyViewModel @AssistedInject constructor(
@@ -26,12 +51,12 @@ class MyViewModel @AssistedInject constructor(
   // and other dependencies
 ) {
 
-  @AssistedInject.Factory
+  @AssistedFactory
   interface Factory: AssistedViewModelFactory<MyViewModel, MyState> {
     override fun create(initialState: MyState): MyViewModel
   }
 
-  companion object: DaggerMvRxViewModelFactory(MyViewModel::class.java)
+  companion object: HiltMavericksViewModelFactory<MyViewModel, MyState>(MyViewModel::class.java)
 }
 ```
 
@@ -40,9 +65,7 @@ class MyViewModel @AssistedInject constructor(
 ```kotlin
 interface AppModule {
 
-    @Binds
-    @IntoMap
-    @ViewModelKey(MyViewModel::class)
+    @[Binds IntoMap ViewModelKey(MyViewModel::class)]
     fun myViewModelFactory(factory: MyViewModel.Factory): AssistedViewModelFactory<*, *>
 
 }
@@ -51,7 +74,7 @@ interface AppModule {
 * Add a provision for the Multibinding map in your Dagger component:
 
 ```kotlin
-    fun viewModelFactories(): Map<Class<out BaseViewModel<*>>, AssistedViewModelFactory<*, *>>
+    fun viewModelFactories(): Map<Class<out MavericksViewModel<*>>, AssistedViewModelFactory<*, *>>
 ```
 
 * With this setup complete, request your ViewModel in a Fragment as usual, using any of MvRx's ViewModel delegates.
@@ -64,4 +87,5 @@ class MyFragment : BaseMvRxFragment() {
 
 ## How it works
 
-The `DaggerMvRxViewModelFactory` is used by MvRx to create the requested ViewModel. This factory uses the map of AssistedInject factories provided in the `AppComponent`, retrieves the one for the requested ViewModel and delegates the creation to it.
+`HiltMavericksViewModelFactory` will try loading the custom entry point from the `SingletonComponent`
+and lookup the viewModel factory using the `viewModelClass` key.

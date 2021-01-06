@@ -4,6 +4,10 @@ apply plugin: "kotlin-android-extensions"
 apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: "kotlin-kapt"
 
+repositories {
+    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+}
+
 android {
 
     defaultConfig {
@@ -11,14 +15,6 @@ android {
         versionCode 1
         versionName "0.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        // To disable checking for the InstallIn annotation and make assisted modules work without,
-        // the installIn annotation, enable the compiler option:
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments["dagger.hilt.disableModulesHaveInstallInCheck"] = "true"
-            }
-        }
     }
 
     buildTypes {
@@ -30,13 +26,11 @@ android {
 }
 
 dependencies {
-    kapt AnnotationProcessors.daggerAssisted
     kapt AnnotationProcessors.hilt
 
     implementation Libraries.appcompat
     implementation Libraries.constraintlayout
     implementation Libraries.coreKtx
-    implementation Libraries.daggerAssisted
     implementation Libraries.fragmentKtx
     implementation Libraries.hilt
     implementation Libraries.rxJava

@@ -8,6 +8,6 @@ import dagger.hilt.android.HiltAndroidApp
 class HelloHiltApplication : Application() {
     override fun onCreate() {
         super.onCreate()
-        MockableMavericks.install(this)
+        MockableMavericks.initialize(this)
     }
 }
