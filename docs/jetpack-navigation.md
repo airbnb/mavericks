@@ -1,16 +1,16 @@
 # Jetpack Navigation
 
-Mavericks ships with a `mvrx-navigation` artifact that makes it easy to use nav graph scoped ViewModels.
+Mavericks ships with a `mavericks-navigation` artifact that makes it easy to use nav graph scoped ViewModels.
 
 ## Getting Started
 
 Add the dependency to your build.gradle file:
 ```groovy
 dependencies {
-  implementation 'com.airbnb.android:mvrx-navigation:x.y.z'
+  implementation 'com.airbnb.android:mavericks-navigation:x.y.z'
 }
 ```
-The latest version of mvrx-navigation is [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx-navigation/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx-navigation)
+The latest version of mavericks-navigation is [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks-navigation/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks-navigation)
 
 ## Initialize Mavericks
 
@@ -31,4 +31,4 @@ MockableMavericks.initialize(this, viewModelDelegateFactory = DefaultNavigationV
 
 Once you have done that, you may use the `navGraphViewModel()` delegate to get a ViewModel scoped to the navigation graph with that id.
 
-To view an example of its usage, check out the sample [here](https://github.com/airbnb/MvRx/blob/master/sample-navigation/src/main/java/com/airbnb/mvrx/sample/navigation/FlowFragments.kt).
+To view an example of its usage, check out the sample [here](https://github.com/airbnb/mavericks/blob/master/sample-navigation/src/main/java/com/airbnb/mvrx/sample/navigation/FlowFragments.kt).

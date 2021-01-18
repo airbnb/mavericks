@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.com/airbnb/MvRx.svg?branch=master)](https://travis-ci.com/github/airbnb/MvRx)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx)
+[![Build Status](https://travis-ci.com/airbnb/mavericks.svg?branch=master)](https://travis-ci.com/github/airbnb/mavericks)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks)
 
 # Mavericks
 
@@ -21,9 +21,12 @@ class CounterViewModel(initialState: CounterState) : MavericksViewModel<CounterS
     fun incrementCount() = setState { copy(count = count + 1) }
 }
 
-/** Fragments in Mavericks are simple and rarely do more than bind your state to views. */
+/**
+ * Fragments in Mavericks are simple and rarely do more than bind your state to views.
+ * Mavericks works well with Fragments but you can use it with whatever view architecture you use.
+ */
 class CounterFragment : Fragment(R.layout.counter_fragment), MavericksView {
-    private val viewModel: CounterViewModel by activityViewModel()
+    private val viewModel: CounterViewModel by fragmentViewModel()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         counterText.setOnClickListener {

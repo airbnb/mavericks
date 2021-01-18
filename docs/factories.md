@@ -4,8 +4,8 @@ In many cases, it is sufficient to let Mavericks create your ViewModel and State
 ## MavericksViewModelFactory
 To intercept either ViewModel or State creation, create a companion object in your ViewModel and make it implement `MavericksViewModelFactory`
 ```kotlin
-class MyViewModel(initialState: MyState, dataStore: DataStore) : BaseMvRxViewModel(initialState, debugMode = true) {
-    companion object : MvRxViewModelFactory<MyViewModel, MyState>
+class MyViewModel(initialState: MyState, dataStore: DataStore) : MavericksViewModel(initialState) {
+    companion object : MavericksViewModelFactory<MyViewModel, MyState>
 }
 ```
 
@@ -28,10 +28,10 @@ ViewModelContext will either be `ActivityViewModelContext` or `FragmentViewModel
 class MyViewModel(
     initialState: MyState,
     ...
-) : MvRxViewModel<MyState>(initialState) {
+) : MavericksViewModel<MyState>(initialState) {
     ...
 
-    companion object : MvRxViewModelFactory<MyViewModel, MyState> {
+    companion object : MavericksViewModelFactory<MyViewModel, MyState> {
 
         override fun initialState(viewModelContext: ViewModelContext): MyState {
             return MyState(...)

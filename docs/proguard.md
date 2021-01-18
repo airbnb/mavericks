@@ -37,24 +37,24 @@ The Mavericks lib itself has a consumer Proguard file that configures Proguard. 
 
 The configuration provided for the lib assumes that your shrinker can correctly handle Kotlin `@Metadata` annotations (e.g. Dexguard 8.6++) if it cannot (e.g. Proguard and current versions of R8) you need to add these rules to the proguard configuration of your app:
 ```
-# BaseMvRxViewModels loads the Companion class via reflection and thus we need to make sure we keep
+# MavericksViewModel loads the Companion class via reflection and thus we need to make sure we keep
 # the name of the Companion object.
 -keepclassmembers class ** extends com.airbnb.mvrx.MavericksViewModel {
     ** Companion;
 }
 
-# Members of the Kotlin data classes used as the state in MvRx are read via Kotlin reflection which cause trouble
+# Members of the Kotlin data classes used as the state in Mavericks are read via Kotlin reflection which cause trouble
 # with Proguard if they are not kept.
 # During reflection cache warming also the types are accessed via reflection. Need to keep them too.
 -keepclassmembers,includedescriptorclasses,allowobfuscation class ** implements com.airbnb.mvrx.MavericksState {
    *;
 }
 
-# The MvRxState object and the names classes that implement the MvRxState interface need to be
+# The MavericksState object and the names classes that implement the MavericksState interface need to be
 # kept as they are accessed via reflection.
 -keepnames class com.airbnb.mvrx.MavericksState
 -keepnames class * implements com.airbnb.mvrx.MavericksState
 
-# MvRxViewModelFactory is referenced via reflection using the Companion class name.
+# MavericksViewModelFactory is referenced via reflection using the Companion class name.
 -keepnames class * implements com.airbnb.mvrx.MavericksViewModelFactory
 ```

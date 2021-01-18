@@ -2,7 +2,7 @@
 
 ## Version 2.0.0-beta4
 - FragmentViewModelContext now allows for custom ViewModelStoreOwner and/or SavedStateRegistry that are different from the fragment ones in FragmentViewModelContext. (#443)
-- Add mvrx-navigation artifact to support AndroidX Navigation destination ViewModels `navGraphViewModel(R.id.my_graph)` (#443)
+- Add mavericks-navigation artifact to support AndroidX Navigation destination ViewModels `navGraphViewModel(R.id.my_graph)` (#443)
 
 ## Version 2.0.0-beta3
 
@@ -39,10 +39,10 @@ Previously, setState would only be prioritized at that nesting level so it would
 [W1, S1, W2, S2, S3]
 Now, it will run:
 [W1, S1, S2, S3, W2]
-- If your MvRxView/Fragment does not use any ViewModels, invalidate() will NOT be called in onStart(). In MvRx 1.x, invalidate would be called even if MvRx was not used at all. If you would like to maintain the original behavior, call `postInvalidate()` from onStart in your base Fragment class.
-- BaseMvRxViewModel no longer extends Jetpack ViewModel
-- viewModelScope is now a property on BaseMvRxViewModel, not the Jetpack extension function for ViewModel. Functionally, this is the same but the previous viewModelScope import will now be unused.
-- If you had been using any restricted internal mvrx library functions your build may break as they have been renamed (you shouldn't be doing this, but in case you are...)
+- If your MavericksView/Fragment does not use any ViewModels, invalidate() will NOT be called in onStart(). In MvRx 1.x, invalidate would be called even if MvRx was not used at all. If you would like to maintain the original behavior, call `postInvalidate()` from onStart in your base Fragment class.
+- MavericksViewModel and BaseMvRxViewModel (from mavericks-rxjava2) no longer extends Jetpack ViewModel
+- viewModelScope is now a property on MavericksViewModel and BaseMvRxViewModel (from mavericks-rxjava2), not the Jetpack extension function for ViewModel. Functionally, this is the same but the previous viewModelScope import will now be unused
+- If you had been using any restricted internal mavericks library functions your build may break as they have been renamed (you shouldn't be doing this, but in case you are...)
 
 ## Version 1.5.1
 - Fix incorrectly failing debug assertions for state class being a data class when a property has internal visibility

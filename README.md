@@ -1,36 +1,32 @@
-[![Build Status](https://travis-ci.com/airbnb/MvRx.svg?branch=master)](https://travis-ci.com/github/airbnb/MvRx)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx)
+[![Build Status](https://travis-ci.com/airbnb/mavericks.svg?branch=master)](https://travis-ci.com/github/airbnb/mavericks)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks)
 
-# MvRx: Android on Autopilot
+# Mavericks (formerly MvRx): Android on Autopilot
 
-## For full documentation, check out the [wiki](https://github.com/airbnb/MvRx/wiki)
+## For full documentation, check out our [docs site](https://airbnb.io/mavericks).
 
-MvRx (pronounced mavericks) is the Android framework from Airbnb that we use for nearly all product development at Airbnb.
+Mavericks is the Android framework from Airbnb that we use for nearly all product development at Airbnb.
 
-When we began creating MvRx, our goal was not to create yet another architecture pattern for Airbnb, it was to make building products easier, faster, and more fun. All of our decisions have built on that. We believe that for MvRx to be successful, it must be effective for building everything from the simplest of screens to the most complex in our app.
+When we began creating Mavericks, our goal was not to create yet another architecture pattern for Airbnb, it was to make building products easier, faster, and more fun. All of our decisions have built on that. We believe that for Mavericks to be successful, it must be effective for building everything from the simplest of screens to the most complex in our app.
 
 This is what it looks like:
 ```kotlin
 
-data class HelloWorldState(val title: String = "Hello World") : MvRxState
+data class HelloWorldState(val title: String = "Hello World") : MavericksState
 
 /**
  * Refer to the wiki for how to set up your base ViewModel.
  */
-class HelloWorldViewModel(initialState: HelloWorldState) : MyBaseMvRxViewModel<HelloWorldState>(initialState, debugMode = BuildConfig.DEBUG) {
+class HelloWorldViewModel(initialState: HelloWorldState) : MavericksViewModel<HelloWorldState>(initialState) {
     fun getMoreExcited() = setState { copy(title = "$title!") }
 }
 
-class HelloWorldFragment : BaseFragment() {
+class HelloWorldFragment : Fragment(R.layout.hello_world_fragment), MavericksView {
     private val viewModel: HelloWorldViewModel by fragmentViewModel()
 
-    override fun EpoxyController.buildModels() = withState(viewModel) { state ->
-        header {
-            title(state.title)
-        }
-        basicRow { 
-            onClick { viewModel.getMoreExcited() }
-        }
+    override fun invalidate = withState(viewModel) { state ->
+        // Update your views with the latest state here.
+        // This will get called any time your state changes and the viewLifecycleOwner is STARTED.
     }
 }
 ```
@@ -41,9 +37,9 @@ Gradle is the only supported build configuration, so just add the dependency to 
 
 ```groovy
 dependencies {
-  implementation 'com.airbnb.android:mvrx:x.y.z'
+  implementation 'com.airbnb.android:mavericks:x.y.z'
 }
 ```
-The latest version of mvrx is [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx)
+The latest version of mavericks is [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks)
 
-## For full documentation, check out the [wiki](https://github.com/airbnb/MvRx/wiki)
+## For full documentation, check out the [docs site](https://airbnb.io/mavericks)

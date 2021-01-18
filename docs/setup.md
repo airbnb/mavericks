@@ -6,13 +6,13 @@ Adding Mavericks to your app requires just three steps:
 
 ```groovy
 dependencies {
-  implementation 'com.airbnb.android:mvrx:x.y.z'
+  implementation 'com.airbnb.android:mavericks:x.y.z'
 }
 ```
-The latest version of mvrx is [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mvrx)
+The latest version of Mavericks is [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks)
 
 
-### 2. Update Your Base Fragment
+### 2. Update Your Base Fragment/View
 Make your base Fragment class implement `MavericksView`.
 ***
 
@@ -37,7 +37,7 @@ If you plan on using Jetpack Navigation, you should also follow the setup steps 
 
 ### [Optional] Set Custom Mavericks View Model Configuration
 
-Mavericks lets you override some configuration that is used every time a new ViewModel is created. For example, you could change the default dispatcher for the state store or for subscriptions. Check out the docs for [ViewModelConfigFactory](https://github.com/airbnb/MvRx/blob/master/mvrx/src/main/kotlin/com/airbnb/mvrx/MavericksViewModelConfigFactory.kt) for more info.
+Mavericks lets you override some configuration that is used every time a new ViewModel is created. For example, you could change the default dispatcher for the state store or for subscriptions. Check out the docs for [ViewModelConfigFactory](https://github.com/airbnb/mavericks/blob/master/mavericks/src/main/kotlin/com/airbnb/mvrx/MavericksViewModelConfigFactory.kt) for more info.
 
 **Note:** If you create your own config factory, ensure that you set `debugMode` correctly so that the [debug checks](https://github.com/airbnb/Mavericks/wiki#debug-checks) are run.
 
