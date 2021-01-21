@@ -16,4 +16,3 @@ interface ViewModelsModule {
     @ViewModelKey(HelloHiltViewModel::class)
     fun helloViewModelFactory(factory: HelloHiltViewModel.Factory): AssistedViewModelFactory<*, *>
 }
-

@@ -30,7 +30,9 @@ class HelloHiltFragment : Fragment(R.layout.hello_hilt_fragment), MvRxView {
     }
 
     override fun invalidate() = withState(viewModel1, viewModel2) { state1, state2 ->
+        @Suppress("Detekt.MaxLineLength")
         binding.with.text = "@MavericksViewModelScoped: VM1: [${state1.viewModelScopedClassId1},${state1.viewModelScopedClassId2}] VM2: [${state2.viewModelScopedClassId1},${state2.viewModelScopedClassId2}]"
+        @Suppress("Detekt.MaxLineLength")
         binding.without.text = "VM1: [${state1.notViewModelScopedClassId1},${state1.notViewModelScopedClassId2}] VM2: [${state2.notViewModelScopedClassId1},${state2.notViewModelScopedClassId2}]"
     }
 }

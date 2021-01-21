@@ -2,7 +2,6 @@ package com.airbnb.mvrx.hellohilt.di
 
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MvRxState
 
 /**
  * This factory allows Mavericks to supply the initial or restored [MavericksState] to Hilt.

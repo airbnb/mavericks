@@ -57,6 +57,7 @@ class navigationLifecycleAwareLazy<out T>(
                     @Suppress("UNCHECKED_CAST") (_v2 as T)
                 } else {
                     val typedValue =
+                        @Suppress("Detekt.TooGenericExceptionCaught")
                         try {
                             initializer!!()
                         } catch (cause: Throwable) {

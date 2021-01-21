@@ -4,7 +4,6 @@ import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.hellohilt.di.AssistedViewModelFactory
-import com.airbnb.mvrx.hellohilt.di.HiltMavericksViewModelFactory
 import com.airbnb.mvrx.hellohilt.di.hiltMavericksViewModelFactory
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
