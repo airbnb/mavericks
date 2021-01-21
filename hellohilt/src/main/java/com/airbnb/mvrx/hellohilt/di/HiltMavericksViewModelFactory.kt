@@ -34,7 +34,7 @@ class HiltMavericksViewModelFactory<VM : MavericksViewModel<S>, S : MavericksSta
 
     override fun create(viewModelContext: ViewModelContext, state: S): VM {
         // We want to create the ViewModelComponent. In order to do that, we need to get its parent: ActivityComponent.
-        val componentBuilder = EntryPoints.get(viewModelContext.activity, CreateMavericksViewModelComponent::class.java).mavericksViewModelComponentBuilder()
+        val componentBuilder = EntryPoints.get(viewModelContext.app(), CreateMavericksViewModelComponent::class.java).mavericksViewModelComponentBuilder()
         val viewModelComponent = componentBuilder.build()
         val viewModelFactoryMap = EntryPoints.get(viewModelComponent, HiltMavericksEntryPoint::class.java).viewModelFactories
         val viewModelFactory = viewModelFactoryMap[viewModelClass]
