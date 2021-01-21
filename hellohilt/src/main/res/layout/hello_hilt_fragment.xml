@@ -12,7 +12,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         tools:text="ViewModel @MavericksViewModelScoped: 1" />
 
@@ -21,7 +20,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
-        android:textAlignment="center"
         android:textAppearance="@style/TextAppearance.AppCompat.Body1"
         tools:text="Repository @MavericksViewModelScoped: 1" />
 </LinearLayout>
