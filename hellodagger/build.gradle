@@ -44,8 +44,7 @@ dependencies {
     implementation Libraries.rxJava
     implementation Libraries.viewModelKtx
     implementation Libraries.multidex
-    implementation project(":mvrx-rxjava2")
-    implementation project(":mvrx-mocking")
+    implementation project(":mvrx")
 
     debugImplementation Libraries.fragmentTesting
 

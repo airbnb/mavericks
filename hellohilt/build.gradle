@@ -1,15 +1,9 @@
 apply plugin: "com.android.application"
 apply plugin: "kotlin-android"
-apply plugin: "kotlin-android-extensions"
-apply plugin: 'dagger.hilt.android.plugin'
 apply plugin: "kotlin-kapt"
-
-repositories {
-    maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
-}
+apply plugin: 'dagger.hilt.android.plugin'
 
 android {
-
     defaultConfig {
         applicationId "com.airbnb.mvrx.helloHilt"
         versionCode 1
@@ -23,29 +17,17 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
-    kapt AnnotationProcessors.hilt
-
     implementation Libraries.appcompat
     implementation Libraries.constraintlayout
-    implementation Libraries.coreKtx
     implementation Libraries.fragmentKtx
+    kapt AnnotationProcessors.hilt
     implementation Libraries.hilt
-    implementation Libraries.rxJava
-    implementation Libraries.viewModelKtx
-    implementation Libraries.multidex
     implementation project(":mvrx-rxjava2")
-    implementation project(":mvrx-mocking")
-
-    debugImplementation Libraries.fragmentTesting
-
-    androidTestImplementation InstrumentedTestLibraries.core
-    androidTestImplementation InstrumentedTestLibraries.espresso
-    androidTestImplementation InstrumentedTestLibraries.junit
-
-    testImplementation project(":testing")
-    testImplementation TestLibraries.junit
-    testImplementation TestLibraries.mockk
 }

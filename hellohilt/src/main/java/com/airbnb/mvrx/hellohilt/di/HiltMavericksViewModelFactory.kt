@@ -1,61 +1,78 @@
 package com.airbnb.mvrx.hellohilt.di
 
-import androidx.fragment.app.FragmentActivity
+import com.airbnb.mvrx.ActivityViewModelContext
+import com.airbnb.mvrx.FragmentViewModelContext
+import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.MvRxState
 import com.airbnb.mvrx.ViewModelContext
+import dagger.hilt.DefineComponent
 import dagger.hilt.EntryPoint
 import dagger.hilt.EntryPoints
 import dagger.hilt.InstallIn
+import dagger.hilt.android.components.ActivityComponent
+import dagger.hilt.android.components.FragmentComponent
 import dagger.hilt.components.SingletonComponent
 
 /**
- * A [MavericksViewModelFactory] which makes it easy to create instances of a ViewModel
- * using its AssistedInject Factory. This class should be implemented by the companion object
- * of every ViewModel which uses AssistedInject.
- *
- * @param viewModelClass The [Class] of the ViewModel being requested for creation
- *
- * This class accesses the map of [AssistedViewModelFactory]s from [SingletonComponent] via an [EntryPoint]
- * and uses it to retrieve the requested ViewModel's factory class. It then creates an instance of this ViewModel
- * using the retrieved factory and returns it.
+ * To connect Mavericks ViewModel creation with Hilt's dependency injection, add the following Factory and companion object to your MavericksViewModel.
  *
  * Example:
  *
- * class MyViewModel @AssistedInject constructor(...): BaseViewModel<MyState>(...) {
+ * class MyViewModel @AssistedInject constructor(...): MavericksViewModel<MyState>(...) {
  *
  *   @AssistedInject.Factory
  *   interface Factory : AssistedViewModelFactory<MyViewModel, MyState> {
  *     ...
  *   }
  *
- *   companion object : HiltMavericksViewModelFactory<MyViewModel, MyState>(MyViewModel::class.java)
- *
+ *   companion object : MavericksViewModelFactory<MyViewModel, MyState> by hiltMavericksViewModelFactory()
  * }
  */
-abstract class HiltMavericksViewModelFactory<VM : MavericksViewModel<S>, S : MvRxState>(
+
+inline fun <reified VM : MavericksViewModel<S>, S : MavericksState> hiltMavericksViewModelFactory() = HiltMavericksViewModelFactory<VM, S>(VM::class.java)
+
+
+class HiltMavericksViewModelFactory<VM : MavericksViewModel<S>, S : MavericksState>(
     private val viewModelClass: Class<out MavericksViewModel<S>>
 ) : MavericksViewModelFactory<VM, S> {
 
-    override fun create(viewModelContext: ViewModelContext, state: S): VM? {
-        return createViewModel(viewModelContext.activity, state)
-    }
-
-    private fun <VM : MavericksViewModel<S>, S : MvRxState> createViewModel(fragmentActivity: FragmentActivity, state: S): VM {
-        val viewModelFactoryMap = EntryPoints.get(fragmentActivity.applicationContext, HiltMavericksEntryPoint::class.java)
-            .viewModelFactories
+    override fun create(viewModelContext: ViewModelContext, state: S): VM {
+        // We want to create the ViewModelComponent. In order to do that, we need to get its parent: ActivityComponent.
+        val componentBuilder = EntryPoints.get(viewModelContext.activity, CreateMavericksViewModelComponent::class.java).mavericksViewModelComponentBuilder()
+        val viewModelComponent = componentBuilder.build()
+        val viewModelFactoryMap = EntryPoints.get(viewModelComponent, HiltMavericksEntryPoint::class.java).viewModelFactories
         val viewModelFactory = viewModelFactoryMap[viewModelClass]
 
         @Suppress("UNCHECKED_CAST")
         val castedViewModelFactory = viewModelFactory as? AssistedViewModelFactory<VM, S>
-        val viewModel = castedViewModelFactory?.create(state)
-        return viewModel as VM
+        return castedViewModelFactory?.create(state) as VM
     }
+}
+
+/**
+ * Hilt's ViewModelComponent's parent is ActivityRetainedComponent but there is no easy way to access it. SingletonComponent should be sufficient
+ * because the ViewModel that gets created is the only object with a reference to the created component so the lifecycle of it will
+ * still be correct.
+ */
+@MavericksViewModelScoped
+@DefineComponent(parent = SingletonComponent::class)
+interface MavericksViewModelComponent
+
+@DefineComponent.Builder
+interface MavericksViewModelComponentBuilder {
+    fun build(): MavericksViewModelComponent
 }
 
 @EntryPoint
 @InstallIn(SingletonComponent::class)
+interface CreateMavericksViewModelComponent {
+    fun mavericksViewModelComponentBuilder(): MavericksViewModelComponentBuilder
+}
+
+@EntryPoint
+@InstallIn(MavericksViewModelComponent::class)
 interface HiltMavericksEntryPoint {
     val viewModelFactories: Map<Class<out MavericksViewModel<*>>, AssistedViewModelFactory<*, *>>
 }
