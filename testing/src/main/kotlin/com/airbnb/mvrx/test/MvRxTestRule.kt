@@ -49,7 +49,7 @@ class MvRxTestRule(
      */
     private val debugMode: Boolean = false,
     /**
-     * A custom coroutine dispatcher that will be set as Dispatchers.Main for testing purposes
+     * A custom coroutine dispatcher that will be set as Dispatchers.Main for testing purposes.
      */
     private val testDispatcher: CoroutineDispatcher = TestCoroutineDispatcher()
 ) : ExternalResource() {
