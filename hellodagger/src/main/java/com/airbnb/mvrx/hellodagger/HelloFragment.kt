@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.fragment_hello.messageTextView
 
 class HelloFragment : Fragment(R.layout.fragment_hello), MavericksView {
 
-    val viewModel: HelloViewModel by fragmentViewModel()
+    val viewModel: HelloDaggerViewModel by fragmentViewModel()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         helloButton.setOnClickListener { viewModel.sayHello() }

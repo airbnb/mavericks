@@ -33,13 +33,11 @@ android {
 
 dependencies {
     kapt AnnotationProcessors.dagger
-    kapt AnnotationProcessors.daggerAssisted
 
     implementation Libraries.appcompat
     implementation Libraries.constraintlayout
     implementation Libraries.coreKtx
     implementation Libraries.dagger
-    implementation Libraries.daggerAssisted
     implementation Libraries.fragmentKtx
     implementation Libraries.rxJava
     implementation Libraries.viewModelKtx

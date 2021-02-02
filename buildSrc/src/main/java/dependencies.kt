@@ -22,8 +22,7 @@ object Versions {
 
     // Libraries
     const val autoValue = "1.6.6"
-    const val dagger = "2.31.1"
-    const val daggerAssisted = "0.5.2"
+    const val dagger = "2.31.2"
     const val epoxy = "4.0.0"
     const val hilt = "2.31.1-alpha"
     const val koin = "2.0.1"
@@ -53,7 +52,6 @@ object Versions {
 object AnnotationProcessors {
     const val autoValue = "com.google.auto.value:auto-value:${Versions.autoValue}"
     const val dagger = "com.google.dagger:dagger-compiler:${Versions.dagger}"
-    const val daggerAssisted = "com.squareup.inject:assisted-inject-processor-dagger2:${Versions.daggerAssisted}"
     const val epoxy = "com.airbnb.android:epoxy-processor:${Versions.epoxy}"
     const val hilt = "com.google.dagger:hilt-android-compiler:${Versions.hilt}"
     const val lifecycle = "androidx.lifecycle:lifecycle-compiler:${Versions.lifecycle}"
@@ -69,7 +67,6 @@ object Libraries {
     const val coordinatorLayout = "androidx.coordinatorlayout:coordinatorlayout:${Versions.coordinatorLayout}"
     const val coreKtx = "androidx.core:core-ktx:${Versions.core}"
     const val dagger = "com.google.dagger:dagger:${Versions.dagger}"
-    const val daggerAssisted = "com.squareup.inject:assisted-inject-annotations-dagger2:${Versions.daggerAssisted}"
     const val epoxy = "com.airbnb.android:epoxy:${Versions.epoxy}"
     const val espressoIdlingResource = "androidx.test.espresso:espresso-idling-resource:${Versions.espresso}"
     const val fragment = "androidx.fragment:fragment:${Versions.fragment}"

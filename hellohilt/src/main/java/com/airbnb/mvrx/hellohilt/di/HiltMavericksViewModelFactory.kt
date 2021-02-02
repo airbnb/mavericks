@@ -17,7 +17,7 @@ import dagger.hilt.components.SingletonComponent
  *
  * class MyViewModel @AssistedInject constructor(...): MavericksViewModel<MyState>(...) {
  *
- *   @AssistedInject.Factory
+ *   @AssistedFactory
  *   interface Factory : AssistedViewModelFactory<MyViewModel, MyState> {
  *     ...
  *   }
