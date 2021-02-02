@@ -10,7 +10,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
-internal class HelloViewModelTest {
+internal class HelloDaggerViewModelTest {
 
     @get:Rule
     val mvrxRule = MvRxTestRule()
@@ -21,7 +21,7 @@ internal class HelloViewModelTest {
         val repo = mockk<HelloRepository> {
             every { sayHello() } returns flowOf("Hello!")
         }
-        val viewModel = HelloViewModel(HelloState(), repo)
+        val viewModel = HelloDaggerViewModel(HelloDaggerState(), repo)
         withState(viewModel) { state ->
             assertEquals(Success("Hello!"), state.message)
         }

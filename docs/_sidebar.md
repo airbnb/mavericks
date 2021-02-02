@@ -6,7 +6,6 @@
 ---
 * [**Async/Network/Db Operations**](async.md)
 * [**Debug Checks**](debug-checks.md)
-* [**Dependency Injection/Dagger**](di.md)
 * [**Creating a Counter App**](counter.md)
 * [**Fragment Arguments**](fragment-arguments.md)
 * [**Mavericks Mocking**](mocking.md)
@@ -22,4 +21,6 @@
 * [**Mavericks + Jetpack Navigation**](jetpack-navigation.md)
 * [**Mavericks + Jetpack Compose**](jetpack-compose.md)
 * [**Mavericks + View Binding**](view-binding.md)
+* [**Mavericks + Dagger/Hilt**](dagger.md)
+* [**Mavericks + Koin**](koin.md)
 * [**Mavericks + Epoxy**](epoxy.md)

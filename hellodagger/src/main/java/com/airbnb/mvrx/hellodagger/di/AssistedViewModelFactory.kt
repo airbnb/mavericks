@@ -20,7 +20,7 @@ import com.airbnb.mvrx.MavericksViewModel
  * implementing AssistedViewModelFactory.
  *
  * class MyViewModel @AssistedInject constructor(...): MavericksViewModel<MyState>(...) {
- *   @AssistedInject.Factory
+ *   @AssistedFactory
  *   interface Factory : AssistedViewModelFactory<MyViewModel, MyState> {
  *     override fun create(state: MyState): MyViewModel
  *   }
@@ -30,7 +30,7 @@ import com.airbnb.mvrx.MavericksViewModel
  * AssistedViewModelFactories using a [ViewModelKey]. Notice that the input to these methods is
  * the exact type of our AssistedInject factory, but the return type is an AssistedViewModelFactory.
  *
- * @AssistedModule(includes = [AssistedInject_MyAppModule::class])
+ * @Module
  * @Module
  * interface MyAppModule {
  *   @Binds

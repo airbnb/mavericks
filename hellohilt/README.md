@@ -1,8 +1,9 @@
-# Dagger Usage Sample for MvRx
+# Hilt Usage Sample for Mavericks
 
-This module contains a sample app demonstrating how to setup Hilt and AssistedInject in an app using MvRx.
+This module contains a sample app demonstrating how to setup Hilt and AssistedInject in an app using Mavericks.
 
 // build.gradle
+```groovy
 dependencies {
     def hiltVersion = "2.31.0" // or newer.
     kapt "com.google.dagger:hilt-android-compiler:${hiltVersion}"
@@ -54,7 +55,7 @@ interface ViewModelsModule {
 
 ```
 
-* With this setup complete, request your ViewModel in a Fragment as usual, using any of MvRx's ViewModel delegates.
+* With this setup complete, request your ViewModel in a Fragment as usual, using any of Mavericks's ViewModel delegates.
 
 ```kotlin
 class MyFragment : Fragment(), MavericksView {
@@ -64,4 +65,4 @@ class MyFragment : Fragment(), MavericksView {
 
 ## How it works
 
-`HiltMavericksViewModelFactory` will create a custom ViewModelComponent that is a child of ActivityComponent and will create an instance of your ViewModel with it.
+`HiltMavericksViewModelFactory` will create a custom ViewModelComponent that is a child of SingletonComponent and will create an instance of your ViewModel with it.
