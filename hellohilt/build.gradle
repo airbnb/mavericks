@@ -1,0 +1,33 @@
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-kapt"
+apply plugin: 'dagger.hilt.android.plugin'
+
+android {
+    defaultConfig {
+        applicationId "com.airbnb.mvrx.helloHilt"
+        versionCode 1
+        versionName "0.0.1"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+dependencies {
+    implementation Libraries.appcompat
+    implementation Libraries.constraintlayout
+    implementation Libraries.fragmentKtx
+    kapt AnnotationProcessors.hilt
+    implementation Libraries.hilt
+    implementation project(":mvrx-rxjava2")
+}

@@ -44,8 +44,6 @@ dependencies {
     implementation Libraries.rxJava
     implementation Libraries.viewModelKtx
     implementation Libraries.multidex
-
-    implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(":mvrx")
 
     debugImplementation Libraries.fragmentTesting
