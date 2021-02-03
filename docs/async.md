@@ -37,18 +37,32 @@ For each event it emits, it will call the `reducer` which takes the current stat
 
 Executing a network request looks like:
 ```kotlin
+interface WeatherApi {
+    suspend fun fetchTemperature(): Int
+}
+
+// Inside of a function in your ViewModel.
 suspend {
     weatherApi.fetchTemperature()
 }.execute { copy(currentTemperature = it) }
 ```
+
+Or for a [Kotlin Flow](https://kotlinlang.org/docs/reference/coroutines/flow.html):
+```kotlin
+interface WeatherRepository {
+    fun fetchTemperature(): Flow<Int>
+}
+
+// Inside of a function in your ViewModel.
+weatherRepository.fetchTemperature().execute { copy(currentTemperature = it) }
+```
+
 In this case:
 * `currentTemperature` is of type `Async<Int>` and originally set to `Uninitialized`
 * After calling `execute`, `currentTemperature` is set to `Loading()`
 * If the API call succeeds, `currentTemperature` is set to `Success(temp)`
 * If the API call fails, `currentTemperature` is set to `Fail(e)`
 * If the ViewModel is cleared before `fetchTemperature()` completes, the API request is cancelled
-
-
 
 ### Subscribing to Async properties
 If your state property is `Async`, you can use `onAsync` instead of `onEach` to subscribe to state changes.
@@ -69,13 +83,21 @@ onAsync(
 )
 ```
 
+### Executing on a different dispatcher
+You may want to run your suspend function on a different dispatcher. To do that, pass a `Dispatcher` as the first parameter to `execute()`:
+```kotlin
+suspend {
+    weatherApi.fetchTemperature()
+}.execute(Dispatchers.IO) { copy(currentTemperature = it) }
+```
+
 ### Retaining data across reloads with `retainValue`
 You may have a model where you want to refresh data and show the last successful data in addition to the loading/failure state of the refresh. To do this, use the optional `retainValue` parameter for `execute` and MvRx will automatically persist the value stored in that property to subsequent `Loading` or `Fail` states.
 
 ```kotlin
-fun fetchData() {
-    repository.dataFlow().execute(retainValue = MyState::data) { copy(data = it) }
-}
+suspend {
+    weatherApi.fetchTemperature()
+}.execute(retailValue = MyState::currentTemperature) { copy(currentTemperature = it) }
 ```
 In the previous example, if you called `fetchData()` again when data is `Success(5)`, the subsequent values will be:
 * `Loading(5)`

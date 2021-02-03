@@ -2,7 +2,7 @@
 Mastering Mavericks only requires using three classes: `MavericksState`, `MavericksViewModel`, and `MavericksView`.
 
 ## MavericksState
-The first step in creating a Mavericks screen is to model it as a function of state. The MavericksState interface [doesn't do anything](https://github.com/airbnb/MvRx/blob/master/mvrx/src/main/kotlin/com/airbnb/mvrx/MavericksState.kt) itself but signals the intention of your class to be used as state.
+The first step in creating a Mavericks screen is to model it as a function of state. The MavericksState interface [doesn't do anything](https://github.com/airbnb/MvRx/blob/master/mavericks/src/main/kotlin/com/airbnb/mvrx/MavericksState.kt) itself but signals the intention of your class to be used as state.
 
 Modeling a screen as a function of state is a useful concept because it is:
 1. Thread safe
@@ -53,18 +53,18 @@ A ViewModel is responsible for:
 1. Updating state
 2. Exposing a stream of states for other classes to subscribe to (MavericksViewModel.stateFlow)
 
-Mavericks ViewModels are conceptually nearly identical to [Jetpack ViewModels](https://developer.android.com/topic/libraries/architecture/viewmodel).
+Mavericks ViewModels are conceptually nearly identical to [Jetpack ViewModels](https://developer.android.com/topic/libraries/architecture/viewmodel) with the addition of being generic on a MavericksState class.
 
-#### Updating state
+### Updating state
 From within a viewModel, you call `setState { copy(yourProp = newValue) }`. If this syntax is unfamiliar:
 1. The signature of the lambda is `S.() -> S` meaning the receiver (aka `this`) of the lambda is the current state when the lambda is invoked and it returns the new lambda
 1. `copy` comes from the fact that the state class is a Kotlin [data class](https://kotlinlang.org/docs/reference/data-classes.html)
 1. The lambda is _not_ executed synchronously. It is put on a queue and run on a background thread. See [threading](threading.md) for more information
 
-#### Handling async/db/network operations
+### Handling async/db/network operations
 Handling asynchronous operations with ease was one of the primary goals of Mavericks. Check out [the docs](async.md) for `Async<T>` and `execute(...)` to learn more.
 
-#### Subscribing to state changes
+### Subscribing to state changes
 You can subscribe to state changes in your ViewModel. You may want to do this for analytics, for example. This usually done in the `init { ... }` block.
 
 ```kotlin
@@ -84,10 +84,10 @@ onEach(YourState::propA, YourState::propB, YourState::propC) { a, b, c ->
 
 **TIP:** If you are calling `setState` from within an `onEach` block, consider using a [derived property](#derived).
 
-#### stateFlow
+### stateFlow
 `MavericksViewModel` exposes a `stateFlow` property which is a normal Kotlin Flow that emits the current state as well as any future updates and can be used however you would like. Helpers such as `onEach` above are just wrappers around it with automatic lifecycle cancellation.
 
-#### Accessing state once
+### Accessing state once
 If you just want to retrieve the value of state one time, you can use `withState { state -> ... }`.
 
 When called from within a ViewModel, this will _not_ be run synchronously. It will be placed on a background queue so that all pending `setState` reducers are called prior to your `withState` call.

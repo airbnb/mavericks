@@ -18,7 +18,7 @@ APIs that take suspending lambdas will auto-cancel the previous instance if it h
 | `execute` is extension on Observable&lt;T>, Single&lt;T>, and Completable| `execute` is extension on Flow&lt;T>, suspend () -> T, and Deferred&lt;T>|
 | No equivalent    |<pre lang="kotlin">Flow&lt;T>.setOnEach(dispatcher: Dispatcher, reducer: suspend (T) -> Unit): Job</pre> |
 | No equivalent    |<pre lang="kotlin">ViewModel&lt;S>.stateFlow: Flow&lt;S></pre>|
-| No equivalent    |<pre lang="kotlin">ViewModel&lt;S>.awaitState(): S</pre>|
+| No equivalent    |<pre lang="kotlin">suspend ViewModel&lt;S>.awaitState(): S</pre>|
 
 ### New Functionality
 

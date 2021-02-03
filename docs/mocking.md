@@ -1,7 +1,7 @@
 # Mocking
 Mavericks includes tooling to mock ViewModel state, which can then be used for automated and manual testing.
 
-This mocking support is added with the optional `mvrx-mocking` artifact, and includes tooling to:
+This mocking support is added with the optional `mavericks-mocking` artifact, and includes tooling to:
 
 - Force (ie "mock") a specific MavericksState for a MavericksViewModel, while preventing (and listening for) subsequent changes
 - Force all ViewModels within a MavericksView to specific states
@@ -23,11 +23,11 @@ For more technical details, read the article series on how Airbnb developed this
 
 ## Initialization and Configuration
 
-1. Add an additional dependency on the `mvrx-mocking` artifact in your build.gradle file. Versioning is the same as the core Mavericks library.
+1. Add an additional dependency on the `mavericks-mocking` artifact in your build.gradle file. Versioning is the same as the core Mavericks library.
 
 2. Initialize Mavericks via a call to `MockableMavericks.initialize` when your application is created. (This replaces the normal call to `Mavericks.initialize`)
 
-3. Use the `MockableMavericksView` interface in place of the normal `MavericksView` and override the `provideMocks` function to define mock states (guidance below). If you are using `mvrx-rxjava` you can have your classes implement both `MvRxView` and `MockableMavericksView`.
+3. Use the `MockableMavericksView` interface in place of the normal `MavericksView` and override the `provideMocks` function to define mock states (guidance below). If you are using `mavericks-rxjava2` you can have your classes implement both `MvRxView` and `MockableMavericksView`.
 
 4. To support generating mocks for an active screen, call the `registerMockPrinter` when the view is initialized (for example, in `onCreate` of the Fragment)
 
