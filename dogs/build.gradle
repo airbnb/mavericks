@@ -11,8 +11,8 @@ android {
         versionName "1.0"
     }
 
-    dataBinding {
-        enabled = true
+    buildFeatures {
+        dataBinding true
     }
 }
 

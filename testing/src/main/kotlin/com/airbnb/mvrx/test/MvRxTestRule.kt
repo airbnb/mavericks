@@ -6,6 +6,7 @@ import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.airbnb.mvrx.MvRxTestOverridesProxy
 import com.airbnb.mvrx.mocking.MockBehavior
 import com.airbnb.mvrx.mocking.MockableMavericks
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestCoroutineDispatcher
@@ -46,12 +47,16 @@ class MvRxTestRule(
      * each time they are created for Unit tests. This also prevents the need for Robolectric,
      * since the debug checks use Android APIs.
      */
-    private val debugMode: Boolean = false
+    private val debugMode: Boolean = false,
+    /**
+     * A custom coroutine dispatcher that will be set as Dispatchers.Main for testing purposes.
+     */
+    private val testDispatcher: CoroutineDispatcher = TestCoroutineDispatcher()
 ) : ExternalResource() {
 
     @ExperimentalCoroutinesApi
     override fun before() {
-        Dispatchers.setMain(TestCoroutineDispatcher())
+        Dispatchers.setMain(testDispatcher)
 
         MvRxTestOverridesProxy.forceDisableLifecycleAwareObserver(setForceDisableLifecycleAwareObserver)
 

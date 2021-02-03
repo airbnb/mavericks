@@ -6,11 +6,11 @@ This module contains a sample app to demonstrate how to ease the usage of Dagger
 
 * **Injecting state into ViewModels with AssistedInject**
   
-  Since the `initialState` parameter is only available at runtime, Dagger can not provide this dependency for us. We need the [AssistedInject](https://github.com/square/AssistedInject) library for this purpose.
+  Since the `initialState` parameter is only available at runtime, we use Dagger [assisted injection](https://dagger.dev/dev-guide/assisted-injection).
 
-* **Multibinding setup for AssistedInject Factories**
+* **Multibinding setup for Dagger**
 
-  Every ViewModel using AssistedInject needs a Factory interface annotated with `@AssistedInject.Factory`. These factories are grouped together under a common parent type [AssistedViewModelFactory](https://github.com/airbnb/mavericks/blob/master/hellodagger/src/main/java/com/airbnb/mvrx/hellodagger/di/AssistedViewModelFactory.kt) to enable a Multibinding Dagger setup.
+  Every ViewModel using Dagger [assisted injection](https://dagger.dev/dev-guide/assisted-injection) needs a Factory interface annotated with `@AssistedFactory`. These factories are grouped together under a common parent type [AssistedViewModelFactory](src/main/java/com/airbnb/mavericks/hellodagger/di/AssistedViewModelFactory.kt) to enable a Multibinding Dagger setup.
 
 * **Removing boilerplate from a MavericksViewModelFactory**
 
@@ -26,7 +26,7 @@ class MyViewModel @AssistedInject constructor(
   // and other dependencies
 ) {
 
-  @AssistedInject.Factory
+  @AssistedFactory
   interface Factory: AssistedViewModelFactory<MyViewModel, MyState> {
     override fun create(initialState: MyState): MyViewModel
   }
@@ -38,6 +38,7 @@ class MyViewModel @AssistedInject constructor(
 * Tell Dagger to include your ViewModel's AssistedInject Factory in a Multibinding map.
 
 ```kotlin
+@Module
 interface AppModule {
 
     @Binds

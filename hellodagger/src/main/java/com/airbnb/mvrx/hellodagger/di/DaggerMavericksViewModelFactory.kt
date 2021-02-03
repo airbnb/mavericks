@@ -8,6 +8,24 @@ import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.hellodagger.appComponent
 
 /**
+ * To connect Mavericks ViewModel creation with Hilt's dependency injection, add the following Factory and companion object to your MavericksViewModel.
+ *
+ * Example:
+ *
+ * class MyViewModel @AssistedInject constructor(@Assisted initialState: MyState, ...): MavericksViewModel<MyState>(...) {
+ *
+ *   @AssistedFactory
+ *   interface Factory : AssistedViewModelFactory<MyViewModel, MyState> {
+ *     ...
+ *   }
+ *
+ *   companion object : MavericksViewModelFactory<MyViewModel, MyState> by daggerMavericksViewModelFactory()
+ * }
+ */
+
+inline fun <reified VM : MavericksViewModel<S>, S : MavericksState> daggerMavericksViewModelFactory() = DaggerMavericksViewModelFactory<VM, S>(VM::class.java)
+
+/**
  * A [MavericksViewModelFactory] which makes it easy to create instances of a ViewModel
  * using its AssistedInject Factory. This class should be implemented by the companion object
  * of every ViewModel which uses AssistedInject.
@@ -22,7 +40,7 @@ import com.airbnb.mvrx.hellodagger.appComponent
  *
  * class MyViewModel @AssistedInject constructor(...): BaseViewModel<MyState>(...) {
  *
- *   @AssistedInject.Factory
+ *   @AssistedFactory
  *   interface Factory : AssistedViewModelFactory<MyViewModel, MyState> {
  *     ...
  *   }
@@ -31,7 +49,7 @@ import com.airbnb.mvrx.hellodagger.appComponent
  *
  * }
  */
-abstract class DaggerMavericksViewModelFactory<VM : MavericksViewModel<S>, S : MavericksState>(
+class DaggerMavericksViewModelFactory<VM : MavericksViewModel<S>, S : MavericksState>(
     private val viewModelClass: Class<VM>
 ) : MavericksViewModelFactory<VM, S> {
 

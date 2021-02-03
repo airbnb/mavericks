@@ -1,17 +1,15 @@
 package com.airbnb.mvrx.hellodagger.di
 
-import com.airbnb.mvrx.hellodagger.HelloViewModel
-import com.squareup.inject.assisted.dagger2.AssistedModule
+import com.airbnb.mvrx.hellodagger.HelloDaggerViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
 
-@AssistedModule
-@Module(includes = [AssistedInject_AppModule::class])
+@Module
 interface AppModule {
 
     @Binds
     @IntoMap
-    @ViewModelKey(HelloViewModel::class)
-    fun helloViewModelFactory(factory: HelloViewModel.Factory): AssistedViewModelFactory<*, *>
+    @ViewModelKey(HelloDaggerViewModel::class)
+    fun helloViewModelFactory(factory: HelloDaggerViewModel.Factory): AssistedViewModelFactory<*, *>
 }
