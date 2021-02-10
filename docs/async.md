@@ -97,7 +97,7 @@ You may have a model where you want to refresh data and show the last successful
 ```kotlin
 suspend {
     weatherApi.fetchTemperature()
-}.execute(retailValue = MyState::currentTemperature) { copy(currentTemperature = it) }
+}.execute(retainValue = MyState::currentTemperature) { copy(currentTemperature = it) }
 ```
 In the previous example, if you called `fetchData()` again when data is `Success(5)`, the subsequent values will be:
 * `Loading(5)`
