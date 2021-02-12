@@ -43,3 +43,5 @@ dependencies {
 The latest version of mavericks is [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks)
 
 ## For full documentation, check out the [docs site](https://airbnb.io/mavericks)
+
+Legacy documentation for MvRx 1.x can still be found in the [wiki](https://github.com/airbnb/mavericks/wiki)
