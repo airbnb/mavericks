@@ -37,7 +37,7 @@ MavericksViewModel can be used and will behave exactly like it used to. However,
 
 ### Upgrading from 1.x :id=upgrading
 
-Upgrading from MvRx 1.x should be fairly simple. Mavericks 2.0 includes a `mvrx-rxjava2` artifact which adds back all existing RxJava based APIs (although they now wrap the internal coroutines implementation).
+Upgrading from MvRx 1.x should be fairly simple. Mavericks 2.0 includes a `mavericks-rxjava2` artifact which adds back all existing RxJava based APIs (although they now wrap the internal coroutines implementation).
 
 #### Migrate initialization code
 
@@ -45,7 +45,7 @@ Previously, you needed to pass `debugMode` into your `BaseMvRxViewModel` super c
 
 #### Update BaseMvRxFragment
 
-With MvRx 1.x, you had to make your base Fragment class extend `BaseMvRxFragment `. Now, you can make it just implement `MavericksView`. The rxjava2 artifact still ships with `BaseMvRxFragment` but it is deprecated and everything will continue to work with the `MavericksView` interface. 
+With MvRx 1.x, you had to make your base Fragment class extend `BaseMvRxFragment`. Now, you can make it just implement `MavericksView`. The rxjava2 artifact still ships with `BaseMvRxFragment` but it is deprecated and everything will continue to work with the `MavericksView` interface. 
 
 #### Update tests
 
