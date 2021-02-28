@@ -85,11 +85,10 @@ sealed class ViewModelContext {
  */
 data class ActivityViewModelContext(
     override val activity: ComponentActivity,
-    override val args: Any?
-) : ViewModelContext() {
-    override val owner get() = activity
-    override val savedStateRegistry get() = activity.savedStateRegistry
-}
+    override val args: Any?,
+    override val owner: ViewModelStoreOwner = activity,
+    override val savedStateRegistry: SavedStateRegistry = activity.savedStateRegistry,
+) : ViewModelContext()
 
 /**
  * The [ViewModelContext] for a ViewModel created with a
