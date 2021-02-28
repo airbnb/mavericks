@@ -38,6 +38,4 @@ dependencies {
     implementation Libraries.multidex
     implementation TestLibraries.kotlinCoroutinesTest
     implementation project(":mvrx-rxjava2")
-
-    testImplementation TestLibraries.roboeletric
 }
