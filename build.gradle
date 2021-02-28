@@ -3,7 +3,7 @@ import com.airbnb.mvrx.AndroidMetaModulePlugin
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
         classpath "com.android.tools.build:gradle:${Versions.gradlePlugin}"
@@ -38,8 +38,7 @@ allprojects {
 
     repositories {
         google()
-        jcenter()
-        maven { url "https://jitpack.io" }
+        mavenCentral()
     }
 
     tasks.whenTaskAdded { task ->

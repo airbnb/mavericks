@@ -1,8 +1,9 @@
 // Libraries
 include ":mvrx"
-include ":mvrx-rxjava2"
+include ':mvrx-compose'
 include ':mvrx-mocking'
 include ':mvrx-navigation'
+include ":mvrx-rxjava2"
 include ':launcher'
 include ":testing"
 
@@ -10,7 +11,7 @@ include ":testing"
 include ":counter"
 include ":dogs"
 include ":hellodagger"
-include ":hellohilt"
 include ":sample"
+include ":sample-compose"
 include ":sample-navigation"
 include ":todomvrx"

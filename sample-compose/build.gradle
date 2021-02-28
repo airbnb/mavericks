@@ -1,0 +1,47 @@
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
+
+android {
+    buildFeatures {
+        compose true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion Versions.compose
+    }
+
+    defaultConfig {
+        applicationId "com.airbnb.mvrx.helloHilt"
+        minSdk 21
+        versionCode 1
+        versionName "0.0.1"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+dependencies {
+    implementation Libraries.activityCompose
+    implementation Libraries.composeFoundation
+    implementation Libraries.constraintlayout
+    implementation project(":mvrx-compose")
+}

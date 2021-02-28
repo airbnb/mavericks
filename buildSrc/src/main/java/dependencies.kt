@@ -1,20 +1,23 @@
 object Versions {
     // Build tools and SDK
     const val buildTools = "29.0.3"
-    const val compileSdk = 29
-    const val gradlePlugin = "4.1.1"
-    const val kotlin = "1.4.10"
-    const val minSdk = 16
-    const val targetSdk = 29
+    const val compileSdk = 30
+    const val gradlePlugin = "7.0.0-alpha08"
+    const val kotlin = "1.4.31"
+    // TODO: revert this for other modules
+    const val minSdk = 21
+    const val targetSdk = 30
 
     // Android libraries
+    const val activityCompose = "1.3.0-alpha03"
     const val appcompat = "1.2.0"
     const val arch = "2.1.0"
     const val cardview = "1.0.0"
     const val constraintlayout = "2.0.0"
     const val coordinatorLayout = "1.1.0"
+    const val compose = "1.0.0-beta01"
     const val core = "1.3.1"
-    const val fragment = "1.2.5"
+    const val fragment = "1.3.0"
     const val lifecycle = "2.2.0"
     const val navigation = "2.3.0"
     const val recyclerview = "1.1.0"
@@ -60,12 +63,17 @@ object AnnotationProcessors {
 }
 
 object Libraries {
+    const val activity = "androidx.activity:activity:${Versions.appcompat}"
+    const val activityCompose = "androidx.activity:activity-compose:${Versions.activityCompose}"
     const val appcompat = "androidx.appcompat:appcompat:${Versions.appcompat}"
     const val autoValue = "com.google.auto.value:auto-value-annotations:${Versions.autoValue}"
     const val cardview = "androidx.cardview:cardview:${Versions.cardview}"
     const val constraintlayout = "androidx.constraintlayout:constraintlayout:${Versions.constraintlayout}"
     const val coordinatorLayout = "androidx.coordinatorlayout:coordinatorlayout:${Versions.coordinatorLayout}"
     const val coreKtx = "androidx.core:core-ktx:${Versions.core}"
+    const val composeCompiler = "androidx.compose.compiler:compiler:${Versions.compose}"
+    const val composeUi = "androidx.compose.ui:ui:${Versions.compose}"
+    const val composeFoundation = "androidx.compose.foundation:foundation:${Versions.compose}"
     const val dagger = "com.google.dagger:dagger:${Versions.dagger}"
     const val epoxy = "com.airbnb.android:epoxy:${Versions.epoxy}"
     const val espressoIdlingResource = "androidx.test.espresso:espresso-idling-resource:${Versions.espresso}"

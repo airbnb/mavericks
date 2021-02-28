@@ -43,6 +43,7 @@ jacoco {
 dependencies {
     api Libraries.kotlinCoroutines
 
+    implementation Libraries.activity
     implementation Libraries.appcompat
     implementation Libraries.fragment
     implementation Libraries.viewModelSavedState
