@@ -51,6 +51,7 @@ class MvRxTestRule(
     /**
      * A custom coroutine dispatcher that will be set as Dispatchers.Main for testing purposes.
      */
+    @Suppress("EXPERIMENTAL_API_USAGE")
     private val testDispatcher: CoroutineDispatcher = TestCoroutineDispatcher()
 ) : ExternalResource() {
 

@@ -36,10 +36,12 @@ class InvalidViewModel(initialState: InvalidState) : TestMavericksViewModel<Inva
 
 class MvRxGlobalViewModelFactoryTest : BaseTest() {
     @get:Rule
+    @Suppress("DEPRECATION")
     val thrown: ExpectedException = ExpectedException.none()
 
     @Test(expected = ViewModelDoesNotExistException::class)
     fun failForNonExistentViewModel() {
+        @Suppress("DEPRECATION")
         val activity = Robolectric.setupActivity(FragmentActivity::class.java)
         getViewModel(activity, forExistingViewModel = true)
     }

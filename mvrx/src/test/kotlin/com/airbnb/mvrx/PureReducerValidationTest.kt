@@ -24,7 +24,7 @@ class PureReducerValidationTest : BaseTest() {
             }
         }
         thrown.expect(IllegalArgumentException::class.java)
-        thrown.expectMessage("Impure reducer set on impureReducerShouldFail\$ImpureViewModel! count changed from 1 to 2. Ensure that your state properties properly implement hashCode.")
+        thrown.expectMessage("Impure reducer set on ImpureViewModel! count changed from 1 to 2. Ensure that your state properties properly implement hashCode.")
         ImpureViewModel(PureReducerValidationState()).impureReducer()
     }
 
@@ -64,7 +64,7 @@ class PureReducerValidationTest : BaseTest() {
         }
 
         thrown.expect(IllegalArgumentException::class.java)
-        thrown.expectMessage("Impure reducer set on impureReducerWithPrivatePropShouldFail\$ImpureViewModel! count changed from 1 to 2. Ensure that your state properties properly implement hashCode.")
+        thrown.expectMessage("Impure reducer set on ImpureViewModel! count changed from 1 to 2. Ensure that your state properties properly implement hashCode.")
         ImpureViewModel(StateWithPrivateVal()).impureReducer()
     }
 }

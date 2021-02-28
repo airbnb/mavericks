@@ -1,6 +1,6 @@
 package com.airbnb.mvrx.dogs
 
-import com.airbnb.mvrx.MvRxViewModelFactory
+import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.dogs.data.DogRepository
 import com.airbnb.mvrx.dogs.utils.MvRxViewModel
@@ -24,8 +24,8 @@ class DogViewModel(
             .execute { copy(adoptionRequest = it) }
     }
 
-    companion object : MvRxViewModelFactory<DogViewModel, DogState> {
-        override fun create(viewModelContext: ViewModelContext, state: DogState): DogViewModel? {
+    companion object : MavericksViewModelFactory<DogViewModel, DogState> {
+        override fun create(viewModelContext: ViewModelContext, state: DogState): DogViewModel {
             val dogRepository = viewModelContext.app<DogApplication>().dogsRepository
             return DogViewModel(state, dogRepository)
         }

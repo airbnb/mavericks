@@ -124,7 +124,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
             )
         )
 
-        result.expect("ConstructorCodeGeneratorTest.testCustomTypePrinter\$Test(date=CustomDate.fromString(\"2000\"))")
+        result.expect("ConstructorCodeGeneratorTest.Test(date=CustomDate.fromString(\"2000\"))")
 
         assertTrue(result.imports.contains("hello world"))
     }
@@ -136,7 +136,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
         ) : MavericksState
 
         com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
-            .expect("ConstructorCodeGeneratorTest.listIsTruncated\$Test(list=listOf(1,2,3))")
+            .expect("ConstructorCodeGeneratorTest.Test(list=listOf(1,2,3))")
     }
 
     @Test
@@ -146,7 +146,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
         ) : MavericksState
 
         com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
-            .expect("ConstructorCodeGeneratorTest.setIsTruncated\$Test(set=setOf(1,2,3))")
+            .expect("ConstructorCodeGeneratorTest.Test(set=setOf(1,2,3))")
     }
 
     @Test
@@ -159,7 +159,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
             Test(),
             Integer.MAX_VALUE,
             Integer.MAX_VALUE
-        ).expect("ConstructorCodeGeneratorTest.listIsNotTruncated\$Test(list=listOf(1,2,3,4))")
+        ).expect("ConstructorCodeGeneratorTest.Test(list=listOf(1,2,3,4))")
     }
 
     @Test
@@ -169,7 +169,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
         ) : MavericksState
 
         com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
-            .expect("ConstructorCodeGeneratorTest.listIsNotTruncatedWhenTypesDiffer\$Test(list=listOf(1,2,3,\"A\"))")
+            .expect("ConstructorCodeGeneratorTest.Test(list=listOf(1,2,3,\"A\"))")
     }
 
     @Test
@@ -179,7 +179,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
         ) : MavericksState
 
         com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
-            .expect("ConstructorCodeGeneratorTest.listIsNotTruncatedWhenSomeItemsAreNull\$Test(list=listOf(null,1,2,3))")
+            .expect("ConstructorCodeGeneratorTest.Test(list=listOf(null,1,2,3))")
     }
 
     @Test
@@ -189,7 +189,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
         ) : MavericksState
 
         com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
-            .expect("ConstructorCodeGeneratorTest.listIsTruncatedWhenAllItemsAreNull\$Test(list=listOf(null,null,null))")
+            .expect("ConstructorCodeGeneratorTest.Test(list=listOf(null,null,null))")
     }
 
     @Suppress("ArrayInDataClass")
@@ -200,7 +200,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
         ) : MavericksState
 
         com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator(Test(), 3, 200)
-            .expect("ConstructorCodeGeneratorTest.arrayIsTruncated\$Test(list=arrayOf(1,2,3))")
+            .expect("ConstructorCodeGeneratorTest.Test(list=arrayOf(1,2,3))")
     }
 
     @Suppress("ArrayInDataClass")
@@ -214,7 +214,7 @@ class ConstructorCodeGeneratorTest : BaseTest() {
             Test(),
             Integer.MAX_VALUE,
             Integer.MAX_VALUE
-        ).expect("ConstructorCodeGeneratorTest.arrayIsNotTruncated\$Test(list=arrayOf(1,2,3,4))")
+        ).expect("ConstructorCodeGeneratorTest.Test(list=arrayOf(1,2,3,4))")
     }
 
     private fun <T : MavericksState> com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator<T>.expect(expectedCode: String) {
