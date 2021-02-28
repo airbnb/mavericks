@@ -10,6 +10,7 @@ data class StateWithPrivateVal(private val count: Int = 0) : MavericksState
 class PureReducerValidationTest : BaseTest() {
 
     @get:Rule
+    @Suppress("DEPRECATION")
     var thrown = ExpectedException.none()!!
 
     @Test

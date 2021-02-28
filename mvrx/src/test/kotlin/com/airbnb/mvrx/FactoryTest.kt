@@ -91,7 +91,7 @@ class NoFactoryTest : BaseTest() {
 
     @Test(expected = IllegalArgumentException::class)
     fun failOnMultipleParametersAndNoCompanion() {
-        class OptionalParamViewModel(initialState: FactoryState, someOtherParam: Int) : MavericksViewModel<FactoryState>(initialState)
+        class OptionalParamViewModel(initialState: FactoryState, @Suppress("UNUSED_PARAMETER") someOtherParam: Int) : MavericksViewModel<FactoryState>(initialState)
         MavericksViewModelProvider.get(OptionalParamViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, null))
     }
 
