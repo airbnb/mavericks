@@ -1,6 +1,5 @@
 package com.airbnb.mvrx.hellodagger.di
 
-import androidx.activity.ComponentActivity
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksViewModelFactory
