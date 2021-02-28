@@ -136,6 +136,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
         // so we just test the common case of "existing". We can't be sure that the fragment
         // was designed for it to be used in the non-existing case (ie it may require arguments)
 
+        @Suppress("DEPRECATION")
         val targetFragment =
             requireNotNull(targetFragment) { "There is no target fragment for ${this::class.java.simpleName}!" }
 

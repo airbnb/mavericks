@@ -19,16 +19,25 @@ android {
     resourcePrefix "mvrx_"
 
     defaultConfig {
+        multiDexEnabled true
         consumerProguardFiles "proguard-rules.pro"
+    }
+
+    packagingOptions {
+        exclude 'META-INF/AL2.0'
+        exclude 'META-INF/LGPL2.1'
     }
 }
 
 dependencies {
+    api project(':mvrx-mocking')
     implementation Libraries.appcompat
     implementation Libraries.junit
     implementation Libraries.kotlinReflect
     implementation Libraries.rxAndroid
+    implementation Libraries.multidex
     implementation TestLibraries.kotlinCoroutinesTest
-    api project(':mvrx-mocking')
     implementation project(":mvrx-rxjava2")
+
+    testImplementation TestLibraries.roboeletric
 }

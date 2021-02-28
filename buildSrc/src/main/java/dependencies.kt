@@ -44,7 +44,7 @@ object Versions {
     const val mockito = "2.25.1"
     const val mockitoKotlin = "2.2.0"
     const val mockk = "1.9.3"
-    const val robolectric = "4.3.1"
+    const val robolectric = "4.5.1"
     const val testCore = "1.2.0"
 }
 

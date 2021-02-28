@@ -1,5 +1,6 @@
 package com.airbnb.mvrx
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.annotation.RestrictTo
 import androidx.lifecycle.Lifecycle
@@ -51,7 +52,13 @@ abstract class BaseMvRxViewModel<S : MavericksState>(
      * between two view models.
      */
     private val lifecycleOwner: LifecycleOwner = LifecycleOwner { lifecycleRegistry }
-    private val lifecycleRegistry = LifecycleRegistry(lifecycleOwner).apply { currentState = Lifecycle.State.RESUMED }
+
+    /**
+     * Since lifecycle 2.3.0, it enforces calls from the main thread. Mavericks owns this registry so it can enforce that to be the case.
+     * Without this, it is impossible to use MvRxViewModels in tests without robolectric which isn't ideal.
+     */
+    @SuppressLint("VisibleForTests")
+    private val lifecycleRegistry = LifecycleRegistry.createUnsafe(lifecycleOwner).apply { currentState = Lifecycle.State.RESUMED }
 
     override fun onCleared() {
         super.onCleared()
