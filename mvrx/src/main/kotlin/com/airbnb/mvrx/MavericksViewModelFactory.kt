@@ -1,8 +1,8 @@
 package com.airbnb.mvrx
 
 import android.app.Application
+import androidx.activity.ComponentActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistry
 
@@ -49,7 +49,7 @@ sealed class ViewModelContext {
     /**
      * The activity which is using the ViewModel.
      */
-    abstract val activity: FragmentActivity
+    abstract val activity: ComponentActivity
 
     internal abstract val savedStateRegistry: SavedStateRegistry
     internal abstract val owner: ViewModelStoreOwner
@@ -58,7 +58,7 @@ sealed class ViewModelContext {
      * Convenience method to type [activity].
      */
     @Suppress("UNCHECKED_CAST")
-    fun <A : FragmentActivity> activity(): A = activity as A
+    fun <A : ComponentActivity> activity(): A = activity as A
 
     /**
      * Convenience method to access a typed Application.
@@ -84,7 +84,7 @@ sealed class ViewModelContext {
  * _without_ a fragment reference, so it is only safe to reference the activity.
  */
 data class ActivityViewModelContext(
-    override val activity: FragmentActivity,
+    override val activity: ComponentActivity,
     override val args: Any?
 ) : ViewModelContext() {
     override val owner get() = activity
@@ -100,7 +100,7 @@ data class ActivityViewModelContext(
  * then you can provided them via this context.
  */
 data class FragmentViewModelContext(
-    override val activity: FragmentActivity,
+    override val activity: ComponentActivity,
     override val args: Any?,
     /**
      * The fragment owner of the ViewModel.

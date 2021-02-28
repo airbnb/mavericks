@@ -8,6 +8,7 @@ object Versions {
     const val targetSdk = 29
 
     // Android libraries
+    const val activity = "1.2.0"
     const val appcompat = "1.2.0"
     const val arch = "2.1.0"
     const val cardview = "1.0.0"
@@ -59,6 +60,7 @@ object AnnotationProcessors {
 }
 
 object Libraries {
+    const val activity = "androidx.appcompat:appcompat:${Versions.appcompat}"
     const val appcompat = "androidx.appcompat:appcompat:${Versions.appcompat}"
     const val autoValue = "com.google.auto.value:auto-value-annotations:${Versions.autoValue}"
     const val cardview = "androidx.cardview:cardview:${Versions.cardview}"

@@ -1,5 +1,8 @@
 # Change Log
 
+## 2.1.0
+- Replaced ViewModelContext Activity type from FragmentActivity to its parent class ComponentActivity for better interop with Compose.
+
 ## Version 2.0.0
 Mavericks 2.0 is a ground up rewrite for coroutines. Check out the [documentation for 2.0](https://airbnb.io/mavericks/#/new-2x) to find out what is new and how to upgrade.
 

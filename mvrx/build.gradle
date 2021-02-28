@@ -42,6 +42,7 @@ jacoco {
 
 dependencies {
     api Libraries.kotlinCoroutines
+    api Libraries.activity
 
     implementation Libraries.appcompat
     implementation Libraries.fragment

@@ -3,20 +3,20 @@ package com.airbnb.mvrx
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.annotation.RestrictTo
+import androidx.activity.ComponentActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModelProvider
 import java.io.Serializable
 
 /**
- * Helper ViewModelProvider that has a single method for taking either a [Fragment] or [FragmentActivity] instead
+ * Helper ViewModelProvider that has a single method for taking either a [Fragment] or [ComponentActivity] instead
  * of two separate ones. The logic for providing the correct scope is inside the method.
  */
 @RestrictTo(RestrictTo.Scope.LIBRARY)
 @InternalMavericksApi
 object MavericksViewModelProvider {
     /**
-     * MvRx specific ViewModelProvider used for creating a BaseMavericksViewModel scoped to either a [Fragment] or [FragmentActivity].
+     * MvRx specific ViewModelProvider used for creating a BaseMavericksViewModel scoped to either a [Fragment] or [ComponentActivity].
      * If this is in a [Fragment], it cannot be called before the Fragment has been added to an Activity or wrapped in a [Lazy] call.
      *
      * @param viewModelClass The class of the ViewModel you would like an instance of.
