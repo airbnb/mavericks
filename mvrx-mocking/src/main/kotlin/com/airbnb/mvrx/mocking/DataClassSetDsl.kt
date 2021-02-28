@@ -174,9 +174,11 @@ interface DataClassSetDsl {
         fun set(value: PropType): DataClass {
 
             val (recursiveProperty: KProperty0<Any?>, recursiveValue: Any?) = when (property) {
-                is NestedProperty<*, *> -> property.wrapperProperty to ((property.buildSetter() as Setter<Any, Any?>).set(
-                    value
-                ))
+                is NestedProperty<*, *> -> property.wrapperProperty to (
+                    (property.buildSetter() as Setter<Any, Any?>).set(
+                        value
+                    )
+                    )
                 else -> property to value
             }
 

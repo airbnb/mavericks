@@ -117,7 +117,8 @@ class ConstructorCodeGenerator<T : Any>(
         fun parent(): EnclosingClass? {
             return EnclosingClass(
                 outerClass = outerClass.enclosingClass
-                    ?: return null, innerClass = outerClass
+                    ?: return null,
+                innerClass = outerClass
             )
         }
     }

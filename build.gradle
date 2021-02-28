@@ -25,7 +25,7 @@ buildscript {
 }
 
 plugins {
-    id("io.gitlab.arturbosch.detekt").version("1.9.1")
+    id("io.gitlab.arturbosch.detekt").version("1.16.0-RC2")
 }
 
 apply plugin: 'io.gitlab.arturbosch.detekt'

@@ -25,9 +25,12 @@ class DadJokeIndexFragment : BaseFragment(R.layout.dad_joke_index_fragment) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         // Unique only will prevent the snackbar from showing again if the user rotates the screen or returns to this fragment.
-        viewModel.onAsync(DadJokeIndexState::request, uniqueOnly(), onFail = {
-            Snackbar.make(binding.root, "Jokes request failed.", Snackbar.LENGTH_INDEFINITE).show()
-        })
+        viewModel.onAsync(
+            DadJokeIndexState::request, uniqueOnly(),
+            onFail = {
+                Snackbar.make(binding.root, "Jokes request failed.", Snackbar.LENGTH_INDEFINITE).show()
+            }
+        )
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

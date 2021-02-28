@@ -76,7 +76,7 @@ internal inline fun <T, reified VM : MavericksViewModel<S>, reified S : Maverick
                      DefaultNavigationViewModelDelegateFactory also implements DefaultViewModelDelegateFactory by default.
                      
                      Mavericks.viewModelDelegateFactory = DefaultNavigationViewModelDelegateFactory()
-                """.trimIndent()
+                    """.trimIndent()
                 )
             }
 

@@ -37,7 +37,8 @@ abstract class MavericksLauncherBaseFragment : Fragment(), MavericksView {
                         isEnabled = true
                     }
                 }
-            })
+            }
+        )
     }
 
     override fun onCreateView(

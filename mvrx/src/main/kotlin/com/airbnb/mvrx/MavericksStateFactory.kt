@@ -100,8 +100,8 @@ internal fun <VM : MavericksViewModel<S>, S : MavericksState> createStateFromCon
             "Attempt to create the MvRx state class ${stateClass.simpleName} has failed. One of the following must be true:" +
                 "\n 1) The state class has default values for every constructor property." +
                 "\n 2) The state class has a secondary constructor for ${
-                    args?.javaClass?.simpleName
-                        ?: "a fragment argument"
+                args?.javaClass?.simpleName
+                    ?: "a fragment argument"
                 }." +
                 "\n 3) ${viewModelClass.simpleName} must have a companion object implementing MvRxFactory with an initialState function " +
                 "that does not return null. "

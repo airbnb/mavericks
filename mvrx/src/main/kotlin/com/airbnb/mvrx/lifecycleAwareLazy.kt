@@ -15,7 +15,8 @@ private object UninitializedValue
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @InternalMavericksApi
 @SuppressWarnings("Detekt.ClassNaming")
-class lifecycleAwareLazy<out T>(private val owner: LifecycleOwner, initializer: () -> T) : Lazy<T>,
+class lifecycleAwareLazy<out T>(private val owner: LifecycleOwner, initializer: () -> T) :
+    Lazy<T>,
     Serializable {
     private var initializer: (() -> T)? = initializer
 
