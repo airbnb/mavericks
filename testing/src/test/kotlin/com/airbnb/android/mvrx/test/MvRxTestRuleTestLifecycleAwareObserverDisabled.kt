@@ -2,15 +2,12 @@ package com.airbnb.android.mvrx.test
 
 import com.airbnb.mvrx.test.MvRxTestRule
 import org.junit.Assert
-import org.junit.ClassRule
+import org.junit.Rule
 import org.junit.Test
 
 class MvRxTestRuleTestLifecycleAwareObserverDisabled {
-    companion object {
-        @JvmField
-        @ClassRule
-        val mvrxTestRule = MvRxTestRule(setForceDisableLifecycleAwareObserver = true)
-    }
+    @get:Rule
+    val mvrxTestRule = MvRxTestRule(setForceDisableLifecycleAwareObserver = true)
 
     @Test
     fun testLifeCycleAwareObserverDisabled() {

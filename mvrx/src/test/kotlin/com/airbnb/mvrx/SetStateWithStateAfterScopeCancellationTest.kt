@@ -1,13 +1,13 @@
 package com.airbnb.mvrx
 
-import junit.framework.Assert.assertEquals
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class SetStateWithStateAfterScopeCancellation : BaseTest() {
+class SetStateWithStateAfterScopeCancellationTest : BaseTest() {
     data class State(val foo: Int) : MavericksState
 
     @Test

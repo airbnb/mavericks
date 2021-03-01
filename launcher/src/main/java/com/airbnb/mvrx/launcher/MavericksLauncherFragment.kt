@@ -75,6 +75,7 @@ class MavericksLauncherFragment : MavericksLauncherBaseFragment() {
     private fun showSelectedMock(mock: MockedViewProvider<*>) {
         // The activity is started for a result so we can know when
         // it returns (so we can clear the selected mock property)
+        @Suppress("DEPRECATION")
         startActivityForResult(
             MavericksLauncherMockActivity.intent(requireContext(), mock),
             SHOW_VIEW_REQUEST_CODE
@@ -269,6 +270,7 @@ class MavericksLauncherFragment : MavericksLauncherBaseFragment() {
      * When a mock screen is closed we clear it's entry as the current selection.
      */
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        @Suppress("DEPRECATION")
         when (requestCode) {
             SHOW_VIEW_REQUEST_CODE -> viewModel.setSelectedMock(null)
             else -> super.onActivityResult(requestCode, resultCode, data)

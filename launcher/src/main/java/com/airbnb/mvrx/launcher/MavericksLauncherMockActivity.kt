@@ -108,7 +108,7 @@ class MavericksLauncherMockActivity : MavericksBaseLauncherActivity() {
          *
          * @see showNextMockFromActivity
          */
-        fun showNextMock(
+        private fun showNextMock(
             showView: (MavericksView) -> Unit,
             onFailure: (Throwable) -> Unit = { throw it }
         ) {
@@ -181,7 +181,7 @@ class MavericksLauncherMockActivity : MavericksBaseLauncherActivity() {
         /**
          * Return the mock behavior that should be used to set up the given mock state.
          */
-        fun mockBehavior(mock: MavericksMock<out MavericksView, out Parcelable>): MockBehavior {
+        private fun mockBehavior(mock: MavericksMock<out MavericksView, out Parcelable>): MockBehavior {
             return when {
                 // The fragment is created with mocked arguments and then follows the normal initialization and behavior path.
                 // However, if there are "existing" view models then those are expected to have mocked state.

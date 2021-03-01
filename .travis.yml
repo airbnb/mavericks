@@ -13,7 +13,7 @@ android:
     - extra-android-support
     - extra-google-m2repository
 jdk:
-  - oraclejdk8
+  - oraclejdk11
 branches:
   except:
     - gh-pages

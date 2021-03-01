@@ -3,7 +3,7 @@ object Versions {
     const val buildTools = "29.0.3"
     const val compileSdk = 29
     const val gradlePlugin = "4.1.1"
-    const val kotlin = "1.4.10"
+    const val kotlin = "1.4.30"
     const val minSdk = 16
     const val targetSdk = 29
 
@@ -14,7 +14,7 @@ object Versions {
     const val constraintlayout = "2.0.0"
     const val coordinatorLayout = "1.1.0"
     const val core = "1.3.1"
-    const val fragment = "1.2.5"
+    const val fragment = "1.3.0"
     const val lifecycle = "2.2.0"
     const val navigation = "2.3.0"
     const val recyclerview = "1.1.0"
@@ -30,7 +30,6 @@ object Versions {
     const val lottie = "3.4.0"
     const val moshi = "1.9.2"
     const val multidex = "2.0.1"
-    const val mvrx = "1.3.0"
     const val picasso = "2.8"
     const val retrofit = "2.7.2"
     const val rxAndroid = "2.1.1"
@@ -45,7 +44,7 @@ object Versions {
     const val mockito = "2.25.1"
     const val mockitoKotlin = "2.2.0"
     const val mockk = "1.9.3"
-    const val robolectric = "4.3.1"
+    const val robolectric = "4.5.1"
     const val testCore = "1.2.0"
 }
 

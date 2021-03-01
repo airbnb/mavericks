@@ -50,6 +50,7 @@ class MavericksLauncherTestMocksActivity : FragmentActivity() {
         }
 
         val intent = provideIntentToTestMock(this, nextMock)
+        @Suppress("DEPRECATION")
         startActivityForResult(intent, REQUEST_CODE_TEST_FINISHED)
 
         // TODO Support clicking on views to catch crashes on click

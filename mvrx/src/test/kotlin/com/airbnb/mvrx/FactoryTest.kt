@@ -35,6 +35,7 @@ class NoFactoryTest : BaseTest() {
 
     @Before
     fun setup() {
+        @Suppress("DEPRECATION")
         activity = Robolectric.setupActivity(FragmentActivity::class.java)
     }
 
@@ -90,7 +91,7 @@ class NoFactoryTest : BaseTest() {
 
     @Test(expected = IllegalArgumentException::class)
     fun failOnMultipleParametersAndNoCompanion() {
-        class OptionalParamViewModel(initialState: FactoryState, someOtherParam: Int) : MavericksViewModel<FactoryState>(initialState)
+        class OptionalParamViewModel(initialState: FactoryState, @Suppress("UNUSED_PARAMETER") someOtherParam: Int) : MavericksViewModel<FactoryState>(initialState)
         MavericksViewModelProvider.get(OptionalParamViewModel::class.java, FactoryState::class.java, ActivityViewModelContext(activity, null))
     }
 
@@ -156,6 +157,7 @@ class FactoryViewModelTest : BaseTest() {
 
     @Before
     fun setup() {
+        @Suppress("DEPRECATION")
         activity = Robolectric.setupActivity(FragmentActivity::class.java)
     }
 
@@ -238,7 +240,7 @@ class FactoryStateTest : BaseTest() {
 
     private class TestFactoryViewModel(initialState: FactoryState) : TestMavericksViewModel<FactoryState>(initialState) {
         companion object : MavericksViewModelFactory<TestFactoryViewModel, FactoryState> {
-            override fun initialState(viewModelContext: ViewModelContext): FactoryState? {
+            override fun initialState(viewModelContext: ViewModelContext): FactoryState {
                 return when (viewModelContext) {
                     is FragmentViewModelContext -> FactoryState("${viewModelContext.fragment.arguments?.getString("greeting")!!} and ${viewModelContext.args<TestArgs>().greeting} factory")
                     else -> FactoryState("${viewModelContext.args<TestArgs>().greeting} factory")
@@ -249,7 +251,7 @@ class FactoryStateTest : BaseTest() {
 
     private class TestFactoryJvmStaticViewModel(initialState: FactoryState) : TestMavericksViewModel<FactoryState>(initialState) {
         companion object : MavericksViewModelFactory<TestFactoryJvmStaticViewModel, FactoryState> {
-            override fun initialState(viewModelContext: ViewModelContext): FactoryState? =
+            override fun initialState(viewModelContext: ViewModelContext): FactoryState =
                 FactoryState("${viewModelContext.args<TestArgs>().greeting} factory")
         }
     }
@@ -264,6 +266,7 @@ class FactoryStateTest : BaseTest() {
 
     @Before
     fun setup() {
+        @Suppress("DEPRECATION")
         activity = Robolectric.setupActivity(FragmentActivity::class.java)
     }
 
@@ -340,6 +343,7 @@ class FactoryViewModelAndStateTest : BaseTest() {
 
     @Before
     fun setup() {
+        @Suppress("DEPRECATION")
         activity = Robolectric.setupActivity(FragmentActivity::class.java)
     }
 

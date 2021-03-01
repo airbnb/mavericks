@@ -169,7 +169,7 @@ class MavericksLauncherViewModel(
 ) : MavericksViewModel<MavericksLauncherState>(initialState) {
 
     init {
-        loadViewsFromCache(initialState)
+        loadViewsFromCache()
 
         viewModelScope.launch {
             MavericksGlobalMockLibrary.mockableViewsFlow.collectLatest { asyncMavericksViewClasses ->
@@ -190,7 +190,7 @@ class MavericksLauncherViewModel(
     }
 
     /** Since parsing views from dex files is slow we can remember the last list of view names and load them directly. */
-    private fun loadViewsFromCache(initialState: MavericksLauncherState) = viewModelScope.launch {
+    private fun loadViewsFromCache() = viewModelScope.launch {
         val cachedFragmentClasses = sharedPrefs.getList(KEY_VIEWS).mapNotNull { lookUpMavericksViewClass(it) }
 
         setState {
@@ -220,13 +220,6 @@ class MavericksLauncherViewModel(
                 log("Setting selected mock from cache: ${selectedMock.viewName}")
                 setState { copy(selectedMock = selectedMock) }
             }
-        }
-    }
-
-    private fun saveMavericksViewsToCache(allMavericksViews: List<Class<out MockableMavericksView>>) {
-        sharedPrefs.edit {
-            // Get fully qualified names and remove duplicates
-            putList(KEY_VIEWS, allMavericksViews.mapNotNull { it.canonicalName }.distinct())
         }
     }
 

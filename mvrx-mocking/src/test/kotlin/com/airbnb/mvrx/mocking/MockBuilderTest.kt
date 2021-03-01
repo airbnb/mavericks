@@ -3,13 +3,13 @@ package com.airbnb.mvrx.mocking
 import android.os.Parcelable
 import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.Async
-import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksState
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.Uninitialized
 import com.airbnb.mvrx.fragmentViewModel
 import kotlinx.android.parcel.Parcelize
-import org.hamcrest.Matchers
+import org.hamcrest.core.IsEqual
 import org.hamcrest.core.StringContains
 import org.hamcrest.core.StringEndsWith
 import org.hamcrest.core.StringStartsWith
@@ -447,5 +447,5 @@ inline fun <reified T : Throwable> ExpectedException.expect(
     msgContains?.let { expectMessage(StringContains(it)) }
     msgStartsWith?.let { expectMessage(StringStartsWith(it)) }
     msgEndsWith?.let { expectMessage(StringEndsWith(it)) }
-    exactMsg?.let { expectMessage(Matchers.equalTo(it)) }
+    exactMsg?.let { expectMessage(IsEqual(it)) }
 }

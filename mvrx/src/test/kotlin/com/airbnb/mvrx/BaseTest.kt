@@ -8,7 +8,6 @@ import android.os.Parcelable
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.test.TestCoroutineDispatcher
 import org.junit.After
 import org.junit.AfterClass
 import org.junit.Before
@@ -18,9 +17,11 @@ import org.junit.runner.RunWith
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.android.controller.ActivityController
+import org.robolectric.annotation.LooperMode
 import org.robolectric.shadows.ShadowLog
 
-@Suppress("EXPERIMENTAL_API_USAGE")
+@Suppress("EXPERIMENTAL_API_USAGE", "DEPRECATION")
+@LooperMode(LooperMode.Mode.LEGACY)
 @RunWith(RobolectricTestRunner::class)
 @Ignore("Base Class")
 abstract class BaseTest {
