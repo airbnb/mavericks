@@ -200,13 +200,15 @@ class MavericksLauncherFragment : MavericksLauncherBaseFragment() {
                     id("view", mockedViewProvider.viewName, mockedViewProvider.mock.name)
                     title(mockedViewProvider.mock.name)
 
-                    subtitle(buildText(context) {
-                        if (LauncherMockIdentifier(mockedViewProvider) in state.recentUsage.mockIdentifiers) {
-                            appendWithColor("Recent ", R.color.mavericks_colorPrimary)
-                        }
+                    subtitle(
+                        buildText(context) {
+                            if (LauncherMockIdentifier(mockedViewProvider) in state.recentUsage.mockIdentifiers) {
+                                appendWithColor("Recent ", R.color.mavericks_colorPrimary)
+                            }
 
-                        if (mockedViewProvider.mock.forInitialization) append("[With Arguments]")
-                    })
+                            if (mockedViewProvider.mock.forInitialization) append("[With Arguments]")
+                        }
+                    )
 
                     onClickListener { _ ->
                         viewModel.setSelectedMock(mockedViewProvider)
@@ -228,11 +230,13 @@ class MavericksLauncherFragment : MavericksLauncherBaseFragment() {
                 id("view entry", viewName)
                 title(viewName.split(".").last())
 
-                subtitle(buildText(context) {
-                    if (viewName in state.recentUsage.viewNames) {
-                        appendWithColor("Recent", R.color.mavericks_colorPrimary)
+                subtitle(
+                    buildText(context) {
+                        if (viewName in state.recentUsage.viewNames) {
+                            appendWithColor("Recent", R.color.mavericks_colorPrimary)
+                        }
                     }
-                })
+                )
 
                 onClickListener { _ ->
                     viewModel.setSelectedView(viewClass)

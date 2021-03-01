@@ -130,7 +130,7 @@ fun <V : MockableMavericksView,
     S2 : MavericksState,
     VM2 : MavericksViewModel<S2>,
     Args : Parcelable>
-    V.mockTwoViewModels(
+V.mockTwoViewModels(
     viewModel1Reference: KProperty1<V, VM1>,
     defaultState1: S1,
     viewModel2Reference: KProperty1<V, VM2>,
@@ -161,7 +161,7 @@ fun <V : MockableMavericksView,
     S3 : MavericksState,
     VM3 : MavericksViewModel<S3>,
     Args : Parcelable>
-    V.mockThreeViewModels(
+V.mockThreeViewModels(
     viewModel1Reference: KProperty1<V, VM1>,
     defaultState1: S1,
     viewModel2Reference: KProperty1<V, VM2>,
@@ -198,7 +198,7 @@ fun <V : MockableMavericksView,
     S4 : MavericksState,
     VM4 : MavericksViewModel<S4>,
     Args : Parcelable>
-    V.mockFourViewModels(
+V.mockFourViewModels(
     viewModel1Reference: KProperty1<V, VM1>,
     defaultState1: S1,
     viewModel2Reference: KProperty1<V, VM2>,
@@ -241,7 +241,7 @@ fun <V : MockableMavericksView,
     S5 : MavericksState,
     VM5 : MavericksViewModel<S5>,
     Args : Parcelable>
-    V.mockFiveViewModels(
+V.mockFiveViewModels(
     viewModel1Reference: KProperty1<V, VM1>,
     defaultState1: S1,
     viewModel2Reference: KProperty1<V, VM2>,
@@ -287,7 +287,7 @@ fun <V : MockableMavericksView,
     S6 : MavericksState,
     VM6 : MavericksViewModel<S6>,
     Args : Parcelable>
-    V.mockSixViewModels(
+V.mockSixViewModels(
     viewModel1Reference: KProperty1<V, VM1>,
     defaultState1: S1,
     viewModel2Reference: KProperty1<V, VM2>,
@@ -339,7 +339,7 @@ fun <V : MockableMavericksView,
     S7 : MavericksState,
     VM7 : MavericksViewModel<S7>,
     Args : Parcelable>
-    V.mockSevenViewModels(
+V.mockSevenViewModels(
     viewModel1Reference: KProperty1<V, VM1>,
     defaultState1: S1,
     viewModel2Reference: KProperty1<V, VM2>,
@@ -616,7 +616,8 @@ internal constructor(
         statesBuilder: TwoStatesBuilder<V, S1, VM1, S2, VM2>.() -> Unit
     ) {
         addState(
-            name, evaluateArgsLambda(args), {
+            name, evaluateArgsLambda(args),
+            {
                 TwoStatesBuilder(
                     vm1,
                     defaultState1,
@@ -789,7 +790,8 @@ internal constructor(
         statesBuilder: ThreeStatesBuilder<V, S1, VM1, S2, VM2, S3, VM3>.() -> Unit
     ) {
         addState(
-            name, evaluateArgsLambda(args), {
+            name, evaluateArgsLambda(args),
+            {
                 ThreeStatesBuilder(
                     vm1,
                     defaultState1,

@@ -35,14 +35,17 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
             error("Cannot access view bindings. View lifecycle is ${lifecycle.currentState}!")
         }
 
-        fragment.viewLifecycleOwnerLiveData.observe(fragment, Observer { viewLifecycleOwner ->
-            viewLifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
-                @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-                fun onDestroy() {
-                    binding = null
-                }
-            })
-        })
+        fragment.viewLifecycleOwnerLiveData.observe(
+            fragment,
+            Observer { viewLifecycleOwner ->
+                viewLifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
+                    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+                    fun onDestroy() {
+                        binding = null
+                    }
+                })
+            }
+        )
 
         @Suppress("UNCHECKED_CAST")
         binding = bindMethod.invoke(null, thisRef.requireView()) as T

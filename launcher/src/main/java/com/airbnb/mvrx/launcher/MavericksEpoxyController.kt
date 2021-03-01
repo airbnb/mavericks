@@ -73,7 +73,7 @@ fun <A : MavericksViewModel<B>,
     D : MavericksState,
     E : MavericksViewModel<F>,
     F : MavericksState>
-    MavericksLauncherBaseFragment.simpleController(
+MavericksLauncherBaseFragment.simpleController(
     viewModel1: A,
     viewModel2: C,
     viewModel3: E,

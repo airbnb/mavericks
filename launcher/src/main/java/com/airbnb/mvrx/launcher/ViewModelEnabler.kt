@@ -53,7 +53,8 @@ class ViewModelEnabler(
                     }
 
                 mockedView.cleanupMockState()
-            }, delayTime
+            },
+            delayTime
         )
     }
 

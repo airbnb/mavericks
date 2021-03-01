@@ -146,9 +146,12 @@ interface MvRxView : MavericksView {
         prop5: KProperty1<S, E>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A, B, C, D, E) -> Unit
-    ) = _internal5(subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, prop5, deliveryMode, { a, b, c, d, e ->
-        subscriber(a, b, c, d, e)
-    }).toDisposable()
+    ) = _internal5(
+        subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, prop5, deliveryMode,
+        { a, b, c, d, e ->
+            subscriber(a, b, c, d, e)
+        }
+    ).toDisposable()
 
     /**
      * Subscribes to state changes for six properties.
@@ -171,9 +174,12 @@ interface MvRxView : MavericksView {
         prop6: KProperty1<S, F>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A, B, C, D, E, F) -> Unit
-    ) = _internal6(subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, prop5, prop6, deliveryMode, { a, b, c, d, e, f ->
-        subscriber(a, b, c, d, e, f)
-    }).toDisposable()
+    ) = _internal6(
+        subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, prop5, prop6, deliveryMode,
+        { a, b, c, d, e, f ->
+            subscriber(a, b, c, d, e, f)
+        }
+    ).toDisposable()
 
     /**
      * Subscribes to state changes for seven properties.
@@ -197,9 +203,12 @@ interface MvRxView : MavericksView {
         prop7: KProperty1<S, G>,
         deliveryMode: DeliveryMode = RedeliverOnStart,
         subscriber: (A, B, C, D, E, F, G) -> Unit
-    ) = _internal7(subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, prop5, prop6, prop7, deliveryMode, { a, b, c, d, e, f, g ->
-        subscriber(a, b, c, d, e, f, g)
-    }).toDisposable()
+    ) = _internal7(
+        subscriptionLifecycleOwner, prop1, prop2, prop3, prop4, prop5, prop6, prop7, deliveryMode,
+        { a, b, c, d, e, f, g ->
+            subscriber(a, b, c, d, e, f, g)
+        }
+    ).toDisposable()
 }
 
 private fun Job.toDisposable() = Disposables.fromAction {

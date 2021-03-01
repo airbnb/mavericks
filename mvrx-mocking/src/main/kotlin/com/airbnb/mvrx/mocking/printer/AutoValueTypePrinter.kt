@@ -25,8 +25,8 @@ class AutoValueTypePrinter : TypePrinter<Any> {
             .filter { !it.isAbstract }
             .firstOrNull { it.simpleName?.contains("builder", ignoreCase = true) == true }
             ?.java
-        // Instead of crashing we have the error msg in the generated code. This allows the
-        // rest of the code to be generated while still making it clear what went wrong.
+            // Instead of crashing we have the error msg in the generated code. This allows the
+            // rest of the code to be generated while still making it clear what went wrong.
             ?: return "Error: Could not find AutoValue Builder for $className"
 
         val builderMethods = builderClass.declaredMethods

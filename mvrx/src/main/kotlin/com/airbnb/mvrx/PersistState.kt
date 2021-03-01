@@ -77,13 +77,13 @@ private fun assertCollectionPersistability(value: Any?) {
     when (value) {
         is Collection<*> -> {
             value
-                    .filterNotNull()
-                    .forEach(::assertPersistable)
+                .filterNotNull()
+                .forEach(::assertPersistable)
         }
         is Map<*, *> -> {
             value
-                    .mapNotNull { it.value }
-                    .forEach(::assertPersistable)
+                .mapNotNull { it.value }
+                .forEach(::assertPersistable)
         }
     }
 }

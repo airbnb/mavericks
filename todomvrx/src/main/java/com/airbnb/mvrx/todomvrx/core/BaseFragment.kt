@@ -83,9 +83,12 @@ abstract class BaseFragment : Fragment(), MvRxView {
             oldTasks = tasks
         }
 
-        viewModel.asyncSubscribe(TasksState::taskRequest, onFail = {
-            coordinatorLayout.showLongSnackbar(R.string.loading_tasks_error)
-        })
+        viewModel.asyncSubscribe(
+            TasksState::taskRequest,
+            onFail = {
+                coordinatorLayout.showLongSnackbar(R.string.loading_tasks_error)
+            }
+        )
     }
 
     override fun invalidate() {
