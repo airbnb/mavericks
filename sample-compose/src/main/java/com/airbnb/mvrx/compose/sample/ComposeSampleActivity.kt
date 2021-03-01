@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.compose.collectState
+import com.airbnb.mvrx.compose.mavericksActivityViewModel
 import com.airbnb.mvrx.compose.mavericksViewModel
 
 data class CounterState(
@@ -65,7 +66,7 @@ class ComposeSampleActivity : AppCompatActivity() {
         // This will get or create a ViewModel scoped to the closest LocalLifecycleOwner which, in this case, is the NavHost.
         val navScopedViewModel: CounterViewModel = mavericksViewModel()
         // This will get or create a ViewModel scoped to the Activity.
-        val activityScopedViewModel: CounterViewModel = mavericksViewModel(LocalContext.current as LifecycleOwner)
+        val activityScopedViewModel: CounterViewModel = mavericksActivityViewModel()
 
         val navScopedCount by navScopedViewModel.collectState(CounterState::count)
         val activityScopedCount by activityScopedViewModel.collectState(CounterState::count)
@@ -91,7 +92,7 @@ class ComposeSampleActivity : AppCompatActivity() {
 
     @Composable
     fun IncrementActivityCountButton() {
-        val activityScopedViewModel: CounterViewModel = mavericksViewModel(LocalContext.current as LifecycleOwner)
+        val activityScopedViewModel: CounterViewModel = mavericksActivityViewModel()
         Button(onClick = activityScopedViewModel::incrementCount) {
             Text("Increment Activity Scoped Count")
         }

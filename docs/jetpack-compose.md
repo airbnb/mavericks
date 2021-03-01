@@ -42,6 +42,6 @@ The results of that call will automatically update in the composable subscribing
 
 By default, `mavericksViewModel()` will get or create a view model scoped to the nearest `LocalLifecycleOwner`. In most cases, this will be the closest `NavBackStackEntry`, `Fragment`, or `Activity`. If you need to specify a custom scope, pass in a different `LifecycleOwner` as the first parameter. For example, to scope a view model to the `Activity`, pass `LocalContext.current as ComponentActivity`. `ComponentActivity` is the super class of both `AppCompatActivity` and `FragmentActivity`.
 
-Mavericks needs a
+As a convenience, `mavericksActivityViewModel()` exists to scope a ViewModel to the host activity.
 
-In many cases (such as `NavBackStackEntry`)
+Mavericks needs a `ViewModelStoreOwner` and `SavedStateRegistryOwner` as well. In many cases (such as `NavBackStackEntry`, `Fragment`, and `Activity`), the `LifecycleOwner` will also implement these classes but if you need to specify custom owners, you can. Just ensure that they have the same lifecycles or else you could get unexpected behavior.
