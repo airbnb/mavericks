@@ -1,6 +1,9 @@
 # Change Log
 
 ## 2.1.0
+- Upgraded to Kotlin 1.4.30.
+- Removed `@RestrictTo` annotations in favor of just `@InternalMavericksApi`. The Kotlin opt-in annotations work more reliably than the Android lint rules and there is no need for both.
+- Created initial release of [mavericks-compose](https://airbnb.io/mavericks/#/jetpack-compose).
 
 ### Breaking Changes
 - ActivityViewModelContext and MavericksViewModelFactory now uses ComponentActivity instead of FragmentActivity to improve Compose interop. ComponentActivity is the super class of FragmentActivity so you may need to replace FragmentActivity with ComponentActivity if you using ActivityViewModelContext.

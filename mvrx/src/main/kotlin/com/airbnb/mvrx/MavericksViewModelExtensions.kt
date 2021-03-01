@@ -2,17 +2,11 @@
 
 package com.airbnb.mvrx
 
-import androidx.annotation.RestrictTo
 import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlin.reflect.KProperty1
 
-/**
- * This name is obfuscated because @RestrictTo doesn't actually work. It would be named onEach.
- * https://issuetracker.google.com/issues/168357308
- */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @InternalMavericksApi
 fun <VM : MavericksViewModel<S>, S : MavericksState> VM._internal(
     owner: LifecycleOwner?,
@@ -20,11 +14,6 @@ fun <VM : MavericksViewModel<S>, S : MavericksState> VM._internal(
     action: suspend (S) -> Unit
 ) = stateFlow.resolveSubscription(owner, deliveryMode, action)
 
-/**
- * This name is obfuscated because @RestrictTo doesn't actually work. It would be named onEach.
- * https://issuetracker.google.com/issues/168357308
- */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @InternalMavericksApi
 fun <VM : MavericksViewModel<S>, S : MavericksState, A> VM._internal1(
     owner: LifecycleOwner?,
@@ -38,11 +27,6 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, A> VM._internal1(
         action(a)
     }
 
-/**
- * This name is obfuscated because @RestrictTo doesn't actually work. It would be named onEach.
- * https://issuetracker.google.com/issues/168357308
- */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @InternalMavericksApi
 fun <VM : MavericksViewModel<S>, S : MavericksState, A, B> VM._internal2(
     owner: LifecycleOwner?,
@@ -57,11 +41,6 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, A, B> VM._internal2(
         action(a, b)
     }
 
-/**
- * This name is obfuscated because @RestrictTo doesn't actually work. It would be named onEach.
- * https://issuetracker.google.com/issues/168357308
- */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @InternalMavericksApi
 fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C> VM._internal3(
     owner: LifecycleOwner?,
@@ -77,11 +56,6 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C> VM._internal3(
         action(a, b, c)
     }
 
-/**
- * This name is obfuscated because @RestrictTo doesn't actually work. It would be named onEach.
- * https://issuetracker.google.com/issues/168357308
- */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @InternalMavericksApi
 fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D> VM._internal4(
     owner: LifecycleOwner?,
@@ -98,11 +72,6 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D> VM._internal4(
         action(a, b, c, d)
     }
 
-/**
- * This name is obfuscated because @RestrictTo doesn't actually work. It would be named onEach.
- * https://issuetracker.google.com/issues/168357308
- */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @InternalMavericksApi
 fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E> VM._internal5(
     owner: LifecycleOwner?,
@@ -120,11 +89,6 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E> VM._internal
         action(a, b, c, d, e)
     }
 
-/**
- * This name is obfuscated because @RestrictTo doesn't actually work. It would be named onEach.
- * https://issuetracker.google.com/issues/168357308
- */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @InternalMavericksApi
 fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E, F> VM._internal6(
     owner: LifecycleOwner?,
@@ -143,11 +107,6 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E, F> VM._inter
         action(a, b, c, d, e, f)
     }
 
-/**
- * This name is obfuscated because @RestrictTo doesn't actually work. It would be named onEach.
- * https://issuetracker.google.com/issues/168357308
- */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @InternalMavericksApi
 fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E, F, G> VM._internal7(
     owner: LifecycleOwner?,
@@ -167,11 +126,6 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, A, B, C, D, E, F, G> VM._in
         action(a, b, c, d, e, f, g)
     }
 
-/**
- * This name is obfuscated because @RestrictTo doesn't actually work. It would be named onAsync.
- * https://issuetracker.google.com/issues/168357308
- */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @InternalMavericksApi
 fun <VM : MavericksViewModel<S>, S : MavericksState, T> VM._internalSF(
     owner: LifecycleOwner?,
