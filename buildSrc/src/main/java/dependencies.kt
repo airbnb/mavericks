@@ -1,6 +1,6 @@
 object Versions {
     // Build tools and SDK
-    const val buildTools = "30.0.2"
+    const val buildTools = "30.0.3"
     const val compileSdk = 30
     const val gradlePlugin = "7.0.0-alpha08"
     const val kotlin = "1.4.30"
