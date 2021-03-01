@@ -3,7 +3,6 @@ package com.airbnb.mvrx
 import android.os.Bundle
 import android.os.Parcelable
 import androidx.activity.ComponentActivity
-import androidx.annotation.RestrictTo
 import androidx.fragment.app.Fragment
 import java.io.Serializable
 import kotlin.properties.ReadOnlyProperty
@@ -16,7 +15,6 @@ import kotlin.reflect.KProperty
  * Looks for [Mavericks.KEY_ARG] on the arguments of the fragments.
  */
 @Suppress("FunctionName")
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @InternalMavericksApi
 fun <T : Fragment> T._fragmentArgsProvider(): Any? = arguments?.get(Mavericks.KEY_ARG)
 
