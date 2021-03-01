@@ -3,8 +3,9 @@ android:
   components:
     - build-tools-30.0.3
     - android-30
-  licenses:
-    - 'android-sdk-license-.+'
+before_install:
+  - yes | sdkmanager "platforms;android-30"
+  - yes | sdkmanager "build-tools;30.0.3"
 jdk:
   - oraclejdk11
 branches:
