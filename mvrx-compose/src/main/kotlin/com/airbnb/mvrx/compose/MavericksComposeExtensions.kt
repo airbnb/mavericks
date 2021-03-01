@@ -1,7 +1,6 @@
 package com.airbnb.mvrx.compose
 
 import androidx.activity.ComponentActivity
-import androidx.annotation.RestrictTo
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -16,6 +15,7 @@ import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistryOwner
 import com.airbnb.mvrx.ActivityViewModelContext
 import com.airbnb.mvrx.FragmentViewModelContext
+import com.airbnb.mvrx.InternalMavericksApi
 import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksViewModel
@@ -24,25 +24,6 @@ import com.airbnb.mvrx.withState
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlin.reflect.KProperty1
-
-/**
- * Creates a Compose State variable that will emit new values whenever this ViewModel's state changes.
- * Prefer the overload with a state property reference to ensure that your composable only recomposes when the properties it uses changes.
- */
-@Composable
-fun <VM : MavericksViewModel<S>, S : MavericksState> VM.collectState(): State<S> {
-    return stateFlow.collectAsState(initial = withState(this) { it })
-}
-
-/**
- * Creates a Compose State variable that will only update when the value of this property changes.
- * Prefer this to subscribing to entire state classes which will trigger a recomposition whenever any state variable changes.
- * If you find yourself subscribing to many state properties in a single composable, consider breaking it up into smaller ones.
- */
-@Composable
-fun <VM : MavericksViewModel<S>, S : MavericksState, A> VM.collectState(prop1: KProperty1<S, A>): State<A> {
-    return stateFlow.map { prop1.get(it) }.distinctUntilChanged().collectAsState(initial = withState(this) { prop1.get(it) })
-}
 
 /**
  * Get or create a [MavericksViewModel] scoped to the closest [LocalLifecycleOwner]. This should be sufficient for most cases. By default, it
@@ -88,14 +69,54 @@ inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mave
     }
 }
 
+/**
+ * Get or create a [MavericksViewModel] scoped to the local activity.
+ * @see [mavericksViewModel]
+ */
 @Composable
-@RestrictTo(RestrictTo.Scope.LIBRARY)
+inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mavericksActivityViewModel(
+    noinline keyFactory: (() -> String)? = null,
+): VM = mavericksViewModel(
+    LocalContext.current as? ComponentActivity ?: error("LocalContext is not a ComponentActivity!"),
+    keyFactory = keyFactory,
+)
+
+/**
+ * Creates a Compose State variable that will emit new values whenever this ViewModel's state changes.
+ * Prefer the overload with a state property reference to ensure that your composable only recomposes when the properties it uses changes.
+ */
+@Composable
+fun <VM : MavericksViewModel<S>, S : MavericksState> VM.collectState(): State<S> {
+    return stateFlow.collectAsState(initial = withState(this) { it })
+}
+
+/**
+ * Creates a Compose State variable that will emit new values whenever this ViewModel's state mapped to the provided mapper changes.
+ * Prefer the overload with a state property reference to ensure that your composable only recomposes when the properties it uses changes.
+ */
+@Composable
+fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectState(mapper: (S) -> O): State<O> {
+    return stateFlow.map { mapper(it) }.distinctUntilChanged().collectAsState(initial = withState(this) { mapper(it) })
+}
+
+/**
+ * Creates a Compose State variable that will only update when the value of this property changes.
+ * Prefer this to subscribing to entire state classes which will trigger a recomposition whenever any state variable changes.
+ * If you find yourself subscribing to many state properties in a single composable, consider breaking it up into smaller ones.
+ */
+@Composable
+fun <VM : MavericksViewModel<S>, S : MavericksState, A> VM.collectState(prop1: KProperty1<S, A>): State<A> {
+    return stateFlow.map { prop1.get(it) }.distinctUntilChanged().collectAsState(initial = withState(this) { prop1.get(it) })
+}
+
+@Composable
+@InternalMavericksApi
 fun _defaultActivity(): ComponentActivity {
     return LocalContext.current as? ComponentActivity ?: error("Composable is not hosted in a ComponentActivity")
 }
 
 @Composable
-@RestrictTo(RestrictTo.Scope.LIBRARY)
+@InternalMavericksApi
 fun _defaultViewModelStoreOwner(lifecycleOwner: LifecycleOwner): ViewModelStoreOwner {
     return when (lifecycleOwner) {
         is ViewModelStoreOwner -> lifecycleOwner
@@ -104,7 +125,7 @@ fun _defaultViewModelStoreOwner(lifecycleOwner: LifecycleOwner): ViewModelStoreO
 }
 
 @Composable
-@RestrictTo(RestrictTo.Scope.LIBRARY)
+@InternalMavericksApi
 fun _defaultSavedStateRegistryOwner(lifecycleOwner: LifecycleOwner): SavedStateRegistryOwner {
     return when (lifecycleOwner) {
         is SavedStateRegistryOwner -> lifecycleOwner

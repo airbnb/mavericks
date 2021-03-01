@@ -1,7 +1,5 @@
 package com.airbnb.mvrx;
 
-import androidx.annotation.RestrictTo;
-
 import com.airbnb.mvrx.test.MvRxTestRule;
 
 /**

@@ -62,7 +62,7 @@ class ComposeSampleActivity : AppCompatActivity() {
 
     @Composable
     fun CounterScreen(title: String) {
-        // This will get or create a ViewModel scoped to the closest LocalLifecycleOwner which is the NavHost.
+        // This will get or create a ViewModel scoped to the closest LocalLifecycleOwner which, in this case, is the NavHost.
         val navScopedViewModel: CounterViewModel = mavericksViewModel()
         // This will get or create a ViewModel scoped to the Activity.
         val activityScopedViewModel: CounterViewModel = mavericksViewModel(LocalContext.current as LifecycleOwner)
