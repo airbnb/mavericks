@@ -2,6 +2,8 @@ language: android
 dist: trusty
 android:
   components:
+    - tools
+    - platform-tools
     - build-tools-30.0.3
     - android-30
 before_install:
