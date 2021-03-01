@@ -18,13 +18,8 @@ tasks.withType(KotlinCompile).all {
 android {
     resourcePrefix "mvrx_"
 
-    compileSdkVersion 30
-    buildToolsVersion "30.0.3"
-
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 30
-
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
