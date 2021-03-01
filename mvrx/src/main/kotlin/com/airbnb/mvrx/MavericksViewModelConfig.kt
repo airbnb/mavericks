@@ -1,6 +1,5 @@
 package com.airbnb.mvrx
 
-import androidx.annotation.RestrictTo
 import kotlinx.coroutines.CoroutineScope
 
 /**
@@ -16,7 +15,7 @@ abstract class MavericksViewModelConfig<S : Any>(
      * The state store instance that will control the state of the ViewModel.
      */
     @InternalMavericksApi
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP) val stateStore: MavericksStateStore<S>,
+    val stateStore: MavericksStateStore<S>,
     /**
      * The coroutine scope that will be provided to the view model.
      */

@@ -1,10 +1,8 @@
 package com.airbnb.mvrx
 
 import android.os.Build
-import androidx.annotation.RestrictTo
 import java.lang.reflect.Modifier
 
-@RestrictTo(RestrictTo.Scope.LIBRARY)
 @InternalMavericksApi
 interface MavericksStateFactory<VM : MavericksViewModel<S>, S : MavericksState> {
 
@@ -16,7 +14,6 @@ interface MavericksStateFactory<VM : MavericksViewModel<S>, S : MavericksState> 
     ): S
 }
 
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @InternalMavericksApi
 class RealMavericksStateFactory<VM : MavericksViewModel<S>, S : MavericksState> : MavericksStateFactory<VM, S> {
 

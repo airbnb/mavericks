@@ -1,7 +1,5 @@
 package com.airbnb.mvrx
 
-import androidx.annotation.RestrictTo
-
 /**
  * The T generic is unused for some classes but since it is sealed and useful for Success and Fail,
  * it should be on all of them.
@@ -58,7 +56,6 @@ data class Success<out T>(private val value: T) : Async<T>(complete = true, shou
      * @see Async.setMetadata
      * @see Async.getMetadata
      */
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @InternalMavericksApi
     var metadata: Any? = null
 }
