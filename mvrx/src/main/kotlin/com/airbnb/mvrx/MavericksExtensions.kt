@@ -2,8 +2,8 @@ package com.airbnb.mvrx
 
 import android.os.Bundle
 import android.os.Parcelable
+import androidx.activity.ComponentActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentActivity
 import java.io.Serializable
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KClass
@@ -209,7 +209,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
 inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T.viewModel(
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
-) where T : FragmentActivity = lifecycleAwareLazy(this) {
+) where T : ComponentActivity = lifecycleAwareLazy(this) {
     MavericksViewModelProvider.get(
         viewModelClass = viewModelClass.java,
         stateClass = S::class.java,

@@ -1,6 +1,5 @@
 package com.airbnb.mvrx.hellodagger.di
 
-import androidx.fragment.app.FragmentActivity
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksViewModelFactory
@@ -53,12 +52,8 @@ class DaggerMavericksViewModelFactory<VM : MavericksViewModel<S>, S : MavericksS
     private val viewModelClass: Class<VM>
 ) : MavericksViewModelFactory<VM, S> {
 
-    override fun create(viewModelContext: ViewModelContext, state: S): VM? {
-        return createViewModel(viewModelContext.activity, state)
-    }
-
-    private fun <VM : MavericksViewModel<S>, S : MavericksState> createViewModel(fragmentActivity: FragmentActivity, state: S): VM {
-        val viewModelFactoryMap = fragmentActivity.appComponent().viewModelFactories()
+    override fun create(viewModelContext: ViewModelContext, state: S): VM {
+        val viewModelFactoryMap = viewModelContext.activity.appComponent().viewModelFactories()
         val viewModelFactory = viewModelFactoryMap[viewModelClass]
 
         @Suppress("UNCHECKED_CAST")

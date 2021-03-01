@@ -1,6 +1,7 @@
 # Change Log
 
-## Version 2.1.0
+## 2.1.0
+- Replaced ViewModelContext Activity type from FragmentActivity to its parent class ComponentActivity for better interop with Compose.
 - Removed `@RestrictTo` annotations in favor of just `@InternalMavericksApi`. The Kotlin opt-in annotations work more reliably than the Android lint rules and there is no need for both.
 
 ## Version 2.0.0
