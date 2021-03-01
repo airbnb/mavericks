@@ -25,9 +25,9 @@ jobs:
       name: Detekt
       script: "./gradlew detekt -PCI=true"
     - name: Lint
-      script: "./gradlew lintRelease"
+      script: "./gradlew lintDebug"
     - name: Unit Tests
-      script: "./gradlew testReleaseUnitTest"
+      script: "./gradlew testDebugUnitTest"
 sudo: false
 cache:
   directories:
