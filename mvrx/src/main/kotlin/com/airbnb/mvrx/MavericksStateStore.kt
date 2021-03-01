@@ -1,9 +1,7 @@
 package com.airbnb.mvrx
 
-import androidx.annotation.RestrictTo
 import kotlinx.coroutines.flow.Flow
 
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @InternalMavericksApi
 interface MavericksStateStore<S : Any> {
     val state: S

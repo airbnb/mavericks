@@ -2,7 +2,6 @@ package com.airbnb.mvrx
 
 import android.os.Bundle
 import android.os.Parcelable
-import androidx.annotation.RestrictTo
 import androidx.activity.ComponentActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -12,7 +11,6 @@ import java.io.Serializable
  * Helper ViewModelProvider that has a single method for taking either a [Fragment] or [ComponentActivity] instead
  * of two separate ones. The logic for providing the correct scope is inside the method.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY)
 @InternalMavericksApi
 object MavericksViewModelProvider {
     /**

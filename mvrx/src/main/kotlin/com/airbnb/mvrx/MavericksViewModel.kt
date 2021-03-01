@@ -1,7 +1,6 @@
 package com.airbnb.mvrx
 
 import androidx.annotation.CallSuper
-import androidx.annotation.RestrictTo
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
@@ -47,7 +46,6 @@ abstract class MavericksViewModel<S : MavericksState>(
     private val configFactory = Mavericks.viewModelConfigFactory
 
     @Suppress("LeakingThis")
-    @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
     @InternalMavericksApi
     val config: MavericksViewModelConfig<S> = configFactory.provideConfig(
         this,
