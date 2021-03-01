@@ -7,8 +7,9 @@ android:
     - build-tools-30.0.3
     - android-30
 before_install:
-  - yes | sdkmanager "platforms;android-30"
-  - yes | sdkmanager "build-tools;30.0.3"
+  - mkdir "$ANDROID_HOME/licenses" || true
+  - echo -e "\n24333f8a63b6825ea9c5514f83c2829b004d1fee" > "$ANDROID_HOME/licenses/android-sdk-license"
+  - echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
 jdk:
   - oraclejdk11
 branches:
