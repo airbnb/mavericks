@@ -14,6 +14,8 @@ android:
     - extra-android-m2repository
     - extra-android-support
     - extra-google-m2repository
+  licenses:
+    - 'android-sdk-license-.+'
 jdk:
   - oraclejdk11
 branches:
