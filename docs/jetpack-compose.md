@@ -4,24 +4,44 @@ Mavericks is still useful in a Jetpack Compose world. With Jetpack Compose, you 
 
 To use Mavericks with Jetpack Compose, add the `com.airbnb.android:mavericks-compose` artifact (TBD on versioning).
 
+## Creating a MavericksViewModel
+
 To get started, create a MavericksViewModel just like you always have. Now, with the `mavericks-compose` artifact, you can get or create a ViewModel in a composable like this:
 
 ```kotlin
 @Composable
 fun MyComponent() {
     val viewModel: CounterViewModel = mavericksViewModel()
-    val count by viewModel.collectState(CounterState::count)
-    Button(onClick = viewModel::incrementCount) {
-        Text("Count: $count")
-    }
+    // You can now call functions on your viewModel.
 }
 ```
 
 By default, the view model will be scoped to the closest `LifecycleOwner` but you can specify a different scope if you need to. Refer to the docs for `mavericksViewModel()` for more information on custom scopes.
 
-If you call `collectAsState()` with no parameters, it will return a Compose state property with the whole ViewModel state class and will update any time the state changes.
+## Accessing State
+
+If you call `collectAsState()` on your view model with no parameters, it will return a [Compose State property](https://developer.android.com/jetpack/compose/state) with the whole ViewModel state class and will update any time the state changes.
+
+You can also pass in a state property reference or a mapper function to get a [Compose State property](https://developer.android.com/jetpack/compose/state) for changes to just that property or mapper function.
 
 The recommended approach is to subscribe individually to a small set of State properties and to break down large Composables into smaller ones. This allows Compose to more efficiently recompose your UI when state changes.
+
+```kotlin
+@Composable
+fun MyComponent() {
+    val viewModel: CounterViewModel = mavericksViewModel()
+    // All changes to your state
+    val state by viewModel.collectAsState()
+    // Just count.
+    val count1 = viewModel.collectAsState(CounterState::count)
+    // Equivalent to count but with more flexibility for nested props.
+    val count2 = viewModel.collectAsState { it.count }
+
+    Text("Count is ${state.count}")
+    Text("Count is $count1")
+    Text("Count is $count2")
+}
+```
 
 ## Compose + Mavericks Mental Model
 
