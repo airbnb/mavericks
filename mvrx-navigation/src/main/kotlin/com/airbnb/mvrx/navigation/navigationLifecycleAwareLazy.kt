@@ -2,9 +2,9 @@
 
 package com.airbnb.mvrx.navigation
 
-import androidx.annotation.RestrictTo
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import com.airbnb.mvrx.InternalMavericksApi
 import java.io.Serializable
 
 private object UninitializedValue
@@ -12,7 +12,7 @@ private object UninitializedValue
 /**
  * This was copied from SynchronizedLazyImpl but modified to automatically initialize in ON_CREATE.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY)
+@InternalMavericksApi
 @SuppressWarnings("Detekt.ClassNaming")
 class navigationLifecycleAwareLazy<out T>(
     owner: LifecycleOwner,

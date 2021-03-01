@@ -1,6 +1,5 @@
 package com.airbnb.mvrx.mocking
 
-import androidx.annotation.RestrictTo
 import com.airbnb.mvrx.InternalMavericksApi
 import com.airbnb.mvrx.MavericksStateStore
 import kotlinx.coroutines.channels.BufferOverflow
@@ -14,7 +13,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
  * The intention of this is to allow state changes in tests to be tracked
  * synchronously.
  */
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @InternalMavericksApi
 class SynchronousMavericksStateStore<S : Any>(initialState: S) : MavericksStateStore<S> {
 

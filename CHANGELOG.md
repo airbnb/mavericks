@@ -1,5 +1,8 @@
 # Change Log
 
+## Version 2.1.0
+- Removed `@RestrictTo` annotations in favor of just `@InternalMavericksApi`. The Kotlin opt-in annotations work more reliably than the Android lint rules and there is no need for both.
+
 ## Version 2.0.0
 Mavericks 2.0 is a ground up rewrite for coroutines. Check out the [documentation for 2.0](https://airbnb.io/mavericks/#/new-2x) to find out what is new and how to upgrade.
 

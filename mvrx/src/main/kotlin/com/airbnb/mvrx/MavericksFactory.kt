@@ -1,6 +1,5 @@
 package com.airbnb.mvrx
 
-import androidx.annotation.RestrictTo
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 
@@ -83,7 +82,6 @@ private fun <VM : MavericksViewModel<S>, S : MavericksState> createDefaultViewMo
     return null
 }
 
-@RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @InternalMavericksApi
 open class ViewModelDoesNotExistException(message: String) : IllegalStateException(message) {
     constructor(

@@ -4,7 +4,6 @@ package com.airbnb.mvrx.mocking
 
 import android.os.Parcelable
 import android.util.Log
-import androidx.annotation.RestrictTo
 import androidx.annotation.VisibleForTesting
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.InternalMavericksApi
@@ -1480,7 +1479,6 @@ open class MavericksViewMocks<V : MockableMavericksView, Args : Parcelable> @Pub
          * Exposed for internal tests to allow us to workaround the requirement that this class
          * can only be created via [getFrom].
          */
-        @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
         @InternalMavericksApi
         fun <R> allowCreationForTesting(block: () -> R): R {
             allowCreationForTesting = true
