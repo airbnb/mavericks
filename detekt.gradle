@@ -7,7 +7,6 @@ dependencies {
 }
 
 detekt {
-    failFast = true
     buildUponDefaultConfig = true
     config = files("$rootDir/detekt.yml")
     autoCorrect = !project.findProperty('CI') ?: false
