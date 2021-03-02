@@ -7,15 +7,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelStoreOwner
-import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistryOwner
 import com.airbnb.mvrx.ActivityViewModelContext
 import com.airbnb.mvrx.FragmentViewModelContext
-import com.airbnb.mvrx.InternalMavericksApi
 import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksViewModel
@@ -26,32 +23,32 @@ import kotlinx.coroutines.flow.map
 import kotlin.reflect.KProperty1
 
 /**
- * Get or create a [MavericksViewModel] scoped to the closest [LocalLifecycleOwner]. This should be sufficient for most cases. By default, it
- * will be the host Activity or Nav Graph (if used). However, you can provide a custom scope by overriding the lifecycleOwner parameter.
+ * Get or create a [MavericksViewModel] scoped to the closest [LocalLifecycleOwner].
+ * In most case, [LocalLifecycleOwner] will be the host Activity or Nav Graph (if used).
+ * However, you can provide a custom scope by overriding the lifecycleOwner parameter.
  *
- * The ViewModelStoreOwner will default to the provided LifecycleOwner if it also implements ViewModelStoreOwner. Many LifecycleOwners such as
- * Fragment, Activity, and NavBackStackEntry do. The same applies to the SavedStateRegistry.
+ * If you provide your own LifecycleOwner, it MUST also implement [ViewModelStoreOwner] and [SavedStateRegistryOwner]. Many standard components
+ * such as [Fragment], [ComponentActivity] (and subclasses such as FragmentActivity and AppCompatActivity), and NavBackStackEntry all do.
  *
- * If the provided LifecycleOwner doesn't implement ViewModelStoreOwner or SavedStateRegistryOwner and you haven't specified one, it will default
- * to LocalViewModelStoreOwner and LocalSavedStateRegistryOwner.
+ * You can call functions on this ViewModel to update state.
  *
- * You can call functions on this ViewModel to update state. To subscribe to its state, call collectAsState(YourState::yourProp) or collectAsState().
+ * To subscribe to this view model's state, call collectAsState(YourState::yourProp), collectAsState { it.yourProp } or collectAsState() on your view model.
  */
 @Composable
 inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mavericksViewModel(
-    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-    activity: ComponentActivity = _defaultActivity(),
-    viewModelStoreOwner: ViewModelStoreOwner = _defaultViewModelStoreOwner(lifecycleOwner),
-    savedStateRegistryOwner: SavedStateRegistryOwner = _defaultSavedStateRegistryOwner(lifecycleOwner),
+    scope: LifecycleOwner = LocalLifecycleOwner.current,
     noinline keyFactory: (() -> String)? = null,
 ): VM {
-    val viewModelClass = VM::class
+    val activity = LocalContext.current as? ComponentActivity ?: error("Composable is not hosted in a ComponentActivity!")
+    val viewModelStoreOwner = scope as? ViewModelStoreOwner ?: error("LifecycleOwner must be a ViewModelStoreOwner!")
+    val savedStateRegistryOwner = scope as? SavedStateRegistryOwner ?: error("LifecycleOwner must be a SavedStateRegistryOwner!")
     val savedStateRegistry = savedStateRegistryOwner.savedStateRegistry
-    val viewModelContext = remember(lifecycleOwner, activity, viewModelStoreOwner, savedStateRegistry) {
-        when (lifecycleOwner) {
+    val viewModelClass = VM::class
+    val viewModelContext = remember(scope, activity, viewModelStoreOwner, savedStateRegistry) {
+        when (scope) {
             is Fragment -> {
-                val args = lifecycleOwner.arguments?.get(Mavericks.KEY_ARG)
-                FragmentViewModelContext(activity, args, lifecycleOwner)
+                val args = scope.arguments?.get(Mavericks.KEY_ARG)
+                FragmentViewModelContext(activity, args, scope)
             }
             else -> {
                 val args = activity.intent.extras?.get(Mavericks.KEY_ARG)
@@ -86,7 +83,7 @@ inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mave
  * Prefer the overload with a state property reference to ensure that your composable only recomposes when the properties it uses changes.
  */
 @Composable
-fun <VM : MavericksViewModel<S>, S : MavericksState> VM.collectState(): State<S> {
+fun <VM : MavericksViewModel<S>, S : MavericksState> VM.collectAsState(): State<S> {
     return stateFlow.collectAsState(initial = withState(this) { it })
 }
 
@@ -95,7 +92,7 @@ fun <VM : MavericksViewModel<S>, S : MavericksState> VM.collectState(): State<S>
  * Prefer the overload with a state property reference to ensure that your composable only recomposes when the properties it uses changes.
  */
 @Composable
-fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectState(mapper: (S) -> O): State<O> {
+fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectAsState(mapper: (S) -> O): State<O> {
     return stateFlow.map { mapper(it) }.distinctUntilChanged().collectAsState(initial = withState(this) { mapper(it) })
 }
 
@@ -105,30 +102,6 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectState(mapper: 
  * If you find yourself subscribing to many state properties in a single composable, consider breaking it up into smaller ones.
  */
 @Composable
-fun <VM : MavericksViewModel<S>, S : MavericksState, A> VM.collectState(prop1: KProperty1<S, A>): State<A> {
+fun <VM : MavericksViewModel<S>, S : MavericksState, A> VM.collectAsState(prop1: KProperty1<S, A>): State<A> {
     return stateFlow.map { prop1.get(it) }.distinctUntilChanged().collectAsState(initial = withState(this) { prop1.get(it) })
-}
-
-@Composable
-@InternalMavericksApi
-fun _defaultActivity(): ComponentActivity {
-    return LocalContext.current as? ComponentActivity ?: error("Composable is not hosted in a ComponentActivity")
-}
-
-@Composable
-@InternalMavericksApi
-fun _defaultViewModelStoreOwner(lifecycleOwner: LifecycleOwner): ViewModelStoreOwner {
-    return when (lifecycleOwner) {
-        is ViewModelStoreOwner -> lifecycleOwner
-        else -> LocalViewModelStoreOwner.current
-    }
-}
-
-@Composable
-@InternalMavericksApi
-fun _defaultSavedStateRegistryOwner(lifecycleOwner: LifecycleOwner): SavedStateRegistryOwner {
-    return when (lifecycleOwner) {
-        is SavedStateRegistryOwner -> lifecycleOwner
-        else -> LocalSavedStateRegistryOwner.current
-    }
 }

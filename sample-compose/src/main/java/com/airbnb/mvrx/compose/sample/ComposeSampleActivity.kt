@@ -19,7 +19,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.compose.collectState
+import com.airbnb.mvrx.compose.collectAsState
 import com.airbnb.mvrx.compose.mavericksActivityViewModel
 import com.airbnb.mvrx.compose.mavericksViewModel
 
@@ -39,11 +39,11 @@ class ComposeSampleActivity : AppCompatActivity() {
         setContent {
             Column {
                 Box(modifier = Modifier.weight(1f)) {
-                    CounterScreenNavHost("Counter Screen 1")
+                    CounterScreenNavHost("Counter Screen in Nav Graph 1")
                 }
                 Divider()
                 Box(modifier = Modifier.weight(1f)) {
-                    CounterScreenNavHost("Counter Screen 2")
+                    CounterScreenNavHost("Counter Screen in Nav Graph 2")
                 }
             }
         }
@@ -66,8 +66,8 @@ class ComposeSampleActivity : AppCompatActivity() {
         // This will get or create a ViewModel scoped to the Activity.
         val activityScopedViewModel: CounterViewModel = mavericksActivityViewModel()
 
-        val navScopedCount by navScopedViewModel.collectState(CounterState::count)
-        val activityScopedCount by activityScopedViewModel.collectState(CounterState::count)
+        val navScopedCount by navScopedViewModel.collectAsState(CounterState::count)
+        val activityScopedCount by activityScopedViewModel.collectAsState(CounterState::count)
 
         Column {
             Text(title)
