@@ -36,8 +36,8 @@ open class ViewSubscriberFragment : Fragment(), MavericksView {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel.onEach { _ -> subscribeCallCount++ }
-        viewModel.onEach(uniqueOnly("onCreate")) { _ -> subscribeUniqueOnlyCallCount++ }
+        viewModel.onEach { subscribeCallCount++ }
+        viewModel.onEach(uniqueOnly("onCreate")) { subscribeUniqueOnlyCallCount++ }
 
         viewModel.onEach(ViewSubscriberState::foo) {
             selectSubscribeValue = it
@@ -56,8 +56,8 @@ open class ViewSubscriberFragment : Fragment(), MavericksView {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.onEach { _ -> viewCreatedSubscribeCallCount++ }
-        viewModel.onEach(uniqueOnly("onCreateView")) { _ -> viewCreatedUniqueOnlyCallCount++ }
+        viewModel.onEach { viewCreatedSubscribeCallCount++ }
+        viewModel.onEach(uniqueOnly("onCreateView")) { viewCreatedUniqueOnlyCallCount++ }
     }
 
     fun setFoo(foo: Int) = viewModel.setFoo(foo)

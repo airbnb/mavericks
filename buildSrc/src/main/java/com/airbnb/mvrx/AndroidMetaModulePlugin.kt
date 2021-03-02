@@ -13,6 +13,7 @@ import org.gradle.kotlin.dsl.withType
 import org.jetbrains.kotlin.gradle.internal.AndroidExtensionsExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinAndroidPluginWrapper
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import java.io.File
 
 class AndroidMetaModulePlugin : Plugin<Project> {
 
@@ -49,6 +50,7 @@ class AndroidMetaModulePlugin : Plugin<Project> {
                             isAbortOnError = true
                             textReport = true
                             textOutput("stdout")
+                            lintConfig = File("../lint.xml")
                         }
 
                         compileOptions {

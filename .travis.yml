@@ -3,15 +3,12 @@ android:
   components:
     - tools
     - platform-tools
-    - build-tools-28.0.2
-    - build-tools-28.0.3
-    - build-tools-29.0.3
-    - android-28
-    - android-29
-    - extra-google-google_play_services
-    - extra-android-m2repository
-    - extra-android-support
-    - extra-google-m2repository
+    - build-tools-30.0.3
+    - android-30
+before_install:
+  - mkdir "$ANDROID_HOME/licenses" || true
+  - echo -e "\n24333f8a63b6825ea9c5514f83c2829b004d1fee" > "$ANDROID_HOME/licenses/android-sdk-license"
+  - echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"
 jdk:
   - oraclejdk11
 branches:
@@ -23,11 +20,10 @@ after_success:
   - ./deploy_snapshot.sh
 jobs:
   include:
-    - stage: format
+    - stage: test
       name: Detekt
       script: "./gradlew detekt -PCI=true"
-    - stage: test
-      name: Lint
+    - name: Lint
       script: "./gradlew lintRelease"
     - name: Unit Tests
       script: "./gradlew testReleaseUnitTest"

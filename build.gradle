@@ -39,18 +39,6 @@ allprojects {
     repositories {
         google()
         jcenter()
-        maven { url "https://jitpack.io" }
-    }
-
-    tasks.whenTaskAdded { task ->
-        if (task.name.startsWith("lint")) {
-            task.doFirst {
-                android.lintOptions.abortOnError true
-                android.lintOptions.textReport true
-                android.lintOptions.textOutput "stdout"
-                android.lintOptions.lintConfig = file("../lint.xml")
-            }
-        }
     }
 }
 

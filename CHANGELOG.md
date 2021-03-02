@@ -1,9 +1,12 @@
 # Change Log
 
 ## 2.1.0
-- Replaced ViewModelContext Activity type from FragmentActivity to its parent class ComponentActivity for better interop with Compose.
-- Removed `@RestrictTo` annotations in favor of just `@InternalMavericksApi`. The Kotlin opt-in annotations work more reliably than the Android lint rules and there is no need for both.
 - Upgraded to Kotlin 1.4.30.
+- Removed `@RestrictTo` annotations in favor of just `@InternalMavericksApi`. The Kotlin opt-in annotations work more reliably than the Android lint rules and there is no need for both.
+- Created initial release of [mavericks-compose](https://airbnb.io/mavericks/#/jetpack-compose).
+
+### Breaking Changes
+- ActivityViewModelContext and MavericksViewModelFactory now uses ComponentActivity instead of FragmentActivity to improve Compose interop. ComponentActivity is the super class of FragmentActivity so you may need to replace FragmentActivity with ComponentActivity if you using ActivityViewModelContext.
 
 ## Version 2.0.0
 Mavericks 2.0 is a ground up rewrite for coroutines. Check out the [documentation for 2.0](https://airbnb.io/mavericks/#/new-2x) to find out what is new and how to upgrade.

@@ -44,6 +44,7 @@ dependencies {
     api Libraries.kotlinCoroutines
     api Libraries.activity
 
+    implementation Libraries.activity
     implementation Libraries.appcompat
     implementation Libraries.fragment
     implementation Libraries.viewModelSavedState

@@ -1,8 +1,5 @@
 package com.airbnb.mvrx;
 
-
-import androidx.annotation.RestrictTo;
-
 @InternalMavericksApi
 public class MavericksTestOverrides {
     /**

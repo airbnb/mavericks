@@ -1,0 +1,66 @@
+import com.airbnb.mvrx.JacocoReportTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'jacoco'
+apply plugin: 'com.vanniktech.maven.publish'
+
+tasks.withType(KotlinCompile).all {
+    kotlinOptions {
+        freeCompilerArgs += [
+                '-Xopt-in=kotlin.RequiresOptIn',
+                '-Xopt-in=com.airbnb.mvrx.InternalMavericksApi',
+        ]
+    }
+}
+
+android {
+    resourcePrefix "mvrx_"
+
+    defaultConfig {
+        minSdkVersion 21
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LGPL2.1'
+        exclude 'META-INF/AL2.0'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = '1.8'
+        allWarningsAsErrors = true
+    }
+
+    buildFeatures {
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion Versions.compose
+    }
+}
+
+dependencies {
+    api project(":mvrx")
+    implementation Libraries.lifecycleCommon
+    implementation Libraries.fragment
+
+    implementation Libraries.composeFoundation
+    implementation Libraries.composeUi
+    implementation Libraries.viewModelCompose
+}
+
+jacoco {
+    toolVersion = "0.8.2"
+}
+
+tasks.register("coverage", JacocoReportTask.class) {
+    coverage.dependsOn("testDebugUnitTest")
+}

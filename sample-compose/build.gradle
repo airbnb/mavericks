@@ -1,0 +1,60 @@
+apply plugin: "com.android.application"
+apply plugin: "kotlin-android"
+
+android {
+    defaultConfig {
+        applicationId "com.airbnb.mvrx.helloHilt"
+        minSdk 21
+        versionCode 1
+        versionName "0.0.1"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildFeatures {
+        compose true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion Versions.compose
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LGPL2.1'
+        exclude 'META-INF/AL2.0'
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+dependencies {
+    implementation project(":mvrx-compose")
+    implementation project(":testing")
+    implementation Libraries.appcompat
+    implementation Libraries.activityCompose
+    implementation Libraries.composeMaterial
+    implementation Libraries.navigationCompose
+
+    androidTestImplementation project(':testing')
+    androidTestImplementation Libraries.junit
+    androidTestImplementation Libraries.appcompat
+    androidTestImplementation Libraries.composeTest
+    androidTestImplementation Libraries.composeMaterial
+}

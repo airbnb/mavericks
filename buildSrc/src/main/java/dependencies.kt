@@ -1,25 +1,29 @@
 object Versions {
     // Build tools and SDK
-    const val buildTools = "29.0.3"
-    const val compileSdk = 29
-    const val gradlePlugin = "4.1.1"
+    const val buildTools = "30.0.3"
+    const val compileSdk = 30
+    const val gradlePlugin = "7.0.0-alpha08"
     const val kotlin = "1.4.30"
     const val minSdk = 16
     const val targetSdk = 29
 
     // Android libraries
     const val activity = "1.2.0"
+    const val activityCompose = "1.3.0-alpha03"
     const val appcompat = "1.2.0"
     const val arch = "2.1.0"
     const val cardview = "1.0.0"
     const val constraintlayout = "2.0.0"
     const val coordinatorLayout = "1.1.0"
+    const val compose = "1.0.0-beta01"
     const val core = "1.3.1"
     const val fragment = "1.3.0"
     const val lifecycle = "2.2.0"
     const val navigation = "2.3.0"
+    const val navigationCompose = "1.0.0-alpha08"
     const val recyclerview = "1.1.0"
     const val room = "2.2.5"
+    const val viewModelCompose = "1.0.0-alpha02"
 
     // Libraries
     const val autoValue = "1.6.6"
@@ -60,13 +64,19 @@ object AnnotationProcessors {
 }
 
 object Libraries {
-    const val activity = "androidx.appcompat:appcompat:${Versions.appcompat}"
+    const val activity = "androidx.activity:activity:${Versions.activity}"
+    const val activityCompose = "androidx.activity:activity-compose:${Versions.activityCompose}"
     const val appcompat = "androidx.appcompat:appcompat:${Versions.appcompat}"
     const val autoValue = "com.google.auto.value:auto-value-annotations:${Versions.autoValue}"
     const val cardview = "androidx.cardview:cardview:${Versions.cardview}"
     const val constraintlayout = "androidx.constraintlayout:constraintlayout:${Versions.constraintlayout}"
     const val coordinatorLayout = "androidx.coordinatorlayout:coordinatorlayout:${Versions.coordinatorLayout}"
     const val coreKtx = "androidx.core:core-ktx:${Versions.core}"
+    const val composeCompiler = "androidx.compose.compiler:compiler:${Versions.compose}"
+    const val composeUi = "androidx.compose.ui:ui:${Versions.compose}"
+    const val composeFoundation = "androidx.compose.foundation:foundation:${Versions.compose}"
+    const val composeMaterial = "androidx.compose.material:material:${Versions.compose}"
+    const val composeTest = "androidx.compose.ui:ui-test-junit4:${Versions.compose}"
     const val dagger = "com.google.dagger:dagger:${Versions.dagger}"
     const val epoxy = "com.airbnb.android:epoxy:${Versions.epoxy}"
     const val espressoIdlingResource = "androidx.test.espresso:espresso-idling-resource:${Versions.espresso}"
@@ -86,6 +96,7 @@ object Libraries {
     const val multidex = "androidx.multidex:multidex:${Versions.multidex}"
     const val navigationFragmentKtx = "androidx.navigation:navigation-fragment-ktx:${Versions.navigation}"
     const val navigationUiKtx = "androidx.navigation:navigation-ui-ktx:${Versions.navigation}"
+    const val navigationCompose = "androidx.navigation:navigation-compose:${Versions.navigationCompose}"
     const val picasso = "com.squareup.picasso:picasso:${Versions.picasso}"
     const val recyclerview = "androidx.recyclerview:recyclerview:${Versions.recyclerview}"
     const val retrofit = "com.squareup.retrofit2:retrofit:${Versions.retrofit}"
@@ -97,6 +108,7 @@ object Libraries {
     const val rxAndroid = "io.reactivex.rxjava2:rxandroid:${Versions.rxAndroid}"
     const val rxJava = "io.reactivex.rxjava2:rxjava:${Versions.rxJava}"
     const val viewModelKtx = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycle}"
+    const val viewModelCompose = "androidx.lifecycle:lifecycle-viewmodel-compose:${Versions.viewModelCompose}"
     const val viewModelSavedState = "androidx.lifecycle:lifecycle-viewmodel-savedstate:${Versions.lifecycle}"
 }
 
