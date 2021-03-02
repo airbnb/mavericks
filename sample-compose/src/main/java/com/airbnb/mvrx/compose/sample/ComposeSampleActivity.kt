@@ -39,11 +39,11 @@ class ComposeSampleActivity : AppCompatActivity() {
         setContent {
             Column {
                 Box(modifier = Modifier.weight(1f)) {
-                    CounterScreenNavHost("Counter Screen 1")
+                    CounterScreenNavHost("Counter Screen in Nav Graph 1")
                 }
                 Divider()
                 Box(modifier = Modifier.weight(1f)) {
-                    CounterScreenNavHost("Counter Screen 2")
+                    CounterScreenNavHost("Counter Screen in Nav Graph 2")
                 }
             }
         }
