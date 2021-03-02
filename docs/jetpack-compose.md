@@ -2,7 +2,7 @@
 
 Mavericks is still useful in a Jetpack Compose world. With Jetpack Compose, you can use Compose for all of your UI but Mavericks for your business logic, data fetching, interface to your dependency injection object graph, etc.
 
-To use Mavericks with Jetpack Compose, add the `com.airbnb.android:mavericks-compose` artifact (TBD on versioning).
+To use Mavericks with Jetpack Compose, add the `com.airbnb.android:mavericks-compose` artifact (2.1.0-alpha01).
 
 ## Creating a MavericksViewModel
 
