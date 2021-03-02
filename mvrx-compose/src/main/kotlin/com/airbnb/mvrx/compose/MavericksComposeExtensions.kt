@@ -32,7 +32,7 @@ import kotlin.reflect.KProperty1
  *
  * You can call functions on this ViewModel to update state.
  *
- * To subscribe to this view model's state, call collectAsState(YourState::yourProp), collectState { it.yourProp } or collectAsState() on your view model.
+ * To subscribe to this view model's state, call collectAsState(YourState::yourProp), collectAsState { it.yourProp } or collectAsState() on your view model.
  */
 @Composable
 inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mavericksViewModel(
@@ -83,7 +83,7 @@ inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mave
  * Prefer the overload with a state property reference to ensure that your composable only recomposes when the properties it uses changes.
  */
 @Composable
-fun <VM : MavericksViewModel<S>, S : MavericksState> VM.collectState(): State<S> {
+fun <VM : MavericksViewModel<S>, S : MavericksState> VM.collectAsState(): State<S> {
     return stateFlow.collectAsState(initial = withState(this) { it })
 }
 
@@ -92,7 +92,7 @@ fun <VM : MavericksViewModel<S>, S : MavericksState> VM.collectState(): State<S>
  * Prefer the overload with a state property reference to ensure that your composable only recomposes when the properties it uses changes.
  */
 @Composable
-fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectState(mapper: (S) -> O): State<O> {
+fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectAsState(mapper: (S) -> O): State<O> {
     return stateFlow.map { mapper(it) }.distinctUntilChanged().collectAsState(initial = withState(this) { mapper(it) })
 }
 
@@ -102,6 +102,6 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectState(mapper: 
  * If you find yourself subscribing to many state properties in a single composable, consider breaking it up into smaller ones.
  */
 @Composable
-fun <VM : MavericksViewModel<S>, S : MavericksState, A> VM.collectState(prop1: KProperty1<S, A>): State<A> {
+fun <VM : MavericksViewModel<S>, S : MavericksState, A> VM.collectAsState(prop1: KProperty1<S, A>): State<A> {
     return stateFlow.map { prop1.get(it) }.distinctUntilChanged().collectAsState(initial = withState(this) { prop1.get(it) })
 }
