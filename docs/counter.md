@@ -27,7 +27,7 @@ data class CounterState(val count: Int = 0) : MavericksState
 
 Next, we need to create a ViewModel which will own CounterState and be responsible for updating it.
 ```kotlin
-class CounterViewModel(initialState: CounterState) : MavericksViewModel<CounterState>(state) {
+class CounterViewModel(initialState: CounterState) : MavericksViewModel<CounterState>(initialState) {
     fun incrementCount() {
       setState { copy(count = count + 1) }
     }
