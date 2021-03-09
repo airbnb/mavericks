@@ -3,6 +3,8 @@
 package com.airbnb.mvrx
 
 import android.annotation.SuppressLint
+import android.os.Handler
+import android.os.Looper
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LifecycleRegistry
@@ -30,13 +32,14 @@ class lifecycleAwareLazy<out T>(private val owner: LifecycleOwner, initializer: 
 
     init {
         // owner.lifecycle.addObserver must be invoked on main thread otherwise addObserver will throw an IllegalStateException.
-        // createUnsafe disables the main thread check.
-        LifecycleRegistry.createUnsafe(owner).addObserver(object : DefaultLifecycleObserver {
-            override fun onCreate(owner: LifecycleOwner) {
-                if (!isInitialized()) value
-                owner.lifecycle.removeObserver(this)
-            }
-        })
+        if (Looper.myLooper() == Looper.getMainLooper()) {
+            owner.lifecycle.addObserver(object : DefaultLifecycleObserver {
+                override fun onCreate(owner: LifecycleOwner) {
+                    if (!isInitialized()) value
+                    owner.lifecycle.removeObserver(this)
+                }
+            })
+        }
     }
 
     @Suppress("LocalVariableName")
