@@ -2,8 +2,10 @@
 
 package com.airbnb.mvrx
 
+import android.annotation.SuppressLint
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
 import java.io.Serializable
 
 private object UninitializedValue
@@ -13,6 +15,7 @@ private object UninitializedValue
  */
 @InternalMavericksApi
 @SuppressWarnings("Detekt.ClassNaming")
+@SuppressLint("VisibleForTests")
 class lifecycleAwareLazy<out T>(private val owner: LifecycleOwner, initializer: () -> T) :
     Lazy<T>,
     Serializable {
@@ -26,7 +29,9 @@ class lifecycleAwareLazy<out T>(private val owner: LifecycleOwner, initializer: 
     private val lock = this
 
     init {
-        owner.lifecycle.addObserver(object : DefaultLifecycleObserver {
+        // owner.lifecycle.addObserver must be invoked on main thread otherwise addObserver will throw an IllegalStateException.
+        // createUnsafe disables the main thread check.
+        LifecycleRegistry.createUnsafe(owner).addObserver(object : DefaultLifecycleObserver {
             override fun onCreate(owner: LifecycleOwner) {
                 if (!isInitialized()) value
                 owner.lifecycle.removeObserver(this)
