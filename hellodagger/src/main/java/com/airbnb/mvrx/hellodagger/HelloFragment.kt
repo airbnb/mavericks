@@ -39,8 +39,8 @@ class HelloFragment : Fragment(R.layout.fragment_hello), MockableMavericksView {
         defaultState = HelloDaggerState(),
         defaultArgs = null
     ) {
-        state("successfully") {
-            copy(message = Success("I haz loaded"))
+        state("Success") {
+            copy(message = Success("Hello World"))
         }
     }
 }

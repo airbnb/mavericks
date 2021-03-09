@@ -31,14 +31,12 @@ class lifecycleAwareLazy<out T>(private val owner: LifecycleOwner, initializer: 
     init {
         // owner.lifecycle.addObserver must be invoked on main thread otherwise addObserver will throw an IllegalStateException.
         // createUnsafe disables the main thread check.
-        synchronized(lock) {
-            LifecycleRegistry.createUnsafe(owner).addObserver(object : DefaultLifecycleObserver {
-                override fun onCreate(owner: LifecycleOwner) {
-                    if (!isInitialized()) value
-                    owner.lifecycle.removeObserver(this)
-                }
-            })
-        }
+        LifecycleRegistry.createUnsafe(owner).addObserver(object : DefaultLifecycleObserver {
+            override fun onCreate(owner: LifecycleOwner) {
+                if (!isInitialized()) value
+                owner.lifecycle.removeObserver(this)
+            }
+        })
     }
 
     @Suppress("LocalVariableName")
