@@ -6,8 +6,8 @@ import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
 import java.io.Serializable
 
 private object UninitializedValue
@@ -17,8 +17,11 @@ private object UninitializedValue
  */
 @InternalMavericksApi
 @SuppressWarnings("Detekt.ClassNaming")
-@SuppressLint("VisibleForTests")
-class lifecycleAwareLazy<out T>(private val owner: LifecycleOwner, initializer: () -> T) :
+class lifecycleAwareLazy<out T>(
+    private val owner: LifecycleOwner,
+    isMainThread: () -> Boolean = { Looper.myLooper() == Looper.getMainLooper() },
+    initializer: () -> T
+) :
     Lazy<T>,
     Serializable {
     private var initializer: (() -> T)? = initializer
@@ -31,15 +34,23 @@ class lifecycleAwareLazy<out T>(private val owner: LifecycleOwner, initializer: 
     private val lock = this
 
     init {
-        // owner.lifecycle.addObserver must be invoked on main thread otherwise addObserver will throw an IllegalStateException.
-        if (Looper.myLooper() == Looper.getMainLooper()) {
-            owner.lifecycle.addObserver(object : DefaultLifecycleObserver {
-                override fun onCreate(owner: LifecycleOwner) {
-                    if (!isInitialized()) value
-                    owner.lifecycle.removeObserver(this)
-                }
-            })
+        if (isMainThread()) {
+            initializeOnCreatedOrGreater(owner)
+        } else {
+            Handler(Looper.getMainLooper()).post {
+                if (owner.lifecycle.currentState < Lifecycle.State.CREATED || isInitialized()) return@post
+                initializeOnCreatedOrGreater(owner)
+            }
         }
+    }
+
+    private fun initializeOnCreatedOrGreater(owner: LifecycleOwner) {
+        owner.lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onCreate(owner: LifecycleOwner) {
+                if (!isInitialized()) value
+                owner.lifecycle.removeObserver(this)
+            }
+        })
     }
 
     @Suppress("LocalVariableName")

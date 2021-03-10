@@ -36,4 +36,21 @@ class LifecycleAwareLazyTest : BaseTest() {
         lazyProp = lifecycleAwareLazy(owner) { "Hello World" }
         assertTrue(lazyProp.isInitialized())
     }
+
+    @Test
+    fun testInitializedIfOnBackgroundThread() {
+        owner.lifecycle.currentState = Lifecycle.State.STARTED
+        lazyProp = lifecycleAwareLazy(owner, { false }) { "Hello World" }
+        assertTrue(lazyProp.isInitialized())
+    }
+
+    @Test
+    fun testIsNotInitializedIfOnBackgroundThreadAndDestroyed() {
+        // Lifecycle can't move from an INITIALIZED to DESTROYED state.
+        // So, we need to first we move it into a created state.
+        owner.lifecycle.currentState = Lifecycle.State.CREATED
+        owner.lifecycle.currentState = Lifecycle.State.DESTROYED
+        lazyProp = lifecycleAwareLazy(owner, { false }) { "Hello World" }
+        assertFalse(lazyProp.isInitialized())
+    }
 }
