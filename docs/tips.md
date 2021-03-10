@@ -32,7 +32,7 @@ or
 
 `setState { copy(yourMap = yourMap.delete(“a”, “b”)) }`
 
-## Drive animations from ViewMode.onEach
+## Drive animations from ViewModel.onEach
 
 You may use an `onEach` callback to drive an animation or show an error for a specific amount of time like this:
 ```kotlin
