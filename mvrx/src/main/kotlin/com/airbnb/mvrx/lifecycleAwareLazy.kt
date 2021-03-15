@@ -2,7 +2,6 @@
 
 package com.airbnb.mvrx
 
-import android.annotation.SuppressLint
 import android.os.Handler
 import android.os.Looper
 import androidx.lifecycle.DefaultLifecycleObserver
@@ -35,22 +34,30 @@ class lifecycleAwareLazy<out T>(
 
     init {
         if (isMainThread()) {
-            initializeOnCreatedOrGreater(owner)
+            initializeWhenCreated(owner)
         } else {
             Handler(Looper.getMainLooper()).post {
-                if (owner.lifecycle.currentState < Lifecycle.State.CREATED || isInitialized()) return@post
-                initializeOnCreatedOrGreater(owner)
+                initializeWhenCreated(owner)
             }
         }
     }
 
-    private fun initializeOnCreatedOrGreater(owner: LifecycleOwner) {
-        owner.lifecycle.addObserver(object : DefaultLifecycleObserver {
-            override fun onCreate(owner: LifecycleOwner) {
-                if (!isInitialized()) value
-                owner.lifecycle.removeObserver(this)
+    private fun initializeWhenCreated(owner: LifecycleOwner) {
+        val lifecycleState = owner.lifecycle.currentState
+        when {
+            lifecycleState == Lifecycle.State.DESTROYED || isInitialized() -> return
+            lifecycleState == Lifecycle.State.INITIALIZED -> {
+                owner.lifecycle.addObserver(object : DefaultLifecycleObserver {
+                    override fun onCreate(owner: LifecycleOwner) {
+                        if (!isInitialized()) value
+                        owner.lifecycle.removeObserver(this)
+                    }
+                })
             }
-        })
+            else -> {
+                if (!isInitialized()) value
+            }
+        }
     }
 
     @Suppress("LocalVariableName")
