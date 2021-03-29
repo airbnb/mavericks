@@ -70,7 +70,11 @@ interface MavericksView : LifecycleOwner {
      * By default [subscriptionLifecycleOwner] is the same as the MvRxView's standard lifecycle owner.
      */
     val subscriptionLifecycleOwner: LifecycleOwner
-        get() = (this as? Fragment)?.viewLifecycleOwnerLiveData?.value ?: this
+        get() = try {
+            (this as? Fragment)?.viewLifecycleOwner ?: this
+        } catch(e: IllegalStateException) {
+            this
+        }
 
     fun postInvalidate() {
         if (pendingInvalidates.add(System.identityHashCode(this@MavericksView))) {
