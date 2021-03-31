@@ -224,4 +224,4 @@ private class JobDisposable(job: Job) : AtomicReference<Job>(job), Disposable {
     override fun isDisposed(): Boolean = get()?.isActive?.not() ?: true
 }
 
-private fun Job.toDisposable(): Disposable = JobDisposable(this)
+internal fun Job.toDisposable(): Disposable = JobDisposable(this)
