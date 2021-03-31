@@ -1,7 +1,8 @@
 package com.airbnb.mvrx
 
-import io.reactivex.disposables.Disposables
+import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.Job
+import java.util.concurrent.atomic.AtomicReference
 import kotlin.reflect.KProperty1
 
 /**
@@ -211,6 +212,16 @@ interface MvRxView : MavericksView {
     ).toDisposable()
 }
 
-private fun Job.toDisposable() = Disposables.fromAction {
-    cancel()
+private class JobDisposable(job: Job) : AtomicReference<Job>(job), Disposable {
+    init {
+        job.invokeOnCompletion { set(null) }
+    }
+
+    override fun dispose() {
+        getAndSet(null)?.cancel()
+    }
+
+    override fun isDisposed(): Boolean = get()?.isActive?.not() ?: true
 }
+
+internal fun Job.toDisposable(): Disposable = JobDisposable(this)

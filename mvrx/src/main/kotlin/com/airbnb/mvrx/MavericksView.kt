@@ -57,20 +57,23 @@ interface MavericksView : LifecycleOwner {
 
     /**
      * The [LifecycleOwner] to use when making new subscriptions. You may want to return different owners depending
-     * on what state your [MavericksView] is in. For fragments, subscriptions made in `onCreate` should use
-     * the fragment's lifecycle owner so that the subscriptions are cleared in `onDestroy`. Subscriptions made in or after
-     * `onCreateView` should use the fragment's _view's_ lifecycle owner so that they are cleared in `onDestroyView`.
+     * on what state your [MavericksView] is in.
      *
-     * For example, if you are using a fragment as a [MavericksView] the proper implementation is:
-     * ```
-     *     override val subscriptionLifecycleOwner: LifecycleOwner
-     *        get() = this.viewLifecycleOwnerLiveData.value ?: this
-     * ```
+     * Fragments are handled by the default implementation using their standard lifecycle owner for subscriptions made
+     * in `onCreate` (cleared in `onDestroy`), or their _view_ lifecycle owner for subscriptions made in or
+     * after `onCreateView` (cleared in `onDestroyView`). Using [Fragment.getViewLifecycleOwner] is necessary to
+     * retrieve the view's lifecycle as early as `onCreateView`. This method throws an `IllegalStateException` when view
+     * lifecycle is unavailable (eg. _before_ `onCreateView`) which is caught as a signal to fall back to the fragment's
+     * standard lifecycle owner.
      *
-     * By default [subscriptionLifecycleOwner] is the same as the MvRxView's standard lifecycle owner.
+     * For non-Fragments the default [subscriptionLifecycleOwner] is the same as the MvRxView's standard lifecycle owner.
      */
     val subscriptionLifecycleOwner: LifecycleOwner
-        get() = (this as? Fragment)?.viewLifecycleOwnerLiveData?.value ?: this
+        get() = try {
+            (this as? Fragment)?.viewLifecycleOwner ?: this
+        } catch(e: IllegalStateException) {
+            this
+        }
 
     fun postInvalidate() {
         if (pendingInvalidates.add(System.identityHashCode(this@MavericksView))) {
