@@ -24,7 +24,7 @@ class HelloWorldViewModel(initialState: HelloWorldState) : MavericksViewModel<He
 class HelloWorldFragment : Fragment(R.layout.hello_world_fragment), MavericksView {
     private val viewModel: HelloWorldViewModel by fragmentViewModel()
 
-    override fun invalidate = withState(viewModel) { state ->
+    override fun invalidate() = withState(viewModel) { state ->
         // Update your views with the latest state here.
         // This will get called any time your state changes and the viewLifecycleOwner is STARTED.
     }
