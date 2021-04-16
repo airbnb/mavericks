@@ -71,7 +71,7 @@ interface MavericksView : LifecycleOwner {
     val subscriptionLifecycleOwner: LifecycleOwner
         get() = try {
             (this as? Fragment)?.viewLifecycleOwner ?: this
-        } catch(e: IllegalStateException) {
+        } catch (e: IllegalStateException) {
             this
         }
 
