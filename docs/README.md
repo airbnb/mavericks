@@ -7,7 +7,7 @@ Mavericks is an Android MVI framework that is both easy to learn yet powerful en
 
 When we began creating Mavericks, our goal was to make building products easier, faster, and more fun. We believe that for Mavericks to be successful, it must be easy to learn for people new to Android development working their first apps yet powerful enough to support the most complex screens at Airbnb.
 
-Mavericks is used in hundreds of screens at Airbnb including 100% of new screens. It has also been adopted by countless other apps from small smaple apps to apps with over 1 billion downloads.
+Mavericks is used in hundreds of screens at Airbnb including 100% of new screens. It has also been adopted by countless other apps from small sample apps to apps with over 1 billion downloads.
 
 Mavericks is built on top of [Android Jetpack](https://developer.android.com/jetpack) and [Kotlin Coroutines](https://developer.android.com/kotlin/coroutines) so it can be thought of as a complement rather than a departure from Google's standard set of libraries.
 
