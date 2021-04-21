@@ -184,7 +184,7 @@ abstract class MavericksViewModel<S : MavericksState>(
      *                    subsequent Loading and Fail states. This is useful if you want to display the previously successful data when
      *                    refreshing.
      * @param reducer A reducer that is applied to the current state and should return the new state. Because the state is the receiver
-     *                and it likely a data class, an implementation may look like: `{ copy(response = it) }`.
+     *                and is likely a data class, an implementation may look like: `{ copy(response = it) }`.
      */
     protected fun <T : Any?> Deferred<T>.execute(
         dispatcher: CoroutineDispatcher? = null,
@@ -201,7 +201,7 @@ abstract class MavericksViewModel<S : MavericksState>(
      *                    subsequent Loading and Fail states. This is useful if you want to display the previously successful data when
      *                    refreshing.
      * @param reducer A reducer that is applied to the current state and should return the new state. Because the state is the receiver
-     *                and it likely a data class, an implementation may look like: `{ copy(response = it) }`.
+     *                and is likely a data class, an implementation may look like: `{ copy(response = it) }`.
      */
     protected fun <T : Any?> (suspend () -> T).execute(
         dispatcher: CoroutineDispatcher? = null,
@@ -241,7 +241,7 @@ abstract class MavericksViewModel<S : MavericksState>(
      *                    subsequent Loading and Fail states. This is useful if you want to display the previously successful data when
      *                    refreshing.
      * @param reducer A reducer that is applied to the current state and should return the new state. Because the state is the receiver
-     *                and it likely a data class, an implementation may look like: `{ copy(response = it) }`.
+     *                and is likely a data class, an implementation may look like: `{ copy(response = it) }`.
      */
     protected fun <T> Flow<T>.execute(
         dispatcher: CoroutineDispatcher? = null,
@@ -270,7 +270,7 @@ abstract class MavericksViewModel<S : MavericksState>(
      * @param dispatcher A custom coroutine dispatcher that the coroutine will run on. If null, uses the dispatcher in [viewModelScope],
      *                  which defaults to [Dispatchers.Main.immediate] and can be overridden globally with [Mavericks.initialize].
      * @param reducer A reducer that is applied to the current state and should return the new state. Because the state is the receiver
-     *                and it likely a data class, an implementation may look like: `{ copy(response = it) }`.
+     *                and is likely a data class, an implementation may look like: `{ copy(response = it) }`.
      */
     protected fun <T> Flow<T>.setOnEach(
         dispatcher: CoroutineDispatcher? = null,
