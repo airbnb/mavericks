@@ -226,7 +226,7 @@ abstract class MavericksViewModel<S : MavericksState>(
             } catch (e: CancellationException) {
                 @Suppress("RethrowCaughtException")
                 throw e
-            } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
+            } catch (@Suppress("TooGenericExceptionCaught") e: Throwable) {
                 setState { reducer(Fail(e, value = retainValue?.get(this)?.invoke())) }
             }
         }
