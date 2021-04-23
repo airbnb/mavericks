@@ -186,7 +186,7 @@ abstract class MavericksViewModel<S : MavericksState>(
      * @param reducer A reducer that is applied to the current state and should return the new state. Because the state is the receiver
      *                and is likely a data class, an implementation may look like: `{ copy(response = it) }`.
      */
-    protected fun <T : Any?> Deferred<T>.execute(
+    protected open fun <T : Any?> Deferred<T>.execute(
         dispatcher: CoroutineDispatcher? = null,
         retainValue: KProperty1<S, Async<T>>? = null,
         reducer: S.(Async<T>) -> S
@@ -203,7 +203,7 @@ abstract class MavericksViewModel<S : MavericksState>(
      * @param reducer A reducer that is applied to the current state and should return the new state. Because the state is the receiver
      *                and is likely a data class, an implementation may look like: `{ copy(response = it) }`.
      */
-    protected fun <T : Any?> (suspend () -> T).execute(
+    protected open fun <T : Any?> (suspend () -> T).execute(
         dispatcher: CoroutineDispatcher? = null,
         retainValue: KProperty1<S, Async<T>>? = null,
         reducer: S.(Async<T>) -> S
@@ -243,7 +243,7 @@ abstract class MavericksViewModel<S : MavericksState>(
      * @param reducer A reducer that is applied to the current state and should return the new state. Because the state is the receiver
      *                and is likely a data class, an implementation may look like: `{ copy(response = it) }`.
      */
-    protected fun <T> Flow<T>.execute(
+    protected open fun <T> Flow<T>.execute(
         dispatcher: CoroutineDispatcher? = null,
         retainValue: KProperty1<S, Async<T>>? = null,
         reducer: S.(Async<T>) -> S
@@ -272,7 +272,7 @@ abstract class MavericksViewModel<S : MavericksState>(
      * @param reducer A reducer that is applied to the current state and should return the new state. Because the state is the receiver
      *                and is likely a data class, an implementation may look like: `{ copy(response = it) }`.
      */
-    protected fun <T> Flow<T>.setOnEach(
+    protected open fun <T> Flow<T>.setOnEach(
         dispatcher: CoroutineDispatcher? = null,
         reducer: S.(T) -> S
     ): Job {
