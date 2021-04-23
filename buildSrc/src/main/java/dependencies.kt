@@ -2,8 +2,8 @@ object Versions {
     // Build tools and SDK
     const val buildTools = "30.0.3"
     const val compileSdk = 30
-    const val gradlePlugin = "7.0.0-alpha08"
-    const val kotlin = "1.4.30"
+    const val gradlePlugin = "7.0.0-alpha14"
+    const val kotlin = "1.4.32"
     const val minSdk = 16
     const val targetSdk = 29
 
@@ -31,7 +31,7 @@ object Versions {
     const val epoxy = "4.0.0"
     const val hilt = "2.31.1-alpha"
     const val koin = "2.0.1"
-    const val kotlinCoroutines = "1.4.1"
+    const val kotlinCoroutines = "1.4.3"
     const val lottie = "3.4.0"
     const val moshi = "1.9.2"
     const val multidex = "2.0.1"

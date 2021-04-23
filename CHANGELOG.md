@@ -1,4 +1,8 @@
 # Change Log
+## 2.2.0
+- Fix subscriptionLifecycleOwner to use viewLifecycleOwner in Fragment's onCreateView (#533)
+- Remove createUnsafe and don't auto-subscribe on background threads (#525)
+- Fix lifecycle 2.3.0 throwing IllegalStateException when using `MavericksLauncherActivity` (#523)
 
 ## 2.1.0
 - Upgraded to Kotlin 1.4.30.

@@ -3,6 +3,7 @@ import com.airbnb.mvrx.AndroidMetaModulePlugin
 buildscript {
     repositories {
         google()
+        mavenCentral()
         jcenter()
     }
     dependencies {
@@ -13,7 +14,9 @@ buildscript {
 
         // Upload with:
         // ./gradlew clean assemble uploadArchives --no-daemon --no-parallel
-        classpath "com.vanniktech:gradle-maven-publish-plugin:0.12.0"
+        classpath "com.vanniktech:gradle-maven-publish-plugin:0.14.2"
+        // Dokka is needed on classpath for vanniktech publish plugin
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.4.30"
     }
 
     configurations.all {
@@ -38,6 +41,7 @@ allprojects {
 
     repositories {
         google()
+        mavenCentral()
         jcenter()
     }
 }
