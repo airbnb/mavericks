@@ -1,7 +1,6 @@
 apply plugin: "com.android.application"
 apply plugin: "kotlin-android"
 apply plugin: "kotlin-kapt"
-apply plugin: "kotlin-android-extensions"
 
 android {
 
@@ -9,6 +8,7 @@ android {
         applicationId "com.airbnb.mvrx.dogs"
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
     }
 
     buildFeatures {
@@ -23,10 +23,12 @@ dependencies {
     implementation Libraries.coreKtx
     implementation Libraries.epoxy
     implementation Libraries.lottie
+    implementation Libraries.multidex
     implementation Libraries.navigationFragmentKtx
     implementation Libraries.navigationUiKtx
     implementation Libraries.picasso
     implementation project(":mvrx-rxjava2")
+    implementation project(":view-binding-utils")
 
     testImplementation TestLibraries.junit
     testImplementation project(":testing")

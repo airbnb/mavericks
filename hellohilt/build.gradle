@@ -30,4 +30,5 @@ dependencies {
     kapt AnnotationProcessors.hilt
     implementation Libraries.hilt
     implementation project(":mvrx-rxjava2")
+    implementation project(":view-binding-utils")
 }

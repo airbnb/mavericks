@@ -1,12 +1,15 @@
 apply plugin: "com.android.application"
 apply plugin: "kotlin-android"
-apply plugin: "kotlin-android-extensions"
 
 android {
     defaultConfig {
         applicationId 'com.airbnb.mvrx.counter'
         versionCode 1
         versionName '1.0'
+    }
+
+    buildFeatures {
+        viewBinding true
     }
 }
 
@@ -17,6 +20,7 @@ dependencies {
     implementation Libraries.lifecycleCommon
 
     implementation project(":mvrx")
+    implementation project(":view-binding-utils")
 
     testImplementation TestLibraries.junit
     testImplementation project(":testing")

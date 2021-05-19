@@ -9,7 +9,7 @@ import com.airbnb.epoxy.ModelView
 import com.airbnb.epoxy.TextProp
 import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.databinding.MarqueeBinding
-import com.airbnb.mvrx.sample.utils.viewBinding
+import com.airbnb.mvrx.viewbinding.viewBinding
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)
 class Marquee @JvmOverloads constructor(
@@ -17,7 +17,7 @@ class Marquee @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : LinearLayout(context, attrs, defStyleAttr) {
-    private val binding by viewBinding<MarqueeBinding>()
+    private val binding: MarqueeBinding by viewBinding()
 
     init {
         orientation = VERTICAL

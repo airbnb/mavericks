@@ -8,9 +8,9 @@ import com.airbnb.mvrx.activityViewModel
 import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.databinding.FlowIntroFragmentBinding
-import com.airbnb.mvrx.sample.utils.viewBinding
 import com.airbnb.mvrx.sample.views.basicRow
 import com.airbnb.mvrx.sample.views.marquee
+import com.airbnb.mvrx.viewbinding.viewBinding
 
 class FlowIntroFragment : BaseFragment(R.layout.flow_intro_fragment) {
     private val binding: FlowIntroFragmentBinding by viewBinding()

@@ -34,7 +34,7 @@ import com.airbnb.mvrx.todomvrx.util.simpleController
 import com.airbnb.mvrx.todomvrx.views.addEditView
 import com.airbnb.mvrx.withState
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @SuppressLint("ParcelCreator")
 @Parcelize
@@ -77,7 +77,6 @@ class AddEditTaskFragment : BaseFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         fab.setImageResource(R.drawable.ic_done)
         fab.setOnClickListener {
             withState(taskViewModel, viewModel) { thisTaskState, allTaskState ->

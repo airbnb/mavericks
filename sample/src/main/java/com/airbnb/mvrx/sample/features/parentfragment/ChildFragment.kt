@@ -6,7 +6,7 @@ import com.airbnb.mvrx.parentFragmentViewModel
 import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.databinding.ChildFragmentBinding
-import com.airbnb.mvrx.sample.utils.viewBinding
+import com.airbnb.mvrx.viewbinding.viewBinding
 import com.airbnb.mvrx.withState
 
 class ChildFragment : BaseFragment(R.layout.child_fragment) {
