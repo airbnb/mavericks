@@ -9,7 +9,7 @@ object Versions {
 
     // Android libraries
     const val activity = "1.2.3"
-    const val activityCompose = "1.3.0-alpha03"
+    const val activityCompose = "1.3.0-alpha08"
     const val appcompat = "1.3.0"
     const val arch = "2.1.0"
     const val cardview = "1.0.0"
