@@ -1,4 +1,5 @@
 package com.airbnb.mvrx.viewbinding
+
 import android.os.Handler
 import android.os.Looper
 import android.view.View
