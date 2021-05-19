@@ -21,7 +21,7 @@ import com.airbnb.mvrx.sample.databinding.RandomDadJokeFragmentBinding
 import com.airbnb.mvrx.sample.features.dadjoke.mocks.mockRandomDadJokeState
 import com.airbnb.mvrx.sample.models.Joke
 import com.airbnb.mvrx.sample.network.DadJokeService
-import com.airbnb.mvrx.sample.utils.viewBinding
+import com.airbnb.mvrx.viewbinding.viewBinding
 import com.airbnb.mvrx.withState
 import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.android.inject

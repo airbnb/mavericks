@@ -1,4 +1,4 @@
-package com.airbnb.mvrx.sample.utils
+package com.airbnb.mvrx.viewbinding
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

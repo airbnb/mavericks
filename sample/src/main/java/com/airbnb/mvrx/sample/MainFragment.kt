@@ -7,9 +7,9 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.airbnb.mvrx.launcher.MavericksLauncherActivity
 import com.airbnb.mvrx.sample.databinding.MainFragmentBinding
-import com.airbnb.mvrx.sample.utils.viewBinding
 import com.airbnb.mvrx.sample.views.basicRow
 import com.airbnb.mvrx.sample.views.marquee
+import com.airbnb.mvrx.viewbinding.viewBinding
 
 class MainFragment : Fragment(R.layout.main_fragment) {
     private val binding: MainFragmentBinding by viewBinding()

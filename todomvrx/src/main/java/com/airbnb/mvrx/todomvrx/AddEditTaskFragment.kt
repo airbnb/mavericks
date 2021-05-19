@@ -34,7 +34,7 @@ import com.airbnb.mvrx.todomvrx.util.simpleController
 import com.airbnb.mvrx.todomvrx.views.addEditView
 import com.airbnb.mvrx.withState
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @SuppressLint("ParcelCreator")
 @Parcelize

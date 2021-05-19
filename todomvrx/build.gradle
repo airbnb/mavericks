@@ -1,7 +1,7 @@
 apply plugin: "com.android.application"
 apply plugin: "kotlin-android"
-apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
+apply plugin: "kotlin-parcelize"
 
 android {
 
@@ -12,6 +12,10 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
+    }
+
+    buildFeatures {
+        viewBinding true
     }
 }
 
@@ -35,6 +39,7 @@ dependencies {
     implementation Libraries.multidex
     implementation project(":mvrx-rxjava2")
     implementation project(':mvrx-mocking')
+    implementation project(':view-binding-utils')
 
     testImplementation TestLibraries.junit
     testImplementation TestLibraries.mockitoKotlin

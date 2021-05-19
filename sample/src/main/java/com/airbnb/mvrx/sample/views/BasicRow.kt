@@ -8,7 +8,7 @@ import com.airbnb.epoxy.CallbackProp
 import com.airbnb.epoxy.ModelView
 import com.airbnb.epoxy.TextProp
 import com.airbnb.mvrx.sample.databinding.BasicRowBinding
-import com.airbnb.mvrx.sample.utils.viewBinding
+import com.airbnb.mvrx.viewbinding.viewBinding
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)
 class BasicRow @JvmOverloads constructor(

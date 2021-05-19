@@ -8,7 +8,7 @@ import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.Uninitialized
 import com.airbnb.mvrx.fragmentViewModel
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import org.hamcrest.core.IsEqual
 import org.hamcrest.core.StringContains
 import org.hamcrest.core.StringEndsWith

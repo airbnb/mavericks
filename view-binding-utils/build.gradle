@@ -1,0 +1,18 @@
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
+
+android {
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+dependencies {
+    implementation Libraries.lifecycleCommon
+    implementation Libraries.fragmentKtx
+
+    implementation project(":mvrx")
+
+    testImplementation TestLibraries.junit
+    testImplementation project(":testing")
+}

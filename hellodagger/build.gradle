@@ -1,6 +1,5 @@
 apply plugin: "com.android.application"
 apply plugin: "kotlin-android"
-apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
 
 android {
@@ -29,6 +28,10 @@ android {
             keyPassword "testing"
         }
     }
+
+    buildFeatures {
+        viewBinding true
+    }
 }
 
 dependencies {
@@ -45,6 +48,7 @@ dependencies {
     implementation project(":mvrx")
     implementation project(":mvrx-mocking")
     implementation project(":launcher")
+    implementation project(":view-binding-utils")
 
     debugImplementation Libraries.fragmentTesting
 

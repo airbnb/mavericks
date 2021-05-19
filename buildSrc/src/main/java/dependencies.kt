@@ -2,28 +2,28 @@ object Versions {
     // Build tools and SDK
     const val buildTools = "30.0.3"
     const val compileSdk = 30
-    const val gradlePlugin = "7.0.0-alpha14"
+    const val gradlePlugin = "7.0.0-beta01"
     const val kotlin = "1.4.32"
     const val minSdk = 16
     const val targetSdk = 29
 
     // Android libraries
-    const val activity = "1.2.0"
-    const val activityCompose = "1.3.0-alpha03"
-    const val appcompat = "1.2.0"
+    const val activity = "1.2.3"
+    const val activityCompose = "1.3.0-alpha08"
+    const val appcompat = "1.3.0"
     const val arch = "2.1.0"
     const val cardview = "1.0.0"
     const val constraintlayout = "2.0.0"
     const val coordinatorLayout = "1.1.0"
-    const val compose = "1.0.0-beta01"
-    const val core = "1.3.1"
-    const val fragment = "1.3.0"
-    const val lifecycle = "2.2.0"
-    const val navigation = "2.3.0"
-    const val navigationCompose = "1.0.0-alpha08"
-    const val recyclerview = "1.1.0"
-    const val room = "2.2.5"
-    const val viewModelCompose = "1.0.0-alpha02"
+    const val compose = "1.0.0-beta07"
+    const val core = "1.5.0"
+    const val fragment = "1.3.4"
+    const val lifecycle = "2.3.1"
+    const val navigation = "2.3.5"
+    const val navigationCompose = "2.4.0-alpha01"
+    const val recyclerview = "1.2.0"
+    const val room = "2.3.0"
+    const val viewModelCompose = "1.0.0-alpha05"
 
     // Libraries
     const val autoValue = "1.6.6"

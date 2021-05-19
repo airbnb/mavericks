@@ -7,6 +7,9 @@ include ':mvrx-rxjava2'
 include ':launcher'
 include ':testing'
 
+// Utils
+include ':view-binding-utils'
+
 // Samples
 include ':counter'
 include ':dogs'

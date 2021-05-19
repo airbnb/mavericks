@@ -10,7 +10,7 @@ import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.core.MvRxViewModel
 import com.airbnb.mvrx.sample.databinding.HelloWorldFragmentBinding
-import com.airbnb.mvrx.sample.utils.viewBinding
+import com.airbnb.mvrx.viewbinding.viewBinding
 import com.airbnb.mvrx.withState
 
 data class HelloWorldState(val title: String = "Hello World") : MavericksState

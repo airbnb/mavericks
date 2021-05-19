@@ -1,6 +1,5 @@
 apply plugin: "com.android.application"
 apply plugin: "kotlin-android"
-apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
 
 android {
@@ -35,6 +34,7 @@ dependencies {
     implementation project(':mvrx-mocking')
     // In real apps this should be debugImplementation so that the launcher isn't included in production!
     implementation project(':launcher')
+    implementation project(':view-binding-utils')
 
     implementation Libraries.appcompat
     implementation Libraries.constraintlayout

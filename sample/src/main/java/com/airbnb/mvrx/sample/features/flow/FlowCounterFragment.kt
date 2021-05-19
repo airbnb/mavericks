@@ -8,7 +8,7 @@ import com.airbnb.mvrx.existingViewModel
 import com.airbnb.mvrx.sample.R
 import com.airbnb.mvrx.sample.core.BaseFragment
 import com.airbnb.mvrx.sample.databinding.FlowCounterFragmentBinding
-import com.airbnb.mvrx.sample.utils.viewBinding
+import com.airbnb.mvrx.viewbinding.viewBinding
 import com.airbnb.mvrx.withState
 
 class FlowCounterFragment : BaseFragment(R.layout.flow_counter_fragment) {
