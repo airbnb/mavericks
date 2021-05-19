@@ -77,6 +77,7 @@ class AddEditTaskFragment : BaseFragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         fab.setImageResource(R.drawable.ic_done)
         fab.setOnClickListener {
             withState(taskViewModel, viewModel) { thisTaskState, allTaskState ->
