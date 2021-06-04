@@ -32,6 +32,7 @@ fun <T : Fragment> T._fragmentArgsProvider(): Any? = arguments?.get(Mavericks.KE
  */
 inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T.fragmentViewModel(
     viewModelClass: KClass<VM> = VM::class,
+    stateClass: KClass<out S> = S::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ): MavericksDelegateProvider<T, VM> where T : Fragment, T : MavericksView =
     viewModelDelegateProvider(
@@ -41,7 +42,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
     ) { stateFactory ->
         MavericksViewModelProvider.get(
             viewModelClass = viewModelClass.java,
-            stateClass = S::class.java,
+            stateClass = stateClass.java,
             viewModelContext = FragmentViewModelContext(
                 activity = requireActivity(),
                 args = _fragmentArgsProvider(),
@@ -59,6 +60,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
  */
 inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T.parentFragmentViewModel(
     viewModelClass: KClass<VM> = VM::class,
+    stateClass: KClass<out S> = S::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ): MavericksDelegateProvider<T, VM> where T : Fragment, T : MavericksView =
     viewModelDelegateProvider(
@@ -83,7 +85,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
             try {
                 return@viewModelDelegateProvider MavericksViewModelProvider.get(
                     viewModelClass = viewModelClass.java,
-                    stateClass = S::class.java,
+                    stateClass = stateClass.java,
                     viewModelContext = FragmentViewModelContext(
                         activity = this.requireActivity(),
                         args = _fragmentArgsProvider(),
@@ -110,7 +112,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
 
         MavericksViewModelProvider.get(
             viewModelClass = viewModelClass.java,
-            stateClass = S::class.java,
+            stateClass = stateClass.java,
             viewModelContext = viewModelContext,
             key = keyFactory(),
             initialStateFactory = stateFactory
@@ -122,6 +124,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
  */
 inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T.targetFragmentViewModel(
     viewModelClass: KClass<VM> = VM::class,
+    stateClass: KClass<out S> = S::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ): MavericksDelegateProvider<T, VM> where T : Fragment, T : MavericksView =
     viewModelDelegateProvider(
@@ -140,7 +143,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
 
         MavericksViewModelProvider.get(
             viewModelClass = viewModelClass.java,
-            stateClass = S::class.java,
+            stateClass = stateClass.java,
             viewModelContext = FragmentViewModelContext(
                 activity = requireActivity(),
                 args = targetFragment._fragmentArgsProvider(),
@@ -157,6 +160,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
  */
 inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T.existingViewModel(
     viewModelClass: KClass<VM> = VM::class,
+    stateClass: KClass<out S> = S::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ): MavericksDelegateProvider<T, VM> where T : Fragment, T : MavericksView =
     viewModelDelegateProvider(
@@ -167,7 +171,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
 
         MavericksViewModelProvider.get(
             viewModelClass = viewModelClass.java,
-            stateClass = S::class.java,
+            stateClass = stateClass.java,
             viewModelContext = ActivityViewModelContext(
                 requireActivity(),
                 _fragmentArgsProvider()
@@ -183,6 +187,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
  */
 inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T.activityViewModel(
     viewModelClass: KClass<VM> = VM::class,
+    stateClass: KClass<out S> = S::class,
     noinline keyFactory: () -> String = { viewModelClass.java.name }
 ): MavericksDelegateProvider<T, VM> where T : Fragment, T : MavericksView =
     viewModelDelegateProvider(
@@ -193,7 +198,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
 
         MavericksViewModelProvider.get(
             viewModelClass = viewModelClass.java,
-            stateClass = S::class.java,
+            stateClass = stateClass.java,
             viewModelContext = ActivityViewModelContext(
                 activity = requireActivity(),
                 args = _fragmentArgsProvider()
@@ -208,11 +213,12 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
  */
 inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T.viewModel(
     viewModelClass: KClass<VM> = VM::class,
+    stateClass: KClass<out S> = S::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ) where T : ComponentActivity = lifecycleAwareLazy(this) {
     MavericksViewModelProvider.get(
         viewModelClass = viewModelClass.java,
-        stateClass = S::class.java,
+        stateClass = stateClass.java,
         viewModelContext = ActivityViewModelContext(this, intent.extras?.get(Mavericks.KEY_ARG)),
         key = keyFactory()
     )
