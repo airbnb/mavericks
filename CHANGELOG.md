@@ -1,4 +1,11 @@
 # Change Log
+
+## 2.3.0
+- Error handling enhancements (#540)
+- Upgraded Compose to beta07 (#549)
+
+Note: Compose support is experimental and mvrx-compose artifact is at version 2.1.0-alpha02
+
 ## 2.2.0
 - Fix subscriptionLifecycleOwner to use viewLifecycleOwner in Fragment's onCreateView (#533)
 - Remove createUnsafe and don't auto-subscribe on background threads (#525)
