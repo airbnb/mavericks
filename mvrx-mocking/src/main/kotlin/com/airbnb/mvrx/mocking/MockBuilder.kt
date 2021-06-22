@@ -111,7 +111,7 @@ inline fun <reified V : MockableMavericksView> V.combineMocks(
  * @see mockNoViewModels
  */
 fun <V : MockableMavericksView, Args : Parcelable, S : MavericksState> V.mockSingleViewModel(
-    viewModelReference: KProperty1<V, MavericksViewModel<S>>,
+    viewModelReference: KProperty1<V, MavericksViewModel<out S>>,
     defaultState: S,
     defaultArgs: Args?,
     mockBuilder: SingleViewModelMockBuilder<V, Args, S>.() -> Unit
@@ -504,7 +504,7 @@ class MavericksMock<V : MavericksView, Args : Parcelable> @PublishedApi internal
  * A mocked State value and a reference to the ViewModel that the State is intended for.
  */
 data class MockState<V : MavericksView, S : MavericksState> internal constructor(
-    val viewModelProperty: KProperty1<V, MavericksViewModel<S>>,
+    val viewModelProperty: KProperty1<V, MavericksViewModel<out S>>,
     val state: S
 )
 
@@ -512,7 +512,7 @@ data class MockState<V : MavericksView, S : MavericksState> internal constructor
  * Provides a DSL for defining variations to the default mock state.
  */
 class SingleViewModelMockBuilder<V : MockableMavericksView, Args : Parcelable, S : MavericksState> internal constructor(
-    private val viewModelReference: KProperty1<V, MavericksViewModel<S>>,
+    private val viewModelReference: KProperty1<V, MavericksViewModel<out S>>,
     private val defaultState: S,
     defaultArgs: Args?
 ) : MockBuilder<V, Args>(defaultArgs, viewModelReference.pairDefault(defaultState)) {
@@ -568,7 +568,7 @@ class SingleViewModelMockBuilder<V : MockableMavericksView, Args : Parcelable, S
     }
 }
 
-private fun <V : MockableMavericksView, S : MavericksState, VM : MavericksViewModel<S>> KProperty1<V, VM>.pairDefault(
+private fun <V : MockableMavericksView, S : MavericksState, VM : MavericksViewModel<out S>> KProperty1<V, VM>.pairDefault(
     state: MavericksState
 ): Pair<KProperty1<V, MavericksViewModel<MavericksState>>, MavericksState> {
     @Suppress("UNCHECKED_CAST")

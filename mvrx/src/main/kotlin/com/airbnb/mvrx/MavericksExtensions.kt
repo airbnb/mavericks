@@ -32,7 +32,7 @@ fun <T : Fragment> T._fragmentArgsProvider(): Any? = arguments?.get(Mavericks.KE
  */
 inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T.fragmentViewModel(
     viewModelClass: KClass<VM> = VM::class,
-    stateClass: KClass<out S> = S::class,
+    stateClass: KClass<S> = S::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
 ): MavericksDelegateProvider<T, VM> where T : Fragment, T : MavericksView =
     viewModelDelegateProvider(
