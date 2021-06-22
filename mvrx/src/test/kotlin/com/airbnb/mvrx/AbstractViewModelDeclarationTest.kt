@@ -15,11 +15,7 @@ data class ChildState(val string: String = "value") : ParentState()
 open class FragmentWithAbstractViewModelDeclaration: Fragment(), MavericksView {
     protected val parentViewModel: ParentViewModel<out ParentState> by fragmentViewModel(viewModelClass = ChildViewModel::class, stateClass = ChildState::class)
 
-    override fun invalidate() {
-        withState(parentViewModel) {
-
-        }
-    }
+    override fun invalidate() {}
 }
 
 class AbstractViewModelDeclarationTest : BaseTest() {
