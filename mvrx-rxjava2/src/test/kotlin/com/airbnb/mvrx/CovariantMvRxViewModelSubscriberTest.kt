@@ -23,7 +23,6 @@ class CovariantMvRxViewModelSubscriberTest : BaseTest() {
     class FragmentWithAbstractMvrxViewModelDeclaration : Fragment(), MvRxView {
         private val parentMvRxViewModel: ParentMvRxViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildMvRxViewModel::class,
-            stateClass = ChildState::class
         )
 
         override fun onCreate(savedInstanceState: Bundle?) {

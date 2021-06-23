@@ -1,8 +1,12 @@
 package com.airbnb.mvrx
 
+import android.os.Parcelable
+import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.testing.launchFragment
+import kotlinx.parcelize.Parcelize
 import org.junit.Test
+import kotlin.reflect.KClass
 
 abstract class ParentViewModel<S : ParentState>(initialState: S) : MavericksViewModel<S>(initialState)
 
@@ -12,10 +16,27 @@ class ChildViewModel(initialState: ChildState) : ParentViewModel<ChildState>(ini
 
 data class ChildState(val string: String = "value") : ParentState()
 
-open class FragmentWithAbstractViewModelDeclaration: Fragment(), MavericksView {
-    protected val parentViewModel: ParentViewModel<out ParentState> by fragmentViewModel(viewModelClass = ChildViewModel::class, stateClass = ChildState::class)
+@Parcelize
+class FragmentWithAbstractViewModelDeclarationArgs(
+    val viewModelClass: Class<out ParentViewModel<out ParentState>>,
+    val stateClass: Class<out ParentState>
+) : Parcelable {
+    constructor(viewModelClass: KClass<out ParentViewModel<out ParentState>>, stateClass: KClass<out ParentState>) : this(
+        viewModelClass.java,
+        stateClass.java
+    )
+}
 
-    override fun invalidate() {}
+open class FragmentWithAbstractViewModelDeclaration : Fragment(), MavericksView {
+    private val args: FragmentWithAbstractViewModelDeclarationArgs by args()
+
+    val parentViewModel: ParentViewModel<out ParentState> by fragmentViewModel(
+        viewModelClass = args.viewModelClass.kotlin,
+        stateClass = args.stateClass.kotlin
+    )
+
+    override fun invalidate() {
+    }
 }
 
 class AbstractViewModelDeclarationTest : BaseTest() {
@@ -25,7 +46,13 @@ class AbstractViewModelDeclarationTest : BaseTest() {
      * an abstract parent class.
      */
     @Test
-    fun testFragmentCreationDoesNotError() {
-        launchFragment<FragmentWithAbstractViewModelDeclaration>()
+    fun testFragmentIsCreatedWithCorrectViewModelType() {
+        launchFragment<FragmentWithAbstractViewModelDeclaration>(
+            bundleOf(
+                Mavericks.KEY_ARG to FragmentWithAbstractViewModelDeclarationArgs(
+                    ChildViewModel::class, ChildState::class
+                )
+            )
+        ).onFragment { assert(it.parentViewModel is ChildViewModel) }
     }
 }

@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.map
 import kotlin.reflect.KProperty1
 
 @InternalMavericksApi
-fun <VM : MavericksViewModel<S>, S : MavericksState> VM._internal(
+fun <VM : MavericksViewModel<out S>, S : MavericksState> VM._internal(
     owner: LifecycleOwner?,
     deliveryMode: DeliveryMode = RedeliverOnStart,
     action: suspend (S) -> Unit

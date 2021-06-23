@@ -8,19 +8,15 @@ class CovariantStateTest : BaseTest() {
     class FragmentWithFiveAbstractViewModelDeclarations : FragmentWithAbstractViewModelDeclaration() {
         private val parentViewModel2: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
         )
         private val parentViewModel3: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
         )
         private val parentViewModel4: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
         )
         private val parentViewModel5: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
         )
 
         override fun onCreate(savedInstanceState: Bundle?) {

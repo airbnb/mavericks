@@ -18,7 +18,7 @@ class CovariantStateMockTest : BaseTest() {
     class FragmentWithParentViewModelDeclarationAndMocks : Fragment(), MockableMavericksView {
         private val parentViewModel: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
 
         override fun invalidate() {}
@@ -33,11 +33,11 @@ class CovariantStateMockTest : BaseTest() {
     class FragmentWithTwoParentViewModelDeclarationsAndMocks : Fragment(), MockableMavericksView {
         private val parentViewModel1: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel2: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
 
         override fun invalidate() {}
@@ -54,15 +54,15 @@ class CovariantStateMockTest : BaseTest() {
     class FragmentWithThreeParentViewModelDeclarationsAndMocks : Fragment(), MockableMavericksView {
         private val parentViewModel1: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel2: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel3: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
 
         override fun invalidate() {}
@@ -81,19 +81,19 @@ class CovariantStateMockTest : BaseTest() {
     class FragmentWithFourParentViewModelDeclarationsAndMocks : Fragment(), MockableMavericksView {
         private val parentViewModel1: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel2: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel3: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel4: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
 
         override fun invalidate() {}
@@ -114,23 +114,23 @@ class CovariantStateMockTest : BaseTest() {
     class FragmentWithFiveParentViewModelDeclarationsAndMocks : Fragment(), MockableMavericksView {
         private val parentViewModel1: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel2: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel3: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel4: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel5: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
 
         override fun invalidate() {}
@@ -153,27 +153,27 @@ class CovariantStateMockTest : BaseTest() {
     class FragmentWithSixParentViewModelDeclarationsAndMocks : Fragment(), MockableMavericksView {
         private val parentViewModel1: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel2: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel3: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel4: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel5: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel6: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
 
         override fun invalidate() {}
@@ -198,31 +198,31 @@ class CovariantStateMockTest : BaseTest() {
     class FragmentWithSevenParentViewModelDeclarationsAndMocks : Fragment(), MockableMavericksView {
         private val parentViewModel1: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel2: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel3: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel4: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel5: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel6: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
         private val parentViewModel7: ParentViewModel<out ParentState> by fragmentViewModel(
             viewModelClass = ChildViewModel::class,
-            stateClass = ChildState::class
+            stateClass = ChildState::class,
         )
 
         override fun invalidate() {}
