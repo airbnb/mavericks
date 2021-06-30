@@ -12,7 +12,6 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -673,7 +672,7 @@ class ViewModelSubscriberTest : BaseTest() {
     }
 
     @Test
-    fun testSubscribeNotCalledOnStartIfNoUpdateOccurredInStop() {
+    fun testUniqueOnlySubscribeNotCalledOnStartIfNoUpdateOccurredInStop() {
         owner.lifecycle.currentState = Lifecycle.State.STARTED
 
         var callCount = 0

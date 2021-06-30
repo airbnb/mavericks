@@ -7,6 +7,8 @@ import kotlin.reflect.KProperty1
  * See: [RedeliverOnStart], [UniqueOnly].
  */
 sealed class DeliveryMode {
+    abstract val subscriptionId: String
+
     internal fun appendPropertiesToId(vararg properties: KProperty1<*, *>): DeliveryMode {
         return when (this) {
             is RedeliverOnStart -> RedeliverOnStart
@@ -21,11 +23,13 @@ sealed class DeliveryMode {
  *
  * Likewise, when a [MavericksView] resubscribes after a configuration change the most recent update will always be emitted.
  */
-object RedeliverOnStart : DeliveryMode()
+object RedeliverOnStart : DeliveryMode() {
+    override val subscriptionId: String = RedeliverOnStart::javaClass.name
+}
 
 /**
  * The subscription will receive the most recent state update when transitioning from locked to unlocked states (stopped -> started),
- * only if the state has changed while locked.
+ * only if the state has changed while locked. This will include the initial state as a state update.
  *
  * Likewise, when a [MavericksView] resubscribes after a configuration change the most recent update will only be emitted
  * if the state has changed while locked.
@@ -33,4 +37,4 @@ object RedeliverOnStart : DeliveryMode()
  * @param subscriptionId A uniqueIdentifier for this subscription. It is an error for two unique only subscriptions to
  * have the same id.
  */
-class UniqueOnly(val subscriptionId: String) : DeliveryMode()
+class UniqueOnly(override val subscriptionId: String) : DeliveryMode()

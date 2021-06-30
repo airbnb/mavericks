@@ -26,8 +26,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import java.util.Collections
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KProperty1
 
 /**
@@ -38,8 +36,6 @@ abstract class BaseMvRxViewModel<S : MavericksState>(
 ) : MavericksViewModel<S>(initialState) {
     private val tag by lazy { javaClass.simpleName }
     private val disposables = CompositeDisposable()
-    private val lastDeliveredStates = ConcurrentHashMap<String, Any>()
-    private val activeSubscriptions = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
     /**
      * Define a [LifecycleOwner] to control subscriptions between [BaseMvRxViewModel]s. This only

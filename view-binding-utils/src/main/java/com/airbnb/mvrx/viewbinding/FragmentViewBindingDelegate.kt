@@ -7,7 +7,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
+import kotlinx.coroutines.launch
 import kotlin.properties.ReadOnlyProperty
 import kotlin.reflect.KProperty
 
@@ -21,16 +23,18 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
     private val bindMethod = bindingClass.getMethod("bind", View::class.java)
 
     init {
-        fragment.viewLifecycleOwnerLiveData.observe(fragment) { viewLifecycleOwner ->
-            viewLifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
-                @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-                fun onDestroy() {
-                    // Lifecycle listeners are called before onDestroyView in a Fragment.
-                    // However, we want views to be able to use bindings in onDestroyView
-                    // to do cleanup so we clear the reference one frame later.
-                    clearBindingHandler.post { binding = null }
-                }
-            })
+        fragment.lifecycleScope.launch {
+            fragment.viewLifecycleOwnerLiveData.observe(fragment) { viewLifecycleOwner ->
+                viewLifecycleOwner.lifecycle.addObserver(object : LifecycleObserver {
+                    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+                    fun onDestroy() {
+                        // Lifecycle listeners are called before onDestroyView in a Fragment.
+                        // However, we want views to be able to use bindings in onDestroyView
+                        // to do cleanup so we clear the reference one frame later.
+                        clearBindingHandler.post { binding = null }
+                    }
+                })
+            }
         }
     }
 

@@ -7,6 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.map
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -22,6 +24,7 @@ open class ViewSubscriberFragment : Fragment(), MavericksView {
 
     var subscribeCallCount = 0
     var subscribeUniqueOnlyCallCount = 0
+    var subscribeCustomCallCount = 0
 
     var selectSubscribeValue = -1
     var selectSubscribeCallCount = 0
@@ -29,15 +32,22 @@ open class ViewSubscriberFragment : Fragment(), MavericksView {
     var selectSubscribeUniqueOnlyValue = -1
     var selectSubscribeUniqueOnlyCallCount = 0
 
+    var selectSubscribeCustomValue = -1
+    var selectSubscribeCustomCallCount = 0
+
     var invalidateCallCount = 0
 
     var viewCreatedSubscribeCallCount = 0
     var viewCreatedUniqueOnlyCallCount = 0
+    var viewCreatedCustomCallCount = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel.onEach { subscribeCallCount++ }
         viewModel.onEach(uniqueOnly("onCreate")) { subscribeUniqueOnlyCallCount++ }
+        viewModel.stateFlow.drop(1).collectLatest(UniqueOnly("onCreate_Custom")) {
+            subscribeCustomCallCount++
+        }
 
         viewModel.onEach(ViewSubscriberState::foo) {
             selectSubscribeValue = it
@@ -46,6 +56,13 @@ open class ViewSubscriberFragment : Fragment(), MavericksView {
         viewModel.onEach(ViewSubscriberState::foo, uniqueOnly("onCreate")) {
             selectSubscribeUniqueOnlyValue = it
             selectSubscribeUniqueOnlyCallCount++
+        }
+
+        viewModel.stateFlow.map { MavericksTuple1(ViewSubscriberState::foo.get(it)) }.drop(1).collectLatest(
+            UniqueOnly("onCreate_Custom").appendPropertiesToId(ViewSubscriberState::foo)
+        ) { (a) ->
+            selectSubscribeCustomValue = a
+            selectSubscribeCustomCallCount++
         }
     }
 
@@ -58,6 +75,9 @@ open class ViewSubscriberFragment : Fragment(), MavericksView {
         super.onViewCreated(view, savedInstanceState)
         viewModel.onEach { viewCreatedSubscribeCallCount++ }
         viewModel.onEach(uniqueOnly("onCreateView")) { viewCreatedUniqueOnlyCallCount++ }
+        viewModel.stateFlow.drop(1).collectLatest(UniqueOnly("onCreateView_Custom")) {
+            viewCreatedCustomCallCount++
+        }
     }
 
     fun setFoo(foo: Int) = viewModel.setFoo(foo)
@@ -104,19 +124,32 @@ class FragmentSubscriberTest : BaseTest() {
     }
 
     @Test
+    fun testSubscribeCustom() {
+        val (_, fragment) = createFragmentInTestActivity<ViewSubscriberFragment>()
+        assertEquals(0, fragment.subscribeCustomCallCount)
+        assertEquals(0, fragment.viewCreatedCustomCallCount)
+
+        // No change in state does not trigger update.
+        fragment.setFoo(0)
+        assertEquals(0, fragment.subscribeCustomCallCount)
+        assertEquals(0, fragment.viewCreatedCustomCallCount)
+
+        fragment.setFoo(1)
+        assertEquals(1, fragment.subscribeCustomCallCount)
+        assertEquals(1, fragment.viewCreatedCustomCallCount)
+    }
+
+    @Test
     fun testSelectSubscribe() {
         val (_, fragment) = createFragmentInTestActivity<ViewSubscriberFragment>()
         assertEquals(0, fragment.selectSubscribeValue)
-        assertEquals(0, fragment.selectSubscribeUniqueOnlyValue)
 
         // No change in state does not trigger update.
         fragment.setFoo(0)
         assertEquals(0, fragment.selectSubscribeValue)
-        assertEquals(0, fragment.selectSubscribeUniqueOnlyValue)
 
         fragment.setFoo(1)
         assertEquals(1, fragment.selectSubscribeValue)
-        assertEquals(1, fragment.selectSubscribeUniqueOnlyValue)
     }
 
     @Test
@@ -130,6 +163,20 @@ class FragmentSubscriberTest : BaseTest() {
 
         fragment.setFoo(1)
         assertEquals(1, fragment.selectSubscribeUniqueOnlyValue)
+    }
+
+    @Test
+    fun testSelectSubscribeCustom() {
+        val (_, fragment) = createFragmentInTestActivity<ViewSubscriberFragment>()
+        assertEquals(-1, fragment.selectSubscribeCustomValue)
+
+        // No change in state does not trigger update.
+        fragment.setFoo(0)
+        assertEquals(-1, fragment.selectSubscribeCustomValue)
+
+        fragment.setFoo(1)
+        assertEquals(1, fragment.selectSubscribeCustomValue)
+        assertEquals(1, fragment.selectSubscribeCustomCallCount)
     }
 
     @Test
@@ -167,6 +214,9 @@ class FragmentSubscriberTest : BaseTest() {
         assertEquals(0, fragment.selectSubscribeUniqueOnlyValue)
         assertEquals(1, fragment.selectSubscribeUniqueOnlyCallCount)
 
+        assertEquals(-1, fragment.selectSubscribeCustomValue)
+        assertEquals(0, fragment.selectSubscribeCustomCallCount)
+
         controller.pause()
         controller.stop()
 
@@ -175,6 +225,9 @@ class FragmentSubscriberTest : BaseTest() {
 
         assertEquals(0, fragment.selectSubscribeUniqueOnlyValue)
         assertEquals(1, fragment.selectSubscribeUniqueOnlyCallCount)
+
+        assertEquals(-1, fragment.selectSubscribeCustomValue)
+        assertEquals(0, fragment.selectSubscribeCustomCallCount)
 
         controller.start()
         controller.resume()
@@ -185,6 +238,9 @@ class FragmentSubscriberTest : BaseTest() {
 
         assertEquals(0, fragment.selectSubscribeUniqueOnlyValue)
         assertEquals(1, fragment.selectSubscribeUniqueOnlyCallCount)
+
+        assertEquals(-1, fragment.selectSubscribeCustomValue)
+        assertEquals(0, fragment.selectSubscribeCustomCallCount)
     }
 
     @Test
@@ -196,6 +252,9 @@ class FragmentSubscriberTest : BaseTest() {
         assertEquals(1, fragment.subscribeUniqueOnlyCallCount)
         assertEquals(1, fragment.viewCreatedUniqueOnlyCallCount)
 
+        assertEquals(0, fragment.subscribeCustomCallCount)
+        assertEquals(0, fragment.viewCreatedCustomCallCount)
+
         controller.pause()
         controller.stop()
 
@@ -206,6 +265,9 @@ class FragmentSubscriberTest : BaseTest() {
         assertEquals(1, fragment.subscribeUniqueOnlyCallCount)
         assertEquals(1, fragment.viewCreatedUniqueOnlyCallCount)
 
+        assertEquals(0, fragment.subscribeCustomCallCount)
+        assertEquals(0, fragment.viewCreatedCustomCallCount)
+
         controller.start()
         controller.resume()
 
@@ -214,6 +276,9 @@ class FragmentSubscriberTest : BaseTest() {
 
         assertEquals(2, fragment.subscribeUniqueOnlyCallCount)
         assertEquals(2, fragment.viewCreatedUniqueOnlyCallCount)
+
+        assertEquals(1, fragment.subscribeCustomCallCount)
+        assertEquals(1, fragment.viewCreatedCustomCallCount)
     }
 
     @Test
@@ -221,24 +286,29 @@ class FragmentSubscriberTest : BaseTest() {
         val (controller, fragment) = createFragmentInTestActivity<ViewSubscriberFragment>()
         assertEquals(1, fragment.subscribeCallCount)
         assertEquals(1, fragment.subscribeUniqueOnlyCallCount)
+        assertEquals(0, fragment.subscribeCustomCallCount)
 
         assertEquals(1, fragment.viewCreatedSubscribeCallCount)
         assertEquals(1, fragment.viewCreatedUniqueOnlyCallCount)
+        assertEquals(0, fragment.viewCreatedCustomCallCount)
 
         controller.pause()
         controller.stop()
 
         assertEquals(1, fragment.subscribeCallCount)
         assertEquals(1, fragment.subscribeUniqueOnlyCallCount)
+        assertEquals(0, fragment.subscribeCustomCallCount)
 
         assertEquals(1, fragment.viewCreatedSubscribeCallCount)
         assertEquals(1, fragment.viewCreatedUniqueOnlyCallCount)
+        assertEquals(0, fragment.viewCreatedCustomCallCount)
 
         controller.start()
         controller.resume()
 
         assertEquals(2, fragment.subscribeCallCount)
         assertEquals(1, fragment.subscribeUniqueOnlyCallCount)
+        assertEquals(0, fragment.subscribeCustomCallCount)
     }
 
     @Test
@@ -246,26 +316,32 @@ class FragmentSubscriberTest : BaseTest() {
         val (controller, fragment) = createFragmentInTestActivity<ViewSubscriberFragment>()
         assertEquals(1, fragment.subscribeCallCount)
         assertEquals(1, fragment.subscribeUniqueOnlyCallCount)
+        assertEquals(0, fragment.subscribeCustomCallCount)
 
         assertEquals(1, fragment.viewCreatedSubscribeCallCount)
         assertEquals(1, fragment.viewCreatedUniqueOnlyCallCount)
+        assertEquals(0, fragment.viewCreatedCustomCallCount)
 
         val fragmentManager = controller.get().supportFragmentManager
         fragmentManager.beginTransaction().replace(CONTAINER_ID, Fragment(), "TAG").addToBackStack(null).commit()
 
         assertEquals(1, fragment.subscribeCallCount)
         assertEquals(1, fragment.subscribeUniqueOnlyCallCount)
+        assertEquals(0, fragment.subscribeCustomCallCount)
 
         assertEquals(1, fragment.viewCreatedSubscribeCallCount)
         assertEquals(1, fragment.viewCreatedUniqueOnlyCallCount)
+        assertEquals(0, fragment.viewCreatedCustomCallCount)
 
         fragmentManager.popBackStackImmediate()
 
         assertEquals(2, fragment.subscribeCallCount)
         assertEquals(1, fragment.subscribeUniqueOnlyCallCount)
+        assertEquals(0, fragment.subscribeCustomCallCount)
 
         assertEquals(2, fragment.viewCreatedSubscribeCallCount)
         assertEquals(1, fragment.viewCreatedUniqueOnlyCallCount)
+        assertEquals(0, fragment.viewCreatedCustomCallCount)
     }
 
     @Test
@@ -273,9 +349,11 @@ class FragmentSubscriberTest : BaseTest() {
         val (controller, fragment) = createFragmentInTestActivity<ViewSubscriberFragment>()
         assertEquals(1, fragment.subscribeCallCount)
         assertEquals(1, fragment.subscribeUniqueOnlyCallCount)
+        assertEquals(0, fragment.subscribeCustomCallCount)
 
         assertEquals(1, fragment.viewCreatedSubscribeCallCount)
         assertEquals(1, fragment.viewCreatedUniqueOnlyCallCount)
+        assertEquals(0, fragment.viewCreatedCustomCallCount)
 
         val fragmentManager = controller.get().supportFragmentManager
         fragmentManager.beginTransaction().replace(CONTAINER_ID, Fragment(), "TAG").addToBackStack(null).commit()
@@ -284,17 +362,21 @@ class FragmentSubscriberTest : BaseTest() {
         fragment.setFoo(1)
         assertEquals(1, fragment.subscribeCallCount)
         assertEquals(1, fragment.subscribeUniqueOnlyCallCount)
+        assertEquals(0, fragment.subscribeCustomCallCount)
 
         assertEquals(1, fragment.viewCreatedSubscribeCallCount)
         assertEquals(1, fragment.viewCreatedUniqueOnlyCallCount)
+        assertEquals(0, fragment.viewCreatedCustomCallCount)
 
         fragmentManager.popBackStackImmediate()
 
         assertEquals(2, fragment.subscribeCallCount)
         assertEquals(2, fragment.subscribeUniqueOnlyCallCount)
+        assertEquals(1, fragment.subscribeCustomCallCount)
 
         assertEquals(2, fragment.viewCreatedSubscribeCallCount)
         assertEquals(2, fragment.viewCreatedUniqueOnlyCallCount)
+        assertEquals(0, fragment.viewCreatedCustomCallCount)
     }
 
     /**
@@ -308,9 +390,11 @@ class FragmentSubscriberTest : BaseTest() {
             super.onStop()
             val subscribeCallCountBeforeFooChange = subscribeCallCount
             val subscribeUniqueOnlyCallCountBeforeFooChange = subscribeUniqueOnlyCallCount
+            val subscribeCustomCallCountBeforeFooChange = subscribeCustomCallCount
             this.setFoo(1)
             assertEquals(subscribeCallCountBeforeFooChange, subscribeCallCount)
             assertEquals(subscribeUniqueOnlyCallCountBeforeFooChange, subscribeUniqueOnlyCallCount)
+            assertEquals(subscribeCustomCallCountBeforeFooChange, subscribeCustomCallCount)
         }
     }
 
@@ -322,6 +406,9 @@ class FragmentSubscriberTest : BaseTest() {
 
         assertEquals(0, fragment.selectSubscribeUniqueOnlyValue)
         assertEquals(1, fragment.selectSubscribeUniqueOnlyCallCount)
+
+        assertEquals(-1, fragment.selectSubscribeCustomValue)
+        assertEquals(0, fragment.selectSubscribeCustomCallCount)
 
         // This will set foo to 1. See FragmentWithStateChangeDuringOrientationChange.
         controller.configurationChange(Configuration().apply {
@@ -338,6 +425,9 @@ class FragmentSubscriberTest : BaseTest() {
         // Even if unique is true, if the state changes we expect a value.
         assertEquals(1, recreatedFragment.selectSubscribeUniqueOnlyValue)
         assertEquals(1, recreatedFragment.selectSubscribeUniqueOnlyCallCount)
+
+        assertEquals(-1, recreatedFragment.selectSubscribeCustomValue)
+        assertEquals(0, recreatedFragment.selectSubscribeCustomCallCount)
     }
 
     @Test
@@ -348,6 +438,9 @@ class FragmentSubscriberTest : BaseTest() {
 
         assertEquals(0, fragment.selectSubscribeUniqueOnlyValue)
         assertEquals(1, fragment.selectSubscribeUniqueOnlyCallCount)
+
+        assertEquals(-1, fragment.selectSubscribeCustomValue)
+        assertEquals(0, fragment.selectSubscribeCustomCallCount)
 
         controller.configurationChange(Configuration().apply {
             setToDefaults()
@@ -362,6 +455,9 @@ class FragmentSubscriberTest : BaseTest() {
 
         assertEquals(-1, recreatedFragment.selectSubscribeUniqueOnlyValue)
         assertEquals(0, recreatedFragment.selectSubscribeUniqueOnlyCallCount)
+
+        assertEquals(-1, recreatedFragment.selectSubscribeCustomValue)
+        assertEquals(0, recreatedFragment.selectSubscribeCustomCallCount)
     }
 
     @Test
@@ -369,9 +465,11 @@ class FragmentSubscriberTest : BaseTest() {
         val (controller, fragment) = createFragmentInTestActivity<FragmentWithStateChangeDuringOrientationChange>()
         assertEquals(1, fragment.subscribeCallCount)
         assertEquals(1, fragment.subscribeUniqueOnlyCallCount)
+        assertEquals(0, fragment.subscribeCustomCallCount)
 
         assertEquals(1, fragment.viewCreatedSubscribeCallCount)
         assertEquals(1, fragment.viewCreatedUniqueOnlyCallCount)
+        assertEquals(0, fragment.viewCreatedCustomCallCount)
 
         // This will set foo to 1. See FragmentWithStateChangeDuringOrientationChange.
         controller.configurationChange(Configuration().apply {
@@ -384,9 +482,11 @@ class FragmentSubscriberTest : BaseTest() {
         // As the value changed, the unique only subscription will be called.
         assertEquals(1, recreatedFragment.subscribeCallCount)
         assertEquals(1, recreatedFragment.subscribeUniqueOnlyCallCount)
+        assertEquals(0, recreatedFragment.subscribeCustomCallCount)
 
         assertEquals(1, recreatedFragment.viewCreatedSubscribeCallCount)
         assertEquals(1, recreatedFragment.viewCreatedUniqueOnlyCallCount)
+        assertEquals(0, recreatedFragment.viewCreatedCustomCallCount)
     }
 
     @Test
@@ -394,9 +494,11 @@ class FragmentSubscriberTest : BaseTest() {
         val (controller, fragment) = createFragmentInTestActivity<ViewSubscriberFragment>()
         assertEquals(1, fragment.subscribeCallCount)
         assertEquals(1, fragment.subscribeUniqueOnlyCallCount)
+        assertEquals(0, fragment.subscribeCustomCallCount)
 
         assertEquals(1, fragment.viewCreatedSubscribeCallCount)
         assertEquals(1, fragment.viewCreatedSubscribeCallCount)
+        assertEquals(0, fragment.viewCreatedCustomCallCount)
 
         controller.configurationChange(Configuration().apply {
             setToDefaults()
@@ -408,9 +510,11 @@ class FragmentSubscriberTest : BaseTest() {
         // As the value has not changed, the unique only subscription will not be called.
         assertEquals(1, recreatedFragment.subscribeCallCount)
         assertEquals(0, recreatedFragment.subscribeUniqueOnlyCallCount)
+        assertEquals(0, recreatedFragment.subscribeCustomCallCount)
 
         assertEquals(1, recreatedFragment.viewCreatedSubscribeCallCount)
         assertEquals(0, recreatedFragment.viewCreatedUniqueOnlyCallCount)
+        assertEquals(0, recreatedFragment.viewCreatedCustomCallCount)
     }
 
     @Test
@@ -607,5 +711,25 @@ class FragmentSubscriberTest : BaseTest() {
         // and changed back while stopped, it would redeliver the value even though it was the same
         // as what it received previously.
         assertEquals(2, fragment.selectSubscribeUniqueOnlyCallCount)
+    }
+
+    @Test
+    fun testCustom() {
+        val (controller, fragment) = createFragmentInTestActivity<ViewSubscriberFragment>()
+        fragment.setFoo(1)
+        assertEquals(1, fragment.selectSubscribeCustomCallCount
+        )
+
+        controller.pause()
+        controller.stop()
+        fragment.setFoo(2)
+        fragment.setFoo(1)
+        controller.start()
+        controller.resume()
+
+        // In MvRx 1.0, this would have been 2. If the value for a uniqueOnly() subscription changed
+        // and changed back while stopped, it would redeliver the value even though it was the same
+        // as what it received previously.
+        assertEquals(1, fragment.selectSubscribeCustomCallCount)
     }
 }
