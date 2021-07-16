@@ -113,7 +113,7 @@ Most of the time, overriding `invalidate()` and updating your views is sufficien
 #### Accessing state once
 If you just want to retrieve the value of state one time, you can use `withState { state -> ... }`.
 
-When called from outside a ViewModel, this will _is_ be run synchronously.
+When called from outside a ViewModel, this will be run synchronously.
 
 #### Triggering state changes
 The ViewModel should expose named functions that can be called by the view. For example, a counter view model could expose a function `incrementCount()` to create a clear API accessible to the view.
