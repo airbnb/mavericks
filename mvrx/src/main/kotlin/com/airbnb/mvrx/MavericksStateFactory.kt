@@ -10,7 +10,7 @@ interface MavericksStateFactory<VM : MavericksViewModel<S>, S : MavericksState> 
         viewModelClass: Class<out VM>,
         stateClass: Class<out S>,
         viewModelContext: ViewModelContext,
-        stateRestorer: (S) -> S
+        stateRestorer: StateRestorer<VM, S>?
     ): S
 }
 
@@ -21,13 +21,14 @@ class RealMavericksStateFactory<VM : MavericksViewModel<S>, S : MavericksState> 
         viewModelClass: Class<out VM>,
         stateClass: Class<out S>,
         viewModelContext: ViewModelContext,
-        stateRestorer: (S) -> S
+        stateRestorer: StateRestorer<VM, S>?
     ): S {
+        val viewModelClass = stateRestorer?.viewModelClass ?: viewModelClass
+        val stateClass = stateRestorer?.stateClass ?: stateClass
         val factoryState = createStateFromCompanionFactory(viewModelClass, viewModelContext)
-        return stateRestorer(
-            factoryState
-                ?: createStateFromConstructor(viewModelClass, stateClass, viewModelContext.args)
-        )
+        val recreatedState = factoryState ?: createStateFromConstructor(viewModelClass, stateClass, viewModelContext.args)
+
+        return stateRestorer?.toRestoredState?.let { it(recreatedState) } ?: recreatedState
     }
 }
 
