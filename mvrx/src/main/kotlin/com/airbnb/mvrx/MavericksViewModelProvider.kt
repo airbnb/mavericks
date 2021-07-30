@@ -104,7 +104,7 @@ object MavericksViewModelProvider {
         val restoredStateClass = getSerializable(KEY_MVRX_SAVED_STATE_CLASS) as? Class<out S>
 
         requireNotNull(restoredState) { "State was not saved prior to restoring!" }
-        requireNotNull(restoredViewModelClass) { "Viewmodel class was not properly saved prior to restoring!" }
+        requireNotNull(restoredViewModelClass) { "ViewModel class was not properly saved prior to restoring!" }
         requireNotNull(restoredStateClass) { "State class was not properly saved prior to restoring!" }
 
         val restoredContext = when (viewModelContext) {
