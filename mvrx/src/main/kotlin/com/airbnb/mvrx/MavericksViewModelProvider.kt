@@ -44,7 +44,7 @@ object MavericksViewModelProvider {
 
         val stateRestorer = savedStateRegistry
             .consumeRestoredStateForKey(key)
-            ?.toStateRestorer<S>(viewModelContext)
+            ?.toStateRestorer<VM, S>(viewModelContext)
 
         val restoredContext = stateRestorer?.viewModelContext ?: viewModelContext
 
@@ -56,7 +56,7 @@ object MavericksViewModelProvider {
                 stateClass,
                 restoredContext,
                 key,
-                stateRestorer?.toRestoredState,
+                stateRestorer,
                 forExistingViewModel,
                 initialStateFactory
             )
@@ -81,6 +81,11 @@ object MavericksViewModelProvider {
     ) = withState(this) { state ->
         Bundle().apply {
             putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, state.persistState())
+
+            // Save the resolved types of the ViewModel and State in the bundle so we can recreate them even if the first declaration invoked does not know the types
+            putSerializable(KEY_MVRX_SAVED_VM_CLASS, this@getSavedStateBundle::class.java)
+            putSerializable(KEY_MVRX_SAVED_STATE_CLASS, state::class.java)
+
             initialArgs?.let { args ->
                 when (args) {
                     is Parcelable -> putParcelable(KEY_MVRX_SAVED_ARGS, args)
@@ -91,21 +96,28 @@ object MavericksViewModelProvider {
         }
     }
 
-    private fun <S : MavericksState> Bundle.toStateRestorer(viewModelContext: ViewModelContext): StateRestorer<S> {
+    @Suppress("UNCHECKED_CAST")
+    private fun <VM : MavericksViewModel<S>, S : MavericksState> Bundle.toStateRestorer(viewModelContext: ViewModelContext): StateRestorer<VM, S> {
         val restoredArgs = get(KEY_MVRX_SAVED_ARGS)
         val restoredState = getBundle(KEY_MVRX_SAVED_INSTANCE_STATE)
+        val restoredViewModelClass = getSerializable(KEY_MVRX_SAVED_VM_CLASS) as? Class<out VM>
+        val restoredStateClass = getSerializable(KEY_MVRX_SAVED_STATE_CLASS) as? Class<out S>
 
         requireNotNull(restoredState) { "State was not saved prior to restoring!" }
+        requireNotNull(restoredViewModelClass) { "ViewModel class was not properly saved prior to restoring!" }
+        requireNotNull(restoredStateClass) { "State class was not properly saved prior to restoring!" }
 
         val restoredContext = when (viewModelContext) {
             is ActivityViewModelContext -> viewModelContext.copy(args = restoredArgs)
             is FragmentViewModelContext -> viewModelContext.copy(args = restoredArgs)
         }
-        return StateRestorer(restoredContext) { restoredState.restorePersistedState(it) }
+        return StateRestorer(restoredContext, restoredViewModelClass, restoredStateClass) { restoredState.restorePersistedState(it) }
     }
 
     private const val KEY_MVRX_SAVED_INSTANCE_STATE = "mvrx:saved_instance_state"
     private const val KEY_MVRX_SAVED_ARGS = "mvrx:saved_args"
+    private const val KEY_MVRX_SAVED_VM_CLASS = "mvrx:saved_viewmodel_class"
+    private const val KEY_MVRX_SAVED_STATE_CLASS = "mvrx:saved_state_class"
 }
 
 /**
@@ -131,7 +143,9 @@ internal fun Class<*>.instance(): Any {
 internal const val ACCESSED_BEFORE_ON_CREATE_ERR_MSG =
     "You can only access a view model after super.onCreate of your activity/fragment has been called."
 
-private data class StateRestorer<S : MavericksState>(
+data class StateRestorer<VM : MavericksViewModel<S>, S : MavericksState>(
     val viewModelContext: ViewModelContext,
+    val viewModelClass: Class<out VM>,
+    val stateClass: Class<out S>,
     val toRestoredState: (S) -> S
 )

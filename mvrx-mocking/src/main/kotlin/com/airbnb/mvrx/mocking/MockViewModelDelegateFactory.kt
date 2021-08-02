@@ -3,17 +3,18 @@ package com.airbnb.mvrx.mocking
 import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.ActivityViewModelContext
 import com.airbnb.mvrx.Mavericks
-import com.airbnb.mvrx.MavericksView
-import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksStateFactory
+import com.airbnb.mvrx.MavericksView
+import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksViewModelProvider
 import com.airbnb.mvrx.RealMavericksStateFactory
+import com.airbnb.mvrx.StateRestorer
 import com.airbnb.mvrx.ViewModelContext
 import com.airbnb.mvrx.ViewModelDelegateFactory
 import com.airbnb.mvrx.ViewModelDoesNotExistException
-import com.airbnb.mvrx.lifecycleAwareLazy
 import com.airbnb.mvrx._internal
+import com.airbnb.mvrx.lifecycleAwareLazy
 import kotlin.reflect.KClass
 import kotlin.reflect.KProperty
 
@@ -130,7 +131,7 @@ class MockViewModelDelegateFactory(
                         viewModelClass: Class<out VM>,
                         stateClass: Class<out S>,
                         viewModelContext: ViewModelContext,
-                        stateRestorer: (S) -> S
+                        stateRestorer: StateRestorer<VM, S>?
                     ): S {
                         //  Throwing this indicates to us that the view model didn't exist,
                         // since the factory will only be invoked when creating a new view model.
@@ -195,7 +196,7 @@ class MockViewModelDelegateFactory(
                     viewModelClass: Class<out VM>,
                     stateClass: Class<out S>,
                     viewModelContext: ViewModelContext,
-                    stateRestorer: (S) -> S
+                    stateRestorer: StateRestorer<VM, S>?
                 ): S {
                     return mockState
                 }

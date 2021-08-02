@@ -8,7 +8,7 @@ internal class MavericksFactory<VM : MavericksViewModel<S>, S : MavericksState>(
     private val stateClass: Class<out S>,
     private val viewModelContext: ViewModelContext,
     private val key: String,
-    private val stateRestorer: ((S) -> S)?,
+    private val stateRestorer: StateRestorer<VM, S>?,
     private val forExistingViewModel: Boolean = false,
     private val initialStateFactory: MavericksStateFactory<VM, S> = RealMavericksStateFactory()
 ) : ViewModelProvider.Factory {
@@ -23,7 +23,7 @@ internal class MavericksFactory<VM : MavericksViewModel<S>, S : MavericksState>(
             viewModelClass,
             stateClass,
             viewModelContext,
-            stateRestorer ?: { it },
+            stateRestorer,
             initialStateFactory
         )
         return viewModel as T
@@ -32,13 +32,17 @@ internal class MavericksFactory<VM : MavericksViewModel<S>, S : MavericksState>(
 
 @Suppress("UNCHECKED_CAST")
 private fun <VM : MavericksViewModel<S>, S : MavericksState> createViewModel(
-    viewModelClass: Class<out VM>,
-    stateClass: Class<out S>,
+    declaredViewModelClass: Class<out VM>,
+    declaredStateClass: Class<out S>,
     viewModelContext: ViewModelContext,
-    stateRestorer: (S) -> S,
+    stateRestorer: StateRestorer<VM, S>?,
     initialStateFactory: MavericksStateFactory<VM, S>
 ): MavericksViewModelWrapper<VM, S> {
-    val initialState = initialStateFactory.createInitialState(viewModelClass, stateClass, viewModelContext, stateRestorer)
+    val initialState = initialStateFactory.createInitialState(declaredViewModelClass, declaredStateClass, viewModelContext, stateRestorer)
+
+    val viewModelClass = stateRestorer?.viewModelClass ?: declaredViewModelClass
+    val stateClass = stateRestorer?.stateClass ?: declaredStateClass
+
     val factoryViewModel = viewModelClass.factoryCompanion()?.let { factoryClass ->
         try {
             factoryClass.getMethod("create", ViewModelContext::class.java, MavericksState::class.java)
