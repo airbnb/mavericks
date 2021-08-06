@@ -71,7 +71,7 @@ class StateRestorationTest : BaseTest() {
     }
 
     /**
-     * This abstract ViewModel class must have its compnaion factory called on restoration, otherwise Mavericks cannot create an instance of
+     * This abstract ViewModel class must have its companion factory called on restoration, otherwise Mavericks cannot create an instance of
      * its state class [StateWithNoDefaultConstructor], and a crash will occur.
      */
     abstract class ParentViewModelWithFactory(initialState: StateWithNoDefaultConstructor) :
