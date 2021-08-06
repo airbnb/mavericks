@@ -65,8 +65,14 @@ object MavericksViewModelProvider {
         try {
             // Save the view model's state to the bundle so that it can be used to recreate
             // state across system initiated process death.
+            // We use classes from the StateRestorer if present, because they represent the original declaration site of the ViewModel and are the ones
+            // we will eventually call for restoration.
             viewModelContext.savedStateRegistry.registerSavedStateProvider(key) {
-                viewModel.viewModel.getSavedStateBundle(restoredContext.args, viewModelClass, stateClass)
+                viewModel.viewModel.getSavedStateBundle(
+                    restoredContext.args,
+                    stateRestorer?.viewModelClass ?: viewModelClass,
+                    stateRestorer?.stateClass ?: stateClass
+                )
             }
         } catch (e: IllegalArgumentException) {
             // The view model was already registered with the context. We only want the initial
