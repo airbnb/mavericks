@@ -66,7 +66,7 @@ object MavericksViewModelProvider {
             // Save the view model's state to the bundle so that it can be used to recreate
             // state across system initiated process death.
             viewModelContext.savedStateRegistry.registerSavedStateProvider(key) {
-                viewModel.viewModel.getSavedStateBundle(restoredContext.args)
+                viewModel.viewModel.getSavedStateBundle(restoredContext.args, viewModelClass, stateClass)
             }
         } catch (e: IllegalArgumentException) {
             // The view model was already registered with the context. We only want the initial
@@ -77,14 +77,18 @@ object MavericksViewModelProvider {
     }
 
     private fun <VM : MavericksViewModel<S>, S : MavericksState> VM.getSavedStateBundle(
-        initialArgs: Any?
+        initialArgs: Any?,
+        originalDeclarationViewModelClass: Class<out VM>,
+        originalDeclarationStateClass: Class<out S>
     ) = withState(this) { state ->
         Bundle().apply {
             putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, state.persistState())
 
-            // Save the resolved types of the ViewModel and State in the bundle so we can recreate them even if the first declaration invoked does not know the types
-            putSerializable(KEY_MVRX_SAVED_VM_CLASS, this@getSavedStateBundle::class.java)
-            putSerializable(KEY_MVRX_SAVED_STATE_CLASS, state::class.java)
+            // Save the types of the ViewModel and State in the bundle so we can recreate them even if the first declaration invoked does not have the
+            // same types as the original declaration.
+            // We save the classes from the original declaration site rather than the resolved classes to ensure the recreation path is the same as the original.
+            putSerializable(KEY_MVRX_SAVED_VM_CLASS, originalDeclarationViewModelClass)
+            putSerializable(KEY_MVRX_SAVED_STATE_CLASS, originalDeclarationStateClass)
 
             initialArgs?.let { args ->
                 when (args) {

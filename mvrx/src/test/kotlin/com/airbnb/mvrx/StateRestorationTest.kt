@@ -57,6 +57,50 @@ class StateRestorationTest : BaseTest() {
         override fun invalidate() {}
     }
 
+    @Test
+    fun testStateRestorationWithBaseTypeDeclarationCorrectlyCallsFactoryInBaseType() {
+        // Attach an instance of FragmentWithParentViewModelWithFactory, causing its factory method to be called directly
+        val (activityController, _) = createFragment<FragmentWithParentViewModelWithFactory, TestActivity>()
+        // Save the Mavericks state of the Activity into a Bundle
+        val bundle = Bundle()
+        activityController.saveInstanceState(bundle)
+
+        // Restore a new Activity with the previously saved state. This mimics the app process being restored with Fragment3 still attached
+        val newController = Robolectric.buildActivity(TestActivity::class.java)
+        newController.setup(bundle)
+    }
+
+    /**
+     * This abstract ViewModel class must have its companion factory called on restoration, otherwise Mavericks cannot create an instance of
+     * its state class [StateWithNoDefaultConstructor], and a crash will occur.
+     */
+    abstract class ParentViewModelWithFactory(initialState: StateWithNoDefaultConstructor) :
+        MavericksViewModel<StateWithNoDefaultConstructor>(initialState) {
+        companion object : MavericksViewModelFactory<ParentViewModelWithFactory, StateWithNoDefaultConstructor> {
+
+            override fun initialState(viewModelContext: ViewModelContext): StateWithNoDefaultConstructor {
+                return StateWithNoDefaultConstructor("")
+            }
+
+            override fun create(viewModelContext: ViewModelContext, state: StateWithNoDefaultConstructor): ParentViewModelWithFactory {
+                return ChildViewModelOfParentWithFactory(state)
+            }
+        }
+    }
+
+    class ChildViewModelOfParentWithFactory(initialState: StateWithNoDefaultConstructor) : ParentViewModelWithFactory(initialState)
+
+    /**
+     * Because this has no default constructor, it must be provided via a companion factory, or else a crash will occur.
+     */
+    data class StateWithNoDefaultConstructor(val string: String) : MavericksState
+
+    class FragmentWithParentViewModelWithFactory : Fragment(), MavericksView {
+        private val parentViewModelWithFactory: ParentViewModelWithFactory by fragmentViewModel()
+
+        override fun invalidate() {}
+    }
+
     companion object {
         const val viewModelKey = "key for retrieving ChildViewModel"
     }
