@@ -63,6 +63,7 @@ object MavericksViewModelProvider {
         ).get(key, MavericksViewModelWrapper::class.java) as MavericksViewModelWrapper<VM, S>
 
         try {
+            //test
             // Save the view model's state to the bundle so that it can be used to recreate
             // state across system initiated process death.
             viewModelContext.savedStateRegistry.registerSavedStateProvider(key) {
