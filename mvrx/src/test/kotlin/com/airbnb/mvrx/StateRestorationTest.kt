@@ -13,20 +13,42 @@ class StateRestorationTest : BaseTest() {
         // Remove Fragment1 from the Activity backstack so we don't try to restore it
         activityController.get().supportFragmentManager.beginTransaction().remove(fragment1).commitNow()
         // Save the Mavericks state of the Activity into a Bundle
-        val bundle = Bundle()
-        activityController.saveInstanceState(bundle)
+        val bundle = Bundle().also { activityController.saveInstanceState(it) }
 
         // Restore a new Activity with the previously saved state and attach an instance of Fragment2
         // This mimics the app process being restored with Fragment2 on top of the backstack, which we don't have the ability to directly test
-        val newController = Robolectric.buildActivity(TestActivity::class.java)
-        newController.setup(bundle)
-        val activity = newController.get()
+        val newController = Robolectric.buildActivity(TestActivity::class.java).apply { setup(bundle) }
         Fragment2().apply {
-            activity.supportFragmentManager
+            newController.get().supportFragmentManager
                 .beginTransaction()
                 .add(this, "TAG")
                 .commitNow()
         }
+    }
+
+    @Test
+    fun testStateRestorationWithBaseTypeDeclarationSucceedsTwiceInARow() {
+        // Attach an instance of Fragment1, causing the ChildViewModel to be initialized
+        val (activityController, fragment1) = createFragment<Fragment1, TestActivity>()
+        // Remove Fragment1 from the Activity backstack so we don't try to restore it
+        activityController.get().supportFragmentManager.beginTransaction().remove(fragment1).commitNow()
+        // Save the Mavericks state of the Activity into a Bundle
+        val bundle = Bundle().also { activityController.saveInstanceState(it) }
+
+        // Restore a new Activity with the previously saved state and attach an instance of Fragment2
+        // This mimics the app process being restored with Fragment2 on top of the backstack, which we don't have the ability to directly test
+        val controllerForFirstRestoredActivity = Robolectric.buildActivity(TestActivity::class.java).apply { setup(bundle) }
+        Fragment2().apply {
+            controllerForFirstRestoredActivity.get().supportFragmentManager
+                .beginTransaction()
+                .add(this, "TAG")
+                .commitNow()
+        }
+        // Save the Mavericks state of the restored Activity into a Bundle
+        val newBundle = Bundle().also { controllerForFirstRestoredActivity.saveInstanceState(it) }
+
+        // Restore another Activity with the saved state from the previously restored Activity.
+        Robolectric.buildActivity(TestActivity::class.java).setup(newBundle)
     }
 
     abstract class ParentViewModel<S : ParentState>(initialState: S) : MavericksViewModel<S>(initialState)
