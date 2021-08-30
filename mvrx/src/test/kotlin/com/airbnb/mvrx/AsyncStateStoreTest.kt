@@ -9,6 +9,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import org.junit.Assert.assertNull
 import org.junit.Test
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlin.time.seconds
 
@@ -21,7 +23,7 @@ class AsyncStateStoreTest {
         val store = CoroutinesStateStore(MavericksStateStoreTestState(), scope)
         val collectJob = scope.launch(Job()) { store.flow.collect() }
         scope.cancel()
-        assertNull(withTimeoutOrNull(1.seconds) {
+        assertNull(withTimeoutOrNull(seconds(1)) {
             collectJob.join()
         })
     }

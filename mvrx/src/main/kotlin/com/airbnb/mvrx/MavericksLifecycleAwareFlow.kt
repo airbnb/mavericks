@@ -63,11 +63,11 @@ private fun startedChannel(owner: Lifecycle): Channel<Boolean> {
     val channel = Channel<Boolean>(Channel.CONFLATED)
     val observer = object : DefaultLifecycleObserver {
         override fun onStart(owner: LifecycleOwner) {
-            channel.offer(true)
+            channel.trySend(true)
         }
 
         override fun onStop(owner: LifecycleOwner) {
-            channel.offer(false)
+            channel.trySend(false)
         }
 
         override fun onDestroy(owner: LifecycleOwner) {
@@ -86,9 +86,9 @@ private inline fun <T : Any> SelectBuilder<Unit>.onReceive(
     crossinline onClosed: () -> Unit,
     noinline onReceive: suspend (value: T) -> Unit
 ) {
-    @Suppress("DEPRECATION")
-    channel.onReceiveOrNull {
-        if (it === null) onClosed()
-        else onReceive(it)
+    channel.onReceiveCatching {
+        val result = it.getOrNull()
+        if (result === null) onClosed()
+        else onReceive(result)
     }
 }

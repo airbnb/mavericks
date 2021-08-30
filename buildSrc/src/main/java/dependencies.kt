@@ -31,7 +31,7 @@ object Versions {
     const val epoxy = "4.0.0"
     const val hilt = "2.36"
     const val koin = "2.0.1"
-    const val kotlinCoroutines = "1.4.3"
+    const val kotlinCoroutines = "1.5.1"
     const val lottie = "3.4.0"
     const val moshi = "1.9.2"
     const val multidex = "2.0.1"
