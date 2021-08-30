@@ -23,10 +23,10 @@ class RealMavericksStateFactory<VM : MavericksViewModel<S>, S : MavericksState> 
         viewModelContext: ViewModelContext,
         stateRestorer: StateRestorer<VM, S>?
     ): S {
-        val viewModelClass = stateRestorer?.viewModelClass ?: viewModelClass
-        val stateClass = stateRestorer?.stateClass ?: stateClass
-        val factoryState = createStateFromCompanionFactory(viewModelClass, viewModelContext)
-        val recreatedState = factoryState ?: createStateFromConstructor(viewModelClass, stateClass, viewModelContext.args)
+        val actualViewModelClass = stateRestorer?.viewModelClass ?: viewModelClass
+        val actualStateClass = stateRestorer?.stateClass ?: stateClass
+        val factoryState = createStateFromCompanionFactory(actualViewModelClass, viewModelContext)
+        val recreatedState = factoryState ?: createStateFromConstructor(actualViewModelClass, actualStateClass, viewModelContext.args)
 
         return stateRestorer?.toRestoredState?.let { it(recreatedState) } ?: recreatedState
     }
