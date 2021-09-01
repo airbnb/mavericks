@@ -11,6 +11,7 @@ import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.selects.SelectBuilder
 import kotlinx.coroutines.selects.select
@@ -20,7 +21,7 @@ import kotlinx.coroutines.yield
  * Emits values from the source flow only when the owner is started.
  * When the owner transitions to started, the most recent value will be emitted.
  *
- * Implementation is similar to [Flow.combineTransform] with the following changes:
+ * Implementation is similar to [combineTransform] with the following changes:
  * 1. Regular channels are used instead of fair channels to avoid unnecessary [yield] calls.
  *    It's possible because lifecycle state updated in the main thread
  * 2. Flow completes when either [this] flow completes or lifecycle is destroyed
