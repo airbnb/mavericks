@@ -11,36 +11,7 @@ When we began creating Mavericks, our goal was not to create yet another archite
 
 This is what it looks like:
 ```kotlin
-
-data class HelloWorldState(val title: String = "Hello World") : MavericksState
-
-/**
- * Refer to the wiki for how to set up your base ViewModel.
- */
-class HelloWorldViewModel(initialState: HelloWorldState) : MavericksViewModel<HelloWorldState>(initialState) {
-    fun getMoreExcited() = setState { copy(title = "$title!") }
-}
-
-class HelloWorldFragment : Fragment(R.layout.hello_world_fragment), MavericksView {
-    private val viewModel: HelloWorldViewModel by fragmentViewModel()
-
-    override fun invalidate() = withState(viewModel) { state ->
-        // Update your views with the latest state here.
-        // This will get called any time your state changes and the viewLifecycleOwner is STARTED.
-    }
-}
-```
-
-## Installation
-
-Gradle is the only supported build configuration, so just add the dependency to your project `build.gradle` file:
-
-```groovy
-dependencies {
-  implementation 'com.airbnb.android:mavericks:x.y.z'
-}
-```
-The latest version of mavericks is [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks)
+com.airbnb.android/mavericks)
 
 ## For full documentation, check out the [docs site](https://airbnb.io/mavericks)
 
