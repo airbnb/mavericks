@@ -16,8 +16,8 @@ branches:
     - gh-pages
 notifications:
   email: false
-after_success:
-  - ./deploy_snapshot.sh
+# after_success:
+#   - ./deploy_snapshot.sh
 jobs:
   include:
     - stage: test
@@ -32,7 +32,3 @@ cache:
   directories:
     - "$HOME/.m2"
     - "$HOME/.gradle"
-env:
-  global:
-    - secure: pkJDHQWy/5GuSd0tEneEF2RO9Wl6jN2rXRF7+K5NBFE214fk9bLnz0+0f3NoU6XaZnXOjH5QwuKX6k7stPmZZNVc1eKU0NsGbd5QYNTJ4AG179nX215U6Z8A7epMy16+TnA4Etqb3j675Bg8eW77J2YWqJ26yu4tTGXWA+JJnu9MzGFep43Sgw025zqvQfwrOVCanJzXR5b+DUd0PpV0RrcUifhoFPhK6MqQZanHliBzPVnsbJW9yxMWEOA4zN+fTQkxwf6tyZGodnvyWkndM5nQ6bMW3YPi5hNQldPKGekJruk5m01Bv+V3IR24LxbC78DBwYMupdSQNnTHRmWUBh29/CBh7GjYs1+kP0BcRGsT1mVhQRaa1NfA7Jtv3P9sSvrF819l9Sf0oCo+22b/d+aHxDv0+kqtq9pRorhpu12xhXSDsVDQW+FUXVWzr0ZmNu35IvSswAwLjxARhupH7fn6cEQYHWNmHDSj4NGxErRICbSfHAUhWMQAHYIprsSBC0CgE1wgtr3FJ6XYiTNwN/cFzCPRrkXegAA4pEA+o0eNSCWcWEuc+ssEwfowqn278bi02BpX30kBoB6dAqedigxYKFsnTthobHqiyiMLEZJHECuePpcGOtIv0HW03b+bMw6YH6KNNAlQdvRWWpRPMNrfn8TlJB5VOavdxTadsGs=
-    - secure: HcMCZS9b8xzllRt6bVU7GwPZGgZr9UmG9ib1sGwXLBpVHCBZC0OXoiIwZxJuc+AdvcbW0Ntxz2UanyL+uRy8dqgLO2U5T0Ej4Tra0fSS2gnkA2G9hB+5jr841txW8jAygn7LcjWwyg3B8upAuBYtIQgKq0GfDvP8es8NQ85VKFGDd1LFH6tZ6vVVTToVHevI92Qaj39FPhFyBhRFKKdpqhP1vEkqIIllU1uzrmsmG1IwAiq5oe82YbOArt54oAzAe1/qQ1mLDttLR03aTdqUa024i5R2YzWxg/BeeSC8b+9EFdpF4wntIyeKr5digPaxKAcEERqv4RL5CaOLFZ0vZt7bpLROEBiNWExLaJXv7l8rdANbb33c3J1+1n4U4fJA3ht4150Lm912Bdh83utdgBVUj+PfthmZ7tnfZj1jFgh2rfv99gASqpqnFtyLE+gnqvgoN0NtZ5yS/95l9h+4PpTO6p/O0FyVLB/or0FAV9wKbRBBLjU3yhfPf65SRGY+EHFhJqMByH45f2BOv9+hUlkMnWiHU9OrqwlBZa9z+yMao9FarVJUfmBC7HuXt7/66Tyb6+8TtiuIZ61Co1yUDTCsdtYENRyjQe5nq9RLSpaxHTAi6E8xZL+p7blak+r/444UGQh8X+A05y0ZSd0qjldXJbCggV9odURl0v2WL64=
