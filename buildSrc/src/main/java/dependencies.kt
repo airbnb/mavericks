@@ -27,7 +27,7 @@ object Versions {
 
     // Libraries
     const val autoValue = "1.6.6"
-    const val dagger = "2.31.2"
+    const val dagger = "2.38.1"
     const val epoxy = "4.0.0"
     const val hilt = "2.36"
     const val koin = "2.0.1"
