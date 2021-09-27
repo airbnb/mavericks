@@ -15,7 +15,7 @@ object Versions {
     const val cardview = "1.0.0"
     const val constraintlayout = "2.0.0"
     const val coordinatorLayout = "1.1.0"
-    const val compose = "1.0.1"
+    const val compose = "1.0.2"
     const val core = "1.5.0"
     const val fragment = "1.3.4"
     const val lifecycle = "2.3.1"
