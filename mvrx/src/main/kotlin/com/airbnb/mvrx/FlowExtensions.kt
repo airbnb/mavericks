@@ -46,7 +46,11 @@ internal fun <T : Any?> Flow<T>.collectLatest(
 }
 
 @Suppress("EXPERIMENTAL_API_USAGE")
-internal fun <T : Any?> Flow<T>.assertOneActiveSubscription(lifecycleOwner: LifecycleOwner, activeSubscriptions: MutableSet<String>, subscriptionId: String): Flow<T> {
+internal fun <T : Any?> Flow<T>.assertOneActiveSubscription(
+    lifecycleOwner: LifecycleOwner,
+    activeSubscriptions: MutableSet<String>,
+    subscriptionId: String
+): Flow<T> {
     val observer = object : DefaultLifecycleObserver {
         override fun onCreate(owner: LifecycleOwner) {
             if (activeSubscriptions.contains(subscriptionId)) error(duplicateSubscriptionMessage(subscriptionId))

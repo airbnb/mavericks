@@ -411,10 +411,12 @@ class FragmentSubscriberTest : BaseTest() {
         assertEquals(0, fragment.selectSubscribeCustomCallCount)
 
         // This will set foo to 1. See FragmentWithStateChangeDuringOrientationChange.
-        controller.configurationChange(Configuration().apply {
-            setToDefaults()
-            this.orientation = Configuration.ORIENTATION_LANDSCAPE
-        })
+        controller.configurationChange(
+            Configuration().apply {
+                setToDefaults()
+                this.orientation = Configuration.ORIENTATION_LANDSCAPE
+            }
+        )
 
         val recreatedFragment = controller.mvRxFragment<FragmentWithStateChangeDuringOrientationChange>()
 
@@ -442,10 +444,12 @@ class FragmentSubscriberTest : BaseTest() {
         assertEquals(-1, fragment.selectSubscribeCustomValue)
         assertEquals(0, fragment.selectSubscribeCustomCallCount)
 
-        controller.configurationChange(Configuration().apply {
-            setToDefaults()
-            this.orientation = Configuration.ORIENTATION_LANDSCAPE
-        })
+        controller.configurationChange(
+            Configuration().apply {
+                setToDefaults()
+                this.orientation = Configuration.ORIENTATION_LANDSCAPE
+            }
+        )
 
         val recreatedFragment = controller.mvRxFragment<ViewSubscriberFragment>()
 
@@ -472,10 +476,12 @@ class FragmentSubscriberTest : BaseTest() {
         assertEquals(0, fragment.viewCreatedCustomCallCount)
 
         // This will set foo to 1. See FragmentWithStateChangeDuringOrientationChange.
-        controller.configurationChange(Configuration().apply {
-            setToDefaults()
-            this.orientation = Configuration.ORIENTATION_LANDSCAPE
-        })
+        controller.configurationChange(
+            Configuration().apply {
+                setToDefaults()
+                this.orientation = Configuration.ORIENTATION_LANDSCAPE
+            }
+        )
 
         val recreatedFragment = controller.mvRxFragment<FragmentWithStateChangeDuringOrientationChange>()
 
@@ -500,10 +506,12 @@ class FragmentSubscriberTest : BaseTest() {
         assertEquals(1, fragment.viewCreatedSubscribeCallCount)
         assertEquals(0, fragment.viewCreatedCustomCallCount)
 
-        controller.configurationChange(Configuration().apply {
-            setToDefaults()
-            this.orientation = Configuration.ORIENTATION_LANDSCAPE
-        })
+        controller.configurationChange(
+            Configuration().apply {
+                setToDefaults()
+                this.orientation = Configuration.ORIENTATION_LANDSCAPE
+            }
+        )
 
         val recreatedFragment = controller.mvRxFragment<ViewSubscriberFragment>()
 
@@ -717,7 +725,8 @@ class FragmentSubscriberTest : BaseTest() {
     fun testCustom() {
         val (controller, fragment) = createFragmentInTestActivity<ViewSubscriberFragment>()
         fragment.setFoo(1)
-        assertEquals(1, fragment.selectSubscribeCustomCallCount
+        assertEquals(
+            1, fragment.selectSubscribeCustomCallCount
         )
 
         controller.pause()

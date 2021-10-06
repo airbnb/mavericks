@@ -53,11 +53,15 @@ class MockableMavericksViewModelConfig<S : MavericksState>(
         updateStateStore()
     }
 
-    fun addOnExecuteListener(listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit) {
+    fun addOnExecuteListener(
+        listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit
+    ) {
         onExecuteListeners.add(listener)
     }
 
-    fun removeOnExecuteListener(listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit) {
+    fun removeOnExecuteListener(
+        listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit
+    ) {
         onExecuteListeners.remove(listener)
     }
 
@@ -300,12 +304,16 @@ open class MockMavericksViewModelConfigFactory(
     /**
      * Add a lambda that will be invoked whenever [MavericksViewModel.execute] is used.
      */
-    fun addOnExecuteListener(listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit) {
+    fun addOnExecuteListener(
+        listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit
+    ) {
         onExecuteListeners.add(listener)
         mockConfigs.values.forEach { it.addOnExecuteListener(listener) }
     }
 
-    fun removeOnExecuteListener(listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit) {
+    fun removeOnExecuteListener(
+        listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit
+    ) {
         onExecuteListeners.remove(listener)
         mockConfigs.values.forEach { it.removeOnExecuteListener(listener) }
     }

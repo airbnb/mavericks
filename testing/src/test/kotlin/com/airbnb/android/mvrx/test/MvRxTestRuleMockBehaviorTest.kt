@@ -1,7 +1,6 @@
 package com.airbnb.android.mvrx.test
 
 import com.airbnb.mvrx.Mavericks
-import com.airbnb.mvrx.MvRx
 import com.airbnb.mvrx.test.MvRxTestRule
 import org.junit.Rule
 import org.junit.Test

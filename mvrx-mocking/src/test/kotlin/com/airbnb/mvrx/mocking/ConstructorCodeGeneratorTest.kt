@@ -217,14 +217,18 @@ class ConstructorCodeGeneratorTest : BaseTest() {
         ).expect("ConstructorCodeGeneratorTest.Test(list=arrayOf(1,2,3,4))")
     }
 
-    private fun <T : MavericksState> com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator<T>.expect(expectedCode: String) {
+    private fun <T : MavericksState> com.airbnb.mvrx.mocking.printer.ConstructorCodeGenerator<T>.expect(
+        expectedCode: String
+    ) {
         assertEquals("valmockTestbylazy{$expectedCode}", lazyPropertyToCreateObject.removeWhiteSpace())
     }
 
     data class StateWithJsonObject(val json: String = """{"color":"red","numbers":[{"favorite":7},{"lowest":0}]}""") :
         MavericksState
 
-    data class StateWithInvalidJsonObject(val json: String = """not valid{"color":"red","numbers":[{"favorite":7},{"lowest":0}]}""") :
+    data class StateWithInvalidJsonObject(
+        val json: String = """not valid{"color":"red","numbers":[{"favorite":7},{"lowest":0}]}"""
+    ) :
         MavericksState
 
     data class StateWithJsonArray(val json: String = """[{"favorite":7},{"lowest":0}]""") :

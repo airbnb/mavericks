@@ -82,7 +82,6 @@ class MockStateHolderTest : BaseTest() {
                             defaultState = defaultState,
                             defaultArgs = null
                         ) {
-
                         }
                     }
                     else -> MavericksViewMocks.DefaultViewMocksProvider.mavericksViewMocks(view)
@@ -220,7 +219,6 @@ class MockStateHolderTest : BaseTest() {
                             defaultState = TestState(num = 4),
                             defaultArgs = null
                         ) {
-
                         }
                     }
                     else -> MavericksViewMocks.DefaultViewMocksProvider.mavericksViewMocks(view)
@@ -253,7 +251,6 @@ class MockStateHolderTest : BaseTest() {
             defaultState = TestState(num = 3),
             defaultArgs = null
         ) {
-
         }
     }
 

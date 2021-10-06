@@ -210,7 +210,9 @@ class PersistedStateTest : BaseTest() {
 
     @Test
     fun testParcelableMapWithChangedValue() {
-        data class State2(@PersistState val data: Map<String, ParcelableClass> = mapOf("foo" to ParcelableClass(count = 2))) : MavericksState
+        data class State2(
+            @PersistState val data: Map<String, ParcelableClass> = mapOf("foo" to ParcelableClass(count = 2))
+        ) : MavericksState
 
         val bundle = PersistStateTestHelpers.persistState(State2(mapOf("foo" to ParcelableClass(3))))
         val state = PersistStateTestHelpers.restorePersistedState(bundle, State2())
@@ -219,7 +221,9 @@ class PersistedStateTest : BaseTest() {
 
     @Test(expected = IllegalStateException::class)
     fun testNonParcelableMap() {
-        data class State2(@PersistState val data: Map<String, Context> = mapOf("foo" to Mockito.mock(Context::class.java))) : MavericksState
+        data class State2(
+            @PersistState val data: Map<String, Context> = mapOf("foo" to Mockito.mock(Context::class.java))
+        ) : MavericksState
 
         PersistStateTestHelpers.persistState(State2())
     }

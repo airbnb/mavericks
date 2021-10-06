@@ -4,7 +4,7 @@ import com.airbnb.mvrx.BaseMvRxViewModel
 import com.airbnb.mvrx.MavericksState
 
 data class TestRuleState(val foo: String = "hello") : MavericksState
-class TestRuleViewModel() : BaseMvRxViewModel<TestRuleState>(TestRuleState()) {
+class TestRuleViewModel : BaseMvRxViewModel<TestRuleState>(TestRuleState()) {
 
     var subscribeCallCount = 0
     var setStateCount = 0
@@ -20,4 +20,3 @@ class TestRuleViewModel() : BaseMvRxViewModel<TestRuleState>(TestRuleState()) {
         copy(foo = "$foo!")
     }
 }
-
