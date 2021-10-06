@@ -8,6 +8,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlin.reflect.KProperty1
 
 // Set of [MavericksView identity hash codes that have a pending invalidate.
@@ -42,11 +44,14 @@ interface MavericksView : LifecycleOwner {
      * Accessing mvrxViewId before calling super.onCreate() will cause a crash.
      */
     val mvrxViewId: String
+        get() = mavericksViewInternalViewModel.mavericksViewId
+
+    val mavericksViewInternalViewModel: MavericksViewInternalViewModel
         get() = when (this) {
-            is ViewModelStoreOwner -> ViewModelProvider(this).get(MavericksViewIdViewModel::class.java).mavericksViewId
+            is ViewModelStoreOwner -> ViewModelProvider(this).get(MavericksViewInternalViewModel::class.java)
             else -> error(
-                "If your MavericksView is not a ViewModelStoreOwner, you must implement mvrxViewId " +
-                    "and return a string that is unique to this view and persistent across its entire lifecycle."
+                "If your MavericksView is not a ViewModelStoreOwner, you must implement mavericksViewInternalViewModel " +
+                    "and return a MavericksViewInternalViewModel that is unique to this view and persistent across its entire lifecycle."
             )
         }
 
@@ -90,7 +95,7 @@ interface MavericksView : LifecycleOwner {
      * in this fragment with exact same properties (i.e. two subscribes, or two selectSubscribes with the same properties).
      */
     fun uniqueOnly(customId: String? = null): UniqueOnly {
-        return UniqueOnly(listOfNotNull(mvrxViewId, customId).joinToString("_"))
+        return UniqueOnly(listOfNotNull(mvrxViewId, UniqueOnly::class.simpleName, customId).joinToString("_"))
     }
 
     /**
@@ -104,7 +109,7 @@ interface MavericksView : LifecycleOwner {
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
      * Default: [RedeliverOnStart].
-     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it is not completed before
      * the next one is emitted.
      */
     fun <S : MavericksState> MavericksViewModel<S>.onEach(deliveryMode: DeliveryMode = RedeliverOnStart, action: suspend (S) -> Unit) =
@@ -122,7 +127,7 @@ interface MavericksView : LifecycleOwner {
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
      * Default: [RedeliverOnStart].
-     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it is not completed before
      * the next one is emitted.
      */
     fun <S : MavericksState, A> MavericksViewModel<S>.onEach(
@@ -142,7 +147,7 @@ interface MavericksView : LifecycleOwner {
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
      * Default: [RedeliverOnStart]
-     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it is not completed before
      * the next one is emitted..
      */
     fun <S : MavericksState, A, B> MavericksViewModel<S>.onEach(
@@ -163,7 +168,7 @@ interface MavericksView : LifecycleOwner {
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
      * Default: [RedeliverOnStart].
-     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it is not completed before
      * the next one is emitted.
      */
     fun <S : MavericksState, A, B, C> MavericksViewModel<S>.onEach(
@@ -185,7 +190,7 @@ interface MavericksView : LifecycleOwner {
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
      * Default: [RedeliverOnStart].
-     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it is not completed before
      * the next one is emitted.
      */
     fun <S : MavericksState, A, B, C, D> MavericksViewModel<S>.onEach(
@@ -208,7 +213,7 @@ interface MavericksView : LifecycleOwner {
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
      * Default: [RedeliverOnStart].
-     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it is not completed before
      * the next one is emitted.
      */
     fun <S : MavericksState, A, B, C, D, E> MavericksViewModel<S>.onEach(
@@ -232,7 +237,7 @@ interface MavericksView : LifecycleOwner {
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
      * Default: [RedeliverOnStart].
-     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it is not completed before
      * the next one is emitted.
      */
     fun <S : MavericksState, A, B, C, D, E, F> MavericksViewModel<S>.onEach(
@@ -257,7 +262,7 @@ interface MavericksView : LifecycleOwner {
      * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
      *
      * Default: [RedeliverOnStart].
-     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it is not completed before
      * the next one is emitted.
      */
     fun <S : MavericksState, A, B, C, D, E, F, G> MavericksViewModel<S>.onEach(
@@ -295,4 +300,33 @@ interface MavericksView : LifecycleOwner {
         onFail: (suspend (Throwable) -> Unit)? = null,
         onSuccess: (suspend (T) -> Unit)? = null
     ) = _internalSF(subscriptionLifecycleOwner, asyncProp, deliveryMode, onFail, onSuccess)
+
+    /**
+     * Subscribes to the given Flow within the coroutine scope of the `subscriptionLifecycleOwner`, starting the flow only when the lifecycle
+     * is started, and executing with the coroutine context of Mavericks' `subscriptionCoroutineContextOverride`. This can be utilized to create
+     * customized subscriptions, for example, to drop the first element in the flow before continuing. This is intended to be used with
+     * `viewmodel.stateflow`.
+     *
+     * @param deliveryMode If [UniqueOnly], when this [MavericksView] goes from a stopped to started lifecycle a value
+     * will only be emitted if the value has changed. This is useful for transient views that should only
+     * be shown once (toasts, poptarts), or logging. Most other views should use [RedeliverOnStart], as when a view is destroyed
+     * and recreated the previous state is necessary to recreate the view.
+     *
+     * Use [uniqueOnly] to automatically create a [UniqueOnly] mode with a unique id for this view.
+     *
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it is not completed before
+     * the next one is emitted.
+     */
+    fun <T : Any?> Flow<T>.collectLatest(
+        deliveryMode: DeliveryMode,
+        action: suspend (T) -> Unit
+    ): Job = mavericksViewInternalViewModel.let {
+        collectLatest(
+            subscriptionLifecycleOwner,
+            it.lastDeliveredStates,
+            it.activeSubscriptions,
+            deliveryMode,
+            action
+        )
+    }
 }

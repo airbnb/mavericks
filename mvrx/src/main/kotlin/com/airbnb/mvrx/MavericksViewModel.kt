@@ -1,9 +1,7 @@
 package com.airbnb.mvrx
 
 import androidx.annotation.CallSuper
-import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
@@ -16,10 +14,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.dropWhile
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
@@ -43,7 +38,8 @@ abstract class MavericksViewModel<S : MavericksState>(
 ) {
 
     // Use the same factory for the life of the viewmodel, as it might change after this viewmodel is created (especially during tests)
-    private val configFactory = Mavericks.viewModelConfigFactory
+    @PublishedApi
+    internal val configFactory = Mavericks.viewModelConfigFactory
 
     @Suppress("LeakingThis")
     @InternalMavericksApi
@@ -55,7 +51,7 @@ abstract class MavericksViewModel<S : MavericksState>(
     val viewModelScope = config.coroutineScope
 
     private val stateStore = config.stateStore
-    private val lastDeliveredStates = ConcurrentHashMap<String, Any>()
+    private val lastDeliveredStates = ConcurrentHashMap<String, Any?>()
     private val activeSubscriptions = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
     private val tag by lazy { javaClass.simpleName }
@@ -290,7 +286,7 @@ abstract class MavericksViewModel<S : MavericksState>(
     /**
      * Subscribe to all state changes.
      *
-     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it is not completed before
      * the next one is emitted.
      */
     protected fun onEach(
@@ -300,7 +296,7 @@ abstract class MavericksViewModel<S : MavericksState>(
     /**
      * Subscribe to state changes for a single property.
      *
-     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it is not completed before
      * the next one is emitted.
      */
     protected fun <A> onEach(
@@ -311,7 +307,7 @@ abstract class MavericksViewModel<S : MavericksState>(
     /**
      * Subscribe to state changes for two properties.
      *
-     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it is not completed before
      * the next one is emitted.
      */
     protected fun <A, B> onEach(
@@ -323,7 +319,7 @@ abstract class MavericksViewModel<S : MavericksState>(
     /**
      * Subscribe to state changes for three properties.
      *
-     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it is not completed before
      * the next one is emitted.
      */
     protected fun <A, B, C> onEach(
@@ -336,7 +332,7 @@ abstract class MavericksViewModel<S : MavericksState>(
     /**
      * Subscribe to state changes for four properties.
      *
-     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it is not completed before
      * the next one is emitted.
      */
     protected fun <A, B, C, D> onEach(
@@ -350,7 +346,7 @@ abstract class MavericksViewModel<S : MavericksState>(
     /**
      * Subscribe to state changes for five properties.
      *
-     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it is not completed before
      * the next one is emitted.
      */
     protected fun <A, B, C, D, E> onEach(
@@ -365,7 +361,7 @@ abstract class MavericksViewModel<S : MavericksState>(
     /**
      * Subscribe to state changes for six properties.
      *
-     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it is not completed before
      * the next one is emitted.
      */
     protected fun <A, B, C, D, E, F> onEach(
@@ -381,7 +377,7 @@ abstract class MavericksViewModel<S : MavericksState>(
     /**
      * Subscribe to state changes for seven properties.
      *
-     * @param action supports cooperative cancellation. The previous action will be cancelled if it as not completed before
+     * @param action supports cooperative cancellation. The previous action will be cancelled if it is not completed before
      * the next one is emitted.
      */
     protected fun <A, B, C, D, E, F, G> onEach(
@@ -416,61 +412,18 @@ abstract class MavericksViewModel<S : MavericksState>(
         deliveryMode: DeliveryMode,
         action: suspend (T) -> Unit
     ): Job {
-        val flow = if (lifecycleOwner == null || MavericksTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER) {
-            this
-        } else if (deliveryMode is UniqueOnly) {
-            val lastDeliveredValue: T? = lastDeliveredValue(deliveryMode)
-            this
-                .assertOneActiveSubscription(lifecycleOwner, deliveryMode)
-                .dropWhile { it == lastDeliveredValue }
-                .flowWhenStarted(lifecycleOwner)
-                .distinctUntilChanged()
-                .onEach { lastDeliveredStates[deliveryMode.subscriptionId] = it }
+        return if (lifecycleOwner != null) {
+            collectLatest(lifecycleOwner, lastDeliveredStates, activeSubscriptions, deliveryMode, action)
         } else {
-            flowWhenStarted(lifecycleOwner)
-        }
-
-        val scope = (lifecycleOwner?.lifecycleScope ?: viewModelScope) + configFactory.subscriptionCoroutineContextOverride
-        return scope.launch(start = CoroutineStart.UNDISPATCHED) {
-            // Use yield to ensure flow collect coroutine is dispatched rather than invoked immediately.
-            // This is necessary when Dispatchers.Main.immediate is used in scope.
-            // Coroutine is launched with start = CoroutineStart.UNDISPATCHED to perform dispatch only once.
-            yield()
-            flow.collectLatest(action)
-        }
-    }
-
-    @Suppress("EXPERIMENTAL_API_USAGE")
-    private fun <T> Flow<T>.assertOneActiveSubscription(owner: LifecycleOwner, deliveryMode: UniqueOnly): Flow<T> {
-        val observer = object : DefaultLifecycleObserver {
-            override fun onCreate(owner: LifecycleOwner) {
-                if (activeSubscriptions.contains(deliveryMode.subscriptionId)) error(duplicateSubscriptionMessage(deliveryMode))
-                activeSubscriptions += deliveryMode.subscriptionId
-            }
-
-            override fun onDestroy(owner: LifecycleOwner) {
-                activeSubscriptions.remove(deliveryMode.subscriptionId)
+            (viewModelScope + configFactory.subscriptionCoroutineContextOverride).launch(start = CoroutineStart.UNDISPATCHED) {
+                // Use yield to ensure flow collect coroutine is dispatched rather than invoked immediately.
+                // This is necessary when Dispatchers.Main.immediate is used in scope.
+                // Coroutine is launched with start = CoroutineStart.UNDISPATCHED to perform dispatch only once.
+                yield()
+                collectLatest(action)
             }
         }
-
-        owner.lifecycle.addObserver(observer)
-        return onCompletion {
-            activeSubscriptions.remove(deliveryMode.subscriptionId)
-            owner.lifecycle.removeObserver(observer)
-        }
     }
-
-    private fun <T> lastDeliveredValue(deliveryMode: UniqueOnly): T? {
-        @Suppress("UNCHECKED_CAST")
-        return lastDeliveredStates[deliveryMode.subscriptionId] as T?
-    }
-
-    private fun duplicateSubscriptionMessage(deliveryMode: UniqueOnly) = """
-        Subscribing with a duplicate subscription id: ${deliveryMode.subscriptionId}.
-        If you have multiple uniqueOnly subscriptions in a MvRx view that listen to the same properties
-        you must use a custom subscription id. If you are using a custom MvRxView, make sure you are using the proper
-        lifecycle owner. See BaseMvRxFragment for an example.
-    """.trimIndent()
 
     private fun <S : MavericksState> assertSubscribeToDifferentViewModel(viewModel: MavericksViewModel<S>) {
         require(this != viewModel) {

@@ -26,7 +26,7 @@ import kotlinx.coroutines.yield
  *    It's possible because lifecycle state updated in the main thread
  * 2. Flow completes when either [this] flow completes or lifecycle is destroyed
  */
-fun <T : Any> Flow<T>.flowWhenStarted(owner: LifecycleOwner): Flow<T> = flow {
+fun <T : Any?> Flow<T>.flowWhenStarted(owner: LifecycleOwner): Flow<T> = flow {
     coroutineScope {
         val startedChannel = startedChannel(owner.lifecycle)
         val flowChannel = produce { collect { send(it) } }
@@ -82,7 +82,7 @@ private fun startedChannel(owner: Lifecycle): Channel<Boolean> {
     return channel
 }
 
-private inline fun <T : Any> SelectBuilder<Unit>.onReceive(
+private inline fun <T : Any?> SelectBuilder<Unit>.onReceive(
     channel: ReceiveChannel<T>,
     crossinline onClosed: () -> Unit,
     noinline onReceive: suspend (value: T) -> Unit
