@@ -15,9 +15,8 @@ internal class HelloDaggerViewModelTest {
     @get:Rule
     val mvrxRule = MvRxTestRule()
 
-
     @Test
-    fun `fetches message when created`()  {
+    fun `fetches message when created`() {
         val repo = mockk<HelloRepository> {
             every { sayHello() } returns flowOf("Hello!")
         }

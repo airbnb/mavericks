@@ -1,4 +1,8 @@
 # Change Log
+## 2.4.0
+- Add covariant recreation support (#565)
+- Exposing unique subscription handling for custom flow operations (#560)
+- Add support for restoring ViewModels that were initially created with a companion factory in a superclass #566
 
 ## 2.3.0
 - Error handling enhancements (#540)

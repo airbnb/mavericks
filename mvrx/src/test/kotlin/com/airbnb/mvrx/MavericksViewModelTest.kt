@@ -28,7 +28,7 @@ class MavericksViewModelTestViewModel : MavericksViewModel<BaseMavericksViewMode
 
     fun setInt(int: Int) = setState { copy(int = int) }
 
-    fun <T : Any?> (suspend () -> T).executePublic (
+    fun <T : Any?> (suspend () -> T).executePublic(
         dispatcher: CoroutineDispatcher? = null,
         retainValue: KProperty1<BaseMavericksViewModelTestState, Async<T>>? = null,
         reducer: BaseMavericksViewModelTestState.(Async<T>) -> BaseMavericksViewModelTestState
@@ -182,7 +182,7 @@ class MavericksViewModelTest : BaseTest() {
     fun testAwaitState() = runInViewModelBlocking(
         BaseMavericksViewModelTestState(int = 0),
         BaseMavericksViewModelTestState(int = 1),
-        ) {
+    ) {
         setInt(1)
         val state = awaitState()
         assertEquals(1, state.int)

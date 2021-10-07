@@ -110,10 +110,12 @@ class ViewModelStoreTest : BaseTest() {
     fun testActivityViewModelRetainedAcrossConfigurationChanges() {
         val (controller, fragment) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>()
         fragment.viewModelActivity.setCount(2)
-        controller.configurationChange(Configuration().apply {
-            setToDefaults()
-            this.orientation = Configuration.ORIENTATION_LANDSCAPE
-        })
+        controller.configurationChange(
+            Configuration().apply {
+                setToDefaults()
+                this.orientation = Configuration.ORIENTATION_LANDSCAPE
+            }
+        )
         val recreatedFragment = controller.mvRxFragment<ViewModelStoreTestFragment>()
         assertNotEquals(fragment, recreatedFragment)
         withState(recreatedFragment.viewModelActivity) { state ->
@@ -127,10 +129,12 @@ class ViewModelStoreTest : BaseTest() {
     fun testPersistedStateForActivityViewModelWhenSetFromFragmentArgsAfterConfigurationChange() {
         val (controller, fragment) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(args = ViewModelStoreTestArgs(3))
         fragment.viewModelActivity.setCount(2)
-        controller.configurationChange(Configuration().apply {
-            setToDefaults()
-            this.orientation = Configuration.ORIENTATION_LANDSCAPE
-        })
+        controller.configurationChange(
+            Configuration().apply {
+                setToDefaults()
+                this.orientation = Configuration.ORIENTATION_LANDSCAPE
+            }
+        )
         val bundleTwo = Bundle()
         controller.saveInstanceState(bundleTwo)
 
@@ -171,10 +175,12 @@ class ViewModelStoreTest : BaseTest() {
     fun testFragmentViewModelRetainedAcrossConfigurationChanges() {
         val (controller, fragment) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>()
         fragment.viewModelFragment.setCount(2)
-        controller.configurationChange(Configuration().apply {
-            setToDefaults()
-            this.orientation = Configuration.ORIENTATION_LANDSCAPE
-        })
+        controller.configurationChange(
+            Configuration().apply {
+                setToDefaults()
+                this.orientation = Configuration.ORIENTATION_LANDSCAPE
+            }
+        )
         val recreatedFragment = controller.mvRxFragment<ViewModelStoreTestFragment>()
         assertNotEquals(fragment, recreatedFragment)
         withState(recreatedFragment.viewModelFragment) { state ->
@@ -188,10 +194,12 @@ class ViewModelStoreTest : BaseTest() {
     fun testPersistedStateForFragmentViewModelWhenSetFromFragmentArgsAfterConfigurationChange() {
         val (controller, fragment) = createFragment<ViewModelStoreTestFragment, TestMvRxActivity>(args = ViewModelStoreTestArgs(3))
         fragment.viewModelFragment.setCount(2)
-        controller.configurationChange(Configuration().apply {
-            setToDefaults()
-            this.orientation = Configuration.ORIENTATION_LANDSCAPE
-        })
+        controller.configurationChange(
+            Configuration().apply {
+                setToDefaults()
+                this.orientation = Configuration.ORIENTATION_LANDSCAPE
+            }
+        )
         val bundleTwo = Bundle()
         controller.saveInstanceState(bundleTwo)
 

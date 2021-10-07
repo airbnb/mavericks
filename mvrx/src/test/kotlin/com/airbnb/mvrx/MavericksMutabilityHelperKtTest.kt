@@ -13,7 +13,6 @@ class MavericksMutabilityHelperKtTest {
     }
 
     data class TestDataClass(
-            internal val foo: Int
+        internal val foo: Int
     )
 }
-
