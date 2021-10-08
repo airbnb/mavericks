@@ -1,8 +1,8 @@
 object Versions {
     // Build tools and SDK
     const val buildTools = "30.0.3"
-    const val compileSdk = 30
-    const val gradlePlugin = "7.0.0"
+    const val compileSdk = 31
+    const val gradlePlugin = "7.0.2"
     const val kotlin = "1.5.30"
     const val minSdk = 16
     const val targetSdk = 29
@@ -20,10 +20,10 @@ object Versions {
     const val fragment = "1.3.4"
     const val lifecycle = "2.3.1"
     const val navigation = "2.3.5"
-    const val navigationCompose = "2.4.0-alpha01"
+    const val navigationCompose = "2.4.0-alpha10"
     const val recyclerview = "1.2.0"
     const val room = "2.3.0"
-    const val viewModelCompose = "1.0.0-alpha05"
+    const val viewModelCompose = "2.4.0-rc01"
 
     // Libraries
     const val autoValue = "1.6.6"
@@ -31,7 +31,7 @@ object Versions {
     const val epoxy = "4.0.0"
     const val hilt = "2.36"
     const val koin = "2.0.1"
-    const val kotlinCoroutines = "1.5.1"
+    const val kotlinCoroutines = "1.5.2"
     const val lottie = "3.4.0"
     const val moshi = "1.9.2"
     const val multidex = "2.0.1"

@@ -14,7 +14,6 @@ abstract class MavericksViewModelConfig<S : Any>(
     /**
      * The state store instance that will control the state of the ViewModel.
      */
-    @InternalMavericksApi
     val stateStore: MavericksStateStore<S>,
     /**
      * The coroutine scope that will be provided to the view model.

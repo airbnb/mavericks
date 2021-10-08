@@ -81,7 +81,8 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewMod
                     2 -> Loading()
                     3 -> Success(Unit)
                     else -> throw IllegalArgumentException("Unexpected call count $callCount")
-                }, it
+                },
+                it
             )
         }
         Completable.create { emitter ->
@@ -101,7 +102,8 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewMod
                     2 -> Loading()
                     3 -> Fail<Unit>(error)
                     else -> throw IllegalArgumentException("Unexpected call count $callCount")
-                }, it
+                },
+                it
             )
         }
         Completable.create {
@@ -120,7 +122,8 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewMod
                     2 -> Loading()
                     3 -> Success("Hello World")
                     else -> throw IllegalArgumentException("Unexpected call count $callCount")
-                }, it
+                },
+                it
             )
         }
         Single.create<String> { emitter ->
@@ -140,7 +143,8 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewMod
                     2 -> Loading()
                     3 -> Fail<String>(error)
                     else -> throw IllegalArgumentException("Unexpected call count $callCount")
-                }, it
+                },
+                it
             )
         }
         Single.create<String> {
@@ -159,7 +163,8 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewMod
                     2 -> Loading()
                     3 -> Success("Hello World")
                     else -> throw IllegalArgumentException("Unexpected call count $callCount")
-                }, it
+                },
+                it
             )
         }
         Observable.just("Hello World").execute { copy(async = it) }
@@ -177,7 +182,8 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewMod
                         2 -> 1
                         3 -> 2
                         else -> throw IllegalArgumentException("Unexpected call count $callCount")
-                    }, it
+                    },
+                    it
                 )
             }
             setState { copy(foo = 1) }
@@ -197,7 +203,8 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewMod
                     2 -> Loading()
                     3 -> Fail<String>(error)
                     else -> throw IllegalArgumentException("Unexpected call count $callCount")
-                }, it
+                },
+                it
             )
         }
         Observable.create<String> {
@@ -216,7 +223,8 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewMod
                     2 -> Loading()
                     3 -> Success("Hello World!")
                     else -> throw IllegalArgumentException("Unexpected call count $callCount")
-                }, it
+                },
+                it
             )
         }
         Observable.just("Hello World").execute(mapper = { "$it!" }) { copy(async = it) }
@@ -692,10 +700,13 @@ class ViewModelSubscriberTest : BaseTest() {
         var callCount = 0
         val success = "Hello World"
         val fail = IllegalStateException("Uh oh")
-        viewModel._internalSF(owner, ViewModelTestState::async, onFail = {
-            callCount++
-            assertEquals(fail, it)
-        }) {
+        viewModel._internalSF(
+            owner, ViewModelTestState::async,
+            onFail = {
+                callCount++
+                assertEquals(fail, it)
+            }
+        ) {
             callCount++
             assertEquals(success, it)
         }

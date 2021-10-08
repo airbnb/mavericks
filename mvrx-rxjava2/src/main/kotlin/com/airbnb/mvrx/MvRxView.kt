@@ -25,7 +25,10 @@ interface MvRxView : MavericksView {
      *
      * Default: [RedeliverOnStart].
      */
-    fun <S : MavericksState> BaseMvRxViewModel<S>.subscribe(deliveryMode: DeliveryMode = RedeliverOnStart, subscriber: (S) -> Unit) =
+    fun <S : MavericksState> BaseMvRxViewModel<S>.subscribe(
+        deliveryMode: DeliveryMode = RedeliverOnStart,
+        subscriber: (S) -> Unit
+    ) =
         _internal(subscriptionLifecycleOwner, deliveryMode, { subscriber(it) }).toDisposable()
 
     /**

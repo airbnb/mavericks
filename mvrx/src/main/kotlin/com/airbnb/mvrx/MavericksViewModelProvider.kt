@@ -107,7 +107,9 @@ object MavericksViewModelProvider {
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun <VM : MavericksViewModel<S>, S : MavericksState> Bundle.toStateRestorer(viewModelContext: ViewModelContext): StateRestorer<VM, S> {
+    private fun <VM : MavericksViewModel<S>, S : MavericksState> Bundle.toStateRestorer(
+        viewModelContext: ViewModelContext
+    ): StateRestorer<VM, S> {
         val restoredArgs = get(KEY_MVRX_SAVED_ARGS)
         val restoredState = getBundle(KEY_MVRX_SAVED_INSTANCE_STATE)
         val restoredViewModelClass = getSerializable(KEY_MVRX_SAVED_VM_CLASS) as? Class<out VM>

@@ -54,9 +54,11 @@ class ViewModelDelegateProviderTest : BaseTest() {
 
     @Test
     fun existingViewModelWithMockedState() {
-        val mockVariants = getMockVariants<Frag2, Nothing>(viewProvider = { _, _ ->
-            Frag2()
-        })
+        val mockVariants = getMockVariants<Frag2, Nothing>(
+            viewProvider = { _, _ ->
+                Frag2()
+            }
+        )
 
         checkNotNull(mockVariants)
 
@@ -75,9 +77,11 @@ class ViewModelDelegateProviderTest : BaseTest() {
 
     @Test
     fun parentFragmentViewModelWithMockedState() {
-        val mockVariants = getMockVariants<Frag3, Nothing>(viewProvider = { _, _ ->
-            Frag3()
-        })
+        val mockVariants = getMockVariants<Frag3, Nothing>(
+            viewProvider = { _, _ ->
+                Frag3()
+            }
+        )
 
         checkNotNull(mockVariants)
 
@@ -108,7 +112,6 @@ class ViewModelDelegateProviderTest : BaseTest() {
             defaultState2 = TestState(2),
             defaultArgs = null
         ) {
-
         }
     }
 
@@ -123,7 +126,6 @@ class ViewModelDelegateProviderTest : BaseTest() {
             defaultState = TestState(2),
             defaultArgs = null
         ) {
-
         }
     }
 
@@ -138,7 +140,6 @@ class ViewModelDelegateProviderTest : BaseTest() {
             defaultState = TestState(2),
             defaultArgs = null
         ) {
-
         }
     }
 

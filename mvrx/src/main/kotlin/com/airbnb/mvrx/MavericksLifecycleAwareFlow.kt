@@ -46,6 +46,7 @@ fun <T : Any?> Flow<T>.flowWhenStarted(owner: LifecycleOwner): Flow<T> = flow {
                 onReceive(startedChannel, { flowChannel.cancel(); isClosed = true }) {
                     started = it
                     if (flowValue !== null) {
+                        @Suppress("UNCHECKED_CAST")
                         transform(it, flowValue as T)
                     }
                 }
