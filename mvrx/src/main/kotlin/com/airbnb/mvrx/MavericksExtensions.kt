@@ -204,7 +204,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
     }
 
 /**
- * [fragmentViewModel] except scoped to the current Activity. Use this to share state between different Fragments.
+ * ViewModel scoped to the Activity.
  */
 inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T.viewModel(
     viewModelClass: KClass<VM> = VM::class,
