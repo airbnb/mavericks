@@ -1,5 +1,6 @@
 package com.airbnb.mvrx.compose
 
+import android.content.ContextWrapper
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -39,7 +40,23 @@ inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mave
     scope: LifecycleOwner = LocalLifecycleOwner.current,
     noinline keyFactory: (() -> String)? = null,
 ): VM {
-    val activity = LocalContext.current as? ComponentActivity ?: error("Composable is not hosted in a ComponentActivity!")
+    var activity: ComponentActivity? = null
+    var currentContext = LocalContext.current
+    if (currentContext is ComponentActivity) {
+        activity = currentContext
+    } else {
+        while (currentContext is ContextWrapper) {
+            if (currentContext is ComponentActivity) {
+                activity = currentContext
+                break
+            }
+            currentContext = currentContext.baseContext
+        }
+    }
+    checkNotNull(activity) {
+        "Composable is not hosted in a ComponentActivity!"
+    }
+
     val viewModelStoreOwner = scope as? ViewModelStoreOwner ?: error("LifecycleOwner must be a ViewModelStoreOwner!")
     val savedStateRegistryOwner = scope as? SavedStateRegistryOwner ?: error("LifecycleOwner must be a SavedStateRegistryOwner!")
     val savedStateRegistry = savedStateRegistryOwner.savedStateRegistry
