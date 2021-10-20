@@ -176,7 +176,11 @@ class MavericksLauncherFragment : MavericksLauncherBaseFragment() {
         }
     }
 
-    private fun EpoxyController.addMocksForSelectedView(state: MavericksLauncherState, mocksToShow: List<MockedViewProvider<*>>?, context: Context) {
+    private fun EpoxyController.addMocksForSelectedView(
+        state: MavericksLauncherState,
+        mocksToShow: List<MockedViewProvider<*>>?,
+        context: Context
+    ) {
         if (mocksToShow == null || mocksToShow.isEmpty()) {
             textRow {
                 id("no mocks")

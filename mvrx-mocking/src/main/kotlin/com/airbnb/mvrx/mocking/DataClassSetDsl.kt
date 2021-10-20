@@ -59,14 +59,18 @@ interface DataClassSetDsl {
     /**
      * A shortcut to setting an Async property to Loading, instead of "data.set { ::property }.with { Loading() }".
      */
-    fun <DataClass : Any, Type : Async<AsyncType>, AsyncType> DataClass.setLoading(block: DataClass.() -> KProperty0<Type>): DataClass {
+    fun <DataClass : Any, Type : Async<AsyncType>, AsyncType> DataClass.setLoading(
+        block: DataClass.() -> KProperty0<Type>
+    ): DataClass {
         return Setter<DataClass, Async<AsyncType>?>(this, block()).with { Loading() }
     }
 
     /**
      * A shortcut to setting an Async property to Fail, instead of "data.set { ::property }.with { Fail() }".
      */
-    fun <DataClass : Any, Type : Async<AsyncType>, AsyncType> DataClass.setNetworkFailure(block: DataClass.() -> KProperty0<Type>): DataClass {
+    fun <DataClass : Any, Type : Async<AsyncType>, AsyncType> DataClass.setNetworkFailure(
+        block: DataClass.() -> KProperty0<Type>
+    ): DataClass {
         return Setter<DataClass, Async<AsyncType>?>(this, block()).with { Fail(Throwable("Network request failed")) }
     }
 
@@ -125,7 +129,10 @@ interface DataClassSetDsl {
     /**
      * Helper to copy a nested class and update a property on it.
      */
-    class Setter<DataClass : Any, PropType>(private val instance: DataClass, internal val property: KProperty0<PropType>) {
+    class Setter<DataClass : Any, PropType>(
+        private val instance: DataClass,
+        internal val property: KProperty0<PropType>
+    ) {
         init {
             val clazz = instance::class
             if (instance is Async<*>) {

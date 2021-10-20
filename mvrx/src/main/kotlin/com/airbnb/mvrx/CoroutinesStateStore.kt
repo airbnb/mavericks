@@ -100,14 +100,14 @@ class CoroutinesStateStore<S : MavericksState>(
     }
 
     override fun get(block: (S) -> Unit) {
-        withStateChannel.offer(block)
+        withStateChannel.trySend(block)
         if (MavericksTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
             flushQueuesOnceBlocking()
         }
     }
 
     override fun set(stateReducer: S.() -> S) {
-        setStateChannel.offer(stateReducer)
+        setStateChannel.trySend(stateReducer)
         if (MavericksTestOverrides.FORCE_SYNCHRONOUS_STATE_STORES) {
             flushQueuesOnceBlocking()
         }

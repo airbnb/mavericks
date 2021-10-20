@@ -89,7 +89,6 @@ abstract class BaseTest {
             }
             .commitNow()
 
-
         return controller
     }
 }

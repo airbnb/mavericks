@@ -112,7 +112,10 @@ interface MavericksView : LifecycleOwner {
      * @param action supports cooperative cancellation. The previous action will be cancelled if it is not completed before
      * the next one is emitted.
      */
-    fun <S : MavericksState> MavericksViewModel<S>.onEach(deliveryMode: DeliveryMode = RedeliverOnStart, action: suspend (S) -> Unit) =
+    fun <S : MavericksState> MavericksViewModel<S>.onEach(
+        deliveryMode: DeliveryMode = RedeliverOnStart,
+        action: suspend (S) -> Unit
+    ) =
         _internal(subscriptionLifecycleOwner, deliveryMode, action)
 
     /**
