@@ -42,12 +42,16 @@ inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mave
 ): VM {
     var activity: ComponentActivity? = null
     var currentContext = LocalContext.current
-    while (currentContext is ContextWrapper) {
-        if (currentContext is ComponentActivity) {
-            activity = currentContext
-            break
+    if (currentContext is ComponentActivity) {
+        activity = currentContext
+    } else {
+        while (currentContext is ContextWrapper) {
+            if (currentContext is ComponentActivity) {
+                activity = currentContext
+                break
+            }
+            currentContext = currentContext.baseContext
         }
-        currentContext = currentContext.baseContext
     }
     checkNotNull(activity) {
         "Composable is not hosted in a ComponentActivity!"
