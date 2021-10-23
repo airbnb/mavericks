@@ -27,6 +27,10 @@ jobs:
       script: "./gradlew lintRelease"
     - name: Unit Tests
       script: "./gradlew testReleaseUnitTest"
+    - name: Code Coverage
+      script: "./gradlew jacocoFullReport"
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 sudo: false
 cache:
   directories:
