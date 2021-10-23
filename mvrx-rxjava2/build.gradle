@@ -1,9 +1,7 @@
-import com.airbnb.mvrx.JacocoReportTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
-apply plugin: "jacoco"
 apply plugin: "com.vanniktech.maven.publish"
 
 tasks.withType(KotlinCompile).all {
@@ -30,10 +28,6 @@ android {
     }
 }
 
-jacoco {
-    toolVersion = "0.8.2"
-}
-
 dependencies {
     api project(':mvrx')
     api Libraries.rxJava
@@ -48,8 +42,4 @@ dependencies {
     testImplementation TestLibraries.kotlinCoroutinesTest
     testImplementation TestLibraries.mockito
     testImplementation TestLibraries.roboeletric
-}
-
-tasks.register("coverage", JacocoReportTask.class) {
-    coverage.dependsOn("testDebugUnitTest")
 }

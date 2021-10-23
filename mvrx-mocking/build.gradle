@@ -1,11 +1,9 @@
-import com.airbnb.mvrx.JacocoReportTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
-apply plugin: "jacoco"
 apply plugin: "com.vanniktech.maven.publish"
 
 tasks.withType(KotlinCompile).all {
@@ -36,10 +34,6 @@ android {
     }
 }
 
-jacoco {
-    toolVersion = "0.8.2"
-}
-
 dependencies {
     implementation Libraries.kotlinReflect
     implementation Libraries.appcompat
@@ -56,6 +50,3 @@ dependencies {
     kaptTest AnnotationProcessors.autoValue
 }
 
-tasks.register("coverage", JacocoReportTask.class) {
-    coverage.dependsOn("testDebugUnitTest")
-}
