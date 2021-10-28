@@ -1,0 +1,60 @@
+// Mostly from https://nolambda.stream/posts/jacoco-setup-for-multi-module-project/
+def coveredProjectNames = ["mvrx", "mvrx-compose", "mvrx-mocking", "mvrx-navigation", "mvrx-rxjava2"]
+def coveredProjects = subprojects.findAll( project -> {
+    coveredProjectNames.contains(project.name)
+})
+
+configure(coveredProjects) { prj ->
+    apply plugin: 'jacoco'
+
+    jacoco {
+        toolVersion = "0.8.7"
+    }
+
+    task jacocoReport(type: JacocoReport, dependsOn: 'testDebugUnitTest') {
+        reports {
+            csv.getRequired().set(false)
+            xml.getRequired().set(true)
+            html.getRequired().set(true)
+        }
+
+        final fileFilter = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*', 'android/**/*.*']
+
+        final kotlinTree = fileTree(dir: "${prj.buildDir}/tmp/kotlin-classes/debug", excludes: fileFilter)
+        final javacTree = fileTree(dir: "${prj.buildDir}/intermediates/javac/debug", excludes: fileFilter)
+        final mainSrc = "${prj.projectDir}/src/main/java"
+
+        sourceDirectories.setFrom files([mainSrc])
+        classDirectories.setFrom files([kotlinTree, javacTree])
+        executionData.setFrom fileTree(dir: prj.buildDir, includes: [
+                'jacoco/testDebugUnitTest.exec', 'outputs/code-coverage/connected/*coverage.ec'
+        ])
+    }
+}
+
+apply plugin: 'jacoco'
+
+task jacocoFullReport(type: JacocoReport, group: 'Coverage reports') {
+    def projects = coveredProjects
+
+    dependsOn(projects.jacocoReport)
+
+    final source = files(projects.jacocoReport.sourceDirectories)
+
+    additionalSourceDirs.setFrom source
+    sourceDirectories.setFrom source
+
+    classDirectories.setFrom files(projects.jacocoReport.classDirectories)
+    executionData.setFrom files(projects.jacocoReport.executionData)
+
+    reports {
+        html {
+            enabled true
+            destination file('build/reports/jacoco/html')
+        }
+        xml {
+            enabled true
+            destination file('build/reports/jacoco/jacocoFullReport.xml')
+        }
+    }
+}

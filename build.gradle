@@ -48,3 +48,5 @@ allprojects {
 subprojects {
     apply from: "$rootDir/detekt.gradle"
 }
+
+apply from: 'gradle/jacoco.gradle'

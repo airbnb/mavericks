@@ -67,6 +67,8 @@ captures/
 .idea/workspace.xml
 .idea/jarRepositories.xml
 .idea/markdown-*.xml
+.idea/sonarlint/
+.idea/checkstyle-idea.xml
 
 # Android Studio 3 in .gitignore file.
 .idea/caches

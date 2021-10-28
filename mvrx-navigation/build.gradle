@@ -1,9 +1,7 @@
-import com.airbnb.mvrx.JacocoReportTask
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'jacoco'
 apply plugin: 'com.vanniktech.maven.publish'
 
 tasks.withType(KotlinCompile).all {
@@ -48,12 +46,4 @@ dependencies {
     testImplementation TestLibraries.roboeletric
     testImplementation Libraries.fragmentKtx
     testImplementation Libraries.fragmentTesting
-}
-
-jacoco {
-    toolVersion = "0.8.2"
-}
-
-tasks.register("coverage", JacocoReportTask.class) {
-    coverage.dependsOn("testDebugUnitTest")
 }
