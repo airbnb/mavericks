@@ -69,6 +69,7 @@ captures/
 .idea/markdown-*.xml
 .idea/sonarlint/
 .idea/checkstyle-idea.xml
+.idea/deploymentTargetDropDown.xml
 
 # Android Studio 3 in .gitignore file.
 .idea/caches
@@ -114,4 +115,3 @@ lint/tmp/
 
 # Mocks
 /mvrx_temp_mocks/*
-.idea/deploymentTargetDropDown.xml
