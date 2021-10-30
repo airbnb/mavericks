@@ -3,7 +3,7 @@ object Versions {
     const val buildTools = "30.0.3"
     const val compileSdk = 31
     const val gradlePlugin = "7.0.3"
-    const val kotlin = "1.5.30"
+    const val kotlin = "1.5.31"
     const val minSdk = 16
     const val targetSdk = 29
 
@@ -15,7 +15,7 @@ object Versions {
     const val cardview = "1.0.0"
     const val constraintlayout = "2.0.0"
     const val coordinatorLayout = "1.1.0"
-    const val compose = "1.0.3"
+    const val compose = "1.0.4"
     const val core = "1.5.0"
     const val fragment = "1.3.4"
     const val lifecycle = "2.3.1"
@@ -30,7 +30,7 @@ object Versions {
     const val dagger = "2.38.1"
     const val epoxy = "4.0.0"
     const val hilt = "2.36"
-    const val koin = "2.0.1"
+    const val koin = "3.1.3"
     const val kotlinCoroutines = "1.5.2"
     const val lottie = "3.4.0"
     const val moshi = "1.9.2"
@@ -85,7 +85,7 @@ object Libraries {
     const val fragmentTesting = "androidx.fragment:fragment-testing:${Versions.fragment}"
     const val hilt = "com.google.dagger:hilt-android:${Versions.hilt}"
     const val junit = "junit:junit:${Versions.junit}"
-    const val koin = "org.koin:koin-android:${Versions.koin}"
+    const val koin = "io.insert-koin:koin-android:${Versions.koin}"
     const val kotlin = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}"
     const val kotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.kotlinCoroutines}"
     const val kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:${Versions.kotlin}"
