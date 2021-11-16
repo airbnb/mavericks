@@ -37,7 +37,7 @@ If you plan on using Jetpack Navigation, you should also follow the setup steps 
 
 ### [Optional] Set Custom Mavericks View Model Configuration
 
-Mavericks lets you override some configuration that is used every time a new ViewModel is created. For example, you could change the default dispatcher for the state store or for subscriptions. Check out the docs for [ViewModelConfigFactory](https://github.com/airbnb/mavericks/blob/master/mavericks/src/main/kotlin/com/airbnb/mvrx/MavericksViewModelConfigFactory.kt) for more info.
+Mavericks lets you override some configuration that is used every time a new ViewModel is created. For example, you could change the default dispatcher for the state store or for subscriptions. Check out the docs for [ViewModelConfigFactory](https://github.com/airbnb/mavericks/blob/main/mavericks/src/main/kotlin/com/airbnb/mvrx/MavericksViewModelConfigFactory.kt) for more info.
 
 **Note:** If you create your own config factory, ensure that you set `debugMode` correctly so that the [debug checks](https://github.com/airbnb/Mavericks/wiki#debug-checks) are run.
 

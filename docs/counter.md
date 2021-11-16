@@ -5,7 +5,7 @@ Getting started with Mavericks is simple. Once it is [integrated into your proje
 ![Counter](/images/counter.png)
 
 When you click the counter text, the count goes up by one.
-Code for this sample can be found [here](https://github.com/airbnb/mavericks/tree/master/counter).
+Code for this sample can be found [here](https://github.com/airbnb/mavericks/tree/main/counter).
 
 ## Create CounterState
 

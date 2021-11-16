@@ -31,4 +31,4 @@ MockableMavericks.initialize(this, viewModelDelegateFactory = DefaultNavigationV
 
 Once you have done that, you may use the `navGraphViewModel()` delegate to get a ViewModel scoped to the navigation graph with that id.
 
-To view an example of its usage, check out the sample [here](https://github.com/airbnb/mavericks/blob/master/sample-navigation/src/main/java/com/airbnb/mvrx/sample/navigation/FlowFragments.kt).
+To view an example of its usage, check out the sample [here](https://github.com/airbnb/mavericks/blob/main/sample-navigation/src/main/java/com/airbnb/mvrx/sample/navigation/FlowFragments.kt).
