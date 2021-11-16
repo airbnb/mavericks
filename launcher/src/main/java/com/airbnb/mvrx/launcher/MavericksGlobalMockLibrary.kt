@@ -51,8 +51,8 @@ object MavericksGlobalMockLibrary {
                     dexFileEntry.startsWith("java.") ||
                         dexFileEntry.startsWith("android.") ||
                         dexFileEntry.startsWith("androidx.")
-                    // TODO: Allow mavericks configuration to specify package name prefix whitelist, or
-                    //  more generally, naming whitelist to identify views, for faster initialization
+                    // TODO: Allow mavericks configuration to specify package name prefix safelist, or
+                    //  more generally, naming safelist to identify views, for faster initialization
                 }.partition { it.endsWith("Fragment") }
                 .let { (possibleFragmentEntries, otherEntries) ->
                     // Prioritize checking "fragment" named classes first, since those are more likely to be matches
@@ -99,8 +99,8 @@ private suspend fun loadMocks(classLoader: BaseDexClassLoader): List<MockedViewP
             dexFileEntry.startsWith("java.") ||
                 dexFileEntry.startsWith("android.") ||
                 dexFileEntry.startsWith("androidx.")
-            // TODO: Allow mavericks configuration to specify package name prefix whitelist, or
-            //  more generally, naming whitelist to identify views, for faster initialization
+            // TODO: Allow mavericks configuration to specify package name prefix safelist, or
+            //  more generally, naming safelist to identify views, for faster initialization
         }
         .map { GlobalScope.async { getMocksForClassName(it, classLoader) } }
         .toList()
