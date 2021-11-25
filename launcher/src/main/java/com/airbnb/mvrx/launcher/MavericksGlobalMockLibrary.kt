@@ -125,6 +125,8 @@ private fun getAsMavericksView(
         classLoader.loadClass(className)
     } catch (e: ClassNotFoundException) {
         return null
+    } catch (e: VerifyError) {
+        return null
     }
 
     return if (MockableMavericksView::class.java.isAssignableFrom(clazz) && !Modifier.isAbstract(clazz.modifiers)) {
