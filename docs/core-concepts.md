@@ -2,7 +2,7 @@
 Mastering Mavericks only requires using three classes: `MavericksState`, `MavericksViewModel`, and `MavericksView`.
 
 ## MavericksState
-The first step in creating a Mavericks screen is to model it as a function of state. The MavericksState interface [doesn't do anything](https://github.com/airbnb/MvRx/blob/master/mavericks/src/main/kotlin/com/airbnb/mvrx/MavericksState.kt) itself but signals the intention of your class to be used as state.
+The first step in creating a Mavericks screen is to model it as a function of state. The MavericksState interface [doesn't do anything](https://github.com/airbnb/mavericks/blob/master/mvrx/src/main/kotlin/com/airbnb/mvrx/MavericksState.kt) itself but signals the intention of your class to be used as state.
 
 Modeling a screen as a function of state is a useful concept because it is:
 1. Thread safe
@@ -16,7 +16,7 @@ Mavericks will also enforce that your state class:
 1. Uses only immutable properties
 1. Has default values for every property to ensure that your screen can be rendered immediately
 
-Mavericks enforces these through its [debug checks](/debug-checks.md)
+Mavericks enforces these through its [debug checks](debug-checks.md)
 
 This concept makes reasoning about and testing a screen trivially easy because given a state class, you can have high confidence that your screen will look correct.
 Example
