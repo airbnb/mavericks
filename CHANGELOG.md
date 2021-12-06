@@ -1,4 +1,10 @@
 # Change Log
+
+## 2.5.0
+- Fix issue when the LocalContext is not directly an Activity (#582)
+- update to Compose 1.0.4, Kotlin 1.5.31, Koin 3.1.3 (#586)
+- Ignore VerifyError Exception when loading potential mockable classes #590
+
 ## 2.4.0
 - Add covariant recreation support (#565)
 - Exposing unique subscription handling for custom flow operations (#560)
