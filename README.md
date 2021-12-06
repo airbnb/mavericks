@@ -1,6 +1,6 @@
-[![Build Status](https://travis-ci.com/airbnb/mavericks.svg?branch=master)](https://travis-ci.com/github/airbnb/mavericks)
+[![Build Status](https://travis-ci.com/airbnb/mavericks.svg?branch=main)](https://travis-ci.com/github/airbnb/mavericks)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks)
-[![codecov.io](https://codecov.io/github/codecov/mavericks/branch/master/graph/badge.svg)](https://codecov.io/github/codecov/mavericks)
+[![codecov.io](https://codecov.io/github/codecov/mavericks/branch/main/graph/badge.svg)](https://codecov.io/github/codecov/mavericks)
 
 # Mavericks (formerly MvRx): Android on Autopilot
 

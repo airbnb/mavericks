@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/airbnb/mavericks.svg?branch=master)](https://travis-ci.com/github/airbnb/mavericks)
+[![Build Status](https://travis-ci.com/airbnb/mavericks.svg?branch=main)](https://travis-ci.com/github/airbnb/mavericks)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks)
 
 # Mavericks

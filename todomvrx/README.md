@@ -18,8 +18,8 @@ Running `cloc` on `src/main` for Mavericks yields:
 ## Architecture
 ToDo-Mavericks uses Room, Epoxy, and Navigation Components for its core architecture.
 
-It then uses [TasksViewModel](https://github.com/airbnb/mavericks/blob/master/todomvrx/src/main/java/com/airbnb/mvrx/todomvrx/TasksViewModel.kt) to act as an in-memory cache and owner of multiple repositories. It could merge db + network but for the sake of having an actual single source of truth, it loads two different database sources that connect to the same database but have different artificial delays. It then proxies all tasks calls to each of them.
+It then uses [TasksViewModel](https://github.com/airbnb/mavericks/blob/main/todomvrx/src/main/java/com/airbnb/mvrx/todomvrx/TasksViewModel.kt) to act as an in-memory cache and owner of multiple repositories. It could merge db + network but for the sake of having an actual single source of truth, it loads two different database sources that connect to the same database but have different artificial delays. It then proxies all tasks calls to each of them.
 
 All task state is shared between Fragments using this ViewModel.
 
-Snackbars for actions like adding a task are handled using [this block of code](https://github.com/airbnb/mavericks/blob/master/todomvrx/src/main/java/com/airbnb/mvrx/todomvrx/core/BaseFragment.kt#L46) which compares state changes to see when tasks have changed.
+Snackbars for actions like adding a task are handled using [this block of code](https://github.com/airbnb/mavericks/blob/main/todomvrx/src/main/java/com/airbnb/mvrx/todomvrx/core/BaseFragment.kt#L46) which compares state changes to see when tasks have changed.

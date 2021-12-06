@@ -8,7 +8,7 @@
 
 SLUG="airbnb/mvrx"
 JDK="oraclejdk8"
-BRANCH="master"
+BRANCH="main"
 
 set -e
 

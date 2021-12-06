@@ -14,7 +14,7 @@ This module contains a sample app to demonstrate how to ease the usage of Dagger
 
 * **Removing boilerplate from a MavericksViewModelFactory**
 
-  An `MavericksViewModelFactory` is different than an AssistedInject Factory, and is still needed. Using this AssistedInject multibinding setup, most ViewModels will share the same boilerplate logic in their `MavericksViewModelFactory`'s. A [DaggerMavericksViewModelFactory](https://github.com/airbnb/mavericks/blob/master/hellodagger/src/main/java/com/airbnb/mvrx/hellodagger/di/DaggerMavericksViewModelFactory.kt) has been added to eliminate this boilerplate.
+  An `MavericksViewModelFactory` is different than an AssistedInject Factory, and is still needed. Using this AssistedInject multibinding setup, most ViewModels will share the same boilerplate logic in their `MavericksViewModelFactory`'s. A [DaggerMavericksViewModelFactory](https://github.com/airbnb/mavericks/blob/main/hellodagger/src/main/java/com/airbnb/mvrx/hellodagger/di/DaggerMavericksViewModelFactory.kt) has been added to eliminate this boilerplate.
 
 ## Example
 
