@@ -16,7 +16,7 @@ Mavericks will also enforce that your state class:
 1. Uses only immutable properties
 1. Has default values for every property to ensure that your screen can be rendered immediately
 
-Mavericks enforces these through its [debug checks](/debug-checks.md)
+Mavericks enforces these through its [debug checks](debug-checks.md)
 
 This concept makes reasoning about and testing a screen trivially easy because given a state class, you can have high confidence that your screen will look correct.
 Example
