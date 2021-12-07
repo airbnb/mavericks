@@ -14,7 +14,7 @@ buildscript {
         // ./gradlew clean assemble uploadArchives --no-daemon --no-parallel
         classpath "com.vanniktech:gradle-maven-publish-plugin:0.14.2"
         // Dokka is needed on classpath for vanniktech publish plugin
-        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.4.30"
+        classpath "org.jetbrains.dokka:dokka-gradle-plugin:1.5.31"
     }
 
     configurations.all {
