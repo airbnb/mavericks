@@ -1,6 +1,8 @@
 package com.airbnb.mvrx.compose.sample
 
 import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
@@ -25,7 +27,32 @@ import com.airbnb.mvrx.compose.mavericksViewModel
 
 data class CounterState(
     val count: Int = 0,
-) : MavericksState
+) : MavericksState {
+    constructor(arguments: ArgumentsTest): this(count = arguments.count)
+}
+
+data class ArgumentsTest(val count: Int) : Parcelable {
+    constructor(parcel: Parcel) : this(parcel.readInt()) {
+    }
+
+    override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeInt(count)
+    }
+
+    override fun describeContents(): Int {
+        return 0
+    }
+
+    companion object CREATOR : Parcelable.Creator<ArgumentsTest> {
+        override fun createFromParcel(parcel: Parcel): ArgumentsTest {
+            return ArgumentsTest(parcel)
+        }
+
+        override fun newArray(size: Int): Array<ArgumentsTest?> {
+            return arrayOfNulls(size)
+        }
+    }
+}
 
 class CounterViewModel(initialState: CounterState) : MavericksViewModel<CounterState>(initialState) {
     fun incrementCount() = setState { copy(count = count + 1) }
@@ -39,30 +66,30 @@ class ComposeSampleActivity : AppCompatActivity() {
         setContent {
             Column {
                 Box(modifier = Modifier.weight(1f)) {
-                    CounterScreenNavHost("Counter Screen in Nav Graph 1")
+                    CounterScreenNavHost("Counter Screen in Nav Graph 1", useInitialArgument = false)
                 }
                 Divider()
                 Box(modifier = Modifier.weight(1f)) {
-                    CounterScreenNavHost("Counter Screen in Nav Graph 2")
+                    CounterScreenNavHost("Counter Screen in Nav Graph 2", useInitialArgument = true)
                 }
             }
         }
     }
 
     @Composable
-    fun CounterScreenNavHost(title: String) {
+    fun CounterScreenNavHost(title: String, useInitialArgument: Boolean) {
         val navController = rememberNavController()
         NavHost(navController, startDestination = "counter") {
             composable("counter") {
-                CounterScreen(title)
+                CounterScreen(title, useInitialArgument)
             }
         }
     }
 
     @Composable
-    fun CounterScreen(title: String) {
+    fun CounterScreen(title: String, useInitialArgument: Boolean) {
         // This will get or create a ViewModel scoped to the closest LocalLifecycleOwner which, in this case, is the NavHost.
-        val navScopedViewModel: CounterViewModel = mavericksViewModel()
+        val navScopedViewModel: CounterViewModel = mavericksViewModel(argsFactory = { ArgumentsTest(5) }.takeIf { useInitialArgument })
         // This will get or create a ViewModel scoped to the Activity.
         val activityScopedViewModel: CounterViewModel = mavericksActivityViewModel()
 

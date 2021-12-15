@@ -39,6 +39,7 @@ import kotlin.reflect.KProperty1
 inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mavericksViewModel(
     scope: LifecycleOwner = LocalLifecycleOwner.current,
     noinline keyFactory: (() -> String)? = null,
+    noinline argsFactory: (() -> Any?)? = null,
 ): VM {
     var activity: ComponentActivity? = null
     var currentContext = LocalContext.current
@@ -64,11 +65,11 @@ inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mave
     val viewModelContext = remember(scope, activity, viewModelStoreOwner, savedStateRegistry) {
         when (scope) {
             is Fragment -> {
-                val args = scope.arguments?.get(Mavericks.KEY_ARG)
+                val args = argsFactory?.invoke() ?: scope.arguments?.get(Mavericks.KEY_ARG)
                 FragmentViewModelContext(activity, args, scope)
             }
             else -> {
-                val args = activity.intent.extras?.get(Mavericks.KEY_ARG)
+                val args = argsFactory?.invoke() ?: activity.intent.extras?.get(Mavericks.KEY_ARG)
                 ActivityViewModelContext(activity, args, viewModelStoreOwner, savedStateRegistry)
             }
         }
@@ -90,9 +91,11 @@ inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mave
 @Composable
 inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mavericksActivityViewModel(
     noinline keyFactory: (() -> String)? = null,
+    noinline argsFactory: (() -> Any?)? = null,
 ): VM = mavericksViewModel(
     LocalContext.current as? ComponentActivity ?: error("LocalContext is not a ComponentActivity!"),
     keyFactory = keyFactory,
+    argsFactory = argsFactory
 )
 
 /**
