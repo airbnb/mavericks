@@ -1,7 +1,6 @@
 package com.airbnb.mvrx.compose
 
 import android.content.ContextWrapper
-import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -11,6 +10,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistryOwner
@@ -23,6 +23,7 @@ import com.airbnb.mvrx.MavericksViewModelProvider
 import com.airbnb.mvrx.withState
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import java.lang.IllegalStateException
 import kotlin.reflect.KProperty1
 
 /**
@@ -65,24 +66,19 @@ inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mave
     val savedStateRegistry = savedStateRegistryOwner.savedStateRegistry
     val viewModelClass = VM::class
 
-    val localView = LocalView.current
+    val view = LocalView.current
     val viewModelContext = remember(scope, activity, viewModelStoreOwner, savedStateRegistry) {
-        var view: View? = localView
-        var fragment: Fragment? = null
-        while (view != null) {
-            val tag = view.getTag(androidx.fragment.R.id.fragment_container_view_tag)
-            if (tag is Fragment) {
-                fragment = tag
-                break
-            }
-            val viewParent = view.parent
-            view = viewParent.takeIf { it is View }?.let { it as View }
+        var parentFragment: Fragment? = null
+        try {
+            parentFragment = FragmentManager.findFragment(view)
+        } catch (_: IllegalStateException) {
+            // current scope is NOT a fragment
         }
 
-        if (fragment != null) {
-            val args = argsFactory?.invoke() ?: fragment.arguments?.get(Mavericks.KEY_ARG)
-            FragmentViewModelContext(activity, args, fragment)
-        } else {
+        if (parentFragment != null) {
+            val args = argsFactory?.invoke() ?: parentFragment.arguments?.get(Mavericks.KEY_ARG)
+            FragmentViewModelContext(activity, args, parentFragment)
+        }else{
             val args = argsFactory?.invoke() ?: activity.intent.extras?.get(Mavericks.KEY_ARG)
             ActivityViewModelContext(activity, args, viewModelStoreOwner, savedStateRegistry)
         }
