@@ -49,8 +49,14 @@ dependencies {
     api project(":mvrx")
     implementation Libraries.lifecycleCommon
     implementation Libraries.fragment
-
+    implementation Libraries.appcompat
     implementation Libraries.composeFoundation
     implementation Libraries.composeUi
     implementation Libraries.viewModelCompose
+
+    androidTestImplementation project(':testing')
+    androidTestImplementation Libraries.junit
+    androidTestImplementation Libraries.activityCompose
+    androidTestImplementation Libraries.composeTest
+    androidTestImplementation Libraries.composeMaterial
 }
