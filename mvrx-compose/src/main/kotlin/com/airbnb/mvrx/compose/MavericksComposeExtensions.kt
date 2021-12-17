@@ -40,7 +40,11 @@ import kotlin.reflect.KProperty1
  *
  * To subscribe to this view model's state, call collectAsState(YourState::yourProp), collectAsState { it.yourProp } or collectAsState() on your view model.
  *
- * To pass an argument to viewModel from a composable function use [argsFactory]. The result from this function will be passed to your state constructor as a parameter.
+ * @param keyFactory Optionally provide a key to differentiate multiple viewmodels of the same type in the same scope. By default the key is the ViewModel
+ * java class name.
+ *
+ * @param argsFactory If present, the result from this function will be passed to your state constructor as a parameter when the viewmodel is first
+ * initialized. This will supersede any arguments from the fragment or activity.
  */
 @Composable
 inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mavericksViewModel(

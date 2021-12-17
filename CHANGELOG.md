@@ -1,5 +1,10 @@
 # Change Log
 
+## 2.5.1
+- Add ability to manually pass argument to composable viewModel factories (#595)
+- Fix Fragment arguments not being correctly passed to viewmodel state initialization in compose usage (#595)
+- Switch mavericks-compose artifact to use same versioning scheme as other artifacts
+
 ## 2.5.0
 - Fix issue when the LocalContext is not directly an Activity (#582)
 - update to Compose 1.0.4, Kotlin 1.5.31, Koin 3.1.3 (#586)
