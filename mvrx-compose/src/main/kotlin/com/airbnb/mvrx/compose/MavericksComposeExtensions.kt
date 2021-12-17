@@ -1,6 +1,8 @@
 package com.airbnb.mvrx.compose
 
+import android.content.Context
 import android.content.ContextWrapper
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -16,6 +18,7 @@ import androidx.lifecycle.ViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistryOwner
 import com.airbnb.mvrx.ActivityViewModelContext
 import com.airbnb.mvrx.FragmentViewModelContext
+import com.airbnb.mvrx.InternalMavericksApi
 import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksViewModel
@@ -23,7 +26,6 @@ import com.airbnb.mvrx.MavericksViewModelProvider
 import com.airbnb.mvrx.withState
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
-import java.lang.IllegalStateException
 import kotlin.reflect.KProperty1
 
 /**
@@ -37,6 +39,8 @@ import kotlin.reflect.KProperty1
  * You can call functions on this ViewModel to update state.
  *
  * To subscribe to this view model's state, call collectAsState(YourState::yourProp), collectAsState { it.yourProp } or collectAsState() on your view model.
+ *
+ * To pass an argument to viewModel from a composable function use [argsFactory]. The result from this function will be passed to your state constructor as a parameter.
  */
 @Composable
 inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mavericksViewModel(
@@ -44,19 +48,7 @@ inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mave
     noinline keyFactory: (() -> String)? = null,
     noinline argsFactory: (() -> Any?)? = null,
 ): VM {
-    var activity: ComponentActivity? = null
-    var currentContext = LocalContext.current
-    if (currentContext is ComponentActivity) {
-        activity = currentContext
-    } else {
-        while (currentContext is ContextWrapper) {
-            if (currentContext is ComponentActivity) {
-                activity = currentContext
-                break
-            }
-            currentContext = currentContext.baseContext
-        }
-    }
+    val activity = extractActivityFromContext(LocalContext.current)
     checkNotNull(activity) {
         "Composable is not hosted in a ComponentActivity!"
     }
@@ -65,20 +57,15 @@ inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mave
     val savedStateRegistryOwner = scope as? SavedStateRegistryOwner ?: error("LifecycleOwner must be a SavedStateRegistryOwner!")
     val savedStateRegistry = savedStateRegistryOwner.savedStateRegistry
     val viewModelClass = VM::class
-
     val view = LocalView.current
+
     val viewModelContext = remember(scope, activity, viewModelStoreOwner, savedStateRegistry) {
-        var parentFragment: Fragment? = null
-        try {
-            parentFragment = FragmentManager.findFragment(view)
-        } catch (_: IllegalStateException) {
-            // current scope is NOT a fragment
-        }
+        val parentFragment = findFragmentFromView(view)
 
         if (parentFragment != null) {
             val args = argsFactory?.invoke() ?: parentFragment.arguments?.get(Mavericks.KEY_ARG)
             FragmentViewModelContext(activity, args, parentFragment)
-        }else{
+        } else {
             val args = argsFactory?.invoke() ?: activity.intent.extras?.get(Mavericks.KEY_ARG)
             ActivityViewModelContext(activity, args, viewModelStoreOwner, savedStateRegistry)
         }
@@ -93,6 +80,30 @@ inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mave
     }
 }
 
+@InternalMavericksApi
+fun extractActivityFromContext(context: Context): ComponentActivity? {
+    var currentContext = context
+    if (currentContext is ComponentActivity) {
+        return currentContext
+    } else {
+        while (currentContext is ContextWrapper) {
+            if (currentContext is ComponentActivity) {
+                return currentContext
+            }
+            currentContext = currentContext.baseContext
+        }
+    }
+    return null
+}
+
+@InternalMavericksApi
+fun findFragmentFromView(view: View): Fragment? = try {
+    FragmentManager.findFragment(view)
+} catch (_: IllegalStateException) {
+    // current scope is NOT a fragment
+    null
+}
+
 /**
  * Get or create a [MavericksViewModel] scoped to the local activity.
  * @see [mavericksViewModel]
@@ -101,11 +112,17 @@ inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mave
 inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mavericksActivityViewModel(
     noinline keyFactory: (() -> String)? = null,
     noinline argsFactory: (() -> Any?)? = null,
-): VM = mavericksViewModel(
-    LocalContext.current as? ComponentActivity ?: error("LocalContext is not a ComponentActivity!"),
-    keyFactory = keyFactory,
-    argsFactory = argsFactory
-)
+): VM {
+    val activity = extractActivityFromContext(LocalContext.current)
+    checkNotNull(activity) {
+        "LocalContext is not a ComponentActivity!"
+    }
+    return mavericksViewModel(
+        scope = activity,
+        keyFactory = keyFactory,
+        argsFactory = argsFactory
+    )
+}
 
 /**
  * Creates a Compose State variable that will emit new values whenever this ViewModel's state changes.
