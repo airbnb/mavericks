@@ -43,6 +43,12 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion Versions.compose
     }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
@@ -54,9 +60,10 @@ dependencies {
     implementation Libraries.composeUi
     implementation Libraries.viewModelCompose
 
-    androidTestImplementation project(':testing')
-    androidTestImplementation Libraries.junit
-    androidTestImplementation Libraries.activityCompose
-    androidTestImplementation Libraries.composeTest
-    androidTestImplementation Libraries.composeMaterial
+    testImplementation project(':testing')
+    testImplementation Libraries.junit
+    testImplementation Libraries.activityCompose
+    testImplementation Libraries.composeTest
+    testImplementation Libraries.composeMaterial
+    testImplementation TestLibraries.roboeletric
 }

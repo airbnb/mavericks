@@ -13,7 +13,10 @@ import com.airbnb.mvrx.Mavericks
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
+@RunWith(RobolectricTestRunner::class)
 class ArgsFactoryTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ArgsTestActivity>()
