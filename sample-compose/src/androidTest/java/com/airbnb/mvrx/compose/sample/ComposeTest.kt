@@ -21,24 +21,24 @@ class ComposeTest {
     @Test
     fun testViewModel() {
         composeTestRule.onAllNodesWithText("Navigation Scoped Count: 0\nActivity Scoped Count: 0")[0].assertExists()
-        composeTestRule.onAllNodesWithText("Navigation Scoped Count: 0\nActivity Scoped Count: 0")[1].assertExists()
+        composeTestRule.onAllNodesWithText("Navigation Scoped Count: 5\nActivity Scoped Count: 0")[0].assertExists()
 
         composeTestRule.onAllNodesWithText("Increment Navigation Scoped Count")[0].performClick()
 
         composeTestRule.onNodeWithText("Navigation Scoped Count: 1\nActivity Scoped Count: 0").assertExists()
-        composeTestRule.onNodeWithText("Navigation Scoped Count: 0\nActivity Scoped Count: 0").assertExists()
+        composeTestRule.onNodeWithText("Navigation Scoped Count: 5\nActivity Scoped Count: 0").assertExists()
 
         composeTestRule.onAllNodesWithText("Increment Activity Scoped Count")[0].performClick()
         composeTestRule.onAllNodesWithText("Increment Activity Scoped Count")[1].performClick()
 
         composeTestRule.onNodeWithText("Navigation Scoped Count: 1\nActivity Scoped Count: 2").assertExists()
-        composeTestRule.onNodeWithText("Navigation Scoped Count: 0\nActivity Scoped Count: 2").assertExists()
+        composeTestRule.onNodeWithText("Navigation Scoped Count: 5\nActivity Scoped Count: 2").assertExists()
 
         composeTestRule.onAllNodesWithText("Increment Navigation Scoped Count")[1].performClick()
         composeTestRule.onAllNodesWithText("Increment Navigation Scoped Count")[1].performClick()
         composeTestRule.onAllNodesWithText("Increment Navigation Scoped Count")[1].performClick()
 
         composeTestRule.onNodeWithText("Navigation Scoped Count: 1\nActivity Scoped Count: 2").assertExists()
-        composeTestRule.onNodeWithText("Navigation Scoped Count: 3\nActivity Scoped Count: 2").assertExists()
+        composeTestRule.onNodeWithText("Navigation Scoped Count: 8\nActivity Scoped Count: 2").assertExists()
     }
 }

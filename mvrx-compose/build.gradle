@@ -43,14 +43,27 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion Versions.compose
     }
+
+    testOptions {
+        unitTests {
+            includeAndroidResources = true
+        }
+    }
 }
 
 dependencies {
     api project(":mvrx")
     implementation Libraries.lifecycleCommon
     implementation Libraries.fragment
-
+    implementation Libraries.appcompat
     implementation Libraries.composeFoundation
     implementation Libraries.composeUi
     implementation Libraries.viewModelCompose
+
+    testImplementation project(':testing')
+    testImplementation Libraries.junit
+    testImplementation Libraries.activityCompose
+    testImplementation Libraries.composeTest
+    testImplementation Libraries.composeMaterial
+    testImplementation TestLibraries.roboeletric
 }
