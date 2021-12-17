@@ -53,14 +53,17 @@ class FragmentArgsTestActivity : AppCompatActivity() {
         setContentView(fragmentContainerView)
 
         supportFragmentManager.beginTransaction()
-            .add(FRAGMENT_CONTAINER_ID, ArgsTestFragment().apply {
-                arguments = ArgumentsTest(count = 5).asMavericksArgs()
-            })
+            .add(
+                FRAGMENT_CONTAINER_ID,
+                ArgsTestFragment().apply {
+                    arguments = ArgumentsTest(count = 5).asMavericksArgs()
+                }
+            )
             .commit()
     }
 }
 
-class ArgsTestFragment: Fragment() {
+class ArgsTestFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
