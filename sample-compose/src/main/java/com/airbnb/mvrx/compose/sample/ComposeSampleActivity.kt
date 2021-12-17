@@ -28,12 +28,11 @@ import com.airbnb.mvrx.compose.mavericksViewModel
 data class CounterState(
     val count: Int = 0,
 ) : MavericksState {
-    constructor(arguments: ArgumentsTest): this(count = arguments.count)
+    constructor(arguments: ArgumentsTest) : this(count = arguments.count)
 }
 
 data class ArgumentsTest(val count: Int) : Parcelable {
-    constructor(parcel: Parcel) : this(parcel.readInt()) {
-    }
+    constructor(parcel: Parcel) : this(parcel.readInt())
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeInt(count)
