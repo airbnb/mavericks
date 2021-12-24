@@ -1,6 +1,6 @@
 package com.airbnb.mvrx.hellohilt
 
-import com.airbnb.mvrx.hellohilt.di.MavericksViewModelScoped
+import com.airbnb.mvrx.hilt.MavericksViewModelScoped
 import java.util.concurrent.atomic.AtomicInteger
 import javax.inject.Inject
 

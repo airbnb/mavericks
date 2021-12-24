@@ -1,4 +1,4 @@
-package com.airbnb.mvrx.hellohilt.di
+package com.airbnb.mvrx.hilt
 
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksViewModel
