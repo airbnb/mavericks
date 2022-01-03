@@ -1,10 +1,10 @@
 package com.airbnb.mvrx.counter
 
-import com.airbnb.mvrx.test.MvRxTestRule
+import com.airbnb.mvrx.test.MvRxTestExtension
 import com.airbnb.mvrx.withState
-import org.junit.Assert.assertEquals
-import org.junit.ClassRule
-import org.junit.Test
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.RegisterExtension
 
 class CounterViewModelTest {
 
@@ -19,7 +19,7 @@ class CounterViewModelTest {
 
     companion object {
         @JvmField
-        @ClassRule
-        val mvrxTestRule = MvRxTestRule()
+        @RegisterExtension
+        val mvrxTestExtension = MvRxTestExtension()
     }
 }

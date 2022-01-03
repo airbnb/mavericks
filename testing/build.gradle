@@ -32,6 +32,7 @@ dependencies {
     api project(':mvrx-mocking')
     implementation Libraries.appcompat
     implementation Libraries.junit
+    implementation Libraries.junit5
     implementation Libraries.kotlinReflect
     implementation Libraries.rxAndroid
     implementation Libraries.multidex
