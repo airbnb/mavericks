@@ -7,7 +7,7 @@ on:
       - master
 jobs:
   build-test:
-    uses: ./.github/workflows/build_test.yml@master
+    uses: airbnb/mavericks/.github/workflows/build_test.yml@master
   deploy-snapshot:
     needs: build-test
     runs-on: ubuntu-latest
