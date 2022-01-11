@@ -1,0 +1,35 @@
+name: Build/Test
+
+on:
+  # Trigger on every pull request
+  pull_request:
+  # This is reused in deploy_snapshot.yml
+  workflow_call:
+jobs:
+  detekt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout mavericks
+        uses: actions/checkout@v2
+      - name: Detekt
+        run: "./gradlew detekt -PCI=true"
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout mavericks
+        uses: actions/checkout@v2
+      - name: Lint
+        run: "./gradlew lintRelease"
+  test-coverage:
+    runs-on: ubuntu-latest
+    needs: [detekt, lint]
+    steps:
+      - name: Checkout mavericks
+        uses: actions/checkout@v2
+      - name: Unit Tests
+        run: "./gradlew testReleaseUnitTest"
+      - name: Code Coverage
+        run: "./gradlew jacocoFullReport"
+      - name: Report coverage
+        if: ${{ success() }}
+        run: "bash <(curl -s https://codecov.io/bash)"
