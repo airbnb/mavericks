@@ -1,0 +1,22 @@
+name: Deploy snapshot
+
+on:
+  # Trigger ONLY on push to master branch
+  push:
+    branches:
+      - master
+jobs:
+  build-test:
+    uses: airbnb/mavericks/.github/workflows/build_test.yml@master
+  deploy-snapshot:
+    needs: build-test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout mavericks
+        uses: actions/checkout@v2
+      - name: Deploy new snapshot of mavericks
+        shell: bash
+        env:
+          SONATYPE_NEXUS_USERNAME: ${{ secrets.NEXUS_USER }}
+          SONATYPE_NEXUS_PASSWORD: ${{ secrets.NEXUS_PASSWORD }}
+        run: ./gradlew -no-daemon --no-parallel mvrx:uploadArchives testing:uploadArchives
