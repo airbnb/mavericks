@@ -211,7 +211,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
 inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T.viewModel(
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
-) where T : ComponentActivity = lifecycleAwareLazy(this) {
+): Lazy<VM> where T : ComponentActivity = lifecycleAwareLazy(this) {
     MavericksViewModelProvider.get(
         viewModelClass = viewModelClass.java,
         stateClass = S::class.java,
