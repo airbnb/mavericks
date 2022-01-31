@@ -13,15 +13,19 @@ android {
     }
 }
 
+tasks.withType(Test) {
+    useJUnitPlatform()
+}
+
 dependencies {
     implementation Libraries.appcompat
     implementation Libraries.constraintlayout
     implementation Libraries.coreKtx
     implementation Libraries.lifecycleCommon
-
     implementation project(":mvrx")
     implementation project(":view-binding-utils")
 
     testImplementation TestLibraries.junit
+    testImplementation TestLibraries.junit5
     testImplementation project(":testing")
 }

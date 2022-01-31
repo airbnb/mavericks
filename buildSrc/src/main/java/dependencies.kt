@@ -46,6 +46,7 @@ object Versions {
     // Testing libraries
     const val junit = "4.13"
     const val junitExt = "1.1.1"
+    const val junit5 = "5.8.2"
     const val mockito = "2.25.1"
     const val mockitoKotlin = "2.2.0"
     const val mockk = "1.9.3"
@@ -85,6 +86,7 @@ object Libraries {
     const val fragmentTesting = "androidx.fragment:fragment-testing:${Versions.fragment}"
     const val hilt = "com.google.dagger:hilt-android:${Versions.hilt}"
     const val junit = "junit:junit:${Versions.junit}"
+    const val junit5 = "org.junit.jupiter:junit-jupiter:${Versions.junit5}"
     const val koin = "io.insert-koin:koin-android:${Versions.koin}"
     const val kotlin = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${Versions.kotlin}"
     const val kotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.kotlinCoroutines}"
@@ -120,6 +122,7 @@ object InstrumentedTestLibraries {
 
 object TestLibraries {
     const val junit = "junit:junit:${Versions.junit}"
+    const val junit5 = "org.junit.jupiter:junit-jupiter:${Versions.junit5}"
     const val kotlinCoroutinesTest = "org.jetbrains.kotlinx:kotlinx-coroutines-test:${Versions.kotlinCoroutines}"
     const val mockito = "org.mockito:mockito-core:${Versions.mockito}"
     const val mockitoKotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:${Versions.mockitoKotlin}"
