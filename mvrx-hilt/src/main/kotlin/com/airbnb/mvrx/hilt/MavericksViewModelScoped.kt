@@ -1,4 +1,4 @@
-package com.airbnb.mvrx.hellohilt.di
+package com.airbnb.mvrx.hilt
 
 import javax.inject.Scope
 

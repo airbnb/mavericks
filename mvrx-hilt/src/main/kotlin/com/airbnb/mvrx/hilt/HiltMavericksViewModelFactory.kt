@@ -1,4 +1,4 @@
-package com.airbnb.mvrx.hellohilt.di
+package com.airbnb.mvrx.hilt
 
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksViewModel
@@ -25,16 +25,21 @@ import dagger.hilt.components.SingletonComponent
  *   companion object : MavericksViewModelFactory<MyViewModel, MyState> by hiltMavericksViewModelFactory()
  * }
  */
-
-inline fun <reified VM : MavericksViewModel<S>, S : MavericksState> hiltMavericksViewModelFactory() = HiltMavericksViewModelFactory<VM, S>(VM::class.java)
+inline fun <reified VM : MavericksViewModel<S>, S : MavericksState> hiltMavericksViewModelFactory() =
+    HiltMavericksViewModelFactory<VM, S>(VM::class.java)
 
 class HiltMavericksViewModelFactory<VM : MavericksViewModel<S>, S : MavericksState>(
     private val viewModelClass: Class<out MavericksViewModel<S>>
 ) : MavericksViewModelFactory<VM, S> {
 
     override fun create(viewModelContext: ViewModelContext, state: S): VM {
-        // We want to create the ViewModelComponent. In order to do that, we need to get its parent: ActivityComponent.
-        val componentBuilder = EntryPoints.get(viewModelContext.app(), CreateMavericksViewModelComponent::class.java).mavericksViewModelComponentBuilder()
+        // We want to create the ViewModelComponent.
+        // In order to do that, we need to get its parent: ActivityComponent.
+        val componentBuilder = EntryPoints.get(
+            viewModelContext.app(),
+            CreateMavericksViewModelComponent::class.java
+        ).mavericksViewModelComponentBuilder()
+
         val viewModelComponent = componentBuilder.build()
         val viewModelFactoryMap = EntryPoints.get(viewModelComponent, HiltMavericksEntryPoint::class.java).viewModelFactories
         val viewModelFactory = viewModelFactoryMap[viewModelClass]

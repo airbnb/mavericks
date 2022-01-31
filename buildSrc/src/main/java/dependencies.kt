@@ -127,5 +127,6 @@ object TestLibraries {
     const val mockito = "org.mockito:mockito-core:${Versions.mockito}"
     const val mockitoKotlin = "com.nhaarman.mockitokotlin2:mockito-kotlin:${Versions.mockitoKotlin}"
     const val mockk = "io.mockk:mockk:${Versions.mockk}"
+    const val hilt = "com.google.dagger:hilt-android-testing:${Versions.hilt}"
     const val roboeletric = "org.robolectric:robolectric:${Versions.robolectric}"
 }

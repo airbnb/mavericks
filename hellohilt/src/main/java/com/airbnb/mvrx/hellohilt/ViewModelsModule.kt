@@ -1,8 +1,8 @@
 package com.airbnb.mvrx.hellohilt
 
-import com.airbnb.mvrx.hellohilt.di.AssistedViewModelFactory
-import com.airbnb.mvrx.hellohilt.di.MavericksViewModelComponent
-import com.airbnb.mvrx.hellohilt.di.ViewModelKey
+import com.airbnb.mvrx.hilt.AssistedViewModelFactory
+import com.airbnb.mvrx.hilt.MavericksViewModelComponent
+import com.airbnb.mvrx.hilt.ViewModelKey
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
