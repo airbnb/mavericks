@@ -1,5 +1,19 @@
 # Change Log
 
+## 2.6.0
+Big thanks to @itsandreramon for contributing the two main improvements in this release!
+
+- Pre-configure Hilt by adding a new "mvrx-hilt" artifact (#598)
+
+See the updated Hilt documentation for guidance on how to more easily use Hilt with Mavericks https://airbnb.io/mavericks/#/dagger?id=hilt
+
+- Add support to use Mavericks with JUnit 5 (#600)
+
+See the new testing documentation at https://airbnb.io/mavericks/#/testing for details.
+
+- Don't expose lifecycleAwareLazy in viewModel return type (#603)
+
+
 ## 2.5.1
 - Add ability to manually pass argument to composable viewModel factories (#595)
 - Fix Fragment arguments not being correctly passed to viewmodel state initialization in compose usage (#595)
