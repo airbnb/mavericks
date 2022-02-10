@@ -95,10 +95,10 @@ abstract class MavericksViewModel<S : MavericksState>(
      * a fair amount of reflection.
      */
     private fun validateState(initialState: S) {
-        state::class.assertImmutability()
+        assertMavericksDataClassImmutability(state::class)
         // Assert that state can be saved and restored.
-        val bundle = state.persistState(validation = true)
-        bundle.restorePersistedState(initialState, validation = true)
+        val bundle = persistMavericksState(state = state, validation = true)
+        restorePersistedMavericksState(bundle, initialState, validation = true)
     }
 
     /**

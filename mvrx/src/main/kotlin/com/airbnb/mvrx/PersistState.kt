@@ -4,7 +4,6 @@ package com.airbnb.mvrx
 
 import android.os.Bundle
 import android.os.Parcelable
-import androidx.annotation.VisibleForTesting
 import java.io.Serializable
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
@@ -29,8 +28,8 @@ annotation class PersistState
  * Iterates through all member properties annotated with [PersistState] and parcels them into a bundle that can be
  * saved with savedInstanceState.
  */
-internal fun <T : MavericksState> T.persistState(validation: Boolean = false): Bundle {
-    val jvmClass = this::class.java
+fun <T : MavericksState> persistMavericksState(state: T, validation: Boolean = false): Bundle {
+    val jvmClass = state::class.java
     // Find the first constructor that has parameters annotated with @PersistState or return.
     val constructor = jvmClass.primaryConstructor() ?: return Bundle()
 
@@ -43,7 +42,7 @@ internal fun <T : MavericksState> T.persistState(validation: Boolean = false): B
 
         val getter = jvmClass.getComponentNFunction(i)
 
-        val value = getter.invoke(this)
+        val value = getter.invoke(state)
         if (validation) assertCollectionPersistability(value)
         bundle.putAny(i.toString(), value)
     }
@@ -105,7 +104,8 @@ private fun <T : Any?> Bundle.putAny(key: String?, value: T): Bundle {
 /**
  * Updates the initial state object given state persisted with [PersistState] in a [Bundle].
  */
-internal fun <T : MavericksState> Bundle.restorePersistedState(
+fun <T : MavericksState> restorePersistedMavericksState(
+    bundle: Bundle,
     initialState: T,
     validation: Boolean = false
 ): T {
@@ -114,7 +114,7 @@ internal fun <T : MavericksState> Bundle.restorePersistedState(
 
     // If we don't set the correct class loader, when the bundle is restored in a new process, it will have the system class loader which
     // can't unmarshal any custom classes.
-    classLoader = jvmClass.classLoader
+    bundle.classLoader = jvmClass.classLoader
 
     // For data classes, Kotlin generates a static function called copy$default.
     // The first parameter is the object to copy from.
@@ -133,10 +133,10 @@ internal fun <T : MavericksState> Bundle.restorePersistedState(
     parameters[0] = initialState
     for (i in 0 until fieldCount) {
         val bundleKey = i.toString()
-        if (containsKey(bundleKey)) {
+        if (bundle.containsKey(bundleKey)) {
             // Copy the persisted value into the parameter array.
             // The bitmask for this element will be 0 so this value will be copied to the new object.
-            parameters[i] = get(bundleKey)
+            parameters[i] = bundle.get(bundleKey)
             continue
         }
 
@@ -159,20 +159,6 @@ internal fun <T : MavericksState> Bundle.restorePersistedState(
         *parameterBitMasks.toTypedArray(),
         null
     ) as T
-}
-
-/**
- * For some reason, Buck doesn't allow you to call internal methods from the same package in test/
- * However, these methods shouldn't populate the global namespace so this helper is a hack around Buck.
- */
-@VisibleForTesting
-object PersistStateTestHelpers {
-    fun <T : MavericksState> persistState(state: T) = state.persistState(validation = true)
-    fun <T : MavericksState> restorePersistedState(
-        bundle: Bundle,
-        initialState: T,
-        validation: Boolean = false
-    ) = bundle.restorePersistedState(initialState, validation)
 }
 
 private val Class<*>.defaultParameterValue: Any?
