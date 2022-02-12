@@ -189,7 +189,7 @@ class PersistedStateTest : BaseTest() {
     fun testNonParcelableList() {
         data class State2(@PersistState val data: List<Context> = listOf(Mockito.mock(Context::class.java))) : MavericksState
 
-        persistMavericksState(State2())
+        persistMavericksState(State2(), validation = true)
     }
 
     @Test
@@ -205,7 +205,7 @@ class PersistedStateTest : BaseTest() {
     fun testNonParcelableSet() {
         data class State2(@PersistState val data: Set<Context> = setOf(Mockito.mock(Context::class.java))) : MavericksState
 
-        persistMavericksState(State2())
+        persistMavericksState(State2(), validation = true)
     }
 
     @Test
@@ -225,7 +225,7 @@ class PersistedStateTest : BaseTest() {
             @PersistState val data: Map<String, Context> = mapOf("foo" to Mockito.mock(Context::class.java))
         ) : MavericksState
 
-        persistMavericksState(State2())
+        persistMavericksState(State2(), validation = true)
     }
 
     @Test(expected = IllegalStateException::class)
