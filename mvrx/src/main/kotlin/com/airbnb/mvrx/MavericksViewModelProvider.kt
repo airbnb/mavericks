@@ -88,7 +88,7 @@ object MavericksViewModelProvider {
         originalDeclarationStateClass: Class<out S>
     ) = withState(this) { state ->
         Bundle().apply {
-            putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, state.persistState())
+            putBundle(KEY_MVRX_SAVED_INSTANCE_STATE, persistMavericksState(state))
 
             // Save the types of the ViewModel and State in the bundle so we can recreate them even if the first declaration invoked does not have the
             // same types as the original declaration.
@@ -111,11 +111,11 @@ object MavericksViewModelProvider {
         viewModelContext: ViewModelContext
     ): StateRestorer<VM, S> {
         val restoredArgs = get(KEY_MVRX_SAVED_ARGS)
-        val restoredState = getBundle(KEY_MVRX_SAVED_INSTANCE_STATE)
+        val restoredStateBundle = getBundle(KEY_MVRX_SAVED_INSTANCE_STATE)
         val restoredViewModelClass = getSerializable(KEY_MVRX_SAVED_VM_CLASS) as? Class<out VM>
         val restoredStateClass = getSerializable(KEY_MVRX_SAVED_STATE_CLASS) as? Class<out S>
 
-        requireNotNull(restoredState) { "State was not saved prior to restoring!" }
+        requireNotNull(restoredStateBundle) { "State was not saved prior to restoring!" }
         requireNotNull(restoredViewModelClass) { "ViewModel class was not properly saved prior to restoring!" }
         requireNotNull(restoredStateClass) { "State class was not properly saved prior to restoring!" }
 
@@ -123,7 +123,9 @@ object MavericksViewModelProvider {
             is ActivityViewModelContext -> viewModelContext.copy(args = restoredArgs)
             is FragmentViewModelContext -> viewModelContext.copy(args = restoredArgs)
         }
-        return StateRestorer(restoredContext, restoredViewModelClass, restoredStateClass) { restoredState.restorePersistedState(it) }
+        return StateRestorer(restoredContext, restoredViewModelClass, restoredStateClass) { state ->
+            restorePersistedMavericksState(restoredStateBundle, state)
+        }
     }
 
     private const val KEY_MVRX_SAVED_INSTANCE_STATE = "mvrx:saved_instance_state"

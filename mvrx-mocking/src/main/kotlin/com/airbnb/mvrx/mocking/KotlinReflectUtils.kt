@@ -2,11 +2,16 @@ package com.airbnb.mvrx.mocking
 
 import kotlin.reflect.KClass
 import kotlin.reflect.KFunction
+import kotlin.reflect.KMutableProperty
+import kotlin.reflect.full.declaredMemberProperties
 import kotlin.reflect.full.extensionReceiverParameter
 import kotlin.reflect.full.functions
 import kotlin.reflect.full.instanceParameter
 import kotlin.reflect.full.isSubclassOf
+import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.memberFunctions
+import kotlin.reflect.full.primaryConstructor
+import kotlin.reflect.full.starProjectedType
 
 internal val KClass<*>.isEnum: Boolean
     get() {
@@ -100,4 +105,41 @@ internal fun Any.findFunction(functionName: String): KFunction<*> {
 internal fun KClass<*>.findFunction(functionName: String): KFunction<*> {
     return functions.find { it.name == functionName }
         ?: error("No function found with name $functionName in class $simpleName")
+}
+
+/**
+ * Ensures that the given class is:
+ * - A kotlin data class
+ * - Contains no mutable properties
+ * - Contains no primary constructor params with a Mutable collection type.
+ *
+ * For further validations restricting usages of Java collections such as ArrayList, this can be combined with [com.airbnb.mvrx.assertMavericksDataClassImmutability]
+ */
+fun assertMavericksDataClassImmutabilityWithKotlinReflect(
+    kClass: KClass<*>,
+) {
+    require(kClass.isData) {
+        "Mavericks state must be a data class! - ${kClass::class.simpleName}"
+    }
+
+    kClass.primaryConstructor?.parameters?.forEach { param ->
+        when {
+            param.type.isSubtypeOf(MutableList::class.starProjectedType) -> {
+                "You cannot use MutableList for ${param.name}. Use the read only List instead."
+            }
+            param.type.isSubtypeOf(MutableMap::class.starProjectedType) -> {
+                "You cannot use MutableMap for ${param.name}. Use the read only Map instead."
+            }
+            param.type.isSubtypeOf(MutableSet::class.starProjectedType) -> {
+                "You cannot use MutableSet for ${param.name}. Use the read only Set instead."
+            }
+            else -> null
+        }?.let { throw IllegalArgumentException("Invalid property in state ${kClass::class.simpleName}: $it") }
+    }
+
+    kClass.declaredMemberProperties.forEach { prop ->
+        require(prop !is KMutableProperty<*>) {
+            "Mutable property ${prop.name} is not allowed in state ${kClass::class.simpleName}"
+        }
+    }
 }

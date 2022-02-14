@@ -24,8 +24,11 @@ private const val IMMUTABLE_MAP_MESSAGE =
  *
  * As a result, you may not use MutableList, mutableListOf(...) or the map variants by convention only.
  */
-internal fun KClass<*>.assertImmutability() {
-    require(java.isData) { "MvRx state must be a data class! - ${this::class.simpleName}" }
+fun assertMavericksDataClassImmutability(
+    kClass: KClass<*>,
+    allowFunctions: Boolean = false,
+) {
+    require(kClass.java.isData) { "Mavericks state must be a data class! - ${kClass::class.simpleName}" }
 
     fun Field.isSubtype(vararg classes: KClass<*>): Boolean {
         return classes.any { klass ->
@@ -36,7 +39,7 @@ internal fun KClass<*>.assertImmutability() {
         }
     }
 
-    java.declaredFields
+    kClass.java.declaredFields
         // During tests, jacoco can add a transient field called jacocoData.
         .filterNot { Modifier.isTransient(it.modifiers) }
         .forEach { prop ->
@@ -50,11 +53,11 @@ internal fun KClass<*>.assertImmutability() {
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT &&
                     prop.isSubtype(android.util.ArrayMap::class) -> "You cannot use ArrayMap for ${prop.name}.\n$IMMUTABLE_MAP_MESSAGE"
                 prop.isSubtype(HashMap::class) -> "You cannot use HashMap for ${prop.name}.\n$IMMUTABLE_MAP_MESSAGE"
-                prop.isSubtype(Function::class, KCallable::class) -> {
-                    "You cannot use functions inside MvRx state. Only pure data should be represented: ${prop.name}"
+                !allowFunctions && prop.isSubtype(Function::class, KCallable::class) -> {
+                    "You cannot use functions inside Mavericks state. Only pure data should be represented: ${prop.name}"
                 }
                 else -> null
-            }?.let { throw IllegalArgumentException("Invalid property in state ${this@assertImmutability::class.simpleName}: $it") }
+            }?.let { throw IllegalArgumentException("Invalid property in state ${kClass::class.simpleName}: $it") }
         }
 }
 
