@@ -8,10 +8,9 @@ import kotlin.reflect.full.extensionReceiverParameter
 import kotlin.reflect.full.functions
 import kotlin.reflect.full.instanceParameter
 import kotlin.reflect.full.isSubclassOf
-import kotlin.reflect.full.isSubtypeOf
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.primaryConstructor
-import kotlin.reflect.full.starProjectedType
+import kotlin.reflect.jvm.jvmName
 
 internal val KClass<*>.isEnum: Boolean
     get() {
@@ -119,27 +118,31 @@ fun assertMavericksDataClassImmutabilityWithKotlinReflect(
     kClass: KClass<*>,
 ) {
     require(kClass.isData) {
-        "Mavericks state must be a data class! - ${kClass::class.simpleName}"
+        "Mavericks state must be a data class! - ${kClass.jvmName}"
     }
 
     kClass.primaryConstructor?.parameters?.forEach { param ->
+        val typeString = param.type.toString()
+
         when {
-            param.type.isSubtypeOf(MutableList::class.starProjectedType) -> {
+            // Note, theoretically typeOf<MutableList>() should work (https://youtrack.jetbrains.com/issue/KT-35877)
+            // but Android Studio can't resolve that function so I can't get that approach to work. (maybe related to https://youtrack.jetbrains.com/issue/KTIJ-20328)
+            "MutableList" in typeString -> {
                 "You cannot use MutableList for ${param.name}. Use the read only List instead."
             }
-            param.type.isSubtypeOf(MutableMap::class.starProjectedType) -> {
+            "MutableMap" in typeString -> {
                 "You cannot use MutableMap for ${param.name}. Use the read only Map instead."
             }
-            param.type.isSubtypeOf(MutableSet::class.starProjectedType) -> {
+            "MutableSet" in typeString -> {
                 "You cannot use MutableSet for ${param.name}. Use the read only Set instead."
             }
             else -> null
-        }?.let { throw IllegalArgumentException("Invalid property in state ${kClass::class.simpleName}: $it") }
+        }?.let { throw IllegalArgumentException("Invalid property in state ${kClass.jvmName}: $it") }
     }
 
     kClass.declaredMemberProperties.forEach { prop ->
         require(prop !is KMutableProperty<*>) {
-            "Mutable property ${prop.name} is not allowed in state ${kClass::class.simpleName}"
+            "Mutable property ${prop.name} is not allowed in state ${kClass.jvmName}"
         }
     }
 }
