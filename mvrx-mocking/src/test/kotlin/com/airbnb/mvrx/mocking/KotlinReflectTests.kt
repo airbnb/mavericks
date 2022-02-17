@@ -32,4 +32,22 @@ class KotlinReflectTests {
         data class State(val foo: Int)
         assertMavericksDataClassImmutabilityWithKotlinReflect(State::class)
     }
+
+    @Test
+    fun readOnlyListIsAllowed() {
+        data class State(val foo: List<Int>)
+        assertMavericksDataClassImmutabilityWithKotlinReflect(State::class)
+    }
+
+    @Test
+    fun readOnlySetIsAllowed() {
+        data class State(val foo: Set<Int>)
+        assertMavericksDataClassImmutabilityWithKotlinReflect(State::class)
+    }
+
+    @Test
+    fun readOnlyMapIsAllowed() {
+        data class State(val foo: Map<Int, Int>)
+        assertMavericksDataClassImmutabilityWithKotlinReflect(State::class)
+    }
 }
