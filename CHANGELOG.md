@@ -1,5 +1,9 @@
 # Change Log
 
+## 2.6.1
+- Expose state restoration functions (#611)
+- Use passed scope as fragment if possible (#618)
+
 ## 2.6.0
 Big thanks to @itsandreramon for contributing the two main improvements in this release!
 
