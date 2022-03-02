@@ -28,7 +28,7 @@ fun assertMavericksDataClassImmutability(
     kClass: KClass<*>,
     allowFunctions: Boolean = false,
 ) {
-    require(kClass.java.isData) { "Mavericks state must be a data class! - ${kClass::class.simpleName}" }
+    require(kClass.java.isData) { "Mavericks state must be a data class! - ${kClass.simpleName}" }
 
     fun Field.isSubtype(vararg classes: KClass<*>): Boolean {
         return classes.any { klass ->
@@ -57,7 +57,7 @@ fun assertMavericksDataClassImmutability(
                     "You cannot use functions inside Mavericks state. Only pure data should be represented: ${prop.name}"
                 }
                 else -> null
-            }?.let { throw IllegalArgumentException("Invalid property in state ${kClass::class.simpleName}: $it") }
+            }?.let { throw IllegalArgumentException("Invalid property in state ${kClass.simpleName}: $it") }
         }
 }
 
