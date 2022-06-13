@@ -124,6 +124,6 @@ class CoroutinesStateStore<S : MavericksState>(
          * The internally allocated buffer is replay + extraBufferCapacity but always allocates 2^n space.
          * We use replay=1 so buffer = 64-1.
          */
-        internal const val SubscriberBufferSize = 63
+        @InternalMavericksApi const val SubscriberBufferSize = 63
     }
 }

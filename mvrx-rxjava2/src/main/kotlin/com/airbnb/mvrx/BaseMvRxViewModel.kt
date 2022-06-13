@@ -115,8 +115,8 @@ abstract class BaseMvRxViewModel<S : MavericksState>(
         stateReducer: S.(Async<V>) -> S
     ): Disposable {
         val blockExecutions = config.onExecute(this@BaseMvRxViewModel)
-        if (blockExecutions != MavericksViewModelConfig.BlockExecutions.No) {
-            if (blockExecutions == MavericksViewModelConfig.BlockExecutions.WithLoading) {
+        if (blockExecutions != MavericksStateModelConfig.BlockExecutions.No) {
+            if (blockExecutions == MavericksStateModelConfig.BlockExecutions.WithLoading) {
                 setState { stateReducer(Loading()) }
             }
             return Disposables.disposed()

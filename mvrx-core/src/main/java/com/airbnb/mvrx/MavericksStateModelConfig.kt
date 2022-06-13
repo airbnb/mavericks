@@ -1,11 +1,12 @@
 package com.airbnb.mvrx
 
 import kotlinx.coroutines.CoroutineScope
+import kotlin.coroutines.CoroutineContext
 
 /**
  * Provides configuration for a [MavericksViewModel].
  */
-abstract class MavericksViewModelConfig<S : Any>(
+abstract class MavericksStateModelConfig<S : Any>(
     /**
      * If true, extra validations will be applied to ensure the view model is used
      * correctly.
@@ -20,6 +21,10 @@ abstract class MavericksViewModelConfig<S : Any>(
      */
     val coroutineScope: CoroutineScope
 ) {
+    abstract val subscriptionCoroutineContextOverride: CoroutineContext
+
+    abstract val verifyStateImmutability: Boolean
+
     /**
      * Called each time a [MavericksViewModel.execute] function is invoked. This allows
      * the execute function to be skipped, based on the returned [BlockExecutions] value.
@@ -37,7 +42,7 @@ abstract class MavericksViewModelConfig<S : Any>(
      * didn't intend to allow operations to change the state.
      */
     abstract fun <S : MavericksState> onExecute(
-        viewModel: MavericksViewModel<S>
+        viewModel: MavericksStateModel<S>
     ): BlockExecutions
 
     /**

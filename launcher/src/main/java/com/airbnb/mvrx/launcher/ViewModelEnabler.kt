@@ -6,7 +6,7 @@ import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.OnLifecycleEvent
 import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MavericksViewModelConfig
+import com.airbnb.mvrx.MavericksStateModelConfig
 import com.airbnb.mvrx.mocking.MockBehavior
 import com.airbnb.mvrx.mocking.MockableMavericksViewModelConfig
 import com.airbnb.mvrx.mocking.MockedView
@@ -46,7 +46,7 @@ class ViewModelEnabler(
                     .forEach { viewModel ->
                         MockableMavericksViewModelConfig.access(viewModel).pushBehaviorOverride(
                             MockBehavior(
-                                blockExecutions = MavericksViewModelConfig.BlockExecutions.No,
+                                blockExecutions = MavericksStateModelConfig.BlockExecutions.No,
                                 stateStoreBehavior = MockBehavior.StateStoreBehavior.Normal
                             )
                         )

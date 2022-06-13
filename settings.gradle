@@ -1,5 +1,6 @@
 // Libraries
 include ':mvrx'
+include ':mvrx-core'
 include ':mvrx-compose'
 include ':mvrx-mocking'
 include ':mvrx-navigation'

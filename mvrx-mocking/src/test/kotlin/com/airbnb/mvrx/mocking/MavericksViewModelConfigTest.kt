@@ -2,7 +2,7 @@ package com.airbnb.mvrx.mocking
 
 import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MavericksViewModelConfig
+import com.airbnb.mvrx.MavericksStateModelConfig
 import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.airbnb.mvrx.MavericksState
 import org.junit.Assert.assertEquals
@@ -19,9 +19,9 @@ class MavericksViewModelConfigTest : BaseTest() {
 
         val originalBehavior = provider.mockBehavior
         val newBehavior =
-            MockBehavior(blockExecutions = MavericksViewModelConfig.BlockExecutions.Completely)
+            MockBehavior(blockExecutions = MavericksStateModelConfig.BlockExecutions.Completely)
         val newBehavior2 =
-            MockBehavior(blockExecutions = MavericksViewModelConfig.BlockExecutions.WithLoading)
+            MockBehavior(blockExecutions = MavericksStateModelConfig.BlockExecutions.WithLoading)
 
         val result = provider.withMockBehavior(newBehavior) {
             assertEquals(newBehavior, provider.mockBehavior)
@@ -57,8 +57,8 @@ class MavericksViewModelConfigTest : BaseTest() {
     @Test
     fun testAddOnConfigProvidedListener() {
         var providedVm: MavericksViewModel<*>? = null
-        var providedConfig: MavericksViewModelConfig<*>? = null
-        val onConfigProvided = { vm: MavericksViewModel<*>, config: MavericksViewModelConfig<*> ->
+        var providedConfig: MavericksStateModelConfig<*>? = null
+        val onConfigProvided = { vm: MavericksViewModel<*>, config: MavericksStateModelConfig<*> ->
             providedVm = vm
             providedConfig = config
         }
@@ -74,8 +74,8 @@ class MavericksViewModelConfigTest : BaseTest() {
     @Test
     fun testRemoveOnConfigProvidedListener() {
         var providedVm: MavericksViewModel<*>? = null
-        var providedConfig: MavericksViewModelConfig<*>? = null
-        val onConfigProvided = { vm: MavericksViewModel<*>, config: MavericksViewModelConfig<*> ->
+        var providedConfig: MavericksStateModelConfig<*>? = null
+        val onConfigProvided = { vm: MavericksViewModel<*>, config: MavericksStateModelConfig<*> ->
             providedVm = vm
             providedConfig = config
         }

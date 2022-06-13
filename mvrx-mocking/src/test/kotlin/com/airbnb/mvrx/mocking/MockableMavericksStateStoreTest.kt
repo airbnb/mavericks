@@ -1,6 +1,6 @@
 package com.airbnb.mvrx.mocking
 
-import com.airbnb.mvrx.MavericksViewModelConfig
+import com.airbnb.mvrx.MavericksStateModelConfig
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.mocking.MockBehavior.InitialStateMocking
 import com.airbnb.mvrx.mocking.MockBehavior.StateStoreBehavior
@@ -187,7 +187,7 @@ class MockableMavericksStateStoreTest : BaseTest() {
             TestState(),
             MockBehavior(
                 initialStateMocking = InitialStateMocking.None,
-                blockExecutions = MavericksViewModelConfig.BlockExecutions.No,
+                blockExecutions = MavericksStateModelConfig.BlockExecutions.No,
                 stateStoreBehavior = storeBehavior
             ),
             coroutineScope = testCoroutineScope()
