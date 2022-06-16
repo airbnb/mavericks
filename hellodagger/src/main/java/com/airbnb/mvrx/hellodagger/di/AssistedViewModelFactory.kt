@@ -31,7 +31,6 @@ import com.airbnb.mvrx.MavericksViewModel
  * the exact type of our AssistedInject factory, but the return type is an AssistedViewModelFactory.
  *
  * @Module
- * @Module
  * interface MyAppModule {
  *   @Binds
  *   @IntoMap
