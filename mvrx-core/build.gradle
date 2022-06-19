@@ -9,7 +9,9 @@ tasks.withType(KotlinCompile).all {
     kotlinOptions {
         freeCompilerArgs += [
                 '-Xopt-in=kotlin.RequiresOptIn',
+                '-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi',
                 '-Xopt-in=com.airbnb.mvrx.InternalMavericksApi',
+                '-Xopt-in=com.airbnb.mvrx.ExperimentalMavericksApi',
         ]
     }
 }
@@ -21,4 +23,7 @@ java {
 
 dependencies {
     api Libraries.kotlinCoroutines
+
+    testImplementation TestLibraries.junit
+    testImplementation TestLibraries.kotlinCoroutinesTest
 }
