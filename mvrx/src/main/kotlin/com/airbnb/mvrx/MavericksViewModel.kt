@@ -5,6 +5,8 @@ import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
+import java.util.Collections
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * All Mavericks ViewModels must extend this class. In Mavericks, ViewModels are generic on a single state class. The ViewModel owns all
@@ -18,7 +20,17 @@ import kotlinx.coroutines.flow.Flow
 abstract class MavericksViewModel<S : MavericksState>(
     initialState: S,
     configFactory: MavericksViewModelConfigFactory = Mavericks.viewModelConfigFactory,
-) : MavericksStateModel<S>(initialState, configFactory) {
+) : MavericksRepository<S>(
+    initialState,
+    object : MavericksRepositoryConfigProvider {
+        override fun <S : MavericksState> invoke(repository: MavericksRepository<S>, initialState: S): MavericksRepositoryConfig<S> {
+            return configFactory.provideConfig(repository as MavericksViewModel<S>, initialState)
+        }
+    }
+) {
+
+    private val lastDeliveredStates = ConcurrentHashMap<String, Any?>()
+    private val activeSubscriptions = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
     @CallSuper
     open fun onCleared() {
@@ -45,5 +57,9 @@ abstract class MavericksViewModel<S : MavericksState>(
         } else {
             resolveSubscription(action)
         }
+    }
+
+    override fun <S : MavericksState> onExecute(repository: MavericksRepository<S>): MavericksBlockExecutions {
+        return (config as MavericksViewModelConfig).onExecute(repository as MavericksViewModel<S>)
     }
 }

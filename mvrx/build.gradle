@@ -10,6 +10,7 @@ tasks.withType(KotlinCompile).all {
         freeCompilerArgs += [
                 '-Xopt-in=kotlin.RequiresOptIn',
                 '-Xopt-in=com.airbnb.mvrx.InternalMavericksApi',
+                '-Xopt-in=com.airbnb.mvrx.ExperimentalMavericksApi',
         ]
     }
 }

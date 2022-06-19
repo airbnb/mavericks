@@ -114,9 +114,9 @@ abstract class BaseMvRxViewModel<S : MavericksState>(
         successMetaData: ((T) -> Any)? = null,
         stateReducer: S.(Async<V>) -> S
     ): Disposable {
-        val blockExecutions = config.onExecute(this@BaseMvRxViewModel)
-        if (blockExecutions != MavericksStateModelConfig.BlockExecutions.No) {
-            if (blockExecutions == MavericksStateModelConfig.BlockExecutions.WithLoading) {
+        val blockExecutions = onExecute(this@BaseMvRxViewModel)
+        if (blockExecutions != MavericksBlockExecutions.No) {
+            if (blockExecutions == MavericksBlockExecutions.WithLoading) {
                 setState { stateReducer(Loading()) }
             }
             return Disposables.disposed()
@@ -172,8 +172,8 @@ abstract class BaseMvRxViewModel<S : MavericksState>(
         assertSubscribeToDifferentViewModel(viewModel)
         viewModel.stateFlow
             .onEach { subscriber(it) }
-            .launchIn(viewModelScope)
-            .cancelOnClear(viewModel.viewModelScope)
+            .launchIn(coroutineScope)
+            .cancelOnClear(viewModel.coroutineScope)
     }
 
     /**
@@ -197,8 +197,8 @@ abstract class BaseMvRxViewModel<S : MavericksState>(
             .map { MvRxTuple1(prop1.get(it)) }
             .distinctUntilChanged()
             .onEach { (a) -> subscriber(a) }
-            .launchIn(viewModelScope)
-            .cancelOnClear(viewModel.viewModelScope)
+            .launchIn(coroutineScope)
+            .cancelOnClear(viewModel.coroutineScope)
     }
 
     private fun <A> selectSubscribeInternal(
@@ -239,8 +239,8 @@ abstract class BaseMvRxViewModel<S : MavericksState>(
                     onFail(asyncValue.error)
                 }
             }
-            .launchIn(viewModelScope)
-            .cancelOnClear(viewModel.viewModelScope)
+            .launchIn(coroutineScope)
+            .cancelOnClear(viewModel.coroutineScope)
     }
 
     /**
@@ -266,8 +266,8 @@ abstract class BaseMvRxViewModel<S : MavericksState>(
             .map { MvRxTuple2(prop1.get(it), prop2.get(it)) }
             .distinctUntilChanged()
             .onEach { (a, b) -> subscriber(a, b) }
-            .launchIn(viewModelScope)
-            .cancelOnClear(viewModel.viewModelScope)
+            .launchIn(coroutineScope)
+            .cancelOnClear(viewModel.coroutineScope)
     }
 
     /**
@@ -295,8 +295,8 @@ abstract class BaseMvRxViewModel<S : MavericksState>(
             .map { MvRxTuple3(prop1.get(it), prop2.get(it), prop3.get(it)) }
             .distinctUntilChanged()
             .onEach { (a, b, c) -> subscriber(a, b, c) }
-            .launchIn(viewModelScope)
-            .cancelOnClear(viewModel.viewModelScope)
+            .launchIn(coroutineScope)
+            .cancelOnClear(viewModel.coroutineScope)
     }
 
     /**
@@ -326,8 +326,8 @@ abstract class BaseMvRxViewModel<S : MavericksState>(
             .map { MvRxTuple4(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it)) }
             .distinctUntilChanged()
             .onEach { (a, b, c, d) -> subscriber(a, b, c, d) }
-            .launchIn(viewModelScope)
-            .cancelOnClear(viewModel.viewModelScope)
+            .launchIn(coroutineScope)
+            .cancelOnClear(viewModel.coroutineScope)
     }
 
     /**
@@ -361,8 +361,8 @@ abstract class BaseMvRxViewModel<S : MavericksState>(
             .map { MvRxTuple5(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it)) }
             .distinctUntilChanged()
             .onEach { (a, b, c, d, e) -> subscriber(a, b, c, d, e) }
-            .launchIn(viewModelScope)
-            .cancelOnClear(viewModel.viewModelScope)
+            .launchIn(coroutineScope)
+            .cancelOnClear(viewModel.coroutineScope)
     }
 
     /**
@@ -398,8 +398,8 @@ abstract class BaseMvRxViewModel<S : MavericksState>(
             .map { MvRxTuple6(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it), prop6.get(it)) }
             .distinctUntilChanged()
             .onEach { (a, b, c, d, e, f) -> subscriber(a, b, c, d, e, f) }
-            .launchIn(viewModelScope)
-            .cancelOnClear(viewModel.viewModelScope)
+            .launchIn(coroutineScope)
+            .cancelOnClear(viewModel.coroutineScope)
     }
 
     /**
@@ -437,8 +437,8 @@ abstract class BaseMvRxViewModel<S : MavericksState>(
             .map { MvRxTuple7(prop1.get(it), prop2.get(it), prop3.get(it), prop4.get(it), prop5.get(it), prop6.get(it), prop7.get(it)) }
             .distinctUntilChanged()
             .onEach { (a, b, c, d, e, f, g) -> subscriber(a, b, c, d, e, f, g) }
-            .launchIn(viewModelScope)
-            .cancelOnClear(viewModel.viewModelScope)
+            .launchIn(coroutineScope)
+            .cancelOnClear(viewModel.coroutineScope)
     }
 
     private fun Job.cancelOnClear(scope: CoroutineScope): Job {

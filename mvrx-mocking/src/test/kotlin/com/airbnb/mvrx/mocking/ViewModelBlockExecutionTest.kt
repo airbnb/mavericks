@@ -2,8 +2,9 @@ package com.airbnb.mvrx.mocking
 
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.Loading
+import com.airbnb.mvrx.MavericksBlockExecutions
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MavericksStateModelConfig
+import com.airbnb.mvrx.MavericksRepositoryConfig
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.Uninitialized
 import org.junit.Assert.assertEquals
@@ -24,7 +25,7 @@ class ViewModelBlockExecutionTest : BaseTest() {
     @Test
     fun executeBlockedCompletely() {
         MockableMavericks.mockConfigFactory.mockBehavior = MockBehavior(
-            blockExecutions = MavericksStateModelConfig.BlockExecutions.Completely,
+            blockExecutions = MavericksBlockExecutions.Completely,
             stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
         )
 
@@ -36,7 +37,7 @@ class ViewModelBlockExecutionTest : BaseTest() {
     @Test
     fun executeBlockedWithLoading() {
         MockableMavericks.mockConfigFactory.mockBehavior = MockBehavior(
-            blockExecutions = MavericksStateModelConfig.BlockExecutions.WithLoading,
+            blockExecutions = MavericksBlockExecutions.WithLoading,
             stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
         )
 

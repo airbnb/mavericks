@@ -1,8 +1,9 @@
 package com.airbnb.mvrx.mocking
 
 import com.airbnb.mvrx.Mavericks
+import com.airbnb.mvrx.MavericksBlockExecutions
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MavericksStateModelConfig
+import com.airbnb.mvrx.MavericksRepositoryConfig
 import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.airbnb.mvrx.MavericksState
 import org.junit.Assert.assertEquals
@@ -19,9 +20,9 @@ class MavericksViewModelConfigTest : BaseTest() {
 
         val originalBehavior = provider.mockBehavior
         val newBehavior =
-            MockBehavior(blockExecutions = MavericksStateModelConfig.BlockExecutions.Completely)
+            MockBehavior(blockExecutions = MavericksBlockExecutions.Completely)
         val newBehavior2 =
-            MockBehavior(blockExecutions = MavericksStateModelConfig.BlockExecutions.WithLoading)
+            MockBehavior(blockExecutions = MavericksBlockExecutions.WithLoading)
 
         val result = provider.withMockBehavior(newBehavior) {
             assertEquals(newBehavior, provider.mockBehavior)
@@ -57,8 +58,8 @@ class MavericksViewModelConfigTest : BaseTest() {
     @Test
     fun testAddOnConfigProvidedListener() {
         var providedVm: MavericksViewModel<*>? = null
-        var providedConfig: MavericksStateModelConfig<*>? = null
-        val onConfigProvided = { vm: MavericksViewModel<*>, config: MavericksStateModelConfig<*> ->
+        var providedConfig: MavericksRepositoryConfig<*>? = null
+        val onConfigProvided = { vm: MavericksViewModel<*>, config: MavericksRepositoryConfig<*> ->
             providedVm = vm
             providedConfig = config
         }
@@ -74,8 +75,8 @@ class MavericksViewModelConfigTest : BaseTest() {
     @Test
     fun testRemoveOnConfigProvidedListener() {
         var providedVm: MavericksViewModel<*>? = null
-        var providedConfig: MavericksStateModelConfig<*>? = null
-        val onConfigProvided = { vm: MavericksViewModel<*>, config: MavericksStateModelConfig<*> ->
+        var providedConfig: MavericksRepositoryConfig<*>? = null
+        val onConfigProvided = { vm: MavericksViewModel<*>, config: MavericksRepositoryConfig<*> ->
             providedVm = vm
             providedConfig = config
         }

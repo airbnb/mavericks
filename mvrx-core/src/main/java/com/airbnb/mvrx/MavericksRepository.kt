@@ -17,37 +17,33 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
 import kotlinx.coroutines.yield
-import java.util.Collections
-import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.reflect.KProperty1
 
-abstract class MavericksStateModel<S : MavericksState>(
+@ExperimentalMavericksApi
+abstract class MavericksRepository<S : MavericksState>(
     private val initialState: S,
-    configFactory: MavericksStateModelConfigFactory,
+    configProvider: MavericksRepositoryConfigProvider,
 ) {
     @Suppress("LeakingThis")
-    private val config = configFactory.provideConfig(this, initialState)
+    @InternalMavericksApi
+    val config = configProvider(this, initialState)
 
     val coroutineScope: CoroutineScope = config.coroutineScope
 
-    val stateStore: MavericksStateStore<S> = config.stateStore
-
     @InternalMavericksApi
-    protected val lastDeliveredStates = ConcurrentHashMap<String, Any?>()
-
-    @InternalMavericksApi
-    protected val activeSubscriptions = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
+    protected val stateStore: MavericksStateStore<S> = config.stateStore
 
     private val tag by lazy { javaClass.simpleName }
 
-    private val mutableStateChecker = if (config.verifyStateImmutability) MutableStateChecker(initialState) else null
+    private val mutableStateChecker = if (config.debugMode) MutableStateChecker(initialState) else null
 
     /**
      * Synchronous access to state is not exposed externally because there is no guarantee that
      * all setState reducers have run yet.
      */
-    @InternalMavericksApi val state: S
+    @InternalMavericksApi
+    val state: S
         get() = stateStore.state
 
     /**
@@ -57,14 +53,14 @@ abstract class MavericksStateModel<S : MavericksState>(
      *
      * This WILL emit the current state followed by all subsequent state updates.
      *
-     * This is not a StateFlow to prevent the ViewModel from having synchronous access to state. withState { state -> } should
+     * This is not a StateFlow to prevent from having synchronous access to state. withState { state -> } should
      * be used as it is guaranteed to be run after all pending setState reducers have run.
      */
     val stateFlow: Flow<S>
         get() = stateStore.flow
 
     init {
-        if (config.verifyStateImmutability) {
+        if (config.debugMode) {
             coroutineScope.launch(Dispatchers.Default) {
                 validateState(initialState)
             }
@@ -90,7 +86,7 @@ abstract class MavericksStateModel<S : MavericksState>(
      *    mutable variables or properties from outside the lambda or else it may crash.
      */
     protected fun setState(reducer: S.() -> S) {
-        if (config.verifyStateImmutability) {
+        if (config.debugMode) {
             // Must use `set` to ensure the validated state is the same as the actual state used in reducer
             // Do not use `get` since `getState` queue has lower priority and the validated state would be the state after reduced
             stateStore.set {
@@ -111,14 +107,14 @@ abstract class MavericksStateModel<S : MavericksState>(
                         }
                     if (changedProp != null) {
                         throw IllegalArgumentException(
-                            "Impure reducer set on ${this@MavericksStateModel::class.java.simpleName}! " +
+                            "Impure reducer set on ${this@MavericksRepository::class.java.simpleName}! " +
                                 "${changedProp.name} changed from ${changedProp.get(firstState)} " +
                                 "to ${changedProp.get(secondState)}. " +
                                 "Ensure that your state properties properly implement hashCode."
                         )
                     } else {
                         throw IllegalArgumentException(
-                            "Impure reducer set on ${this@MavericksStateModel::class.java.simpleName}! Differing states were provided by the same reducer." +
+                            "Impure reducer set on ${this@MavericksRepository::class.java.simpleName}! Differing states were provided by the same reducer." +
                                 "Ensure that your state properties properly implement hashCode. First state: $firstState -> Second state: $secondState"
                         )
                     }
@@ -143,7 +139,7 @@ abstract class MavericksStateModel<S : MavericksState>(
     }
 
     /**
-     * Access the current ViewModel state. Takes a block of code that will be run after all current pending state
+     * Access the current repository state. Takes a block of code that will be run after all current pending state
      * updates are processed.
      */
     protected fun withState(action: (state: S) -> Unit) {
@@ -153,7 +149,7 @@ abstract class MavericksStateModel<S : MavericksState>(
     /**
      * Run a coroutine and wrap its progression with [Async] property reduced to the global state.
      *
-     * @param dispatcher A custom coroutine dispatcher that the coroutine will run on. If null, uses the dispatcher in [viewModelScope],
+     * @param dispatcher A custom coroutine dispatcher that the coroutine will run on. If null, uses the dispatcher in [coroutineScope],
      *                  which defaults to [Dispatchers.Main.immediate] and can be overridden globally with [Mavericks.initialize].
      * @param retainValue A state property that, when set, will be called to retrieve an optional existing data value that will be retained across
      *                    subsequent Loading and Fail states. This is useful if you want to display the previously successful data when
@@ -170,7 +166,7 @@ abstract class MavericksStateModel<S : MavericksState>(
     /**
      * Run a coroutine and wrap its progression with [Async] property reduced to the global state.
      *
-     * @param dispatcher A custom coroutine dispatcher that the coroutine will run on. If null, uses the dispatcher in [viewModelScope],
+     * @param dispatcher A custom coroutine dispatcher that the coroutine will run on. If null, uses the dispatcher in [coroutineScope],
      *                  which defaults to [Dispatchers.Main.immediate] and can be overridden globally with [Mavericks.initialize].
      * @param retainValue A state property that, when set, will be called to retrieve an optional existing data value that will be retained across
      *                    subsequent Loading and Fail states. This is useful if you want to display the previously successful data when
@@ -183,9 +179,9 @@ abstract class MavericksStateModel<S : MavericksState>(
         retainValue: KProperty1<S, Async<T>>? = null,
         reducer: S.(Async<T>) -> S
     ): Job {
-        val blockExecutions = config.onExecute(this@MavericksStateModel)
-        if (blockExecutions != MavericksStateModelConfig.BlockExecutions.No) {
-            if (blockExecutions == MavericksStateModelConfig.BlockExecutions.WithLoading) {
+        val blockExecutions = onExecute(this@MavericksRepository)
+        if (blockExecutions != MavericksBlockExecutions.No) {
+            if (blockExecutions == MavericksBlockExecutions.WithLoading) {
                 setState { reducer(Loading()) }
             }
             // Simulate infinite loading
@@ -210,7 +206,7 @@ abstract class MavericksStateModel<S : MavericksState>(
     /**
      * Collect a Flow and wrap its progression with [Async] property reduced to the global state.
      *
-     * @param dispatcher A custom coroutine dispatcher that the coroutine will run on. If null, uses the dispatcher in [viewModelScope],
+     * @param dispatcher A custom coroutine dispatcher that the coroutine will run on. If null, uses the dispatcher in [coroutineScope],
      *                  which defaults to [Dispatchers.Main.immediate] and can be overridden globally with [Mavericks.initialize].
      * @param retainValue A state property that, when set, will be called to retrieve an optional existing data value that will be retained across
      *                    subsequent Loading and Fail states. This is useful if you want to display the previously successful data when
@@ -223,9 +219,9 @@ abstract class MavericksStateModel<S : MavericksState>(
         retainValue: KProperty1<S, Async<T>>? = null,
         reducer: S.(Async<T>) -> S
     ): Job {
-        val blockExecutions = config.onExecute(this@MavericksStateModel)
-        if (blockExecutions != MavericksStateModelConfig.BlockExecutions.No) {
-            if (blockExecutions == MavericksStateModelConfig.BlockExecutions.WithLoading) {
+        val blockExecutions = onExecute(this@MavericksRepository)
+        if (blockExecutions != MavericksBlockExecutions.No) {
+            if (blockExecutions == MavericksBlockExecutions.WithLoading) {
                 setState { reducer(Loading(value = retainValue?.get(this)?.invoke())) }
             }
             // Simulate infinite loading
@@ -242,7 +238,7 @@ abstract class MavericksStateModel<S : MavericksState>(
     /**
      * Collect a Flow and update state each time it emits a value. This is functionally the same as wrapping onEach with a setState call.
      *
-     * @param dispatcher A custom coroutine dispatcher that the coroutine will run on. If null, uses the dispatcher in [viewModelScope],
+     * @param dispatcher A custom coroutine dispatcher that the coroutine will run on. If null, uses the dispatcher in [coroutineScope],
      *                  which defaults to [Dispatchers.Main.immediate] and can be overridden globally with [Mavericks.initialize].
      * @param reducer A reducer that is applied to the current state and should return the new state. Because the state is the receiver
      *                and is likely a data class, an implementation may look like: `{ copy(response = it) }`.
@@ -251,8 +247,8 @@ abstract class MavericksStateModel<S : MavericksState>(
         dispatcher: CoroutineDispatcher? = null,
         reducer: S.(T) -> S
     ): Job {
-        val blockExecutions = config.onExecute(this@MavericksStateModel)
-        if (blockExecutions != MavericksStateModelConfig.BlockExecutions.No) {
+        val blockExecutions = onExecute(this@MavericksRepository)
+        if (blockExecutions != MavericksBlockExecutions.No) {
             // Simulate infinite work
             return coroutineScope.launch { delay(Long.MAX_VALUE) }
         }
@@ -260,6 +256,28 @@ abstract class MavericksStateModel<S : MavericksState>(
         return onEach {
             setState { reducer(it) }
         }.launchIn(coroutineScope + (dispatcher ?: EmptyCoroutineContext))
+    }
+
+    /**
+     * Called each time a [execute] function is invoked. This allows
+     * the execute function to be skipped, based on the returned [MavericksBlockExecutions] value.
+     *
+     * This is intended to be used to allow the [MavericksRepository] to be mocked out for testing.
+     * Blocking calls to execute prevents long running asynchronous operations from changing the
+     * state later on when the calls complete.
+     *
+     * Mocking out the state store cannot accomplish this on its own, because in some cases we may
+     * want the state store to initially be mocked, with state changes blocked, but later on we may
+     * want it to allow state changes.
+     *
+     * This prevents the case of an executed async call from modifying state once the state stored
+     * is "enabled", even if the execute was performed when the state store was "disabled" and we
+     * didn't intend to allow operations to change the state.
+     */
+    protected open fun <S : MavericksState> onExecute(
+        repository: MavericksRepository<S>
+    ): MavericksBlockExecutions {
+        return MavericksBlockExecutions.No
     }
 
     /**
@@ -394,12 +412,6 @@ abstract class MavericksStateModel<S : MavericksState>(
             // Coroutine is launched with start = CoroutineStart.UNDISPATCHED to perform dispatch only once.
             yield()
             collectLatest(action)
-        }
-    }
-
-    private fun <S : MavericksState> assertSubscribeToDifferentViewModel(viewModel: MavericksStateModel<S>) {
-        require(this != viewModel) {
-            "This method is for subscribing to other view models. Please pass a different instance as the argument."
         }
     }
 
