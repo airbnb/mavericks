@@ -15,7 +15,7 @@ class PureReducerValidationTest : BaseTest() {
 
     @Test
     fun impureReducerShouldFail() {
-        class ImpureViewModel(initialState: PureReducerValidationState) : TestMavericksViewModel<PureReducerValidationState>(initialState) {
+        class ImpureViewModel(initialState: PureReducerValidationState) : TestMavericksRepository<PureReducerValidationState>(initialState) {
             private var count = 0
             fun impureReducer() {
                 setState {
@@ -31,7 +31,7 @@ class PureReducerValidationTest : BaseTest() {
 
     @Test
     fun pureReducerShouldNotFail() {
-        class PureViewModel(initialState: PureReducerValidationState) : TestMavericksViewModel<PureReducerValidationState>(initialState) {
+        class PureViewModel(initialState: PureReducerValidationState) : TestMavericksRepository<PureReducerValidationState>(initialState) {
             fun pureReducer() {
                 setState {
                     val state = copy(count = count + 1)
@@ -44,7 +44,7 @@ class PureReducerValidationTest : BaseTest() {
 
     @Test
     fun shouldBeAbleToUsePrivateProps() {
-        class PureViewModel(initialState: StateWithPrivateVal) : TestMavericksViewModel<StateWithPrivateVal>(initialState) {
+        class PureViewModel(initialState: StateWithPrivateVal) : TestMavericksRepository<StateWithPrivateVal>(initialState) {
             fun pureReducer() {
                 setState { this }
             }
@@ -54,7 +54,7 @@ class PureReducerValidationTest : BaseTest() {
 
     @Test
     fun impureReducerWithPrivatePropShouldFail() {
-        class ImpureViewModel(initialState: StateWithPrivateVal) : TestMavericksViewModel<StateWithPrivateVal>(initialState) {
+        class ImpureViewModel(initialState: StateWithPrivateVal) : TestMavericksRepository<StateWithPrivateVal>(initialState) {
             private var count = 0
             fun impureReducer() {
                 setState {
