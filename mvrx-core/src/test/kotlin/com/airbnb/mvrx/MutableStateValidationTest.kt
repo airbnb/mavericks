@@ -9,7 +9,7 @@ class MutableStateValidationTest : BaseTest() {
 
     @Test(expected = IllegalArgumentException::class)
     fun mutableStateShouldFail() {
-        class ViewModel(initialState: StateWithMutableMap) :
+        class Repository(initialState: StateWithMutableMap) :
             TestMavericksRepository<StateWithMutableMap>(initialState) {
 
             fun addKeyToMap() {
@@ -19,12 +19,12 @@ class MutableStateValidationTest : BaseTest() {
                 setState { copy(map = myMap) }
             }
         }
-        ViewModel(StateWithMutableMap()).addKeyToMap()
+        Repository(StateWithMutableMap()).addKeyToMap()
     }
 
     @Test
     fun immutableStateShouldNotFail() {
-        class ViewModel(initialState: StateWithImmutableMap) :
+        class Repository(initialState: StateWithImmutableMap) :
             TestMavericksRepository<StateWithImmutableMap>(initialState) {
 
             fun addKeyToMap() {
@@ -34,6 +34,6 @@ class MutableStateValidationTest : BaseTest() {
                 setState { copy(map = myMap) }
             }
         }
-        ViewModel(StateWithImmutableMap()).addKeyToMap()
+        Repository(StateWithImmutableMap()).addKeyToMap()
     }
 }
