@@ -9,4 +9,8 @@ class TestMavericksRepositoryConfig<S : MavericksState>(initialState: S) : Maver
     stateStore = CoroutinesStateStore(initialState, CoroutineScope(Dispatchers.Unconfined)),
     coroutineScope = CoroutineScope(Dispatchers.Unconfined),
     subscriptionCoroutineContextOverride = EmptyCoroutineContext,
-)
+) {
+    override fun <S : MavericksState> onExecute(repository: MavericksRepository<S>): MavericksBlockExecutions {
+        return MavericksBlockExecutions.No
+    }
+}

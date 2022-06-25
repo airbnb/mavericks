@@ -29,4 +29,24 @@ abstract class MavericksRepositoryConfig<S : Any>(
      * By default subscriptions use [coroutineScope] to launch the subscription in.
      */
     val subscriptionCoroutineContextOverride: CoroutineContext
-)
+) {
+    /**
+     * Called each time a [MavericksRepository.execute] function is invoked. This allows
+     * the execute function to be skipped, based on the returned [MavericksBlockExecutions] value.
+     *
+     * This is intended to be used to allow the [MavericksRepository] to be mocked out for testing.
+     * Blocking calls to execute prevents long running asynchronous operations from changing the
+     * state later on when the calls complete.
+     *
+     * Mocking out the state store cannot accomplish this on its own, because in some cases we may
+     * want the state store to initially be mocked, with state changes blocked, but later on we may
+     * want it to allow state changes.
+     *
+     * This prevents the case of an executed async call from modifying state once the state stored
+     * is "enabled", even if the execute was performed when the state store was "disabled" and we
+     * didn't intend to allow operations to change the state.
+     */
+    abstract fun <S : MavericksState> onExecute(
+        repository: MavericksRepository<S>
+    ): MavericksBlockExecutions
+}

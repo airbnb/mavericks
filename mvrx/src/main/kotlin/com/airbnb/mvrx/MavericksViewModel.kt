@@ -29,6 +29,8 @@ abstract class MavericksViewModel<S : MavericksState>(
     }
 ) {
 
+    val viewModelScope = coroutineScope
+
     private val lastDeliveredStates = ConcurrentHashMap<String, Any?>()
     private val activeSubscriptions = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
@@ -57,9 +59,5 @@ abstract class MavericksViewModel<S : MavericksState>(
         } else {
             resolveSubscription(action)
         }
-    }
-
-    override fun <S : MavericksState> onExecute(repository: MavericksRepository<S>): MavericksBlockExecutions {
-        return (config as MavericksViewModelConfig).onExecute(repository as MavericksViewModel<S>)
     }
 }
