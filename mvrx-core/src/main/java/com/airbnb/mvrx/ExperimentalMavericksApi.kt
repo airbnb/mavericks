@@ -6,4 +6,4 @@ package com.airbnb.mvrx
  */
 @Retention(value = AnnotationRetention.BINARY)
 @RequiresOptIn(level = RequiresOptIn.Level.WARNING)
-annotation class ExperimentalMavericksApi()
+annotation class ExperimentalMavericksApi

@@ -1,7 +1,6 @@
 package com.airbnb.mvrx.mocking
 
 import com.airbnb.mvrx.MavericksBlockExecutions
-import com.airbnb.mvrx.MavericksRepositoryConfig
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.mocking.MockBehavior.InitialStateMocking
 import com.airbnb.mvrx.mocking.MockBehavior.StateStoreBehavior

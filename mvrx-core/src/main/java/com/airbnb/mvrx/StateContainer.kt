@@ -46,5 +46,12 @@ fun <
     G : MavericksRepository<H>, H : MavericksState,
     I : MavericksRepository<J>, J : MavericksState,
     K
-    > withState(repository1: A, repository2: C, repository3: E, repository4: G, repository5: I, block: (B, D, F, H, J) -> K) =
+    > withState(
+    repository1: A,
+    repository2: C,
+    repository3: E,
+    repository4: G,
+    repository5: I,
+    block: (B, D, F, H, J) -> K
+) =
     block(repository1.state, repository2.state, repository3.state, repository4.state, repository5.state)

@@ -4,7 +4,6 @@ import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.Loading
 import com.airbnb.mvrx.MavericksBlockExecutions
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MavericksRepositoryConfig
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.Uninitialized
 import org.junit.Assert.assertEquals
