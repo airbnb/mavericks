@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import com.airbnb.mvrx.CoroutinesStateStore
 import com.airbnb.mvrx.MavericksBlockExecutions
-import com.airbnb.mvrx.MavericksRepository
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.airbnb.mvrx.MavericksState
@@ -74,13 +73,11 @@ class MockableMavericksViewModelConfig<S : MavericksState>(
 
     fun clearOnExecuteListeners(): Unit = onExecuteListeners.clear()
 
-    override fun <S : MavericksState> onExecute(repository: MavericksRepository<S>): MavericksBlockExecutions {
+    override fun <S : MavericksState> onExecute(viewModel: MavericksViewModel<S>): MavericksBlockExecutions {
         val blockExecutions = currentMockBehavior.blockExecutions
 
-        if (repository is MavericksViewModel) {
-            onExecuteListeners.forEach { listener ->
-                listener(this, repository, blockExecutions)
-            }
+        onExecuteListeners.forEach { listener ->
+            listener(this, viewModel, blockExecutions)
         }
 
         return blockExecutions

@@ -22,14 +22,12 @@ import kotlin.reflect.KProperty1
 
 @ExperimentalMavericksApi
 abstract class MavericksRepository<S : MavericksState>(
-    private val initialState: S,
-    configProvider: MavericksRepositoryConfigProvider,
+    initialState: S,
+    configProvider: MavericksRepositoryConfigProvider<S>,
 ) {
-    @Suppress("LeakingThis")
-    @InternalMavericksApi
-    val config = configProvider(this, initialState)
+    private val config = configProvider.provide(initialState)
 
-    val coroutineScope: CoroutineScope = config.coroutineScope
+    protected val coroutineScope: CoroutineScope = config.coroutineScope
 
     @InternalMavericksApi
     protected val stateStore: MavericksStateStore<S> = config.stateStore
@@ -62,7 +60,7 @@ abstract class MavericksRepository<S : MavericksState>(
     init {
         if (config.debugMode) {
             coroutineScope.launch(Dispatchers.Default) {
-                validateState(initialState)
+                validateState()
             }
         }
     }
@@ -71,8 +69,7 @@ abstract class MavericksRepository<S : MavericksState>(
      * Validates a number of properties on the state class. This cannot be called from the main thread because it does
      * a fair amount of reflection.
      */
-    @InternalMavericksApi
-    protected open fun validateState(initialState: S) {
+    private fun validateState() {
         assertMavericksDataClassImmutability(state::class)
     }
 

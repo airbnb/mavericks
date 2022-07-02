@@ -1,10 +1,18 @@
 package com.airbnb.mvrx
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlin.coroutines.EmptyCoroutineContext
+
 abstract class TestMavericksRepository<S : MavericksState>(initialState: S) : MavericksRepository<S>(
-    initialState,
-    object : MavericksRepositoryConfigProvider {
-        override fun <S : MavericksState> invoke(repository: MavericksRepository<S>, initialState: S): MavericksRepositoryConfig<S> {
-            return TestMavericksRepositoryConfig(initialState)
-        }
+    initialState = initialState,
+    configProvider = {
+        MavericksRepositoryConfig(
+            debugMode = true,
+            stateStore = CoroutinesStateStore(initialState, CoroutineScope(Dispatchers.Unconfined)),
+            coroutineScope = CoroutineScope(Dispatchers.Unconfined),
+            subscriptionCoroutineContextOverride = EmptyCoroutineContext,
+            onExecute = { MavericksBlockExecutions.No }
+        )
     }
 )

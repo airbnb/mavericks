@@ -3,9 +3,9 @@ package com.airbnb.mvrx.mocking
 import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.MavericksBlockExecutions
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MavericksRepositoryConfig
 import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.airbnb.mvrx.MavericksState
+import com.airbnb.mvrx.MavericksViewModelConfig
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -58,8 +58,8 @@ class MavericksViewModelConfigTest : BaseTest() {
     @Test
     fun testAddOnConfigProvidedListener() {
         var providedVm: MavericksViewModel<*>? = null
-        var providedConfig: MavericksRepositoryConfig<*>? = null
-        val onConfigProvided = { vm: MavericksViewModel<*>, config: MavericksRepositoryConfig<*> ->
+        var providedConfig: MavericksViewModelConfig<*>? = null
+        val onConfigProvided = { vm: MavericksViewModel<*>, config: MavericksViewModelConfig<*> ->
             providedVm = vm
             providedConfig = config
         }
@@ -75,8 +75,8 @@ class MavericksViewModelConfigTest : BaseTest() {
     @Test
     fun testRemoveOnConfigProvidedListener() {
         var providedVm: MavericksViewModel<*>? = null
-        var providedConfig: MavericksRepositoryConfig<*>? = null
-        val onConfigProvided = { vm: MavericksViewModel<*>, config: MavericksRepositoryConfig<*> ->
+        var providedConfig: MavericksViewModelConfig<*>? = null
+        val onConfigProvided = { vm: MavericksViewModel<*>, config: MavericksViewModelConfig<*> ->
             providedVm = vm
             providedConfig = config
         }

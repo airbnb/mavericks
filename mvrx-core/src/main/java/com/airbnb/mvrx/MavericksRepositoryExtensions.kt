@@ -7,12 +7,12 @@ import kotlinx.coroutines.flow.map
 import kotlin.reflect.KProperty1
 
 @InternalMavericksApi
-fun <VM : MavericksRepository<S>, S : MavericksState> VM._internal(
+fun <Repository : MavericksRepository<S>, S : MavericksState> Repository._internal(
     action: suspend (S) -> Unit
 ) = stateFlow.resolveSubscription(action)
 
 @InternalMavericksApi
-fun <VM : MavericksRepository<S>, S : MavericksState, A> VM._internal1(
+fun <Repository : MavericksRepository<S>, S : MavericksState, A> Repository._internal1(
     prop1: KProperty1<S, A>,
     action: suspend (A) -> Unit
 ) = stateFlow
@@ -23,7 +23,7 @@ fun <VM : MavericksRepository<S>, S : MavericksState, A> VM._internal1(
     }
 
 @InternalMavericksApi
-fun <VM : MavericksRepository<S>, S : MavericksState, A, B> VM._internal2(
+fun <Repository : MavericksRepository<S>, S : MavericksState, A, B> Repository._internal2(
     prop1: KProperty1<S, A>,
     prop2: KProperty1<S, B>,
     action: suspend (A, B) -> Unit
@@ -35,7 +35,7 @@ fun <VM : MavericksRepository<S>, S : MavericksState, A, B> VM._internal2(
     }
 
 @InternalMavericksApi
-fun <VM : MavericksRepository<S>, S : MavericksState, A, B, C> VM._internal3(
+fun <Repository : MavericksRepository<S>, S : MavericksState, A, B, C> Repository._internal3(
     prop1: KProperty1<S, A>,
     prop2: KProperty1<S, B>,
     prop3: KProperty1<S, C>,
@@ -48,7 +48,7 @@ fun <VM : MavericksRepository<S>, S : MavericksState, A, B, C> VM._internal3(
     }
 
 @InternalMavericksApi
-fun <VM : MavericksRepository<S>, S : MavericksState, A, B, C, D> VM._internal4(
+fun <Repository : MavericksRepository<S>, S : MavericksState, A, B, C, D> Repository._internal4(
     prop1: KProperty1<S, A>,
     prop2: KProperty1<S, B>,
     prop3: KProperty1<S, C>,
@@ -62,7 +62,7 @@ fun <VM : MavericksRepository<S>, S : MavericksState, A, B, C, D> VM._internal4(
     }
 
 @InternalMavericksApi
-fun <VM : MavericksRepository<S>, S : MavericksState, A, B, C, D, E> VM._internal5(
+fun <Repository : MavericksRepository<S>, S : MavericksState, A, B, C, D, E> Repository._internal5(
     prop1: KProperty1<S, A>,
     prop2: KProperty1<S, B>,
     prop3: KProperty1<S, C>,
@@ -77,7 +77,7 @@ fun <VM : MavericksRepository<S>, S : MavericksState, A, B, C, D, E> VM._interna
     }
 
 @InternalMavericksApi
-fun <VM : MavericksRepository<S>, S : MavericksState, A, B, C, D, E, F> VM._internal6(
+fun <Repository : MavericksRepository<S>, S : MavericksState, A, B, C, D, E, F> Repository._internal6(
     prop1: KProperty1<S, A>,
     prop2: KProperty1<S, B>,
     prop3: KProperty1<S, C>,
@@ -93,7 +93,7 @@ fun <VM : MavericksRepository<S>, S : MavericksState, A, B, C, D, E, F> VM._inte
     }
 
 @InternalMavericksApi
-fun <VM : MavericksRepository<S>, S : MavericksState, A, B, C, D, E, F, G> VM._internal7(
+fun <Repository : MavericksRepository<S>, S : MavericksState, A, B, C, D, E, F, G> Repository._internal7(
     prop1: KProperty1<S, A>,
     prop2: KProperty1<S, B>,
     prop3: KProperty1<S, C>,
@@ -110,7 +110,7 @@ fun <VM : MavericksRepository<S>, S : MavericksState, A, B, C, D, E, F, G> VM._i
     }
 
 @InternalMavericksApi
-fun <VM : MavericksRepository<S>, S : MavericksState, T> VM._internalSF(
+fun <Repository : MavericksRepository<S>, S : MavericksState, T> Repository._internalSF(
     asyncProp: KProperty1<S, Async<T>>,
     onFail: (suspend (Throwable) -> Unit)? = null,
     onSuccess: (suspend (T) -> Unit)? = null

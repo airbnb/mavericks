@@ -8,7 +8,7 @@ class BaseViewModelTest : BaseTest() {
     data class TestState(val foo: Int = 5) : MavericksState
     class TestViewModel : MavericksViewModel<TestState>(TestState()) {
         // Make viewModelScope public
-        val scope = coroutineScope
+        val scope = viewModelScope
     }
 
     @Test

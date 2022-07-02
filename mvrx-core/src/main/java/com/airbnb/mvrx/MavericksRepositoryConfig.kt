@@ -2,12 +2,13 @@ package com.airbnb.mvrx
 
 import kotlinx.coroutines.CoroutineScope
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * Provides configuration for a [MavericksRepositoryConfig].
  */
 @ExperimentalMavericksApi
-abstract class MavericksRepositoryConfig<S : Any>(
+class MavericksRepositoryConfig<S : MavericksState>(
     /**
      * If true, extra validations will be applied to ensure the repository is used correctly.
      */
@@ -28,8 +29,8 @@ abstract class MavericksRepositoryConfig<S : Any>(
      *
      * By default subscriptions use [coroutineScope] to launch the subscription in.
      */
-    val subscriptionCoroutineContextOverride: CoroutineContext
-) {
+    val subscriptionCoroutineContextOverride: CoroutineContext = EmptyCoroutineContext,
+
     /**
      * Called each time a [MavericksRepository.execute] function is invoked. This allows
      * the execute function to be skipped, based on the returned [MavericksBlockExecutions] value.
@@ -46,7 +47,7 @@ abstract class MavericksRepositoryConfig<S : Any>(
      * is "enabled", even if the execute was performed when the state store was "disabled" and we
      * didn't intend to allow operations to change the state.
      */
-    abstract fun <S : MavericksState> onExecute(
-        repository: MavericksRepository<S>
-    ): MavericksBlockExecutions
-}
+    val onExecute: (repository: MavericksRepository<S>) -> MavericksBlockExecutions = {
+        MavericksBlockExecutions.No
+    }
+)

@@ -84,7 +84,7 @@ open class MavericksViewModelConfigFactory(
             coroutineScope = scope,
             subscriptionCoroutineContextOverride = subscriptionCoroutineContextOverride
         ) {
-            override fun <S : MavericksState> onExecute(repository: MavericksRepository<S>): MavericksBlockExecutions {
+            override fun <S : MavericksState> onExecute(viewModel: MavericksViewModel<S>): MavericksBlockExecutions {
                 return MavericksBlockExecutions.No
             }
         }
