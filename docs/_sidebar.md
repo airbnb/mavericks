@@ -3,6 +3,7 @@
 * [**Setting Up Mavericks**](setup.md)
 * [**What's new in Mavericks 2.0**](new-2x.md)
     * [**Upgrading from MvRx 1.x**](new-2x.md#upgrading)
+* [**What's new in Mavericks 3.0**](new-3x.md)
 ---
 * [**Async/Network/Db Operations**](async.md)
 * [**Debug Checks**](debug-checks.md)
