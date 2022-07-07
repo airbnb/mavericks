@@ -12,7 +12,7 @@ class MavericksRepositoryConfig<S : MavericksState>(
     /**
      * If true, extra validations will be applied to ensure the repository is used correctly.
      */
-    val debugMode: Boolean,
+    val performCorrectnessValidations: Boolean,
 
     /**
      * The state store instance that will control the state of the repository.

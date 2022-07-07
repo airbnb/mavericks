@@ -39,7 +39,7 @@ abstract class MavericksViewModel<S : MavericksState>(
 
     val viewModelScope = config.coroutineScope
 
-    private val repository = Repository(initialState)
+    private val repository = Repository()
     private val lastDeliveredStates = ConcurrentHashMap<String, Any?>()
     private val activeSubscriptions = Collections.newSetFromMap(ConcurrentHashMap<String, Boolean>())
 
@@ -331,18 +331,14 @@ abstract class MavericksViewModel<S : MavericksState>(
 
     override fun toString(): String = "${this::class.java.simpleName} $state"
 
-    private inner class Repository(initialState: S) : MavericksRepository<S>(
-        initialState = initialState,
-        configProvider = {
-            MavericksRepositoryConfig(
-                debugMode = config.debugMode,
-                stateStore = config.stateStore,
-                coroutineScope = config.coroutineScope,
-                subscriptionCoroutineContextOverride = config.subscriptionCoroutineContextOverride,
-                onExecute =
-                { config.onExecute(this@MavericksViewModel) },
-            )
-        }
+    private inner class Repository : MavericksRepository<S>(
+        MavericksRepositoryConfig(
+            performCorrectnessValidations = config.debugMode,
+            stateStore = config.stateStore,
+            coroutineScope = config.coroutineScope,
+            subscriptionCoroutineContextOverride = config.subscriptionCoroutineContextOverride,
+            onExecute = { config.onExecute(this@MavericksViewModel) },
+        )
     ) {
         fun setStateInternal(reducer: S.() -> S) {
             setState(reducer)

@@ -22,10 +22,31 @@ import kotlin.reflect.KProperty1
 
 @ExperimentalMavericksApi
 abstract class MavericksRepository<S : MavericksState>(
-    initialState: S,
-    configProvider: MavericksRepositoryConfigProvider<S>,
+    private val config: MavericksRepositoryConfig<S>
 ) {
-    private val config = configProvider.provide(initialState)
+    constructor(
+        /**
+         * State to initialize repository with
+         */
+        initialState: S,
+        /**
+         * The coroutine scope that will be provided to the repository.
+         */
+        coroutineScope: CoroutineScope,
+        /**
+         * If true, extra validations will be applied to ensure the repository is used correctly.
+         */
+        performCorrectnessValidations: Boolean,
+    ) : this(
+        MavericksRepositoryConfig(
+            performCorrectnessValidations = performCorrectnessValidations,
+            stateStore = CoroutinesStateStore(
+                initialState = initialState,
+                scope = coroutineScope,
+            ),
+            coroutineScope = coroutineScope,
+        )
+    )
 
     protected val coroutineScope: CoroutineScope = config.coroutineScope
 
@@ -34,7 +55,7 @@ abstract class MavericksRepository<S : MavericksState>(
 
     private val tag by lazy { javaClass.simpleName }
 
-    private val mutableStateChecker = if (config.debugMode) MutableStateChecker(initialState) else null
+    private val mutableStateChecker = if (config.performCorrectnessValidations) MutableStateChecker(config.stateStore.state) else null
 
     /**
      * Synchronous access to state is not exposed externally because there is no guarantee that
@@ -58,7 +79,7 @@ abstract class MavericksRepository<S : MavericksState>(
         get() = stateStore.flow
 
     init {
-        if (config.debugMode) {
+        if (config.performCorrectnessValidations) {
             coroutineScope.launch(Dispatchers.Default) {
                 validateState()
             }
@@ -83,7 +104,7 @@ abstract class MavericksRepository<S : MavericksState>(
      *    mutable variables or properties from outside the lambda or else it may crash.
      */
     protected fun setState(reducer: S.() -> S) {
-        if (config.debugMode) {
+        if (config.performCorrectnessValidations) {
             // Must use `set` to ensure the validated state is the same as the actual state used in reducer
             // Do not use `get` since `getState` queue has lower priority and the validated state would be the state after reduced
             stateStore.set {
