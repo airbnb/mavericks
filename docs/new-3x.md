@@ -36,13 +36,8 @@ class WeatherForecastRepository(
     private val api: WeatherApi,
 ) : MavericksRepository<WeatherForecastState>(
     initialState = WeatherForecastState(),
-    configProvider = { initialState ->
-        MavericksRepositoryConfig(
-            debugMode = true,
-            stateStore = CoroutinesStateStore(initialState, scope),
-            coroutineScope = scope,
-        )
-    },
+    coroutineScope = scope,
+    performCorrectnessValidations = BuildConfig.DEBUG,
 ) {
     init {
         suspend { api.getForecasts() }.execute { copy(forecasts = it) }
