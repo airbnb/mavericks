@@ -225,7 +225,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
  * creating a key for each one.
  *
  * To create arguments, define a property in your fragment like:
- *     `private val listingId by arg<MyArgs>()`
+ *     `private val listingId: MyArgs by args()`
  *
  * Each fragment can only have a single argument with the key [Mavericks.KEY_ARG]
  */
@@ -251,11 +251,11 @@ fun <V : Any> args() = object : ReadOnlyProperty<Fragment, V> {
  * creating a key for each one.
  *
  * To create nullable arguments, define a property in your fragment like:
- *     `private val listingId by argsOrNull<MyArgs?>()`
+ *     `private val listingId: MyArgs? by argsOrNull()`
  *
  * Each fragment can only have a single argument with the key [Mavericks.KEY_ARG]
  */
-fun <V : Any> argsOrNull() = object : ReadOnlyProperty<Fragment, V?> {
+fun <V> argsOrNull() = object : ReadOnlyProperty<Fragment, V?> {
     var value: V? = null
     var read: Boolean = false
 
