@@ -11,6 +11,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 class MavericksRepositoryConfig<S : MavericksState>(
     /**
      * If true, extra validations will be applied to ensure the repository is used correctly.
+     * Should be enabled for debug build only.
      */
     val performCorrectnessValidations: Boolean,
 

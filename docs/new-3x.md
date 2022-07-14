@@ -48,3 +48,33 @@ class WeatherForecastRepository(
     }
 }
 ```
+
+#### `MavericksRepositoryConfig` 
+
+In order to construct an instance of `MavericksRepository` you have to provide some configuration parameters, you can do that by:
+
+1. providing instance of `MavericksRepositoryConfig`
+```kotlin
+class WeatherForecastRepository(
+    scope: CoroutineScope,
+    private val api: WeatherApi,
+) : MavericksRepository<WeatherForecastState>(
+    MavericksRepositoryConfig(...)
+```
+
+2. or via constructor arguments
+```kotlin
+class WeatherForecastRepository(
+    scope: CoroutineScope,
+    private val api: WeatherApi,
+) : MavericksRepository<WeatherForecastState>(
+    initialState = WeatherForecastState(),
+    coroutineScope = scope,
+    performCorrectnessValidations = BuildConfig.DEBUG,
+)
+```
+
+**Note:** `performCorrectnessValidations` should be enabled in debug build only as it applies runtime checks to ensure the repository is used correctly.
+To avoid extra overhead this flag should be disabled in production build.
+
+Checkout out  [integrate Mavericks into your app](/debug-checks) or docs for [MavericksRepositoryConfig](https://github.com/airbnb/mavericks/blob/main/mvrx-core/src/main/kotlin/com/airbnb/mvrx/MavericksRepositoryConfig.kt) for more info.
