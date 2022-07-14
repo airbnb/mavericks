@@ -1,5 +1,8 @@
 # Change Log
 
+## 2.7.0
+- Add mockEightViewModels and mockNineViewModels to MockBuilder (#633)
+
 ## 2.6.1
 - Expose state restoration functions (#611)
 - Use passed scope as fragment if possible (#618)
