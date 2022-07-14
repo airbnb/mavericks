@@ -10,7 +10,7 @@ class MutableStateValidationTest : BaseTest() {
     @Test(expected = IllegalArgumentException::class)
     fun mutableStateShouldFail() {
         class Repository(initialState: StateWithMutableMap) :
-            TestMavericksRepository<StateWithMutableMap>(initialState) {
+            BaseTestMavericksRepository<StateWithMutableMap>(initialState) {
 
             fun addKeyToMap() {
                 val myMap = withState(this) { it.map }
@@ -25,7 +25,7 @@ class MutableStateValidationTest : BaseTest() {
     @Test
     fun immutableStateShouldNotFail() {
         class Repository(initialState: StateWithImmutableMap) :
-            TestMavericksRepository<StateWithImmutableMap>(initialState) {
+            BaseTestMavericksRepository<StateWithImmutableMap>(initialState) {
 
             fun addKeyToMap() {
                 val myMap = withState(this) { it.map }.toMutableMap()

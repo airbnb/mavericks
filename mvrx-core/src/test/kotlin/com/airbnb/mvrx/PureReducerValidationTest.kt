@@ -15,7 +15,7 @@ class PureReducerValidationTest : BaseTest() {
 
     @Test
     fun impureReducerShouldFail() {
-        class ImpureRepository(initialState: PureReducerValidationState) : TestMavericksRepository<PureReducerValidationState>(initialState) {
+        class ImpureRepository(initialState: PureReducerValidationState) : BaseTestMavericksRepository<PureReducerValidationState>(initialState) {
             private var count = 0
             fun impureReducer() {
                 setState {
@@ -31,7 +31,7 @@ class PureReducerValidationTest : BaseTest() {
 
     @Test
     fun pureReducerShouldNotFail() {
-        class PureRepository(initialState: PureReducerValidationState) : TestMavericksRepository<PureReducerValidationState>(initialState) {
+        class PureRepository(initialState: PureReducerValidationState) : BaseTestMavericksRepository<PureReducerValidationState>(initialState) {
             fun pureReducer() {
                 setState {
                     val state = copy(count = count + 1)
@@ -44,7 +44,7 @@ class PureReducerValidationTest : BaseTest() {
 
     @Test
     fun shouldBeAbleToUsePrivateProps() {
-        class PureRepository(initialState: StateWithPrivateVal) : TestMavericksRepository<StateWithPrivateVal>(initialState) {
+        class PureRepository(initialState: StateWithPrivateVal) : BaseTestMavericksRepository<StateWithPrivateVal>(initialState) {
             fun pureReducer() {
                 setState { this }
             }
@@ -54,7 +54,7 @@ class PureReducerValidationTest : BaseTest() {
 
     @Test
     fun impureReducerWithPrivatePropShouldFail() {
-        class ImpureRepository(initialState: StateWithPrivateVal) : TestMavericksRepository<StateWithPrivateVal>(initialState) {
+        class ImpureRepository(initialState: StateWithPrivateVal) : BaseTestMavericksRepository<StateWithPrivateVal>(initialState) {
             private var count = 0
             fun impureReducer() {
                 setState {
