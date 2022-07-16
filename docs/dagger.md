@@ -44,12 +44,13 @@ class ExampleViewModel @AssistedInject constructor(
         override fun create(state: ExampleState): ExampleViewModel
     }
 
-    companion object : MavericksViewModelFactory<TestViewModel, TestState> by hiltMavericksViewModelFactory()
+    companion object : MavericksViewModelFactory<ExampleViewModel, ExampleState> by hiltMavericksViewModelFactory()
 }
 ```
 ```kotlin
 import com.airbnb.mvrx.hilt.AssistedViewModelFactory
 import com.airbnb.mvrx.hilt.MavericksViewModelComponent
+import com.airbnb.mvrx.hilt.ViewModelKey
 
 @Module
 @InstallIn(MavericksViewModelComponent::class)
@@ -58,6 +59,6 @@ interface ExampleViewModelModule {
     @Binds
     @IntoMap
     @ViewModelKey(ExampleViewModel::class)
-    fun exampleViewModelFactory(factory: TestViewModel.Factory): AssistedViewModelFactory<*, *>
+    fun exampleViewModelFactory(factory: ExampleViewModel.Factory): AssistedViewModelFactory<*, *>
 }
 ```
