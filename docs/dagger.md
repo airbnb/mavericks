@@ -50,6 +50,7 @@ class ExampleViewModel @AssistedInject constructor(
 ```kotlin
 import com.airbnb.mvrx.hilt.AssistedViewModelFactory
 import com.airbnb.mvrx.hilt.MavericksViewModelComponent
+import com.airbnb.mvrx.hilt.ViewModelKey
 
 @Module
 @InstallIn(MavericksViewModelComponent::class)
