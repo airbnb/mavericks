@@ -26,7 +26,7 @@ abstract class MavericksRepository<S : MavericksState>(
 ) {
     constructor(
         /**
-         * State to initialize repository with
+         * State to initialize repository with.
          */
         initialState: S,
         /**
