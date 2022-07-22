@@ -225,7 +225,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
  * creating a key for each one.
  *
  * To create arguments, define a property in your fragment like:
- *     `private val listingId by arg<MyArgs>()`
+ *     `private val listingId: MyArgs by args()`
  *
  * Each fragment can only have a single argument with the key [Mavericks.KEY_ARG]
  */
@@ -243,6 +243,31 @@ fun <V : Any> args() = object : ReadOnlyProperty<Fragment, V> {
             value = argUntyped as V
         }
         return value ?: throw IllegalArgumentException("")
+    }
+}
+
+/**
+ * Fragment argument delegate that makes it possible to set fragment args without
+ * creating a key for each one.
+ *
+ * To create nullable arguments, define a property in your fragment like:
+ *     `private val listingId: MyArgs? by argsOrNull()`
+ *
+ * Each fragment can only have a single argument with the key [Mavericks.KEY_ARG]
+ */
+fun <V> argsOrNull() = object : ReadOnlyProperty<Fragment, V?> {
+    var value: V? = null
+    var read: Boolean = false
+
+    override fun getValue(thisRef: Fragment, property: KProperty<*>): V? {
+        if (!read) {
+            val args = thisRef.arguments
+            val argUntyped = args?.get(Mavericks.KEY_ARG)
+            @Suppress("UNCHECKED_CAST")
+            value = argUntyped as? V
+            read = true
+        }
+        return value
     }
 }
 
