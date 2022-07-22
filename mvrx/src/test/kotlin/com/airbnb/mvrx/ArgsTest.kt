@@ -18,28 +18,58 @@ class MvRxArgsFragment : Fragment(), MavericksView {
     override fun invalidate() {}
 }
 
+class MvRxArgsOrNullFragment : Fragment(), MavericksView {
+    val args: MvrxArgsTestArgs? by argsOrNull()
+
+    override fun invalidate() {}
+}
+
 class MvRxFragmentTest : BaseTest() {
     @Test
-    fun testArgs() {
+    fun testByArgsWithArgs() {
         val (_, fragment) = createFragment<MvRxArgsFragment, TestMvRxActivity>(args = MvrxArgsTestArgs())
         Assert.assertEquals(0, fragment.args.count)
     }
 
     @Test
-    fun testSetArgs() {
+    fun testByArgsSetArgs() {
         val (_, fragment) = createFragment<MvRxArgsFragment, TestMvRxActivity>(args = MvrxArgsTestArgs(2))
         Assert.assertEquals(2, fragment.args.count)
     }
 
     @Test(expected = ClassCastException::class)
-    fun testSetWrongArgs() {
+    fun testByArgsSetWrongArgs() {
         val (_, fragment) = createFragment<MvRxArgsFragment, TestMvRxActivity>(args = MvrxArgsTestArgs2(2))
         fragment.args
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun testNoArgs() {
+    fun testByArgsWithNoArgs() {
         val (_, fragment) = createFragment<MvRxArgsFragment, TestMvRxActivity>()
+        fragment.args
+    }
+
+    @Test
+    fun testByArgsOrNullWithArgs() {
+        val (_, fragment) = createFragment<MvRxArgsOrNullFragment, TestMvRxActivity>(args = MvrxArgsTestArgs())
+        Assert.assertEquals(0, fragment.args?.count)
+    }
+
+    @Test
+    fun testByArgsOrNullSetArgs() {
+        val (_, fragment) = createFragment<MvRxArgsOrNullFragment, TestMvRxActivity>(args = MvrxArgsTestArgs(2))
+        Assert.assertEquals(2, fragment.args?.count)
+    }
+
+    @Test
+    fun testByArgsOrNullWithNoArgs() {
+        val (_, fragment) = createFragment<MvRxArgsOrNullFragment, TestMvRxActivity>()
+        Assert.assertNull(fragment.args?.count)
+    }
+
+    @Test(expected = ClassCastException::class)
+    fun testByArgsOrNullSetWrongArgs() {
+        val (_, fragment) = createFragment<MvRxArgsOrNullFragment, TestMvRxActivity>(args = MvrxArgsTestArgs2(2))
         fragment.args
     }
 }
