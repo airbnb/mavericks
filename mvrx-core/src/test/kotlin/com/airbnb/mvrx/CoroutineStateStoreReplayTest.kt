@@ -26,13 +26,11 @@ class CoroutineStateStoreReplayTest {
         repeat(100) {
             singleReplayTestIteration(N = 5000, subscribers = 10)
         }
-        Unit
     }
 
     @Test
     fun replayLargeTest() = runBlocking {
         singleReplayTestIteration(N = 100_000, subscribers = 10)
-        Unit
     }
 
     /**
@@ -42,6 +40,7 @@ class CoroutineStateStoreReplayTest {
      * or 4,3,4,5 (incorrect order)
      * or 3,3,4,5 (duplicate value)
      */
+    @Suppress("DeferredResultUnused")
     private suspend fun singleReplayTestIteration(N: Int, subscribers: Int) = withContext(Dispatchers.Default) {
         val scope = CoroutineScope(Dispatchers.Default + Job())
         val store = CoroutinesStateStore(State(foo = 0), scope)
@@ -72,6 +71,7 @@ class CoroutineStateStoreReplayTest {
      * Will fail if stateChannel subscription will be collected without finally block in CoroutinesStateStore.flow builder
      */
     @Test(timeout = 10_000)
+    @Suppress("DeferredResultUnused", "LocalVariableName")
     fun testProperCancellation() = runBlocking {
         val scope = CoroutineScope(Dispatchers.Default + Job())
         val store = CoroutinesStateStore(State(foo = 0), scope)
@@ -97,6 +97,5 @@ class CoroutineStateStoreReplayTest {
             }
         }
         scope.cancel()
-        Unit
     }
 }

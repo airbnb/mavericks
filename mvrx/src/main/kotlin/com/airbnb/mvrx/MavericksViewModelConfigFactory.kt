@@ -78,9 +78,14 @@ open class MavericksViewModelConfigFactory(
         initialState: S
     ): MavericksViewModelConfig<S> {
         val scope = coroutineScope()
-        return object : MavericksViewModelConfig<S>(debugMode, CoroutinesStateStore(initialState, scope, storeContextOverride), scope) {
-            override fun <S : MavericksState> onExecute(viewModel: MavericksViewModel<S>): BlockExecutions {
-                return BlockExecutions.No
+        return object : MavericksViewModelConfig<S>(
+            debugMode = debugMode,
+            stateStore = CoroutinesStateStore(initialState, scope, storeContextOverride),
+            coroutineScope = scope,
+            subscriptionCoroutineContextOverride = subscriptionCoroutineContextOverride
+        ) {
+            override fun <S : MavericksState> onExecute(viewModel: MavericksViewModel<S>): MavericksBlockExecutions {
+                return MavericksBlockExecutions.No
             }
         }
     }

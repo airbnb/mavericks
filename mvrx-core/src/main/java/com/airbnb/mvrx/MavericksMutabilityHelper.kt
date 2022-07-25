@@ -1,10 +1,5 @@
 package com.airbnb.mvrx
 
-import android.os.Build
-import android.util.SparseArray
-import androidx.collection.ArrayMap
-import androidx.collection.LongSparseArray
-import androidx.collection.SparseArrayCompat
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 import java.lang.reflect.ParameterizedType
@@ -30,6 +25,16 @@ fun assertMavericksDataClassImmutability(
 ) {
     require(kClass.java.isData) { "Mavericks state must be a data class! - ${kClass.simpleName}" }
 
+    val disallowedFieldCollectionTypes = listOfNotNull(
+        ArrayList::class.java,
+        HashMap::class.java,
+        runCatching { Class.forName("android.util.SparseArray") }.getOrNull(),
+        runCatching { Class.forName("androidx.collection.LongSparseArray") }.getOrNull(),
+        runCatching { Class.forName("androidx.collection.SparseArrayCompat") }.getOrNull(),
+        runCatching { Class.forName("androidx.collection.ArrayMap") }.getOrNull(),
+        runCatching { Class.forName("android.util.ArrayMap") }.getOrNull(),
+    )
+
     fun Field.isSubtype(vararg classes: KClass<*>): Boolean {
         return classes.any { klass ->
             return when (val returnType = this.type) {
@@ -43,16 +48,12 @@ fun assertMavericksDataClassImmutability(
         // During tests, jacoco can add a transient field called jacocoData.
         .filterNot { Modifier.isTransient(it.modifiers) }
         .forEach { prop ->
+            val disallowedFieldCollectionType = disallowedFieldCollectionTypes.firstOrNull { clazz -> prop.isSubtype(clazz.kotlin) }
             when {
                 !Modifier.isFinal(prop.modifiers) -> "State property ${prop.name} must be a val, not a var."
-                prop.isSubtype(ArrayList::class) -> "You cannot use ArrayList for ${prop.name}.\n$IMMUTABLE_LIST_MESSAGE"
-                prop.isSubtype(SparseArray::class) -> "You cannot use SparseArray for ${prop.name}.\n$IMMUTABLE_LIST_MESSAGE"
-                prop.isSubtype(LongSparseArray::class) -> "You cannot use LongSparseArray for ${prop.name}.\n$IMMUTABLE_LIST_MESSAGE"
-                prop.isSubtype(SparseArrayCompat::class) -> "You cannot use SparseArrayCompat for ${prop.name}.\n$IMMUTABLE_LIST_MESSAGE"
-                prop.isSubtype(ArrayMap::class) -> "You cannot use ArrayMap for ${prop.name}.\n$IMMUTABLE_MAP_MESSAGE"
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT &&
-                    prop.isSubtype(android.util.ArrayMap::class) -> "You cannot use ArrayMap for ${prop.name}.\n$IMMUTABLE_MAP_MESSAGE"
-                prop.isSubtype(HashMap::class) -> "You cannot use HashMap for ${prop.name}.\n$IMMUTABLE_MAP_MESSAGE"
+                disallowedFieldCollectionType != null -> {
+                    "You cannot use ${disallowedFieldCollectionType.simpleName} for ${prop.name}.\n$IMMUTABLE_LIST_MESSAGE"
+                }
                 !allowFunctions && prop.isSubtype(Function::class, KCallable::class) -> {
                     "You cannot use functions inside Mavericks state. Only pure data should be represented: ${prop.name}"
                 }

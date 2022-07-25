@@ -1,34 +1,37 @@
 package com.airbnb.mvrx
 
-import androidx.lifecycle.LifecycleOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
- * Provides configuration for a [MavericksViewModel].
+ * Provides configuration for a [MavericksRepositoryConfig].
  */
-abstract class MavericksViewModelConfig<S : Any>(
+@ExperimentalMavericksApi
+class MavericksRepositoryConfig<S : MavericksState>(
     /**
-     * If true, extra validations will be applied to ensure the view model is used
-     * correctly.
+     * If true, extra validations will be applied to ensure the repository is used correctly.
+     * Should be enabled for debug build only.
      */
-    val debugMode: Boolean,
+    val performCorrectnessValidations: Boolean,
+
     /**
-     * The state store instance that will control the state of the ViewModel.
+     * The state store instance that will control the state of the repository.
      */
     val stateStore: MavericksStateStore<S>,
+
     /**
-     * The coroutine scope that will be provided to the view model.
+     * The coroutine scope that will be provided to the repository.
      */
     val coroutineScope: CoroutineScope,
+
     /**
-     * Provide a context that will be added to the coroutine scope when a subscription is registered (eg [MavericksView.onEach]).
+     * Provide a context that will be added to the coroutine scope when a subscription is registered (eg [MavericksRepository.onEach]).
      *
-     * By default subscriptions use [MavericksView.subscriptionLifecycleOwner] and [LifecycleOwner.lifecycleScope] to
-     * retrieve a coroutine scope to launch the subscription in.
+     * By default subscriptions use [coroutineScope] to launch the subscription in.
      */
-    val subscriptionCoroutineContextOverride: CoroutineContext
-) {
+    val subscriptionCoroutineContextOverride: CoroutineContext = EmptyCoroutineContext,
+
     /**
      * Called each time a [MavericksRepository.execute] function is invoked. This allows
      * the execute function to be skipped, based on the returned [MavericksBlockExecutions] value.
@@ -45,5 +48,7 @@ abstract class MavericksViewModelConfig<S : Any>(
      * is "enabled", even if the execute was performed when the state store was "disabled" and we
      * didn't intend to allow operations to change the state.
      */
-    abstract fun <S : MavericksState> onExecute(viewModel: MavericksViewModel<S>): MavericksBlockExecutions
-}
+    val onExecute: (repository: MavericksRepository<S>) -> MavericksBlockExecutions = {
+        MavericksBlockExecutions.No
+    }
+)

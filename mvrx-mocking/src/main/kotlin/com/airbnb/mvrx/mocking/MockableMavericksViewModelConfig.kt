@@ -3,12 +3,13 @@ package com.airbnb.mvrx.mocking
 import android.content.Context
 import androidx.lifecycle.LifecycleOwner
 import com.airbnb.mvrx.CoroutinesStateStore
+import com.airbnb.mvrx.MavericksBlockExecutions
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MavericksViewModelConfig
 import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksStateStore
 import com.airbnb.mvrx.MavericksView
+import com.airbnb.mvrx.MavericksViewModelConfig
 import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.ScriptableStateStore
 import com.airbnb.mvrx.mocking.printer.ViewModelStatePrinter
@@ -23,7 +24,12 @@ class MockableMavericksViewModelConfig<S : MavericksState>(
     val initialMockBehavior: MockBehavior,
     coroutineScope: CoroutineScope,
     debugMode: Boolean
-) : MavericksViewModelConfig<S>(debugMode = debugMode, stateStore = mockableStateStore, coroutineScope = coroutineScope) {
+) : MavericksViewModelConfig<S>(
+    debugMode = debugMode,
+    stateStore = mockableStateStore,
+    coroutineScope = coroutineScope,
+    subscriptionCoroutineContextOverride = EmptyCoroutineContext
+) {
 
     val currentMockBehavior: MockBehavior
         get() = mockBehaviorOverrides.peek() ?: initialMockBehavior
@@ -31,7 +37,7 @@ class MockableMavericksViewModelConfig<S : MavericksState>(
     private val mockBehaviorOverrides = LinkedList<MockBehavior>()
 
     private val onExecuteListeners =
-        mutableSetOf<(MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit>()
+        mutableSetOf<(MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksBlockExecutions) -> Unit>()
 
     fun pushBehaviorOverride(behaviorChange: (currentBehavior: MockBehavior) -> MockBehavior) {
         pushBehaviorOverride(behaviorChange(currentMockBehavior))
@@ -54,24 +60,24 @@ class MockableMavericksViewModelConfig<S : MavericksState>(
     }
 
     fun addOnExecuteListener(
-        listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit
+        listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksBlockExecutions) -> Unit
     ) {
         onExecuteListeners.add(listener)
     }
 
     fun removeOnExecuteListener(
-        listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit
+        listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksBlockExecutions) -> Unit
     ) {
         onExecuteListeners.remove(listener)
     }
 
     fun clearOnExecuteListeners(): Unit = onExecuteListeners.clear()
 
-    override fun <S : MavericksState> onExecute(viewModel: MavericksViewModel<S>): BlockExecutions {
+    override fun <S : MavericksState> onExecute(viewModel: MavericksViewModel<S>): MavericksBlockExecutions {
         val blockExecutions = currentMockBehavior.blockExecutions
 
-        onExecuteListeners.forEach {
-            it(this, viewModel, blockExecutions)
+        onExecuteListeners.forEach { listener ->
+            listener(this, viewModel, blockExecutions)
         }
 
         return blockExecutions
@@ -104,7 +110,7 @@ class MockableMavericksViewModelConfig<S : MavericksState>(
  */
 data class MockBehavior(
     val initialStateMocking: InitialStateMocking = InitialStateMocking.None,
-    val blockExecutions: MavericksViewModelConfig.BlockExecutions = MavericksViewModelConfig.BlockExecutions.No,
+    val blockExecutions: MavericksBlockExecutions = MavericksBlockExecutions.No,
     val stateStoreBehavior: StateStoreBehavior = StateStoreBehavior.Normal,
     /**
      * If true, when a view registers a ViewModel via a delegate the view will be subscribed
@@ -194,7 +200,7 @@ open class MockMavericksViewModelConfigFactory(
         get() = mockConfigs.toMap()
 
     private val onExecuteListeners =
-        mutableSetOf<(MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit>()
+        mutableSetOf<(MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksBlockExecutions) -> Unit>()
 
     /**
      * Determines what sort of mocked state store is created when [provideConfig] is called.
@@ -204,7 +210,7 @@ open class MockMavericksViewModelConfigFactory(
      */
     var mockBehavior: MockBehavior = MockBehavior(
         initialStateMocking = MockBehavior.InitialStateMocking.None,
-        blockExecutions = MavericksViewModelConfig.BlockExecutions.No,
+        blockExecutions = MavericksBlockExecutions.No,
         stateStoreBehavior = MockBehavior.StateStoreBehavior.Normal
     )
 
@@ -305,14 +311,14 @@ open class MockMavericksViewModelConfigFactory(
      * Add a lambda that will be invoked whenever [MavericksViewModel.execute] is used.
      */
     fun addOnExecuteListener(
-        listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit
+        listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksBlockExecutions) -> Unit
     ) {
         onExecuteListeners.add(listener)
         mockConfigs.values.forEach { it.addOnExecuteListener(listener) }
     }
 
     fun removeOnExecuteListener(
-        listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksViewModelConfig.BlockExecutions) -> Unit
+        listener: (MavericksViewModelConfig<*>, MavericksViewModel<*>, MavericksBlockExecutions) -> Unit
     ) {
         onExecuteListeners.remove(listener)
         mockConfigs.values.forEach { it.removeOnExecuteListener(listener) }

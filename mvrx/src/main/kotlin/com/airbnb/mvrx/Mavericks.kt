@@ -23,7 +23,7 @@ object Mavericks {
     var viewModelDelegateFactory: ViewModelDelegateFactory = DefaultViewModelDelegateFactory()
 
     /**
-     * A factory for creating a [MavericksViewModelConfig] for each ViewModel.
+     * A factory for creating a [MavericksRepositoryConfig] for each ViewModel.
      *
      * You MUST provide an instance here before creating any viewmodels. You can do this when
      * your application is created via the [initialize] helper.

@@ -15,23 +15,23 @@ class PureReducerValidationTest : BaseTest() {
 
     @Test
     fun impureReducerShouldFail() {
-        class ImpureViewModel(initialState: PureReducerValidationState) : TestMavericksViewModel<PureReducerValidationState>(initialState) {
+        class ImpureRepository(initialState: PureReducerValidationState) : BaseTestMavericksRepository<PureReducerValidationState>(initialState) {
             private var count = 0
             fun impureReducer() {
                 setState {
-                    val state = copy(count = ++this@ImpureViewModel.count)
+                    val state = copy(count = ++this@ImpureRepository.count)
                     state
                 }
             }
         }
         thrown.expect(IllegalArgumentException::class.java)
-        thrown.expectMessage("Impure reducer set on ImpureViewModel! count changed from 1 to 2. Ensure that your state properties properly implement hashCode.")
-        ImpureViewModel(PureReducerValidationState()).impureReducer()
+        thrown.expectMessage("Impure reducer set on ImpureRepository! count changed from 1 to 2. Ensure that your state properties properly implement hashCode.")
+        ImpureRepository(PureReducerValidationState()).impureReducer()
     }
 
     @Test
     fun pureReducerShouldNotFail() {
-        class PureViewModel(initialState: PureReducerValidationState) : TestMavericksViewModel<PureReducerValidationState>(initialState) {
+        class PureRepository(initialState: PureReducerValidationState) : BaseTestMavericksRepository<PureReducerValidationState>(initialState) {
             fun pureReducer() {
                 setState {
                     val state = copy(count = count + 1)
@@ -39,33 +39,33 @@ class PureReducerValidationTest : BaseTest() {
                 }
             }
         }
-        PureViewModel(PureReducerValidationState()).pureReducer()
+        PureRepository(PureReducerValidationState()).pureReducer()
     }
 
     @Test
     fun shouldBeAbleToUsePrivateProps() {
-        class PureViewModel(initialState: StateWithPrivateVal) : TestMavericksViewModel<StateWithPrivateVal>(initialState) {
+        class PureRepository(initialState: StateWithPrivateVal) : BaseTestMavericksRepository<StateWithPrivateVal>(initialState) {
             fun pureReducer() {
                 setState { this }
             }
         }
-        PureViewModel(StateWithPrivateVal()).pureReducer()
+        PureRepository(StateWithPrivateVal()).pureReducer()
     }
 
     @Test
     fun impureReducerWithPrivatePropShouldFail() {
-        class ImpureViewModel(initialState: StateWithPrivateVal) : TestMavericksViewModel<StateWithPrivateVal>(initialState) {
+        class ImpureRepository(initialState: StateWithPrivateVal) : BaseTestMavericksRepository<StateWithPrivateVal>(initialState) {
             private var count = 0
             fun impureReducer() {
                 setState {
-                    val state = copy(count = ++this@ImpureViewModel.count)
+                    val state = copy(count = ++this@ImpureRepository.count)
                     state
                 }
             }
         }
 
         thrown.expect(IllegalArgumentException::class.java)
-        thrown.expectMessage("Impure reducer set on ImpureViewModel! count changed from 1 to 2. Ensure that your state properties properly implement hashCode.")
-        ImpureViewModel(StateWithPrivateVal()).impureReducer()
+        thrown.expectMessage("Impure reducer set on ImpureRepository! count changed from 1 to 2. Ensure that your state properties properly implement hashCode.")
+        ImpureRepository(StateWithPrivateVal()).impureReducer()
     }
 }

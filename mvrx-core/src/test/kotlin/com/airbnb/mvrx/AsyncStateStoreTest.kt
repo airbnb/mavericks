@@ -11,7 +11,6 @@ import org.junit.Assert.assertNull
 import org.junit.Test
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
-import kotlin.time.seconds
 
 class AsyncStateStoreTest {
 

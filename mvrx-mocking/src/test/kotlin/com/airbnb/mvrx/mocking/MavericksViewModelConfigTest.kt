@@ -1,10 +1,11 @@
 package com.airbnb.mvrx.mocking
 
 import com.airbnb.mvrx.Mavericks
+import com.airbnb.mvrx.MavericksBlockExecutions
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MavericksViewModelConfig
 import com.airbnb.mvrx.MavericksViewModelConfigFactory
 import com.airbnb.mvrx.MavericksState
+import com.airbnb.mvrx.MavericksViewModelConfig
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
@@ -19,9 +20,9 @@ class MavericksViewModelConfigTest : BaseTest() {
 
         val originalBehavior = provider.mockBehavior
         val newBehavior =
-            MockBehavior(blockExecutions = MavericksViewModelConfig.BlockExecutions.Completely)
+            MockBehavior(blockExecutions = MavericksBlockExecutions.Completely)
         val newBehavior2 =
-            MockBehavior(blockExecutions = MavericksViewModelConfig.BlockExecutions.WithLoading)
+            MockBehavior(blockExecutions = MavericksBlockExecutions.WithLoading)
 
         val result = provider.withMockBehavior(newBehavior) {
             assertEquals(newBehavior, provider.mockBehavior)

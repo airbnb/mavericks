@@ -8,6 +8,7 @@ tasks.withType(KotlinCompile).all {
     kotlinOptions {
         freeCompilerArgs += [
                 '-Xopt-in=com.airbnb.mvrx.InternalMavericksApi',
+                '-Xopt-in=com.airbnb.mvrx.ExperimentalMavericksApi',
         ]
     }
 }
