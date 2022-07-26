@@ -2,7 +2,7 @@
 
 ### Experimental MavericksRepository
 
-Mavericks 3.0 introduces an experimental module `mvrx-core` with new abstraction `MavericksRepository` designed to provide a base class for any statefull repository implementation that owns and manages its state. This module is pure Kotlin and has no Android dependencies. Primary goal of this module is to provide the same API and behaviour as `MavericksViewModel` in Android modules.
+Mavericks 3.0 introduces an experimental module `mvrx-core` with new abstraction `MavericksRepository` designed to provide a base class for any stateful repository implementation that owns and manages its state. This module is pure Kotlin and has no Android dependencies. Primary goal of this module is to provide the same API and behaviour as `MavericksViewModel` in Android modules.
 
 
 ### API Changes

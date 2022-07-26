@@ -1,5 +1,9 @@
 # Change Log
 
+## 3.0.0
+- New experimental, pure Kotlin `mvrx-core` module (#635)
+- Breaking changes: `MavericksViewModelConfig.BlockExecutions` is extracted into top level class `MavericksBlockExecutions` (#635)
+
 ## 2.7.0
 - Add mockEightViewModels and mockNineViewModels to MockBuilder (#633)
 
