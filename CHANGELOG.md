@@ -1,8 +1,9 @@
 # Change Log
 
 ## 3.0.0
-- New experimental, pure Kotlin `mvrx-core` module (#635)
+- Experimental `mvrx-core` module with new abstraction `MavericksRepository` that behaves exactly like `MavericksViewModel` except it doesn't have any Android dependencies and can be used in pure Kotlin modules (#635)
 - Breaking changes: `MavericksViewModelConfig.BlockExecutions` is extracted into top level class `MavericksBlockExecutions` (#635)
+- New mavericks extension `argsOrNull` to handle optional (nullable) fragment args (#639)
 
 ## 2.7.0
 - Add mockEightViewModels and mockNineViewModels to MockBuilder (#633)
