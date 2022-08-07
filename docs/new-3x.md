@@ -2,7 +2,7 @@
 
 ### Experimental MavericksRepository
 
-Mavericks 3.0 introduces an experimental module `mvrx-core` with new abstraction `MavericksRepository` designed to provide a base class for any stateful repository implementation that owns and manages its state. This module is pure Kotlin and has no Android dependencies. Primary goal of this module is to provide the same API and behaviour as `MavericksViewModel` in Android modules.
+Mavericks 3.0 introduces an experimental module `mvrx-common` with new abstraction `MavericksRepository` designed to provide a base class for any stateful repository implementation that owns and manages its state. This module is pure Kotlin and has no Android dependencies. Primary goal of this module is to provide the same API and behaviour as `MavericksViewModel` in Android modules.
 
 
 ### API Changes
@@ -77,4 +77,4 @@ class WeatherForecastRepository(
 **Note:** `performCorrectnessValidations` should be enabled in debug build only as it applies runtime checks to ensure the repository is used correctly.
 To avoid extra overhead this flag should be disabled in production build.
 
-Checkout out  [integrate Mavericks into your app](/debug-checks) or docs for [MavericksRepositoryConfig](https://github.com/airbnb/mavericks/blob/main/mvrx-core/src/main/kotlin/com/airbnb/mvrx/MavericksRepositoryConfig.kt) for more info.
+Checkout out  [integrate Mavericks into your app](/debug-checks) or docs for [MavericksRepositoryConfig](https://github.com/airbnb/mavericks/blob/main/mvrx-common/src/main/kotlin/com/airbnb/mvrx/MavericksRepositoryConfig.kt) for more info.
