@@ -36,7 +36,7 @@ android {
 }
 
 dependencies {
-    api project(':mvrx-core')
+    api project(':mvrx-common')
     api Libraries.kotlinCoroutines
     api Libraries.activity
 
