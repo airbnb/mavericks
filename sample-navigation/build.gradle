@@ -15,8 +15,7 @@ android {
 }
 
 dependencies {
-    implementation Libraries.appcompat
-
     implementation project(":mvrx-navigation")
     implementation project(':view-binding-utils')
+    implementation libs.appcompat
 }

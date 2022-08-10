@@ -35,28 +35,29 @@ android {
 }
 
 dependencies {
-    kapt AnnotationProcessors.dagger
-
-    implementation Libraries.appcompat
-    implementation Libraries.constraintlayout
-    implementation Libraries.coreKtx
-    implementation Libraries.dagger
-    implementation Libraries.fragmentKtx
-    implementation Libraries.rxJava
-    implementation Libraries.viewModelKtx
-    implementation Libraries.multidex
     implementation project(":mvrx")
     implementation project(":mvrx-mocking")
     implementation project(":launcher")
     implementation project(":view-binding-utils")
 
-    debugImplementation Libraries.fragmentTesting
+    kapt libs.daggerCompiler
 
-    androidTestImplementation InstrumentedTestLibraries.core
-    androidTestImplementation InstrumentedTestLibraries.espresso
-    androidTestImplementation InstrumentedTestLibraries.junit
+    implementation libs.appcompat
+    implementation libs.constraintlayout
+    implementation libs.coreKtx
+    implementation libs.dagger
+    implementation libs.fragmentKtx
+    implementation libs.rxJava
+    implementation libs.viewModelKtx
+    implementation libs.multidex
+
+    debugImplementation libs.fragmentTesting
+
+    androidTestImplementation libs.core
+    androidTestImplementation libs.espresso
+    androidTestImplementation libs.junit
 
     testImplementation project(":testing")
-    testImplementation TestLibraries.junit
-    testImplementation TestLibraries.mockk
+    testImplementation libs.junit
+    testImplementation libs.mockk
 }

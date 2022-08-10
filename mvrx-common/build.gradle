@@ -22,8 +22,8 @@ java {
 }
 
 dependencies {
-    api Libraries.kotlinCoroutines
+    api libs.kotlinCoroutines
 
-    testImplementation TestLibraries.junit
-    testImplementation TestLibraries.kotlinCoroutinesTest
+    testImplementation libs.junit
+    testImplementation libs.kotlinCoroutinesTest
 }

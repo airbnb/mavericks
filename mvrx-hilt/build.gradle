@@ -34,18 +34,18 @@ android {
 }
 
 dependencies {
-    kapt AnnotationProcessors.hilt
-    implementation Libraries.hilt
-    implementation Libraries.lifecycleCommon
-    implementation Libraries.kotlinCoroutines
     api project(':mvrx')
+    kapt libs.hiltCompiler
+    implementation libs.hilt
+    implementation libs.lifecycleCommon
+    implementation libs.kotlinCoroutines
 
-    kaptTest AnnotationProcessors.hilt
-    testImplementation TestLibraries.hilt
-    testImplementation Libraries.junit
-    testImplementation TestLibraries.kotlinCoroutinesTest
-    testImplementation TestLibraries.roboeletric
-    testImplementation TestLibraries.kotlinCoroutinesTest
-    testImplementation TestLibraries.mockito
     testImplementation project(':testing')
+    kaptTest libs.hiltCompiler
+    testImplementation libs.hilt
+    testImplementation libs.junit
+    testImplementation libs.kotlinCoroutinesTest
+    testImplementation libs.roboeletric
+    testImplementation libs.kotlinCoroutinesTest
+    testImplementation libs.mockito
 }

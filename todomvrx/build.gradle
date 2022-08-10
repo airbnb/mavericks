@@ -21,27 +21,27 @@ android {
 
 
 dependencies {
-    kapt AnnotationProcessors.epoxy
-    kapt AnnotationProcessors.room
-
-    implementation Libraries.appcompat
-    implementation Libraries.constraintlayout
-    implementation(Libraries.epoxy) { exclude group: "com.android.support" }
-    implementation Libraries.espressoIdlingResource
-    implementation Libraries.lifecycleCommon
-    implementation Libraries.navigationFragmentKtx
-    implementation Libraries.navigationUiKtx
-    implementation Libraries.recyclerview
-    implementation Libraries.roomRuntime
-    implementation Libraries.roomRxJava
-    implementation Libraries.rxAndroid
-    implementation Libraries.rxJava
-    implementation Libraries.multidex
     implementation project(":mvrx-rxjava2")
     implementation project(':mvrx-mocking')
     implementation project(':view-binding-utils')
+    kapt libs.epoxyProcessor
+    kapt libs.roomCompiler
 
-    testImplementation TestLibraries.junit
-    testImplementation TestLibraries.mockitoKotlin
+    implementation libs.appcompat
+    implementation libs.constraintlayout
+    implementation(libs.epoxy) { exclude group: "com.android.support" }
+    implementation libs.espressoIdlingResource
+    implementation libs.lifecycleCommon
+    implementation libs.navigationFragmentKtx
+    implementation libs.navigationUiKtx
+    implementation libs.recyclerview
+    implementation libs.roomRuntime
+    implementation libs.roomRxJava
+    implementation libs.rxAndroid
+    implementation libs.rxJava
+    implementation libs.multidex
+
+    testImplementation libs.junit
+    testImplementation libs.mockitoKotlin
     testImplementation project(":testing")
 }

@@ -27,8 +27,8 @@ android {
 
 
 dependencies {
-    kapt AnnotationProcessors.epoxy
-    kapt AnnotationProcessors.moshi
+    kapt libs.epoxyProcessor
+    kapt libs.moshiCodegen
 
     implementation project(":mvrx")
     implementation project(':mvrx-mocking')
@@ -36,22 +36,22 @@ dependencies {
     implementation project(':launcher')
     implementation project(':view-binding-utils')
 
-    implementation Libraries.appcompat
-    implementation Libraries.constraintlayout
-    implementation(Libraries.epoxy) { exclude group: "com.android.support" }
-    implementation Libraries.koin
-    implementation Libraries.lifecycleCommon
-    implementation Libraries.moshi
-    implementation Libraries.moshiKotlin
-    implementation Libraries.multidex
-    implementation Libraries.navigationFragmentKtx
-    implementation Libraries.navigationUiKtx
-    implementation Libraries.recyclerview
-    implementation Libraries.retrofit
-    implementation Libraries.retrofitMoshi
-    implementation Libraries.retrofitRxJava
-    implementation Libraries.rxAndroid
-    implementation Libraries.rxJava
+    implementation libs.appcompat
+    implementation libs.constraintlayout
+    implementation(libs.epoxy) { exclude group: "com.android.support" }
+    implementation libs.koin
+    implementation libs.lifecycleCommon
+    implementation libs.moshi
+    implementation libs.moshiKotlin
+    implementation libs.multidex
+    implementation libs.navigationFragmentKtx
+    implementation libs.navigationUiKtx
+    implementation libs.recyclerview
+    implementation libs.retrofit
+    implementation libs.retrofitMoshi
+    implementation libs.retrofitRxJava
+    implementation libs.rxAndroid
+    implementation libs.rxJava
 
-    testImplementation TestLibraries.junit
+    testImplementation libs.junit
 }

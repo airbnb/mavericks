@@ -1,3 +1,5 @@
+import static de.fayard.refreshVersions.core.Versions.versionFor
+
 apply plugin: "com.android.application"
 apply plugin: "kotlin-android"
 
@@ -24,7 +26,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion Versions.compose
+        kotlinCompilerExtensionVersion versionFor("version.androidx.compose.compiler")
     }
 
     buildTypes {
@@ -49,14 +51,14 @@ android {
 dependencies {
     implementation project(":mvrx-compose")
     implementation project(":testing")
-    implementation Libraries.appcompat
-    implementation Libraries.activityCompose
-    implementation Libraries.composeMaterial
-    implementation Libraries.navigationCompose
+    implementation libs.appcompat
+    implementation libs.activityCompose
+    implementation libs.composeMaterial
+    implementation libs.navigationCompose
 
     androidTestImplementation project(':testing')
-    androidTestImplementation Libraries.junit
-    androidTestImplementation Libraries.appcompat
-    androidTestImplementation Libraries.composeTest
-    androidTestImplementation Libraries.composeMaterial
+    androidTestImplementation libs.junit
+    androidTestImplementation libs.appcompat
+    androidTestImplementation libs.composeTest
+    androidTestImplementation libs.composeMaterial
 }

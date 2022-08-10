@@ -1,3 +1,4 @@
+import static de.fayard.refreshVersions.core.Versions.versionFor
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 apply plugin: 'com.android.library'
@@ -41,7 +42,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion Versions.compose
+        kotlinCompilerExtensionVersion versionFor("version.androidx.compose.compiler")
     }
 
     testOptions {
@@ -53,17 +54,17 @@ android {
 
 dependencies {
     api project(":mvrx")
-    implementation Libraries.lifecycleCommon
-    implementation Libraries.fragment
-    implementation Libraries.appcompat
-    implementation Libraries.composeFoundation
-    implementation Libraries.composeUi
-    implementation Libraries.viewModelCompose
+    implementation libs.lifecycleCommon
+    implementation libs.fragment
+    implementation libs.appcompat
+    implementation libs.composeFoundation
+    implementation libs.composeUi
+    implementation libs.viewModelCompose
 
     testImplementation project(':testing')
-    testImplementation Libraries.junit
-    testImplementation Libraries.activityCompose
-    testImplementation Libraries.composeTest
-    testImplementation Libraries.composeMaterial
-    testImplementation TestLibraries.roboeletric
+    testImplementation libs.junit
+    testImplementation libs.activityCompose
+    testImplementation libs.composeTest
+    testImplementation libs.composeMaterial
+    testImplementation libs.roboeletric
 }

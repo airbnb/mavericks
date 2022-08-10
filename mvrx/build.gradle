@@ -37,19 +37,19 @@ android {
 
 dependencies {
     api project(':mvrx-common')
-    api Libraries.kotlinCoroutines
-    api Libraries.activity
+    api libs.kotlinCoroutines
+    api libs.activity
 
-    implementation Libraries.activity
-    implementation Libraries.appcompat
-    implementation Libraries.fragment
-    implementation Libraries.viewModelSavedState
-    implementation Libraries.lifecycleCommon
-    implementation Libraries.viewModelKtx
-    implementation Libraries.runtimeKtx
+    implementation libs.activity
+    implementation libs.appcompat
+    implementation libs.fragment
+    implementation libs.viewModelSavedState
+    implementation libs.lifecycleCommon
+    implementation libs.viewModelKtx
+    implementation libs.runtimeKtx
 
-    testImplementation TestLibraries.junit
-    testImplementation TestLibraries.kotlinCoroutinesTest
-    testImplementation TestLibraries.mockito
-    testImplementation TestLibraries.roboeletric
+    testImplementation libs.junit
+    testImplementation libs.kotlinCoroutinesTest
+    testImplementation libs.mockito
+    testImplementation libs.roboeletric
 }
