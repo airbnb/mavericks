@@ -1,5 +1,6 @@
 package com.airbnb.mvrx.compose
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.content.ContextWrapper
 import android.view.View
@@ -142,7 +143,9 @@ fun <VM : MavericksViewModel<S>, S : MavericksState> VM.collectAsState(): State<
  * Prefer the overload with a state property reference to ensure that your composable only recomposes when the properties it uses changes.
  */
 @Composable
+@SuppressLint("FlowOperatorInvokedInComposition")
 fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectAsState(mapper: (S) -> O): State<O> {
+    // TODO(gpeal) fix this lint error.
     return stateFlow.map { mapper(it) }.distinctUntilChanged().collectAsState(initial = withState(this) { mapper(it) })
 }
 
@@ -152,6 +155,8 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectAsState(mapper
  * If you find yourself subscribing to many state properties in a single composable, consider breaking it up into smaller ones.
  */
 @Composable
+@SuppressLint("FlowOperatorInvokedInComposition")
 fun <VM : MavericksViewModel<S>, S : MavericksState, A> VM.collectAsState(prop1: KProperty1<S, A>): State<A> {
+    // TODO(gpeal) fix this lint error.
     return stateFlow.map { prop1.get(it) }.distinctUntilChanged().collectAsState(initial = withState(this) { prop1.get(it) })
 }

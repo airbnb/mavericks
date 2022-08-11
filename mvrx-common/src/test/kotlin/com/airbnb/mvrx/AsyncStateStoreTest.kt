@@ -22,7 +22,7 @@ class AsyncStateStoreTest {
         val collectJob = scope.launch(Job()) { store.flow.collect() }
         scope.cancel()
         assertNull(
-            withTimeoutOrNull(seconds(1)) {
+            withTimeoutOrNull(1.seconds) {
                 collectJob.join()
             }
         )

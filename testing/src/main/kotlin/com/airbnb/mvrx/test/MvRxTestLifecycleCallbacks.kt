@@ -8,8 +8,7 @@ import com.airbnb.mvrx.mocking.MockBehavior
 import com.airbnb.mvrx.mocking.MockableMavericks
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 
@@ -29,10 +28,9 @@ internal class MvRxTestLifecycleCallbacksImpl(
     ),
     private val debugMode: Boolean = false,
     @Suppress("EXPERIMENTAL_API_USAGE")
-    private val testDispatcher: CoroutineDispatcher = TestCoroutineDispatcher()
+    private val testDispatcher: CoroutineDispatcher = StandardTestDispatcher()
 ) : MvRxTestLifecycleCallbacks {
 
-    @ExperimentalCoroutinesApi
     override fun before() {
         Dispatchers.setMain(testDispatcher)
 
@@ -41,7 +39,6 @@ internal class MvRxTestLifecycleCallbacksImpl(
         setupMocking()
     }
 
-    @ExperimentalCoroutinesApi
     override fun after() {
         Dispatchers.resetMain()
 

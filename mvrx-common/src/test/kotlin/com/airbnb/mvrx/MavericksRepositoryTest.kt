@@ -3,14 +3,14 @@ package com.airbnb.mvrx
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -58,7 +58,6 @@ class MavericksRepositoryTestRepository : BaseTestMavericksRepository<MavericksR
     }
 }
 
-@ExperimentalCoroutinesApi
 class MavericksRepositoryTest : BaseTest() {
 
     private lateinit var repository: MavericksRepositoryTestRepository
@@ -191,7 +190,7 @@ class MavericksRepositoryTest : BaseTest() {
     private fun runInRepositoryBlocking(
         vararg expectedState: MavericksRepositoryTestState,
         block: suspend MavericksRepositoryTestRepository.() -> Unit
-    ) = runBlockingTest {
+    ) = runTest(UnconfinedTestDispatcher()) {
         val states = mutableListOf<MavericksRepositoryTestState>()
         val consumerJob = repository.stateFlow.onEach { states += it }.launchIn(this)
         repository.runInRepository(block)

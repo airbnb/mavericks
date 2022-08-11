@@ -77,9 +77,14 @@ data class TestState(
     val str: String?,
     val num: Int?
 ) : MavericksState {
+    // These are added to make sure that the reflection works correctly in MavericksViewModelFactory.
+    @Suppress("unused")
     constructor(args: ParcelableArgs) : this(args.str, null)
+    @Suppress("unused")
     constructor(args: SerializableArgs) : this(null, args.num)
+    @Suppress("unused")
     constructor(id: Long) : this("id", id.toInt())
+    @Suppress("unused")
     constructor() : this("empty", 2)
 }
 

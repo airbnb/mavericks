@@ -14,7 +14,7 @@ internal class MavericksFactory<VM : MavericksViewModel<S>, S : MavericksState>(
 ) : ViewModelProvider.Factory {
 
     @Suppress("UNCHECKED_CAST")
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (stateRestorer == null && forExistingViewModel) {
             throw ViewModelDoesNotExistException(viewModelClass, viewModelContext, key)
         }

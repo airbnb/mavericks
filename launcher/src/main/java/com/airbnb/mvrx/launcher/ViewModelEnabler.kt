@@ -1,9 +1,9 @@
 package com.airbnb.mvrx.launcher
 
 import android.os.Handler
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import android.os.Looper
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.airbnb.mvrx.MavericksBlockExecutions
 import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.MavericksViewModel
@@ -24,17 +24,15 @@ import kotlin.reflect.KProperty1
 class ViewModelEnabler(
     private val mockedView: MockedView<*>,
     private val mock: MockedViewProvider<*>
-) : LifecycleObserver {
+) : DefaultLifecycleObserver {
 
-    @Suppress("unused")
-    @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
-    fun onResume() {
+    override fun onResume(owner: LifecycleOwner) {
         val view = mockedView.viewInstance
         view.lifecycle.removeObserver(this)
 
         // This is briefly delayed in case any UI initialization causes network events to be
         // triggered, which we don't want overriding the mock state.
-        Handler().postDelayed(
+        Handler(Looper.getMainLooper()).postDelayed(
             {
                 mock.mock
                     .states

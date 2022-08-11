@@ -18,7 +18,6 @@ class ViewSubscriberViewModel(initialState: ViewSubscriberState) : TestMavericks
     fun setFoo(foo: Int) = setState { copy(foo = foo) }
 }
 
-@Suppress("DEPRECATION")
 open class ViewSubscriberFragment : Fragment(), MavericksView {
     private val viewModel: ViewSubscriberViewModel by fragmentViewModel()
 

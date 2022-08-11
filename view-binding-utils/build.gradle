@@ -8,11 +8,11 @@ android {
 }
 
 dependencies {
-    implementation Libraries.lifecycleCommon
-    implementation Libraries.fragmentKtx
-
     implementation project(":mvrx")
+    implementation libs.lifecycleCommon
+    implementation libs.fragmentKtx
 
-    testImplementation TestLibraries.junit
+
     testImplementation project(":testing")
+    testImplementation libs.junit
 }

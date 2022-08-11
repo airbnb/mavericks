@@ -7,12 +7,12 @@ import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.disposables.Disposable
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -42,7 +42,7 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewMod
     var onFailCalled = 0
 
     init {
-        onEach { _ -> subscribeCallCount++ }
+        onEach { subscribeCallCount++ }
         onEach(ViewModelTestState::foo) { selectSubscribe1Called++ }
         onEach(ViewModelTestState::foo, ViewModelTestState::bar) { _, _ -> selectSubscribe2Called++ }
         onEach(ViewModelTestState::foo, ViewModelTestState::bar, ViewModelTestState::bam) { _, _, _ -> selectSubscribe3Called++ }
@@ -232,7 +232,6 @@ class ViewModelTestViewModel(initialState: ViewModelTestState) : BaseMvRxViewMod
     }
 }
 
-@ExperimentalCoroutinesApi
 class ViewModelSubscriberTest : BaseTest() {
 
     private lateinit var viewModel: ViewModelTestViewModel
@@ -792,7 +791,7 @@ class ViewModelSubscriberTest : BaseTest() {
     }
 
     @Test
-    fun testStateFlowReceivesAllStates() = runBlockingTest {
+    fun testStateFlowReceivesAllStates() = runTest(UnconfinedTestDispatcher()) {
         val receivedValues = mutableListOf<Int>()
         val subscribeJob = viewModel.stateFlow.onEach {
             receivedValues += it.foo

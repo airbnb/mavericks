@@ -19,6 +19,7 @@ data class MavericksTestState(
     @PersistState val persistedCount: Int = 0,
     val notPersistedCount: Int = 0
 ) : MavericksState {
+    @Suppress("unused")
     constructor(args: MvRxTestArgs) : this(persistedCount = args.initialCount, notPersistedCount = args.initialCount)
 }
 
@@ -29,6 +30,7 @@ class MyViewModel(initialState: MavericksTestState) : TestMavericksViewModel<Mav
 data class InvalidArgs(val initialCount: Int = 1)
 
 data class InvalidState(val count: Int = 0) : MavericksState {
+    @Suppress("unused")
     constructor(args: InvalidArgs) : this(count = args.initialCount)
 }
 
@@ -121,10 +123,10 @@ private fun getViewModel(
     activity: FragmentActivity,
     forExistingViewModel: Boolean = false
 ) = MavericksViewModelProvider.get(
-    VM_CLASS,
+    VmClass,
     MavericksTestState::class.java,
     ActivityViewModelContext(activity, MvRxTestArgs()),
-    VM_KEY,
+    VmKey,
     forExistingViewModel
 )
 
@@ -135,5 +137,5 @@ private fun buildActivity(savedInstanceState: Bundle? = null): Pair<ActivityCont
     return controller to controller.get()
 }
 
-private const val VM_KEY = "key"
-private val VM_CLASS = MyViewModel::class.java
+private const val VmKey = "key"
+private val VmClass = MyViewModel::class.java

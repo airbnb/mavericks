@@ -22,6 +22,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.PopupMenu
+import androidx.core.view.MenuProvider
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.fragmentViewModel
 import com.airbnb.mvrx.todomvrx.core.BaseFragment
@@ -47,24 +48,30 @@ class TaskListFragment : BaseFragment() {
 
     private val taskListViewModel: TaskListViewModel by fragmentViewModel()
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        requireActivity().addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.tasks_fragment_menu, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.menu_refresh -> viewModel.refreshTasks().andTrue()
+                    R.id.menu_filter -> showFilteringPopUpMenu().andTrue()
+                    R.id.menu_clear -> viewModel.clearCompletedTasks().andTrue()
+                    else -> false
+                }
+            }
+        })
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setHasOptionsMenu(true)
         fab.setImageResource(R.drawable.ic_add)
         fab.setOnClickListener {
             navigate(R.id.addEditFragment, AddEditTaskArgs())
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.tasks_fragment_menu, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.menu_refresh -> viewModel.refreshTasks().andTrue()
-        R.id.menu_filter -> showFilteringPopUpMenu().andTrue()
-        R.id.menu_clear -> viewModel.clearCompletedTasks().andTrue()
-        else -> super.onOptionsItemSelected(item)
     }
 
     override fun epoxyController() = simpleController(viewModel, taskListViewModel) { state, taskListState ->

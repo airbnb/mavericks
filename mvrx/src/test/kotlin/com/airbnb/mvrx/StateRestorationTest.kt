@@ -60,6 +60,7 @@ class StateRestorationTest : BaseTest() {
     data class ChildState(val string: String = "value") : ParentState()
 
     class Fragment1 : Fragment(), MavericksView {
+        @Suppress("unused")
         private val activityVm: ChildViewModel by activityViewModel { viewModelKey }
 
         override fun invalidate() {}
@@ -74,6 +75,7 @@ class StateRestorationTest : BaseTest() {
          * We need to use a shared key for retrieving the ViewModel, because Mavericks will otherwise use the declaration site class, which is
          * abstract in this case - we want to retrieve the [ChildViewModel] initialized by [Fragment1]
          */
+        @Suppress("unused")
         private val existingVm: ParentViewModel<ParentState> by existingViewModel { viewModelKey }
 
         override fun invalidate() {}
@@ -118,6 +120,7 @@ class StateRestorationTest : BaseTest() {
     data class StateWithNoDefaultConstructor(val string: String) : MavericksState
 
     class FragmentWithParentViewModelWithFactory : Fragment(), MavericksView {
+        @Suppress("unused")
         private val parentViewModelWithFactory: ParentViewModelWithFactory by fragmentViewModel()
 
         override fun invalidate() {}

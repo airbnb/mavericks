@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.airbnb.mvrx.mocking.printer
 
 import android.content.BroadcastReceiver
@@ -8,13 +10,12 @@ import android.os.AsyncTask
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
-import androidx.lifecycle.OnLifecycleEvent
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import com.airbnb.mvrx.Mavericks
+import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksView
 import com.airbnb.mvrx.MavericksViewModel
-import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.mocking.MockableMavericks
 import com.airbnb.mvrx.mocking.printer.MavericksMockPrinter.Companion.ACTION_COPY_MAVERICKS_STATE
 import com.airbnb.mvrx.withState
@@ -28,7 +29,7 @@ import java.io.File
  */
 class MavericksMockPrinter private constructor(
     private val mavericksView: MavericksView
-) : LifecycleObserver {
+) : DefaultLifecycleObserver {
 
     private val broadcastReceiver by lazy { ViewArgPrinter(mavericksView) }
     private val context: Context
@@ -57,18 +58,15 @@ class MavericksMockPrinter private constructor(
         }
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_START)
-    fun onStarted() {
+    override fun onStart(owner: LifecycleOwner) {
         broadcastReceiver.register(context)
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
-    fun onStopped() {
+    override fun onStop(owner: LifecycleOwner) {
         broadcastReceiver.unregister(context)
     }
 
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-    fun onDestroyed() {
+    override fun onDestroy(owner: LifecycleOwner) {
         viewsWithRegisteredReceivers.remove(mavericksView)
     }
 
@@ -144,6 +142,7 @@ internal abstract class MavericksPrintStateBroadcastReceiver : BroadcastReceiver
         )
 
         // This is done async since the mock generation reflection can be slow.
+        @Suppress("DEPRECATION")
         AsyncTask.THREAD_POOL_EXECUTOR.execute {
             if (isMatch(settings)) {
                 val objectToMock = provideObjectToMock()
@@ -256,7 +255,7 @@ internal class ViewModelStatePrinter<S : MavericksState>(
         return withState(viewModel) { it }
     }
 
-    override fun provideObjectToMock(): Any? = currentState()
+    override fun provideObjectToMock(): Any = currentState()
 
     //  Include state in mock printing if either the state or view model match the name filters
     override val objectsToCheckForNameMatch: List<Any?>

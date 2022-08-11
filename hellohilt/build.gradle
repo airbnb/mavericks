@@ -1,7 +1,7 @@
 apply plugin: "com.android.application"
 apply plugin: "kotlin-android"
 apply plugin: "kotlin-kapt"
-apply plugin: 'dagger.hilt.android.plugin'
+apply plugin: "dagger.hilt.android.plugin"
 
 android {
     defaultConfig {
@@ -24,11 +24,11 @@ android {
 }
 
 dependencies {
-    kapt AnnotationProcessors.hilt
-    implementation Libraries.hilt
-    implementation Libraries.appcompat
-    implementation Libraries.constraintlayout
-    implementation Libraries.fragmentKtx
     implementation project(":mvrx-hilt")
     implementation project(":view-binding-utils")
+    kapt libs.hiltCompiler
+    implementation libs.hilt
+    implementation libs.appcompat
+    implementation libs.constraintlayout
+    implementation libs.fragmentKtx
 }

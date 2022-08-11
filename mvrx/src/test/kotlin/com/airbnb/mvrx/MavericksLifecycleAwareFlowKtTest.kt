@@ -1,7 +1,6 @@
 package com.airbnb.mvrx
 
 import androidx.lifecycle.Lifecycle
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
@@ -12,14 +11,14 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-@ExperimentalCoroutinesApi
 class MavericksLifecycleAwareFlowKtTest : BaseTest() {
     @Test
-    fun testDoesntFlowFromCreate() = runBlockingTest {
+    fun testDoesntFlowFromCreate() = runTest(UnconfinedTestDispatcher()) {
         val flow = flowOf(1)
         val owner = TestLifecycleOwner()
         val values = mutableListOf<Int>()
@@ -31,7 +30,7 @@ class MavericksLifecycleAwareFlowKtTest : BaseTest() {
     }
 
     @Test
-    fun testFlowsFromStart() = runBlockingTest {
+    fun testFlowsFromStart() = runTest(UnconfinedTestDispatcher()) {
         val flow = flowOf(1)
         val owner = TestLifecycleOwner()
         val values = mutableListOf<Int>()
@@ -44,7 +43,7 @@ class MavericksLifecycleAwareFlowKtTest : BaseTest() {
     }
 
     @Test
-    fun testFlowsWhenStarted() = runBlockingTest {
+    fun testFlowsWhenStarted() = runTest(UnconfinedTestDispatcher()) {
         val channel = Channel<Int>(Channel.UNLIMITED)
         channel.send(1)
         val owner = TestLifecycleOwner()
@@ -59,7 +58,7 @@ class MavericksLifecycleAwareFlowKtTest : BaseTest() {
     }
 
     @Test
-    fun testEmitsWhenRestarted() = runBlockingTest {
+    fun testEmitsWhenRestarted() = runTest(UnconfinedTestDispatcher()) {
         val channel = Channel<Int>(Channel.UNLIMITED)
         channel.send(1)
         val owner = TestLifecycleOwner()
@@ -81,7 +80,7 @@ class MavericksLifecycleAwareFlowKtTest : BaseTest() {
     }
 
     @Test
-    fun testStateUpdateHasHigherPriority() = runBlockingTest {
+    fun testStateUpdateHasHigherPriority() = runTest(UnconfinedTestDispatcher()) {
         val owner = TestLifecycleOwner()
         owner.lifecycle.currentState = Lifecycle.State.STARTED
         val values = mutableListOf<Int>()
@@ -102,7 +101,7 @@ class MavericksLifecycleAwareFlowKtTest : BaseTest() {
     }
 
     @Test
-    fun testAllValuesCollectedIfLifecycleWasStarted() = runBlockingTest {
+    fun testAllValuesCollectedIfLifecycleWasStarted() = runTest(UnconfinedTestDispatcher()) {
         val owner = TestLifecycleOwner()
         owner.lifecycle.currentState = Lifecycle.State.STARTED
         val values = mutableListOf<Int>()

@@ -9,8 +9,9 @@ apply plugin: "com.vanniktech.maven.publish"
 tasks.withType(KotlinCompile).all {
     kotlinOptions {
         freeCompilerArgs += [
-                '-Xopt-in=com.airbnb.mvrx.InternalMavericksApi',
-                '-Xopt-in=com.airbnb.mvrx.ExperimentalMavericksApi',
+                '-opt-in=com.airbnb.mvrx.InternalMavericksApi',
+                '-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi',
+                '-opt-in=com.airbnb.mvrx.ExperimentalMavericksApi',
         ]
     }
 }
@@ -36,18 +37,18 @@ android {
 }
 
 dependencies {
-    implementation Libraries.kotlinReflect
-    implementation Libraries.appcompat
     api project(':mvrx')
+    implementation libs.kotlinReflect
+    implementation libs.appcompat
 
     testImplementation project(':testing')
-    testImplementation TestLibraries.mockito
-    testImplementation TestLibraries.junit
-    testImplementation TestLibraries.roboeletric
-    testImplementation TestLibraries.kotlinCoroutinesTest
+    testImplementation libs.mockito
+    testImplementation libs.junit
+    testImplementation libs.roboeletric
+    testImplementation libs.kotlinCoroutinesTest
 
     // Including autovalue just for the AutoValue type printer test
-    testImplementation Libraries.autoValue
-    kaptTest AnnotationProcessors.autoValue
+    testImplementation libs.autoValue
+    kaptTest libs.autoValue
 }
 

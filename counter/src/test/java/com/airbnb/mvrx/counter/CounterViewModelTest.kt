@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.RegisterExtension
 
 class CounterViewModelTest {
+    @RegisterExtension
+    val mvrxTestExtension = MvRxTestExtension()
 
     @Test
     fun testIncrementCount() {
@@ -15,11 +17,5 @@ class CounterViewModelTest {
         withState(viewModel) { state ->
             assertEquals(1, state.count)
         }
-    }
-
-    companion object {
-        @JvmField
-        @RegisterExtension
-        val mvrxTestExtension = MvRxTestExtension()
     }
 }

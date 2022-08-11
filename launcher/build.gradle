@@ -8,7 +8,7 @@ apply plugin: "com.vanniktech.maven.publish"
 tasks.withType(KotlinCompile).all {
     kotlinOptions {
         freeCompilerArgs += [
-                '-Xopt-in=com.airbnb.mvrx.InternalMavericksApi',
+                '-opt-in=com.airbnb.mvrx.InternalMavericksApi',
         ]
     }
 }
@@ -31,23 +31,23 @@ dependencies {
     implementation project(':mvrx')
     implementation project(':mvrx-mocking')
 
-    api Libraries.kotlinCoroutines
+    api libs.kotlinCoroutines
 
-    implementation Libraries.coreKtx
-    implementation Libraries.epoxy
-    kapt AnnotationProcessors.epoxy
-    implementation Libraries.recyclerview
-    implementation Libraries.coordinatorLayout
-    implementation Libraries.kotlinReflect
-    implementation Libraries.appcompat
-    implementation Libraries.fragment
-    implementation Libraries.viewModelSavedState
-    implementation Libraries.lifecycleCommon
-    implementation Libraries.viewModelKtx
-    implementation Libraries.runtimeKtx
+    implementation libs.coreKtx
+    implementation libs.epoxy
+    kapt libs.epoxyProcessor
+    implementation libs.recyclerview
+    implementation libs.coordinatorLayout
+    implementation libs.kotlinReflect
+    implementation libs.appcompat
+    implementation libs.fragment
+    implementation libs.viewModelSavedState
+    implementation libs.lifecycleCommon
+    implementation libs.viewModelKtx
+    implementation libs.runtimeKtx
 
 
-    testImplementation TestLibraries.kotlinCoroutinesTest
-    testImplementation TestLibraries.mockito
-    testImplementation TestLibraries.roboeletric
+    testImplementation libs.kotlinCoroutinesTest
+    testImplementation libs.mockito
+    testImplementation libs.roboeletric
 }

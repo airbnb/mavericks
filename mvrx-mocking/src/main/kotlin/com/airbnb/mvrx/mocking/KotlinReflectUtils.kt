@@ -19,17 +19,6 @@ internal val KClass<*>.isEnum: Boolean
         } == true
     }
 
-/**
- * True if this is a java primitive type.
- * This will return false for any nullable types, since those can't be represented as java primitives.
- */
-internal val KClass<*>.isPrimitiveType: Boolean
-    get() {
-        return getIfReflectionSupported {
-            javaPrimitiveType
-        } != null
-    }
-
 internal val KClass<*>.isKotlinClass: Boolean
     get() {
         return this.java.declaredAnnotations.any {
@@ -83,7 +72,7 @@ internal fun <R> KFunction<R>.callNamed(
 ): R {
     val map = params.mapTo(ArrayList()) { (key, value) ->
         val param = parameters.firstOrNull { it.name == key }
-            ?: throw IllegalStateException("No parameter named '$key' found on copy function for '${this.returnType.classifier}'")
+            ?: error("No parameter named '$key' found on copy function for '${this.returnType.classifier}'")
         param to value
     }
 

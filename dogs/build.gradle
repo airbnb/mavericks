@@ -17,19 +17,19 @@ android {
 }
 
 dependencies {
-    implementation Libraries.appcompat
-    implementation Libraries.cardview
-    implementation Libraries.constraintlayout
-    implementation Libraries.coreKtx
-    implementation Libraries.epoxy
-    implementation Libraries.lottie
-    implementation Libraries.multidex
-    implementation Libraries.navigationFragmentKtx
-    implementation Libraries.navigationUiKtx
-    implementation Libraries.picasso
     implementation project(":mvrx-rxjava2")
     implementation project(":view-binding-utils")
+    implementation libs.appcompat
+    implementation libs.cardview
+    implementation libs.constraintlayout
+    implementation libs.coreKtx
+    implementation libs.epoxy
+    implementation libs.lottie
+    implementation libs.multidex
+    implementation libs.navigationFragmentKtx
+    implementation libs.navigationUiKtx
+    implementation libs.picasso
 
-    testImplementation TestLibraries.junit
     testImplementation project(":testing")
+    testImplementation libs.junit
 }

@@ -7,8 +7,8 @@ apply plugin: 'com.vanniktech.maven.publish'
 tasks.withType(KotlinCompile).all {
     kotlinOptions {
         freeCompilerArgs += [
-                '-Xopt-in=kotlin.RequiresOptIn',
-                '-Xopt-in=com.airbnb.mvrx.InternalMavericksApi',
+                '-opt-in=kotlin.RequiresOptIn',
+                '-opt-in=com.airbnb.mvrx.InternalMavericksApi',
         ]
     }
 }
@@ -35,15 +35,15 @@ android {
 
 dependencies {
     api project(":mvrx")
-    implementation Libraries.lifecycleCommon
+    implementation libs.lifecycleCommon
 
-    api Libraries.navigationUiKtx
-    api Libraries.navigationFragmentKtx
+    api libs.navigationUiKtx
+    api libs.navigationFragmentKtx
 
     testImplementation project(":testing")
-    testImplementation TestLibraries.junit
-    testImplementation TestLibraries.mockito
-    testImplementation TestLibraries.roboeletric
-    testImplementation Libraries.fragmentKtx
-    testImplementation Libraries.fragmentTesting
+    testImplementation libs.junit
+    testImplementation libs.mockito
+    testImplementation libs.roboeletric
+    testImplementation libs.fragmentKtx
+    testImplementation libs.fragmentTesting
 }

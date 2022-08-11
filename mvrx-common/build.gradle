@@ -8,10 +8,10 @@ plugins {
 tasks.withType(KotlinCompile).all {
     kotlinOptions {
         freeCompilerArgs += [
-                '-Xopt-in=kotlin.RequiresOptIn',
-                '-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi',
-                '-Xopt-in=com.airbnb.mvrx.InternalMavericksApi',
-                '-Xopt-in=com.airbnb.mvrx.ExperimentalMavericksApi',
+                '-opt-in=kotlin.RequiresOptIn',
+                '-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi',
+                '-opt-in=com.airbnb.mvrx.InternalMavericksApi',
+                '-opt-in=com.airbnb.mvrx.ExperimentalMavericksApi',
         ]
     }
 }
@@ -22,8 +22,8 @@ java {
 }
 
 dependencies {
-    api Libraries.kotlinCoroutines
+    api libs.kotlinCoroutines
 
-    testImplementation TestLibraries.junit
-    testImplementation TestLibraries.kotlinCoroutinesTest
+    testImplementation libs.junit
+    testImplementation libs.kotlinCoroutinesTest
 }

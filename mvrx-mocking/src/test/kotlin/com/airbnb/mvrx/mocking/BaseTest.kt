@@ -16,7 +16,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.android.controller.ActivityController
 
 @RunWith(RobolectricTestRunner::class)
-@Ignore
+@Ignore("Base Class")
 abstract class BaseTest {
 
     @Before

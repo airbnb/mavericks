@@ -8,7 +8,8 @@ apply plugin: "com.vanniktech.maven.publish"
 tasks.withType(KotlinCompile).all {
     kotlinOptions {
         freeCompilerArgs += [
-                '-Xopt-in=com.airbnb.mvrx.InternalMavericksApi',
+                '-opt-in=com.airbnb.mvrx.InternalMavericksApi',
+                '-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi',
         ]
     }
 }
@@ -25,17 +26,19 @@ android {
     packagingOptions {
         exclude 'META-INF/AL2.0'
         exclude 'META-INF/LGPL2.1'
+        exclude 'META-INF/LICENSE.md'
+        exclude 'META-INF/LICENSE-notice.md'
     }
 }
 
 dependencies {
     api project(':mvrx-mocking')
-    implementation Libraries.appcompat
-    implementation Libraries.junit
-    implementation Libraries.junit5
-    implementation Libraries.kotlinReflect
-    implementation Libraries.rxAndroid
-    implementation Libraries.multidex
-    implementation TestLibraries.kotlinCoroutinesTest
+    implementation libs.appcompat
+    implementation libs.junit
+    implementation libs.junit5
+    implementation libs.kotlinReflect
+    implementation libs.rxAndroid
+    implementation libs.multidex
+    implementation libs.kotlinCoroutinesTest
     implementation project(":mvrx-rxjava2")
 }

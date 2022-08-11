@@ -8,7 +8,7 @@ apply plugin: "com.vanniktech.maven.publish"
 tasks.withType(KotlinCompile).all {
     kotlinOptions {
         freeCompilerArgs += [
-                '-Xopt-in=com.airbnb.mvrx.InternalMavericksApi',
+                '-opt-in=com.airbnb.mvrx.InternalMavericksApi',
         ]
     }
 }
@@ -29,23 +29,23 @@ android {
     }
 
     kotlinOptions {
-        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        freeCompilerArgs += "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
     }
 }
 
 dependencies {
-    kapt AnnotationProcessors.hilt
-    implementation Libraries.hilt
-    implementation Libraries.lifecycleCommon
-    implementation Libraries.kotlinCoroutines
     api project(':mvrx')
+    kapt libs.hiltCompiler
+    implementation libs.hilt
+    implementation libs.lifecycleCommon
+    implementation libs.kotlinCoroutines
 
-    kaptTest AnnotationProcessors.hilt
-    testImplementation TestLibraries.hilt
-    testImplementation Libraries.junit
-    testImplementation TestLibraries.kotlinCoroutinesTest
-    testImplementation TestLibraries.roboeletric
-    testImplementation TestLibraries.kotlinCoroutinesTest
-    testImplementation TestLibraries.mockito
     testImplementation project(':testing')
+    kaptTest libs.hiltCompiler
+    testImplementation libs.hiltTesting
+    testImplementation libs.junit
+    testImplementation libs.kotlinCoroutinesTest
+    testImplementation libs.roboeletric
+    testImplementation libs.kotlinCoroutinesTest
+    testImplementation libs.mockito
 }

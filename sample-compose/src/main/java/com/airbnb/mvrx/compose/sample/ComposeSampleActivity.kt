@@ -28,6 +28,7 @@ import com.airbnb.mvrx.compose.mavericksViewModel
 data class CounterState(
     val count: Int = 0,
 ) : MavericksState {
+    @Suppress("unused")
     constructor(arguments: ArgumentsTest) : this(count = arguments.count)
 }
 

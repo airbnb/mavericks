@@ -4,11 +4,11 @@
     package="com.airbnb.mvrx.compose">
 
     <application
-        android:name=".TestComposeApplication"
+        android:name="com.airbnb.mvrx.compose.TestComposeApplication"
         tools:ignore="GoogleAppIndexingWarning"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         android:allowBackup="false">
-        <activity android:name=".ArgsTestActivity"
+        <activity android:name="com.airbnb.mvrx.compose.ArgsTestActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -16,6 +16,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".FragmentArgsTestActivity" android:exported="false" />
+        <activity android:name="com.airbnb.mvrx.compose.FragmentArgsTestActivity" android:exported="false" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>
