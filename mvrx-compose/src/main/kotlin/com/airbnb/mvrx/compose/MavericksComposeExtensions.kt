@@ -1,6 +1,5 @@
 package com.airbnb.mvrx.compose
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.ContextWrapper
 import android.view.View
