@@ -15,7 +15,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="androidx.activity.ComponentActivity" android:exported="false" >
+        <activity
+            android:name="androidx.activity.ComponentActivity"
+            android:exported="false"
+            tools:replace="android:exported">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
