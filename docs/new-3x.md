@@ -14,7 +14,7 @@ Mavericks 3.0 introduces one breaking change: `MavericksViewModelConfig.BlockExe
 #### `MavericksRepository`
 
 `MavericksRepository` behaves exactly like `MavericksViewModel` except it doesn't have any Android dependencies. Even more, under the hood `MavericksViewModel` uses `MavericksRepository` to manage its state. You can find that `MavericksRepository` and `MavericksViewModel` are very similar in terms of API and behaviour.
-As this is experimental module you have to opt in to use it by `-Xopt-in=com.airbnb.mvrx.InternalMavericksApi` compilation argument.
+As this is experimental module you have to opt in to use it by `-opt-in=com.airbnb.mvrx.InternalMavericksApi` compilation argument.
 
 ```kotlin
 data class Forecast(

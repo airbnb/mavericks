@@ -6,7 +6,7 @@
 # 5. Make sure it is using the version you want
 
 [plugins]
-ksp = { id = "com.google.devtools.ksp", version = "1.6.21-1.0.5" }
+ksp = { id = "com.google.devtools.ksp", version = "1.7.10-1.0.6" }
 
 [libraries]
 androidGradle = "com.android.tools.build:gradle:_"

@@ -8,7 +8,7 @@ apply plugin: "com.vanniktech.maven.publish"
 tasks.withType(KotlinCompile).all {
     kotlinOptions {
         freeCompilerArgs += [
-                '-Xopt-in=com.airbnb.mvrx.InternalMavericksApi',
+                '-opt-in=com.airbnb.mvrx.InternalMavericksApi',
         ]
     }
 }
@@ -29,7 +29,7 @@ android {
     }
 
     kotlinOptions {
-        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        freeCompilerArgs += "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
     }
 }
 

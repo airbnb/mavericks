@@ -2,6 +2,7 @@ package com.airbnb.mvrx.sample
 
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.collection.SparseArrayCompat
 import androidx.fragment.app.Fragment
@@ -34,7 +35,7 @@ class LauncherActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             // This is posted so that the nav graph can set its initial fragment first, otherwise
             // it will override the one we set.
-            Handler().post {
+            Handler(Looper.getMainLooper()).post {
                 showNextMockFromActivity(
                     activity = this,
                     showView = { showFragmentWithNavigation(it) }

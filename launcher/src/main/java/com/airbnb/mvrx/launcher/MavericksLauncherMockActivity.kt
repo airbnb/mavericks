@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.os.Parcelable
 import android.util.Log
 import androidx.core.os.postDelayed
@@ -159,7 +160,7 @@ class MavericksLauncherMockActivity : MavericksBaseLauncherActivity() {
                         mock.mock.isDefaultInitialization || mock.mock.isForProcessRecreation
                     val finishAfterMs: Long = if (isInitializing) 3000 else 500
 
-                    Handler().postDelayed(finishAfterMs) {
+                    Handler(Looper.getMainLooper()).postDelayed(finishAfterMs) {
                         onMockLoaded(activity, mock, mockedView)
                         activity.finish()
                     }

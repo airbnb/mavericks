@@ -7,8 +7,8 @@ apply plugin: 'com.vanniktech.maven.publish'
 tasks.withType(KotlinCompile).all {
     kotlinOptions {
         freeCompilerArgs += [
-                '-Xopt-in=kotlin.RequiresOptIn',
-                '-Xopt-in=com.airbnb.mvrx.InternalMavericksApi',
+                '-opt-in=kotlin.RequiresOptIn',
+                '-opt-in=com.airbnb.mvrx.InternalMavericksApi',
         ]
     }
 }

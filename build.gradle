@@ -55,7 +55,10 @@ subprojects { project ->
                 compileSdkVersion  32
 
                 defaultConfig {
-                    minSdk 16
+                    // Allow projects to override this.
+                    if (minSdk == null) {
+                        minSdk 16
+                    }
                     //noinspection ExpiredTargetSdkVersion
                     targetSdk 29
                 }

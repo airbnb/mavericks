@@ -36,7 +36,7 @@ import java.io.Serializable
  * ```
  */
 class MavericksNavDirections private constructor(
-    @IdRes private val actionId: Int,
+    @IdRes override val actionId: Int,
     private val parcelable: Parcelable? = null,
     private val serializable: Serializable? = null,
     private val title: String? = null
@@ -59,8 +59,8 @@ class MavericksNavDirections private constructor(
             )
     }
 
-    override fun getArguments(): Bundle =
-        Bundle().apply {
+    override val arguments: Bundle
+        get() = Bundle().apply {
             if (parcelable != null) {
                 putParcelable(Mavericks.KEY_ARG, parcelable)
             } else {
@@ -68,7 +68,4 @@ class MavericksNavDirections private constructor(
             }
             title?.also { putString(KEY_ARG_TITLE, it) }
         }
-
-    @IdRes
-    override fun getActionId(): Int = actionId
 }
