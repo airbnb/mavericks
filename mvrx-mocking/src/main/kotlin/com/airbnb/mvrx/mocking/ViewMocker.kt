@@ -186,7 +186,7 @@ private fun argumentsBundle(arguments: Parcelable, viewName: String): Bundle {
             }
         }.makeClone()
     } catch (e: Throwable) {
-        throw AssertionError(
+        throw IllegalArgumentException(
             "The arguments class ${arguments::class.simpleName} for view " +
                 "$viewName failed to be parceled. Make sure it is a valid Parcelable " +
                 "and all properties on it are valid Parcelables or Serializables.",
