@@ -3,7 +3,7 @@ apply plugin: 'io.gitlab.arturbosch.detekt'
 tasks.detekt.jvmTarget = "1.8"
 
 dependencies {
-    detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:1.18.1"
+    detektPlugins libs.detektFormatting
 }
 
 detekt {

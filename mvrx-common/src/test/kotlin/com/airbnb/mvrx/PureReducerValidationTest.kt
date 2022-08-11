@@ -24,7 +24,6 @@ class PureReducerValidationTest : BaseTest() {
             IllegalArgumentException::class.java
         ) {
             ImpureRepository(PureReducerValidationState()).impureReducer()
-
         }
     }
 
@@ -68,7 +67,6 @@ class PureReducerValidationTest : BaseTest() {
             IllegalArgumentException::class.java
         ) {
             ImpureRepository(StateWithPrivateVal()).impureReducer()
-
         }
     }
 }

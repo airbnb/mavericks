@@ -231,6 +231,7 @@ naming:
     active: true
     functionPattern: '^_{0,1}([a-z$][a-zA-Z$0-9]*)|(`.*`)$'
     excludeClassPattern: '$^'
+    ignoreAnnotated: ['Composable']
   MatchingDeclarationName:
     active: false # Covered by ktlint
   MemberNameEqualsClassName:
@@ -245,7 +246,7 @@ naming:
     packagePattern: '(^[a-z]+(\.[a-z][a-z0-9]*)*$)|(.*rich_message.*)|(.*host_referrals.*)' # TODO: fix rich_message and host_referrals
   TopLevelPropertyNaming:
     active: true
-    constantPattern: '[A-Z][_A-Z0-9]*'
+    constantPattern: '[A-Za-z][_A-Za-z0-9]*'
     propertyPattern: '[A-Za-z][_A-Za-z0-9]*'
     privatePropertyPattern: '(_)?[A-Za-z][A-Za-z0-9]*'
   VariableMaxLength:
@@ -288,7 +289,7 @@ potential-bugs:
     active: true
   LateinitUsage:
     active: false
-    excludeAnnotatedProperties: []
+    ignoreAnnotated: []
     ignoreOnClassesPattern: ""
   UnconditionalJumpStatementInLoop:
     active: true
@@ -311,6 +312,8 @@ style:
   DataClassContainsFunctions:
     active: false
     conversionFunctionPrefix: 'to'
+  DestructuringDeclarationWithTooManyEntries:
+    active: false
   EqualsNullCall:
     active: true
   ExpressionBodySyntax:
@@ -400,7 +403,7 @@ style:
     allowedNames: "(_|ignored|expected)"
   UseDataClass:
     active: false
-    excludeAnnotatedClasses: []
+    ignoreAnnotated: []
   UtilityClassWithPublicConstructor:
     active: false
   WildcardImport:

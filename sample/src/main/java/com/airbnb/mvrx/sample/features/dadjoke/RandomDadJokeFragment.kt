@@ -23,7 +23,6 @@ import com.airbnb.mvrx.sample.models.Joke
 import com.airbnb.mvrx.sample.network.DadJokeService
 import com.airbnb.mvrx.viewbinding.viewBinding
 import com.airbnb.mvrx.withState
-import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.android.inject
 
 data class RandomDadJokeState(val joke: Async<Joke> = Uninitialized) : MavericksState
@@ -39,7 +38,7 @@ class RandomDadJokeViewModel(
     fun fetchRandomJoke() {
         suspend {
             dadJokeService.random()
-        }.execute(Dispatchers.IO) { copy(joke = it) }
+        }.execute { copy(joke = it) }
     }
 
     companion object : MavericksViewModelFactory<RandomDadJokeViewModel, RandomDadJokeState> {
