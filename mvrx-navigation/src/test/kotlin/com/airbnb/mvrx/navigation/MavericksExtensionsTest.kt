@@ -32,7 +32,6 @@ class MavericksExtensionsTest {
 
     @Test
     fun `can viewModel be created using navigation backStack and consumed by follow fragments`() {
-
         launchFragmentInContainer(instantiate = { HostFragment() }).onFragment { fragment ->
             val navController = Navigation.findNavController(fragment.requireView())
             navController.navigate(R.id.action_store_to_consumer)
