@@ -99,26 +99,27 @@ class MavericksViewModelConfigTest : BaseTest() {
 
         MockableMavericks.mockConfigFactory.pushMockBehaviorOverride(newBehavior)
 
+        val config = vm.config
         assertEquals(
             newBehavior,
-            (vm.config as MockableMavericksViewModelConfig).currentMockBehavior
+            (config as MockableMavericksViewModelConfig).currentMockBehavior
         )
 
         assertEquals(
             newBehavior,
-            (vm.config.stateStore as MockableStateStore).mockBehavior
+            (config.stateStore as MockableStateStore).mockBehavior
         )
 
         MockableMavericks.mockConfigFactory.popMockBehaviorOverride()
 
         assertEquals(
             originalBehavior,
-            vm.config.currentMockBehavior
+            config.currentMockBehavior
         )
 
         assertEquals(
             originalBehavior,
-            (vm.config.stateStore as MockableStateStore).mockBehavior
+            (config.stateStore as MockableStateStore).mockBehavior
         )
     }
 

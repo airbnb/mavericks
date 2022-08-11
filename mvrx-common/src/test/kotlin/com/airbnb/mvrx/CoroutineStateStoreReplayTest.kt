@@ -3,13 +3,11 @@ package com.airbnb.mvrx
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
@@ -17,20 +15,19 @@ import kotlinx.coroutines.withContext
 import org.junit.Assert
 import org.junit.Test
 
-@ExperimentalCoroutinesApi
 class CoroutineStateStoreReplayTest {
     data class State(val foo: Int) : MavericksState
 
     @Test
     fun replayTest() = runBlocking {
         repeat(100) {
-            singleReplayTestIteration(N = 5000, subscribers = 10)
+            singleReplayTestIteration(n = 5000, subscribers = 10)
         }
     }
 
     @Test
     fun replayLargeTest() = runBlocking {
-        singleReplayTestIteration(N = 100_000, subscribers = 10)
+        singleReplayTestIteration(n = 100_000, subscribers = 10)
     }
 
     /**
@@ -41,12 +38,12 @@ class CoroutineStateStoreReplayTest {
      * or 3,3,4,5 (duplicate value)
      */
     @Suppress("DeferredResultUnused")
-    private suspend fun singleReplayTestIteration(N: Int, subscribers: Int) = withContext(Dispatchers.Default) {
+    private suspend fun singleReplayTestIteration(n: Int, subscribers: Int) = withContext(Dispatchers.Default) {
         val scope = CoroutineScope(Dispatchers.Default + Job())
         val store = CoroutinesStateStore(State(foo = 0), scope)
 
         async {
-            repeat(N) {
+            repeat(n) {
                 store.set { copy(foo = foo + 1) }
             }
         }
@@ -57,7 +54,7 @@ class CoroutineStateStoreReplayTest {
                 async {
                     // Since only increase by 1 reducers are applied
                     // it's expected to see monotonously increasing sequence with no missing values
-                    store.flow.takeWhile { it.foo < N }.toList().zipWithNext { a, b ->
+                    store.flow.takeWhile { it.foo < n }.toList().zipWithNext { a, b ->
                         Assert.assertEquals(a.foo + 1, b.foo)
                     }
                 }
@@ -83,15 +80,15 @@ class CoroutineStateStoreReplayTest {
         }
         collectJob.cancel()
 
-        val N = 200
+        val n = 200
         coroutineScope {
             async(start = CoroutineStart.UNDISPATCHED) {
-                store.flow.takeWhile { it.foo < N }.collect {
+                store.flow.takeWhile { it.foo < n }.collect {
                     // no-op
                 }
             }
             async {
-                repeat(N) {
+                repeat(n) {
                     store.set { copy(foo = foo + 1) }
                 }
             }

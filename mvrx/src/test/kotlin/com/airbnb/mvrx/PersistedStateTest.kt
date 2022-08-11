@@ -11,6 +11,7 @@ import org.mockito.Mockito
 
 class PersistedStateTest : BaseTest() {
 
+    @Suppress("unused")
     enum class MyEnum {
         A,
         B,
@@ -74,6 +75,7 @@ class PersistedStateTest : BaseTest() {
     @Test
     fun saveSetIntWithSecondaryConstructor() {
         data class State(@PersistState val count: Int = 0) : MavericksState {
+            @Suppress("unused")
             constructor(args: String) : this(args.toInt())
         }
 
@@ -85,6 +87,7 @@ class PersistedStateTest : BaseTest() {
     @Test
     fun saveSetIntWithTwoPropertiesAndDerivedProp() {
         data class State(@PersistState val count: Int = 0, val name: String = "") : MavericksState {
+            @Suppress("unused")
             val isEven = count % 2 == 0
         }
 

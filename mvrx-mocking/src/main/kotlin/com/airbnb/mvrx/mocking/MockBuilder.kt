@@ -1,4 +1,4 @@
-@file:Suppress("Detekt.ParameterListWrapping")
+@file:Suppress("Detekt.ParameterListWrapping", "unused")
 
 package com.airbnb.mvrx.mocking
 
@@ -14,6 +14,7 @@ import com.airbnb.mvrx.PersistState
 import com.airbnb.mvrx.mocking.MavericksMock.Companion.DEFAULT_INITIALIZATION_NAME
 import com.airbnb.mvrx.mocking.MavericksMock.Companion.DEFAULT_STATE_NAME
 import com.airbnb.mvrx.mocking.MavericksMock.Companion.RESTORED_STATE_NAME
+import java.util.Locale
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.reflect.KFunction
 import kotlin.reflect.KProperty
@@ -759,8 +760,8 @@ class SingleViewModelMockBuilder<V : MockableMavericksView, Args : Parcelable, S
         val asyncProperty = state.asyncPropertyBlock()
         // Split "myProperty" to "My property"
         val asyncName =
-            asyncProperty.name.replace(Regex("[A-Z]")) { " ${it.value.toLowerCase()}" }.trim()
-                .capitalize()
+            asyncProperty.name.replace(Regex("[A-Z]")) { " ${it.value.lowercase(Locale.getDefault())}" }.trim()
+                .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
 
         state("$asyncName loading") {
             state.setLoading { asyncProperty }
@@ -787,10 +788,10 @@ class TwoViewModelMockBuilder<
     S2 : MavericksState,
     Args : Parcelable>
 internal constructor(
-    val vm1: KProperty1<V, VM1>,
-    val defaultState1: S1,
-    val vm2: KProperty1<V, VM2>,
-    val defaultState2: S2,
+    private val vm1: KProperty1<V, VM1>,
+    private val defaultState1: S1,
+    private val vm2: KProperty1<V, VM2>,
+    private val defaultState2: S2,
     defaultArgs: Args?
 ) : MockBuilder<V, Args>(
     defaultArgs,
@@ -886,7 +887,8 @@ internal constructor(
 
 // Split "myProperty" to "My property"
 private fun KProperty0<Any?>.splitNameByCase(): String {
-    return name.replace(Regex("[A-Z]")) { " ${it.value.toLowerCase()}" }.trim().capitalize()
+    return name.replace(Regex("[A-Z]")) { " ${it.value.lowercase(Locale.getDefault())}" }.trim()
+        .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
 }
 
 /**
@@ -909,10 +911,10 @@ open class TwoStatesBuilder<
     S2 : MavericksState,
     VM2 : MavericksViewModel<S2>>
 internal constructor(
-    val vm1: KProperty1<V, VM1>,
-    val defaultState1: S1,
-    val vm2: KProperty1<V, VM2>,
-    val defaultState2: S2
+    private val vm1: KProperty1<V, VM1>,
+    private val defaultState1: S1,
+    private val vm2: KProperty1<V, VM2>,
+    private val defaultState2: S2
 ) {
     private val stateMap = mutableMapOf<KProperty1<V, MavericksViewModel<MavericksState>>, MavericksState>()
 
@@ -965,12 +967,12 @@ class ThreeViewModelMockBuilder<
     S3 : MavericksState,
     Args : Parcelable>
 internal constructor(
-    val vm1: KProperty1<V, VM1>,
-    val defaultState1: S1,
-    val vm2: KProperty1<V, VM2>,
-    val defaultState2: S2,
-    val vm3: KProperty1<V, VM3>,
-    val defaultState3: S3,
+    private val vm1: KProperty1<V, VM1>,
+    private val defaultState1: S1,
+    private val vm2: KProperty1<V, VM2>,
+    private val defaultState2: S2,
+    private val vm3: KProperty1<V, VM3>,
+    private val defaultState3: S3,
     defaultArgs: Args?
 ) : MockBuilder<V, Args>(
     defaultArgs,
@@ -1099,8 +1101,8 @@ internal constructor(
     defaultState1: S1,
     vm2: KProperty1<V, VM2>,
     defaultState2: S2,
-    val vm3: KProperty1<V, VM3>,
-    val defaultState3: S3
+    private val vm3: KProperty1<V, VM3>,
+    private val defaultState3: S3
 ) : TwoStatesBuilder<V, S1, VM1, S2, VM2>(vm1, defaultState1, vm2, defaultState2) {
 
     init {
@@ -1129,14 +1131,14 @@ class FourViewModelMockBuilder<
     S4 : MavericksState,
     Args : Parcelable>
 internal constructor(
-    val vm1: KProperty1<V, VM1>,
-    val defaultState1: S1,
-    val vm2: KProperty1<V, VM2>,
-    val defaultState2: S2,
-    val vm3: KProperty1<V, VM3>,
-    val defaultState3: S3,
-    val vm4: KProperty1<V, VM4>,
-    val defaultState4: S4,
+    private val vm1: KProperty1<V, VM1>,
+    private val defaultState1: S1,
+    private val vm2: KProperty1<V, VM2>,
+    private val defaultState2: S2,
+    private val vm3: KProperty1<V, VM3>,
+    private val defaultState3: S3,
+    private val vm4: KProperty1<V, VM4>,
+    private val defaultState4: S4,
     defaultArgs: Args?
 ) : MockBuilder<V, Args>(
     defaultArgs,
@@ -1196,8 +1198,8 @@ internal constructor(
     defaultState2: S2,
     vm3: KProperty1<V, VM3>,
     defaultState3: S3,
-    val vm4: KProperty1<V, VM4>,
-    val defaultState4: S4
+    private val vm4: KProperty1<V, VM4>,
+    private val defaultState4: S4
 ) : ThreeStatesBuilder<V, S1, VM1, S2, VM2, S3, VM3>(
     vm1,
     defaultState1,
@@ -1235,16 +1237,16 @@ class FiveViewModelMockBuilder<
     S5 : MavericksState,
     Args : Parcelable>
 internal constructor(
-    val vm1: KProperty1<V, VM1>,
-    val defaultState1: S1,
-    val vm2: KProperty1<V, VM2>,
-    val defaultState2: S2,
-    val vm3: KProperty1<V, VM3>,
-    val defaultState3: S3,
-    val vm4: KProperty1<V, VM4>,
-    val defaultState4: S4,
-    val vm5: KProperty1<V, VM5>,
-    val defaultState5: S5,
+    private val vm1: KProperty1<V, VM1>,
+    private val defaultState1: S1,
+    private val vm2: KProperty1<V, VM2>,
+    private val defaultState2: S2,
+    private val vm3: KProperty1<V, VM3>,
+    private val defaultState3: S3,
+    private val vm4: KProperty1<V, VM4>,
+    private val defaultState4: S4,
+    private val vm5: KProperty1<V, VM5>,
+    private val defaultState5: S5,
     defaultArgs: Args?
 ) : MockBuilder<V, Args>(
     defaultArgs,
@@ -1311,8 +1313,8 @@ internal constructor(
     defaultState3: S3,
     vm4: KProperty1<V, VM4>,
     defaultState4: S4,
-    val vm5: KProperty1<V, VM5>,
-    val defaultState5: S5
+    private val vm5: KProperty1<V, VM5>,
+    private val defaultState5: S5
 ) : FourStatesBuilder<V, S1, VM1, S2, VM2, S3, VM3, S4, VM4>(
     vm1,
     defaultState1,
@@ -1354,18 +1356,18 @@ class SixViewModelMockBuilder<
     S6 : MavericksState,
     Args : Parcelable>
 internal constructor(
-    val vm1: KProperty1<V, VM1>,
-    val defaultState1: S1,
-    val vm2: KProperty1<V, VM2>,
-    val defaultState2: S2,
-    val vm3: KProperty1<V, VM3>,
-    val defaultState3: S3,
-    val vm4: KProperty1<V, VM4>,
-    val defaultState4: S4,
-    val vm5: KProperty1<V, VM5>,
-    val defaultState5: S5,
-    val vm6: KProperty1<V, VM6>,
-    val defaultState6: S6,
+    private val vm1: KProperty1<V, VM1>,
+    private val defaultState1: S1,
+    private val vm2: KProperty1<V, VM2>,
+    private val defaultState2: S2,
+    private val vm3: KProperty1<V, VM3>,
+    private val defaultState3: S3,
+    private val vm4: KProperty1<V, VM4>,
+    private val defaultState4: S4,
+    private val vm5: KProperty1<V, VM5>,
+    private val defaultState5: S5,
+    private val vm6: KProperty1<V, VM6>,
+    private val defaultState6: S6,
     defaultArgs: Args?
 ) : MockBuilder<V, Args>(
     defaultArgs,
@@ -1439,8 +1441,8 @@ internal constructor(
     defaultState4: S4,
     vm5: KProperty1<V, VM5>,
     defaultState5: S5,
-    val vm6: KProperty1<V, VM6>,
-    val defaultState6: S6
+    private val vm6: KProperty1<V, VM6>,
+    private val defaultState6: S6
 ) : FiveStatesBuilder<V, S1, VM1, S2, VM2, S3, VM3, S4, VM4, S5, VM5>(
     vm1,
     defaultState1,
@@ -1486,20 +1488,20 @@ class SevenViewModelMockBuilder<
     S7 : MavericksState,
     Args : Parcelable>
 internal constructor(
-    val vm1: KProperty1<V, VM1>,
-    val defaultState1: S1,
-    val vm2: KProperty1<V, VM2>,
-    val defaultState2: S2,
-    val vm3: KProperty1<V, VM3>,
-    val defaultState3: S3,
-    val vm4: KProperty1<V, VM4>,
-    val defaultState4: S4,
-    val vm5: KProperty1<V, VM5>,
-    val defaultState5: S5,
-    val vm6: KProperty1<V, VM6>,
-    val defaultState6: S6,
-    val vm7: KProperty1<V, VM7>,
-    val defaultState7: S7,
+    private val vm1: KProperty1<V, VM1>,
+    private val defaultState1: S1,
+    private val vm2: KProperty1<V, VM2>,
+    private val defaultState2: S2,
+    private val vm3: KProperty1<V, VM3>,
+    private val defaultState3: S3,
+    private val vm4: KProperty1<V, VM4>,
+    private val defaultState4: S4,
+    private val vm5: KProperty1<V, VM5>,
+    private val defaultState5: S5,
+    private val vm6: KProperty1<V, VM6>,
+    private val defaultState6: S6,
+    private val vm7: KProperty1<V, VM7>,
+    private val defaultState7: S7,
     defaultArgs: Args?
 ) : MockBuilder<V, Args>(
     defaultArgs,
@@ -1580,8 +1582,8 @@ internal constructor(
     defaultState5: S5,
     vm6: KProperty1<V, VM6>,
     defaultState6: S6,
-    val vm7: KProperty1<V, VM7>,
-    val defaultState7: S7
+    private val vm7: KProperty1<V, VM7>,
+    private val defaultState7: S7
 ) : SixStatesBuilder<V, S1, VM1, S2, VM2, S3, VM3, S4, VM4, S5, VM5, S6, VM6>(
     vm1,
     defaultState1,
@@ -1631,22 +1633,22 @@ class EightViewModelMockBuilder<
     S8 : MavericksState,
     Args : Parcelable>
 internal constructor(
-    val vm1: KProperty1<V, VM1>,
-    val defaultState1: S1,
-    val vm2: KProperty1<V, VM2>,
-    val defaultState2: S2,
-    val vm3: KProperty1<V, VM3>,
-    val defaultState3: S3,
-    val vm4: KProperty1<V, VM4>,
-    val defaultState4: S4,
-    val vm5: KProperty1<V, VM5>,
-    val defaultState5: S5,
-    val vm6: KProperty1<V, VM6>,
-    val defaultState6: S6,
-    val vm7: KProperty1<V, VM7>,
-    val defaultState7: S7,
-    val vm8: KProperty1<V, VM8>,
-    val defaultState8: S8,
+    private val vm1: KProperty1<V, VM1>,
+    private val defaultState1: S1,
+    private val vm2: KProperty1<V, VM2>,
+    private val defaultState2: S2,
+    private val vm3: KProperty1<V, VM3>,
+    private val defaultState3: S3,
+    private val vm4: KProperty1<V, VM4>,
+    private val defaultState4: S4,
+    private val vm5: KProperty1<V, VM5>,
+    private val defaultState5: S5,
+    private val vm6: KProperty1<V, VM6>,
+    private val defaultState6: S6,
+    private val vm7: KProperty1<V, VM7>,
+    private val defaultState7: S7,
+    private val vm8: KProperty1<V, VM8>,
+    private val defaultState8: S8,
     defaultArgs: Args?
 ) : MockBuilder<V, Args>(
     defaultArgs,
@@ -1734,8 +1736,8 @@ internal constructor(
     defaultState6: S6,
     vm7: KProperty1<V, VM7>,
     defaultState7: S7,
-    val vm8: KProperty1<V, VM8>,
-    val defaultState8: S8
+    private val vm8: KProperty1<V, VM8>,
+    private val defaultState8: S8
 ) : SevenStatesBuilder<V, S1, VM1, S2, VM2, S3, VM3, S4, VM4, S5, VM5, S6, VM6, S7, VM7>(
     vm1,
     defaultState1,
@@ -1789,24 +1791,24 @@ class NineViewModelMockBuilder<
     S9 : MavericksState,
     Args : Parcelable>
 internal constructor(
-    val vm1: KProperty1<V, VM1>,
-    val defaultState1: S1,
-    val vm2: KProperty1<V, VM2>,
-    val defaultState2: S2,
-    val vm3: KProperty1<V, VM3>,
-    val defaultState3: S3,
-    val vm4: KProperty1<V, VM4>,
-    val defaultState4: S4,
-    val vm5: KProperty1<V, VM5>,
-    val defaultState5: S5,
-    val vm6: KProperty1<V, VM6>,
-    val defaultState6: S6,
-    val vm7: KProperty1<V, VM7>,
-    val defaultState7: S7,
-    val vm8: KProperty1<V, VM8>,
-    val defaultState8: S8,
-    val vm9: KProperty1<V, VM9>,
-    val defaultState9: S9,
+    private val vm1: KProperty1<V, VM1>,
+    private val defaultState1: S1,
+    private val vm2: KProperty1<V, VM2>,
+    private val defaultState2: S2,
+    private val vm3: KProperty1<V, VM3>,
+    private val defaultState3: S3,
+    private val vm4: KProperty1<V, VM4>,
+    private val defaultState4: S4,
+    private val vm5: KProperty1<V, VM5>,
+    private val defaultState5: S5,
+    private val vm6: KProperty1<V, VM6>,
+    private val defaultState6: S6,
+    private val vm7: KProperty1<V, VM7>,
+    private val defaultState7: S7,
+    private val vm8: KProperty1<V, VM8>,
+    private val defaultState8: S8,
+    private val vm9: KProperty1<V, VM9>,
+    private val defaultState9: S9,
     defaultArgs: Args?
 ) : MockBuilder<V, Args>(
     defaultArgs,
@@ -1901,8 +1903,8 @@ internal constructor(
     defaultState7: S7,
     vm8: KProperty1<V, VM8>,
     defaultState8: S8,
-    val vm9: KProperty1<V, VM9>,
-    val defaultState9: S9
+    private val vm9: KProperty1<V, VM9>,
+    private val defaultState9: S9
 ) : EightStatesBuilder<V, S1, VM1, S2, VM2, S3, VM3, S4, VM4, S5, VM5, S6, VM6, S7, VM7, S8, VM8>(
     vm1,
     defaultState1,
@@ -1960,26 +1962,26 @@ class TenViewModelMockBuilder<
     S10 : MavericksState,
     Args : Parcelable>
 internal constructor(
-    val vm1: KProperty1<V, VM1>,
-    val defaultState1: S1,
-    val vm2: KProperty1<V, VM2>,
-    val defaultState2: S2,
-    val vm3: KProperty1<V, VM3>,
-    val defaultState3: S3,
-    val vm4: KProperty1<V, VM4>,
-    val defaultState4: S4,
-    val vm5: KProperty1<V, VM5>,
-    val defaultState5: S5,
-    val vm6: KProperty1<V, VM6>,
-    val defaultState6: S6,
-    val vm7: KProperty1<V, VM7>,
-    val defaultState7: S7,
-    val vm8: KProperty1<V, VM8>,
-    val defaultState8: S8,
-    val vm9: KProperty1<V, VM9>,
-    val defaultState9: S9,
-    val vm10: KProperty1<V, VM10>,
-    val defaultState10: S10,
+    private val vm1: KProperty1<V, VM1>,
+    private val defaultState1: S1,
+    private val vm2: KProperty1<V, VM2>,
+    private val defaultState2: S2,
+    private val vm3: KProperty1<V, VM3>,
+    private val defaultState3: S3,
+    private val vm4: KProperty1<V, VM4>,
+    private val defaultState4: S4,
+    private val vm5: KProperty1<V, VM5>,
+    private val defaultState5: S5,
+    private val vm6: KProperty1<V, VM6>,
+    private val defaultState6: S6,
+    private val vm7: KProperty1<V, VM7>,
+    private val defaultState7: S7,
+    private val vm8: KProperty1<V, VM8>,
+    private val defaultState8: S8,
+    private val vm9: KProperty1<V, VM9>,
+    private val defaultState9: S9,
+    private val vm10: KProperty1<V, VM10>,
+    private val defaultState10: S10,
     defaultArgs: Args?
 ) : MockBuilder<V, Args>(
     defaultArgs,
@@ -2081,8 +2083,8 @@ internal constructor(
     defaultState8: S8,
     vm9: KProperty1<V, VM9>,
     defaultState9: S9,
-    val vm10: KProperty1<V, VM10>,
-    val defaultState10: S10
+    private val vm10: KProperty1<V, VM10>,
+    private val defaultState10: S10
 ) : NineStatesBuilder<V, S1, VM1, S2, VM2, S3, VM3, S4, VM4, S5, VM5, S6, VM6, S7, VM7, S8, VM8, S9, VM9>(
     vm1,
     defaultState1,
@@ -2248,11 +2250,11 @@ open class MavericksViewMocks<V : MockableMavericksView, Args : Parcelable> @Pub
 }
 
 open class MockBuilder<V : MockableMavericksView, Args : Parcelable> internal constructor(
-    internal val defaultArgs: Args?,
+    private val defaultArgs: Args?,
     vararg defaultStatePairs: Pair<KProperty1<V, MavericksViewModel<MavericksState>>, MavericksState>
 ) : MavericksViewMocks<V, Args>(), DataClassSetDsl {
 
-    internal val defaultStates = defaultStatePairs.map { MockState(it.first, it.second) }
+    private val defaultStates = defaultStatePairs.map { MockState(it.first, it.second) }
 
     @VisibleForTesting
     override val mocks = mutableListOf<MavericksMock<V, Args>>()

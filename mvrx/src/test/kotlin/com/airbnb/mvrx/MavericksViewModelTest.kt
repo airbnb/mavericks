@@ -3,14 +3,14 @@ package com.airbnb.mvrx
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -58,7 +58,6 @@ class MavericksViewModelTestViewModel : MavericksViewModel<BaseMavericksViewMode
     }
 }
 
-@ExperimentalCoroutinesApi
 class MavericksViewModelTest : BaseTest() {
 
     private lateinit var viewModel: MavericksViewModelTestViewModel
@@ -191,7 +190,7 @@ class MavericksViewModelTest : BaseTest() {
     private fun runInViewModelBlocking(
         vararg expectedState: BaseMavericksViewModelTestState,
         block: suspend MavericksViewModelTestViewModel.() -> Unit
-    ) = runBlockingTest {
+    ) = runTest(UnconfinedTestDispatcher()) {
         val states = mutableListOf<BaseMavericksViewModelTestState>()
         val consumerJob = viewModel.stateFlow.onEach { states += it }.launchIn(this)
         viewModel.runInViewModel(block)

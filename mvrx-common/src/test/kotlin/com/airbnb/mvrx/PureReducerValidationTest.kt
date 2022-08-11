@@ -1,17 +1,12 @@
 package com.airbnb.mvrx
 
-import org.junit.Rule
+import org.junit.Assert
 import org.junit.Test
-import org.junit.rules.ExpectedException
 
 data class PureReducerValidationState(val count: Int = 0) : MavericksState
 data class StateWithPrivateVal(private val count: Int = 0) : MavericksState
 
 class PureReducerValidationTest : BaseTest() {
-
-    @get:Rule
-    @Suppress("DEPRECATION")
-    var thrown = ExpectedException.none()!!
 
     @Test
     fun impureReducerShouldFail() {
@@ -24,9 +19,13 @@ class PureReducerValidationTest : BaseTest() {
                 }
             }
         }
-        thrown.expect(IllegalArgumentException::class.java)
-        thrown.expectMessage("Impure reducer set on ImpureRepository! count changed from 1 to 2. Ensure that your state properties properly implement hashCode.")
-        ImpureRepository(PureReducerValidationState()).impureReducer()
+        Assert.assertThrows(
+            "Impure reducer set on ImpureRepository! count changed from 1 to 2. Ensure that your state properties properly implement hashCode.",
+            IllegalArgumentException::class.java
+        ) {
+            ImpureRepository(PureReducerValidationState()).impureReducer()
+
+        }
     }
 
     @Test
@@ -64,8 +63,12 @@ class PureReducerValidationTest : BaseTest() {
             }
         }
 
-        thrown.expect(IllegalArgumentException::class.java)
-        thrown.expectMessage("Impure reducer set on ImpureRepository! count changed from 1 to 2. Ensure that your state properties properly implement hashCode.")
-        ImpureRepository(StateWithPrivateVal()).impureReducer()
+        Assert.assertThrows(
+            "Impure reducer set on ImpureRepository! count changed from 1 to 2. Ensure that your state properties properly implement hashCode.",
+            IllegalArgumentException::class.java
+        ) {
+            ImpureRepository(StateWithPrivateVal()).impureReducer()
+
+        }
     }
 }

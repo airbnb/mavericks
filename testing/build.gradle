@@ -9,6 +9,7 @@ tasks.withType(KotlinCompile).all {
     kotlinOptions {
         freeCompilerArgs += [
                 '-opt-in=com.airbnb.mvrx.InternalMavericksApi',
+                '-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi',
         ]
     }
 }
@@ -25,6 +26,8 @@ android {
     packagingOptions {
         exclude 'META-INF/AL2.0'
         exclude 'META-INF/LGPL2.1'
+        exclude 'META-INF/LICENSE.md'
+        exclude 'META-INF/LICENSE-notice.md'
     }
 }
 

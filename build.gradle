@@ -76,8 +76,8 @@ subprojects { project ->
                 }
 
                 sourceSets {
-                    main.assets.srcDirs += file("src/main/kotlin")
-                    test.assets.srcDirs += file("src/test/kotlin")
+                    main.java.srcDirs += "src/main/kotlin"
+                    test.java.srcDirs += "src/test/kotlin"
                 }
             }
         }

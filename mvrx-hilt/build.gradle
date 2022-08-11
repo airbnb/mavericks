@@ -42,7 +42,7 @@ dependencies {
 
     testImplementation project(':testing')
     kaptTest libs.hiltCompiler
-    testImplementation libs.hilt
+    testImplementation libs.hiltTesting
     testImplementation libs.junit
     testImplementation libs.kotlinCoroutinesTest
     testImplementation libs.roboeletric

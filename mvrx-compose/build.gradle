@@ -60,6 +60,7 @@ dependencies {
     implementation libs.composeFoundation
     implementation libs.composeUi
     implementation libs.viewModelCompose
+    debugImplementation libs.composeUiTestManifest
 
     testImplementation project(':testing')
     testImplementation libs.junit

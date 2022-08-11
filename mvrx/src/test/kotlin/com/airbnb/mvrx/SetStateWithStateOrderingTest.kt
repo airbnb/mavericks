@@ -5,7 +5,7 @@ package com.airbnb.mvrx
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 import org.junit.AfterClass
@@ -22,7 +22,7 @@ class SetStateWithStateOrderingTest : MavericksViewModel<OrderingState>(Ordering
         @JvmStatic
         fun setup() {
             // We need to set main but don't want a synchronous state store to make sure that the real ordering is correct
-            Dispatchers.setMain(TestCoroutineDispatcher())
+            Dispatchers.setMain(StandardTestDispatcher())
             Mavericks.viewModelConfigFactory = MavericksViewModelConfigFactory(false)
         }
 

@@ -11,6 +11,7 @@ import org.robolectric.Robolectric
 import org.robolectric.annotation.Config
 
 data class ViewModelStoreTestState(val notPersistedCount: Int = 1, @PersistState val persistedCount: Int = 1) : MavericksState {
+    @Suppress("unused")
     constructor(args: ViewModelStoreTestArgs) : this(args.count, args.count)
 }
 

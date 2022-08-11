@@ -1,12 +1,12 @@
 package com.airbnb.mvrx
 
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -39,7 +39,7 @@ class StateStoreTest : BaseTest() {
     }
 
     @Test
-    fun testSubscribeNotCalledForNoop() = runBlockingTest {
+    fun testSubscribeNotCalledForNoop() = runTest(UnconfinedTestDispatcher()) {
         val store = CoroutinesStateStore(MavericksStateStoreTestState(), this)
         var callCount = 0
         val job = store.flow.onEach {
@@ -52,7 +52,7 @@ class StateStoreTest : BaseTest() {
     }
 
     @Test
-    fun testSubscribeNotCalledForSameValue() = runBlockingTest {
+    fun testSubscribeNotCalledForSameValue() = runTest(UnconfinedTestDispatcher()) {
         val store = CoroutinesStateStore(MavericksStateStoreTestState(), this)
         var callCount = 0
         val job = store.flow.onEach {
@@ -65,7 +65,7 @@ class StateStoreTest : BaseTest() {
     }
 
     @Test
-    fun testBlockingReceiver() = runBlockingTest {
+    fun testBlockingReceiver() = runTest(UnconfinedTestDispatcher()) {
         val store = CoroutinesStateStore(MavericksStateStoreTestState(), this)
         val values = mutableListOf<Int>()
         val job1 = launch {

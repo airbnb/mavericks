@@ -3,8 +3,7 @@ package com.airbnb.mvrx.test
 import com.airbnb.mvrx.mocking.MockBehavior
 import com.airbnb.mvrx.mocking.MockableMavericks
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.jupiter.api.extension.AfterEachCallback
 import org.junit.jupiter.api.extension.BeforeEachCallback
 import org.junit.jupiter.api.extension.ExtensionContext
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.extension.ExtensionContext
 /**
  * To use this in your test class, add:
  * ```
- * @JvmField
  * @RegisterExtension
  * val mvrxExtension = MvRxTestExtension()
  * ```
@@ -48,7 +46,7 @@ class MvRxTestExtension(
      * A custom coroutine dispatcher that will be set as Dispatchers.Main for testing purposes.
      */
     @Suppress("EXPERIMENTAL_API_USAGE")
-    private val testDispatcher: CoroutineDispatcher = TestCoroutineDispatcher()
+    private val testDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 ) : BeforeEachCallback, AfterEachCallback {
 
     private val testLifecycleCallbacks: MvRxTestLifecycleCallbacks = MvRxTestLifecycleCallbacksImpl(
@@ -58,12 +56,10 @@ class MvRxTestExtension(
         testDispatcher = testDispatcher,
     )
 
-    @ExperimentalCoroutinesApi
     override fun beforeEach(context: ExtensionContext?) {
         testLifecycleCallbacks.before()
     }
 
-    @ExperimentalCoroutinesApi
     override fun afterEach(context: ExtensionContext?) {
         testLifecycleCallbacks.after()
     }

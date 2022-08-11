@@ -3,8 +3,7 @@ package com.airbnb.mvrx.test
 import com.airbnb.mvrx.mocking.MockBehavior
 import com.airbnb.mvrx.mocking.MockableMavericks
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.TestCoroutineDispatcher
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.rules.ExternalResource
 
 /**
@@ -44,8 +43,7 @@ class MvRxTestRule(
     /**
      * A custom coroutine dispatcher that will be set as Dispatchers.Main for testing purposes.
      */
-    @Suppress("EXPERIMENTAL_API_USAGE")
-    private val testDispatcher: CoroutineDispatcher = TestCoroutineDispatcher()
+    testDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 ) : ExternalResource() {
 
     private val testLifecycleCallbacks: MvRxTestLifecycleCallbacks = MvRxTestLifecycleCallbacksImpl(
@@ -55,12 +53,10 @@ class MvRxTestRule(
         testDispatcher = testDispatcher,
     )
 
-    @ExperimentalCoroutinesApi
     override fun before() {
         testLifecycleCallbacks.before()
     }
 
-    @ExperimentalCoroutinesApi
     override fun after() {
         testLifecycleCallbacks.after()
     }
