@@ -19,7 +19,6 @@ buildscript {
 
     configurations.all {
         resolutionStrategy {
-            // Use Proguard 6.2.0
             force "net.sf.proguard:proguard-gradle:_"
         }
     }
@@ -82,51 +81,6 @@ subprojects { project ->
             }
         }
     }
-
-//        plugins.whenPluginAdded {
-//            if (this is KotlinAndroidPluginWrapper) {
-//                extensions.findByType<AndroidExtensionsExtension>()?.apply {
-//                    isExperimental = true
-//                }
-//            }
-//            if (this is AppPlugin || this is LibraryPlugin) {
-//                dependencies {
-//                    add("implementation", Libraries.kotlin)
-//                }
-//
-//                android.apply {
-//                    compileSdkVersion(Versions.compileSdk)
-//                    buildToolsVersion(Versions.buildTools)
-//
-//                    defaultConfig {
-//                        minSdk = Versions.minSdk
-//                        targetSdk = Versions.targetSdk
-//                    }
-//
-//                    lintOptions {
-//                        isAbortOnError = true
-//                        textReport = true
-//                        textOutput("stdout")
-//                        lintConfig = File("../lint.xml")
-//                    }
-//
-//                    compileOptions {
-//                        sourceCompatibility = JavaVersion.VERSION_1_8
-//                        targetCompatibility = JavaVersion.VERSION_1_8
-//                    }
-//
-//                    sourceSets {
-//                        getByName("main").java.apply {
-//                            setSrcDirs(srcDirs + file("src/main/kotlin"))
-//                        }
-//                        getByName("test").java.apply {
-//                            setSrcDirs(srcDirs + file("src/test/kotlin"))
-//                        }
-//                    }
-//                }
-//            }
-//        }
-
 }
 
 apply from: 'gradle/jacoco.gradle'
