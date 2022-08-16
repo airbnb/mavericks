@@ -10,7 +10,7 @@ class MvRxTestRuleTestLifecycleAwareObserverDisabled {
     @get:Rule
     val mvrxTestRule = MavericksTestRule(
         setForceDisableLifecycleAwareObserver = true, viewModelMockBehavior = MockBehavior(
-            stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
+            stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous,
         ),
     )
 
