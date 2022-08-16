@@ -1,9 +1,7 @@
 package com.airbnb.mvrx;
 
-import com.airbnb.mvrx.test.MvRxTestRule;
-
 /**
- * Used as a proxy between {@link MvRxTestRule} and MvRx.
+ * Used as a proxy between {@link com.airbnb.mvrx.test.MavericksTestRule} and Mavericks.
  * this is Java because the flag is package private.
  */
 @InternalMavericksApi

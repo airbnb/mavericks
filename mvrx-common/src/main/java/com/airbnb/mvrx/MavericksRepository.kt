@@ -100,7 +100,7 @@ abstract class MavericksRepository<S : MavericksState>(
      * 1) It will not be called synchronously or on the same thread. This is for performance and accuracy reasons.
      * 2) Similar to the execute lambda above, the current state is the state receiver so the `count` in `count + 1` is actually the count
      *    property of the state at the time that the lambda is called.
-     * 3) In development, MvRx will do checks to make sure that your setState is pure by calling in multiple times. As a result, DO NOT use
+     * 3) In development, Mavericks will do checks to make sure that your setState is pure by calling in multiple times. As a result, DO NOT use
      *    mutable variables or properties from outside the lambda or else it may crash.
      */
     protected fun setState(reducer: S.() -> S) {

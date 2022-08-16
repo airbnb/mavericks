@@ -15,11 +15,8 @@ By default, the rule/extension will:
 
 Add the `MvRxTestExtension` to your test's companion object.
 ```kotlin
-    companion object {
-        @JvmField
-        @RegisterExtension
-        val mvrxTestExtension = MvRxTestExtension()
-    }
+    @RegisterExtension
+    val mavericksTestExtension = MavericksTestExtension()
 ```
 
 ### JUnit 4 Rule
@@ -28,5 +25,5 @@ Add the `MvRxTestRule` rule to your test.
 
 ```kotlin
     @get:Rule
-    val mvrxRule = MvRxTestRule()
+    val mavericksRule = MavericksTestRule()
 ```

@@ -77,7 +77,7 @@ private fun <VM : MavericksViewModel<S>, S : MavericksState> createDefaultViewMo
                 try {
                     primaryConstructor.isAccessible = true
                 } catch (e: SecurityException) {
-                    throw IllegalStateException("ViewModel class is not public and MvRx could not make the primary constructor accessible.", e)
+                    throw IllegalStateException("ViewModel class is not public and Mavericks could not make the primary constructor accessible.", e)
                 }
             }
             return primaryConstructor?.newInstance(state) as? VM

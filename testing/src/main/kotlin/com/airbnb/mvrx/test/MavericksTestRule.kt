@@ -17,13 +17,13 @@ import org.junit.rules.ExternalResource
  */
 class MavericksTestRule(
     /**
-     * If true, any subscriptions made to a MvRx view model will NOT be made lifecycle aware.
+     * If true, any subscriptions made to a Mavericks view model will NOT be made lifecycle aware.
      * This can make it easier to test subscriptions because you won't have to move the test targets to a
      * STARTED state before they can receive subscriptions.
      */
     setForceDisableLifecycleAwareObserver: Boolean = true,
     /**
-     * If provided, MvRx mocking will be enabled via [MockableMavericks.initialize] and this will be set as
+     * If provided, Mavericks mocking will be enabled via [MockableMavericks.initialize] and this will be set as
      * the mocking behavior. The default behavior simply puts the ViewModel in a configuration
      * where state changes happen synchronously, which is often necessary for tests.
      *

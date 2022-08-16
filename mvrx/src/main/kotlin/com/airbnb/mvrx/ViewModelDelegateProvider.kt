@@ -42,7 +42,7 @@ abstract class MavericksDelegateProvider<T, R> {
 }
 
 /**
- * This is invoked each time a Fragment accesses a ViewModel via the MvRx extension functions
+ * This is invoked each time a Fragment accesses a ViewModel via the Mavericks extension functions
  * (eg [fragmentViewModel], [activityViewModel], [existingViewModel]).
  *
  * It allows global callbacks for when a view model is instantiated, with control over how the view model state

@@ -38,7 +38,7 @@ fun MavericksView.cancelPendingInvalidates() {
 
 interface MavericksView : LifecycleOwner {
     /**
-     * Override this to supply a globally unique id for this MvRxView. If your [MavericksView] is being recreated due to
+     * Override this to supply a globally unique id for this [MavericksView]. If your [MavericksView] is being recreated due to
      * a lifecycle event (e.g. rotation) you should assign a consistent id. Likely this means you should save the id
      * in onSaveInstance state. The viewId will not be accessed until a subscribe method is called.
      * Accessing mvrxViewId before calling super.onCreate() will cause a crash.
@@ -56,7 +56,7 @@ interface MavericksView : LifecycleOwner {
         }
 
     /**
-     * Override this to handle any state changes from [MavericksViewModel]s created through MvRx Fragment delegates.
+     * Override this to handle any state changes from [MavericksViewModel]s created through Mavericks Fragment delegates.
      */
     fun invalidate()
 
@@ -71,7 +71,7 @@ interface MavericksView : LifecycleOwner {
      * lifecycle is unavailable (eg. _before_ `onCreateView`) which is caught as a signal to fall back to the fragment's
      * standard lifecycle owner.
      *
-     * For non-Fragments the default [subscriptionLifecycleOwner] is the same as the MvRxView's standard lifecycle owner.
+     * For non-Fragments the default [subscriptionLifecycleOwner] is the same as the [MavericksView]'s standard lifecycle owner.
      */
     val subscriptionLifecycleOwner: LifecycleOwner
         get() = try {

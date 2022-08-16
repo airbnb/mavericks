@@ -55,24 +55,24 @@ You may also find it helpful to define functions in your bash profile to make it
 ```
 # Open the launcher
 function mavericks_launcher() {
-  adb shell am start -n com.your.application.package/com.airbnb.mvrx.launcher.MvRxLauncherActivity
+  adb shell am start -n com.your.application.package/com.airbnb.mvrx.launcher.MavericksLauncherActivity
 }
 
 # Test fragments and mocks that match the given pattern.
 # ie: mavericks_test my_fragment
 function mavericks_test() {
-  adb shell am start -n com.airbnb.sample/com.airbnb.mvrx.launcher.MvRxLauncherActivity --es viewNamePatternToTest $1
+  adb shell am start -n com.airbnb.sample/com.airbnb.mvrx.launcher.MavericksLauncherActivity --es viewNamePatternToTest $1
 }
 
 # Test all mocks in the app
 function mavericks_test_all() {
-  adb shell am start -n com.airbnb.sample/com.airbnb.mvrx.launcher.MvRxLauncherActivity --es viewNamePatternToTest ""
+  adb shell am start -n com.airbnb.sample/com.airbnb.mvrx.launcher.MavericksLauncherActivity --es viewNamePatternToTest ""
 }
 
 # Open the first fragment that matches the pattern
 # ie: mavericks_open MyFragment
 function mavericks_open() {
-  adb shell am start -n com.airbnb.sample/com.airbnb.mvrx.launcher.MvRxLauncherActivity --es viewNameToOpen $1
+  adb shell am start -n com.airbnb.sample/com.airbnb.mvrx.launcher.MavericksLauncherActivity --es viewNameToOpen $1
 }
 ```
 

@@ -238,7 +238,7 @@ fun <V : Any> args() = object : ReadOnlyProperty<Fragment, V> {
                 ?: throw IllegalArgumentException("There are no fragment arguments!")
             val argUntyped = args.get(Mavericks.KEY_ARG)
             argUntyped
-                ?: throw IllegalArgumentException("MvRx arguments not found at key _root_ide_package_.com.airbnb.mvrx.Mavericks.KEY_ARG!")
+                ?: throw IllegalArgumentException("Mavericks arguments not found at key _root_ide_package_.com.airbnb.mvrx.Mavericks.KEY_ARG!")
             @Suppress("UNCHECKED_CAST")
             value = argUntyped as V
         }
