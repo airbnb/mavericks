@@ -25,7 +25,7 @@ android {
 
 dependencies {
     implementation project(":mvrx-hilt")
-    implementation project(":view-binding-utils")
+    implementation project(":utils-view-binding")
     kapt libs.hiltCompiler
     implementation libs.hilt
     implementation libs.appcompat

@@ -14,7 +14,7 @@ include ':mvrx-launcher'
 include ':mvrx-testing'
 
 // Utils
-include ':view-binding-utils'
+include ':utils-view-binding'
 
 // Samples
 include ':counter'

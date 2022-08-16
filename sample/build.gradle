@@ -34,7 +34,7 @@ dependencies {
     implementation project(':mvrx-mocking')
     // In real apps this should be debugImplementation so that the launcher isn't included in production!
     implementation project(':mvrx-launcher')
-    implementation project(':view-binding-utils')
+    implementation project(':utils-view-binding')
 
     implementation libs.appcompat
     implementation libs.constraintlayout

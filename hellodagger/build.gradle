@@ -38,7 +38,7 @@ dependencies {
     implementation project(":mvrx")
     implementation project(":mvrx-mocking")
     implementation project(":mvrx-launcher")
-    implementation project(":view-binding-utils")
+    implementation project(":utils-view-binding")
 
     kapt libs.daggerCompiler
 
