@@ -1,6 +1,6 @@
 package com.airbnb.mvrx.hilt
 
-import com.airbnb.mvrx.test.MvRxTestRule
+import com.airbnb.mvrx.test.MavericksTestRule
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.flow.first
@@ -21,7 +21,7 @@ import javax.inject.Inject
 class ViewModelTest {
 
     @get:Rule
-    val mvrxTestRule = MvRxTestRule()
+    val mvrxTestRule = MavericksTestRule()
 
     @get:Rule
     var hiltRule = HiltAndroidRule(this)

@@ -7,20 +7,15 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import org.junit.rules.ExternalResource
 
 /**
- * To use this in your test class, add:
+ * To use this in your junit 4 test class, add:
  * ```
  * @get:Rule
- * val mvrxRule = MvRxTestRule()
+ * val mavericksRule = MavericksTestRule()
  * ```
+ *
+ * @see MavericksTestExtension
  */
-@Deprecated(
-    "Use MavericksTestRule instead.",
-    replaceWith = ReplaceWith(
-        "MavericksTestRule(setForceDisableLifecycleAwareObserver, viewModelMockBehavior, debugMode, testDispatcher)",
-        imports = ["com.airbnb.mvrx.test.MavericksTestRule"]
-    ),
-)
-class MvRxTestRule(
+class MavericksTestRule(
     /**
      * If true, any subscriptions made to a MvRx view model will NOT be made lifecycle aware.
      * This can make it easier to test subscriptions because you won't have to move the test targets to a

@@ -4,23 +4,18 @@ import com.airbnb.mvrx.mocking.MockBehavior
 import com.airbnb.mvrx.mocking.MockableMavericks
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import org.junit.rules.ExternalResource
+import org.junit.jupiter.api.extension.AfterEachCallback
+import org.junit.jupiter.api.extension.BeforeEachCallback
+import org.junit.jupiter.api.extension.ExtensionContext
 
 /**
  * To use this in your test class, add:
  * ```
- * @get:Rule
- * val mvrxRule = MvRxTestRule()
+ * @RegisterExtension
+ * val mvrxExtension = MvRxTestExtension()
  * ```
  */
-@Deprecated(
-    "Use MavericksTestRule instead.",
-    replaceWith = ReplaceWith(
-        "MavericksTestRule(setForceDisableLifecycleAwareObserver, viewModelMockBehavior, debugMode, testDispatcher)",
-        imports = ["com.airbnb.mvrx.test.MavericksTestRule"]
-    ),
-)
-class MvRxTestRule(
+class MavericksTestExtension(
     /**
      * If true, any subscriptions made to a MvRx view model will NOT be made lifecycle aware.
      * This can make it easier to test subscriptions because you won't have to move the test targets to a
@@ -50,8 +45,9 @@ class MvRxTestRule(
     /**
      * A custom coroutine dispatcher that will be set as Dispatchers.Main for testing purposes.
      */
-    testDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
-) : ExternalResource() {
+    @Suppress("EXPERIMENTAL_API_USAGE")
+    private val testDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
+) : BeforeEachCallback, AfterEachCallback {
 
     private val testLifecycleCallbacks: MavericksTestLifecycleCallbacks = MavericksTestLifecycleCallbacksImpl(
         setForceDisableLifecycleAwareObserver = setForceDisableLifecycleAwareObserver,
@@ -60,11 +56,11 @@ class MvRxTestRule(
         testDispatcher = testDispatcher,
     )
 
-    override fun before() {
+    override fun beforeEach(context: ExtensionContext?) {
         testLifecycleCallbacks.before()
     }
 
-    override fun after() {
+    override fun afterEach(context: ExtensionContext?) {
         testLifecycleCallbacks.after()
     }
 }

@@ -1,13 +1,13 @@
 package com.airbnb.android.mvrx.test
 
 import com.airbnb.mvrx.Mavericks
-import com.airbnb.mvrx.test.MvRxTestRule
+import com.airbnb.mvrx.test.MavericksTestRule
 import org.junit.Rule
 import org.junit.Test
 
 class MvRxTestRuleMockBehaviorTest {
     @get:Rule
-    val mvrxTestRule = MvRxTestRule()
+    val mvrxTestRule = MavericksTestRule()
 
     @Test
     fun mockingDisabledFromNullBehavior() {
@@ -18,7 +18,7 @@ class MvRxTestRuleMockBehaviorTest {
 class MvRxTestRuleNoMockBehaviorTest {
 
     @get:Rule
-    val mvrxTestRule = MvRxTestRule(viewModelMockBehavior = null)
+    val mvrxTestRule = MavericksTestRule(viewModelMockBehavior = null)
 
     @Test
     fun mockingDisabledFromNullBehavior() {

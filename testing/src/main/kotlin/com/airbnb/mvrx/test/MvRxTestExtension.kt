@@ -9,12 +9,21 @@ import org.junit.jupiter.api.extension.BeforeEachCallback
 import org.junit.jupiter.api.extension.ExtensionContext
 
 /**
- * To use this in your test class, add:
+ * To use this in your junit 5 test class, add:
  * ```
  * @RegisterExtension
- * val mvrxExtension = MvRxTestExtension()
+ * val mavericksExtension = MavericksTestExtension()
  * ```
+ *
+ * @see MavericksTestRule
  */
+@Deprecated(
+    "Use MavericksTestExtension instead.",
+    replaceWith = ReplaceWith(
+        "MavericksTestExtension(setForceDisableLifecycleAwareObserver, viewModelMockBehavior, debugMode, testDispatcher)",
+        imports = ["com.airbnb.mvrx.test.MavericksTestExtension"]
+    ),
+)
 class MvRxTestExtension(
     /**
      * If true, any subscriptions made to a MvRx view model will NOT be made lifecycle aware.
@@ -49,7 +58,7 @@ class MvRxTestExtension(
     private val testDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 ) : BeforeEachCallback, AfterEachCallback {
 
-    private val testLifecycleCallbacks: MvRxTestLifecycleCallbacks = MvRxTestLifecycleCallbacksImpl(
+    private val testLifecycleCallbacks: MavericksTestLifecycleCallbacks = MavericksTestLifecycleCallbacksImpl(
         setForceDisableLifecycleAwareObserver = setForceDisableLifecycleAwareObserver,
         viewModelMockBehavior = viewModelMockBehavior,
         debugMode = debugMode,

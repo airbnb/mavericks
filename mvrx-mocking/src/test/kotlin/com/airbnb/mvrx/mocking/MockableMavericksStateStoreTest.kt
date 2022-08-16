@@ -4,7 +4,7 @@ import com.airbnb.mvrx.MavericksBlockExecutions
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.mocking.MockBehavior.InitialStateMocking
 import com.airbnb.mvrx.mocking.MockBehavior.StateStoreBehavior
-import com.airbnb.mvrx.test.MvRxTestRule
+import com.airbnb.mvrx.test.MavericksTestRule
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.firstOrNull
@@ -20,7 +20,7 @@ class MockableMavericksStateStoreTest : BaseTest() {
     companion object {
         @JvmField
         @ClassRule
-        val mvrxTestRule = MvRxTestRule()
+        val mvrxTestRule = MavericksTestRule()
     }
 
     @Test

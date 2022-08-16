@@ -1,13 +1,18 @@
 package com.airbnb.android.mvrx.test
 
-import com.airbnb.mvrx.test.MvRxTestRule
+import com.airbnb.mvrx.mocking.MockBehavior
+import com.airbnb.mvrx.test.MavericksTestRule
 import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 
 class MvRxTestRuleTestLifecycleAwareObserverDisabled {
     @get:Rule
-    val mvrxTestRule = MvRxTestRule(setForceDisableLifecycleAwareObserver = true)
+    val mvrxTestRule = MavericksTestRule(
+        setForceDisableLifecycleAwareObserver = true, viewModelMockBehavior = MockBehavior(
+            stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
+        )
+    )
 
     @Test
     fun testLifeCycleAwareObserverDisabled() {

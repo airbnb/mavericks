@@ -12,7 +12,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
 
-internal interface MvRxTestLifecycleCallbacks {
+internal interface MavericksTestLifecycleCallbacks {
     fun before()
     fun after()
 }
@@ -21,7 +21,7 @@ internal interface MvRxTestLifecycleCallbacks {
  * Utility class that wraps common test code for both
  * the JUnit 4 Rule & JUnit 5 Extension.
  */
-internal class MvRxTestLifecycleCallbacksImpl(
+internal class MavericksTestLifecycleCallbacksImpl(
     private val setForceDisableLifecycleAwareObserver: Boolean = true,
     private val viewModelMockBehavior: MockBehavior? = MockBehavior(
         stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
@@ -29,7 +29,7 @@ internal class MvRxTestLifecycleCallbacksImpl(
     private val debugMode: Boolean = false,
     @Suppress("EXPERIMENTAL_API_USAGE")
     private val testDispatcher: CoroutineDispatcher = StandardTestDispatcher()
-) : MvRxTestLifecycleCallbacks {
+) : MavericksTestLifecycleCallbacks {
 
     override fun before() {
         Dispatchers.setMain(testDispatcher)
