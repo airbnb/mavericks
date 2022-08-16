@@ -13,8 +13,9 @@ abstract class BaseTest {
 
     @get:Rule
     val mvrxRule = MavericksTestRule(
-        setForceDisableLifecycleAwareObserver = false, viewModelMockBehavior = MockBehavior(
+        setForceDisableLifecycleAwareObserver = false,
+        viewModelMockBehavior = MockBehavior(
             stateStoreBehavior = MockBehavior.StateStoreBehavior.Synchronous
-        )
+        ),
     )
 }
