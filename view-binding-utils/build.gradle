@@ -13,6 +13,6 @@ dependencies {
     implementation libs.fragmentKtx
 
 
-    testImplementation project(":testing")
+    testImplementation project(":mvrx-testing")
     testImplementation libs.junit
 }

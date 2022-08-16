@@ -38,7 +38,7 @@ dependencies {
     implementation libs.lifecycleCommon
     implementation libs.runtimeKtx
 
-    testImplementation project(':testing')
+    testImplementation project(':mvrx-testing')
     testImplementation libs.junit
     testImplementation libs.appcompat
     testImplementation libs.kotlinCoroutinesTest

@@ -40,7 +40,7 @@ dependencies {
     api libs.navigationUiKtx
     api libs.navigationFragmentKtx
 
-    testImplementation project(":testing")
+    testImplementation project(":mvrx-testing")
     testImplementation libs.junit
     testImplementation libs.mockito
     testImplementation libs.roboeletric

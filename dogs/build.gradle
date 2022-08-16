@@ -30,6 +30,6 @@ dependencies {
     implementation libs.navigationUiKtx
     implementation libs.picasso
 
-    testImplementation project(":testing")
+    testImplementation project(":mvrx-testing")
     testImplementation libs.junit
 }

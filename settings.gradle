@@ -10,8 +10,8 @@ include ':mvrx-mocking'
 include ':mvrx-navigation'
 include ':mvrx-hilt'
 include ':mvrx-rxjava2'
-include ':launcher'
-include ':testing'
+include ':mvrx-launcher'
+include ':mvrx-testing'
 
 // Utils
 include ':view-binding-utils'

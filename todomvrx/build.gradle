@@ -43,5 +43,5 @@ dependencies {
 
     testImplementation libs.junit
     testImplementation libs.mockitoKotlin
-    testImplementation project(":testing")
+    testImplementation project(":mvrx-testing")
 }

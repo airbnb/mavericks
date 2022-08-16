@@ -25,7 +25,7 @@ dependencies {
     implementation libs.coreKtx
     implementation libs.lifecycleCommon
 
-    testImplementation project(":testing")
+    testImplementation project(":mvrx-testing")
     testImplementation libs.junit
     testImplementation libs.junit5
 }
