@@ -4,7 +4,7 @@ import androidx.fragment.app.testing.launchFragmentInContainer
 import androidx.navigation.Navigation
 import com.airbnb.mvrx.Mavericks
 import com.airbnb.mvrx.navigation.test.R
-import com.airbnb.mvrx.test.MvRxTestRule
+import com.airbnb.mvrx.test.MavericksTestRule
 import com.airbnb.mvrx.withState
 import org.junit.Before
 import org.junit.Rule
@@ -21,7 +21,7 @@ import org.robolectric.annotation.LooperMode
 class MavericksExtensionsTest {
 
     @get:Rule
-    val mvrxRule = MvRxTestRule()
+    val mvrxRule = MavericksTestRule()
     private val factory = DefaultNavigationViewModelDelegateFactory()
 
     @Before

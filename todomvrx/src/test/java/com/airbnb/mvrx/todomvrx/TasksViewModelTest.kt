@@ -2,7 +2,7 @@ package com.airbnb.mvrx.todomvrx
 
 import com.airbnb.mvrx.Fail
 import com.airbnb.mvrx.Success
-import com.airbnb.mvrx.test.MvRxTestRule
+import com.airbnb.mvrx.test.MavericksTestRule
 import com.airbnb.mvrx.todomvrx.data.Task
 import com.airbnb.mvrx.todomvrx.data.source.TasksDataSource
 import com.airbnb.mvrx.withState
@@ -277,6 +277,6 @@ class TasksViewModelTest {
 
         @JvmField
         @ClassRule
-        val mvrxTestRule = MvRxTestRule()
+        val mvrxTestRule = MavericksTestRule()
     }
 }

@@ -42,7 +42,7 @@ class DadJokeIndexViewModel(
     }
 
     /**
-     * If you implement MvRxViewModelFactory in your companion object, MvRx will use that to create
+     * If you implement MavericksViewModelFactory in your companion object, MvRx will use that to create
      * your ViewModel. You can use this to achieve constructor dependency injection with Mavericks.
      *
      * @see MavericksViewModelFactory

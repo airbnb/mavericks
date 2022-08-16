@@ -71,7 +71,7 @@ internal fun <T : Any?> Flow<T>.assertOneActiveSubscription(
 
 private fun duplicateSubscriptionMessage(subscriptionId: String) = """
         Subscribing with a duplicate subscription id: $subscriptionId.
-        If you have multiple uniqueOnly subscriptions in a MvRx view that listen to the same properties
-        you must use a custom subscription id. If you are using a custom MvRxView, make sure you are using the proper
+        If you have multiple uniqueOnly subscriptions in a Mavericks view that listen to the same properties
+        you must use a custom subscription id. If you are using a custom MavericksView, make sure you are using the proper
         lifecycle owner. See BaseMvRxFragment for an example.
 """.trimIndent()

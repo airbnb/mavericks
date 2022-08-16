@@ -9,8 +9,8 @@ import java.lang.reflect.Constructor
 import java.lang.reflect.Method
 
 /**
- * Annotate a field in your MvRxViewModel state with [PersistState] to have it automatically persisted when Android kills your process
- * to free up memory. MvRx will automatically recreate your ViewModel when the process restarts with these fields saved.
+ * Annotate a field in your [MavericksViewModel] state with [PersistState] to have it automatically persisted when Android kills your process
+ * to free up memory. Mavericks will automatically recreate your ViewModel when the process restarts with these fields saved.
  *
  * You should ONLY SAVE what you need to refetch data, not fetched data itself. For example, for search, save the search filters not the
  * search results.
@@ -37,8 +37,8 @@ fun <T : MavericksState> persistMavericksState(state: T, validation: Boolean = f
     constructor.parameterAnnotations.forEachIndexed { i, p ->
         if (p.none { it is PersistState }) return@forEachIndexed
         // For each parameter in the constructor, there is a componentN function because state is a data class.
-        // We can rely on this to be true because the MvRxMutabilityHelpers asserts that the state class is a data class.
-        // See MvRxMutabilityHelper Class<*>.isData
+        // We can rely on this to be true because the MavericksMutabilityHelpers asserts that the state class is a data class.
+        // See MavericksMutabilityHelper Class<*>.isData
 
         val getter = jvmClass.getComponentNFunction(i)
 

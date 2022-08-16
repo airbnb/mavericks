@@ -12,8 +12,8 @@ import java.io.Serializable
  * data argument.
  *
  * @param actionId - the navigation graph action ID.
- * @param parcelable -  A [Parcelable] MvRx argument that is passed as the [Mavericks.KEY_ARG] fragment argument
- * @param serializable -  A [Serializable] MvRx argument that is passed as the [Mavericks.KEY_ARG] fragment argument
+ * @param parcelable -  A [Parcelable] Mavericks argument that is passed as the [Mavericks.KEY_ARG] fragment argument
+ * @param serializable -  A [Serializable] Mavericks argument that is passed as the [Mavericks.KEY_ARG] fragment argument
  * @param title - an optional title that the destination can extract in the graph definition
  *
  * Graph usage example.

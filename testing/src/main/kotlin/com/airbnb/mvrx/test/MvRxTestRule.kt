@@ -13,6 +13,13 @@ import org.junit.rules.ExternalResource
  * val mvrxRule = MvRxTestRule()
  * ```
  */
+@Deprecated(
+    "Use MavericksTestRule instead.",
+    replaceWith = ReplaceWith(
+        "MavericksTestRule(setForceDisableLifecycleAwareObserver, viewModelMockBehavior, debugMode, testDispatcher)",
+        imports = ["com.airbnb.mvrx.test.MavericksTestRule"]
+    ),
+)
 class MvRxTestRule(
     /**
      * If true, any subscriptions made to a MvRx view model will NOT be made lifecycle aware.
@@ -46,7 +53,7 @@ class MvRxTestRule(
     testDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
 ) : ExternalResource() {
 
-    private val testLifecycleCallbacks: MvRxTestLifecycleCallbacks = MvRxTestLifecycleCallbacksImpl(
+    private val testLifecycleCallbacks: MavericksTestLifecycleCallbacks = MavericksTestLifecycleCallbacksImpl(
         setForceDisableLifecycleAwareObserver = setForceDisableLifecycleAwareObserver,
         viewModelMockBehavior = viewModelMockBehavior,
         debugMode = debugMode,

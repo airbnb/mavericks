@@ -14,7 +14,7 @@ import java.io.Serializable
 @InternalMavericksApi
 object MavericksViewModelProvider {
     /**
-     * MvRx specific ViewModelProvider used for creating a BaseMavericksViewModel scoped to either a [Fragment] or [ComponentActivity].
+     * Mavericks specific ViewModelProvider used for creating a BaseMavericksViewModel scoped to either a [Fragment] or [ComponentActivity].
      * If this is in a [Fragment], it cannot be called before the Fragment has been added to an Activity or wrapped in a [Lazy] call.
      *
      * @param viewModelClass The class of the ViewModel you would like an instance of.

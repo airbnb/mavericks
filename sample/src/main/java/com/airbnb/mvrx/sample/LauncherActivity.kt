@@ -17,10 +17,10 @@ import com.airbnb.mvrx.launcher.MavericksLauncherMockActivity.Companion.showNext
 
 /**
  * This class provides a custom implementation for handling launched mocks, by overriding
- * the default behavior in MvRxLauncherMockActivity.
+ * the default behavior in MavericksLauncherMockActivity.
  *
  * The Application class was overridden to set this behavior change:
- * `MvRxLauncherMockActivity.activityToShowMock = LauncherActivity::class`
+ * `MavericksLauncherMockActivity.activityToShowMock = LauncherActivity::class`
  *
  * This is needed so we can support the navigation architecture that is used.
  *

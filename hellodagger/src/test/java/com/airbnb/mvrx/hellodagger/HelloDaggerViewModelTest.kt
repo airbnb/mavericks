@@ -1,7 +1,7 @@
 package com.airbnb.mvrx.hellodagger
 
 import com.airbnb.mvrx.Success
-import com.airbnb.mvrx.test.MvRxTestRule
+import com.airbnb.mvrx.test.MavericksTestRule
 import com.airbnb.mvrx.withState
 import io.mockk.every
 import io.mockk.mockk
@@ -13,7 +13,7 @@ import org.junit.Test
 internal class HelloDaggerViewModelTest {
 
     @get:Rule
-    val mvrxRule = MvRxTestRule()
+    val mvrxRule = MavericksTestRule()
 
     @Test
     fun `fetches message when created`() {

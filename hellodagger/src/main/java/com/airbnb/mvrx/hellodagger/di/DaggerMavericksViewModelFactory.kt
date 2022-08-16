@@ -44,7 +44,7 @@ inline fun <reified VM : MavericksViewModel<S>, S : MavericksState> daggerMaveri
  *     ...
  *   }
  *
- *   companion object : DaggerMvRxViewModelFactory<MyViewModel, MyState>(MyViewModel::class.java)
+ *   companion object : DaggerMavericksViewModelFactory<MyViewModel, MyState>(MyViewModel::class.java)
  *
  * }
  */

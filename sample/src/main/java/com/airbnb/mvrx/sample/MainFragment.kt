@@ -18,14 +18,14 @@ class MainFragment : Fragment(R.layout.main_fragment) {
         binding.recyclerView.withModels {
             marquee {
                 id("marquee")
-                title("Welcome to MvRx")
+                title("Welcome to Mavericks")
                 subtitle("Select a demo below")
             }
 
             basicRow {
                 id("hello_world")
                 title("Hello World")
-                subtitle(demonstrates("Simple MvRx usage"))
+                subtitle(demonstrates("Simple Mavericks usage"))
                 clickListener { _ -> findNavController().navigate(R.id.action_main_to_helloWorldFragment) }
             }
 
@@ -46,7 +46,7 @@ class MainFragment : Fragment(R.layout.main_fragment) {
             basicRow {
                 id("launcher")
                 title("Launcher")
-                subtitle(demonstrates("MvRx Launcher"))
+                subtitle(demonstrates("Mavericks Launcher"))
                 clickListener { _ ->
                     startActivity(Intent(requireActivity(), MavericksLauncherActivity::class.java))
                 }

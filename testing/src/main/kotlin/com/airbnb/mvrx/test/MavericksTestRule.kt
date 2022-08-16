@@ -4,27 +4,18 @@ import com.airbnb.mvrx.mocking.MockBehavior
 import com.airbnb.mvrx.mocking.MockableMavericks
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import org.junit.jupiter.api.extension.AfterEachCallback
-import org.junit.jupiter.api.extension.BeforeEachCallback
-import org.junit.jupiter.api.extension.ExtensionContext
+import org.junit.rules.ExternalResource
 
 /**
- * To use this in your junit 5 test class, add:
+ * To use this in your junit 4 test class, add:
  * ```
- * @RegisterExtension
- * val mvrxExtension = MvRxTestExtension()
+ * @get:Rule
+ * val mavericksRule = MavericksTestRule()
  * ```
  *
- * @see MavericksTestRule
+ * @see MavericksTestExtension
  */
-@Deprecated(
-    "Use MavericksTestExtension instead.",
-    replaceWith = ReplaceWith(
-        "MavericksTestExtension(setForceDisableLifecycleAwareObserver, viewModelMockBehavior, debugMode, testDispatcher)",
-        imports = ["com.airbnb.mvrx.test.MavericksTestExtension"]
-    ),
-)
-class MvRxTestExtension(
+class MavericksTestRule(
     /**
      * If true, any subscriptions made to a Mavericks view model will NOT be made lifecycle aware.
      * This can make it easier to test subscriptions because you won't have to move the test targets to a
@@ -54,9 +45,8 @@ class MvRxTestExtension(
     /**
      * A custom coroutine dispatcher that will be set as Dispatchers.Main for testing purposes.
      */
-    @Suppress("EXPERIMENTAL_API_USAGE")
-    private val testDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
-) : BeforeEachCallback, AfterEachCallback {
+    testDispatcher: CoroutineDispatcher = UnconfinedTestDispatcher()
+) : ExternalResource() {
 
     private val testLifecycleCallbacks: MavericksTestLifecycleCallbacks = MavericksTestLifecycleCallbacksImpl(
         setForceDisableLifecycleAwareObserver = setForceDisableLifecycleAwareObserver,
@@ -65,11 +55,11 @@ class MvRxTestExtension(
         testDispatcher = testDispatcher,
     )
 
-    override fun beforeEach(context: ExtensionContext?) {
+    override fun before() {
         testLifecycleCallbacks.before()
     }
 
-    override fun afterEach(context: ExtensionContext?) {
+    override fun after() {
         testLifecycleCallbacks.after()
     }
 }
