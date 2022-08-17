@@ -18,7 +18,7 @@ android {
 
 dependencies {
     implementation project(":mvrx-rxjava2")
-    implementation project(":view-binding-utils")
+    implementation project(":utils-view-binding")
     implementation libs.appcompat
     implementation libs.cardview
     implementation libs.constraintlayout
@@ -30,6 +30,6 @@ dependencies {
     implementation libs.navigationUiKtx
     implementation libs.picasso
 
-    testImplementation project(":testing")
+    testImplementation project(":mvrx-testing")
     testImplementation libs.junit
 }

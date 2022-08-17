@@ -50,13 +50,13 @@ android {
 
 dependencies {
     implementation project(":mvrx-compose")
-    implementation project(":testing")
+    implementation project(":mvrx-testing")
     implementation libs.appcompat
     implementation libs.activityCompose
     implementation libs.composeMaterial
     implementation libs.navigationCompose
 
-    androidTestImplementation project(':testing')
+    androidTestImplementation project(':mvrx-testing')
     androidTestImplementation libs.junit
     androidTestImplementation libs.appcompat
     androidTestImplementation libs.composeTest

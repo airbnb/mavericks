@@ -62,7 +62,7 @@ dependencies {
     implementation libs.viewModelCompose
     debugImplementation libs.composeUiTestManifest
 
-    testImplementation project(':testing')
+    testImplementation project(':mvrx-testing')
     testImplementation libs.junit
     testImplementation libs.activityCompose
     testImplementation libs.composeTest

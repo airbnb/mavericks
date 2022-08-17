@@ -41,7 +41,7 @@ dependencies {
     implementation libs.kotlinReflect
     implementation libs.appcompat
 
-    testImplementation project(':testing')
+    testImplementation project(':mvrx-testing')
     testImplementation libs.mockito
     testImplementation libs.junit
     testImplementation libs.roboeletric

@@ -40,7 +40,7 @@ dependencies {
     implementation libs.lifecycleCommon
     implementation libs.kotlinCoroutines
 
-    testImplementation project(':testing')
+    testImplementation project(':mvrx-testing')
     kaptTest libs.hiltCompiler
     testImplementation libs.hiltTesting
     testImplementation libs.junit

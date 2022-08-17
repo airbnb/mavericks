@@ -23,7 +23,7 @@ android {
 dependencies {
     implementation project(":mvrx-rxjava2")
     implementation project(':mvrx-mocking')
-    implementation project(':view-binding-utils')
+    implementation project(':utils-view-binding')
     kapt libs.epoxyProcessor
     kapt libs.roomCompiler
 
@@ -43,5 +43,5 @@ dependencies {
 
     testImplementation libs.junit
     testImplementation libs.mockitoKotlin
-    testImplementation project(":testing")
+    testImplementation project(":mvrx-testing")
 }

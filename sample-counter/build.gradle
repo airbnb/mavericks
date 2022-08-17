@@ -19,13 +19,13 @@ tasks.withType(Test) {
 
 dependencies {
     implementation project(":mvrx")
-    implementation project(":view-binding-utils")
+    implementation project(":utils-view-binding")
     implementation libs.appcompat
     implementation libs.constraintlayout
     implementation libs.coreKtx
     implementation libs.lifecycleCommon
 
-    testImplementation project(":testing")
+    testImplementation project(":mvrx-testing")
     testImplementation libs.junit
     testImplementation libs.junit5
 }

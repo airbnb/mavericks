@@ -37,8 +37,8 @@ android {
 dependencies {
     implementation project(":mvrx")
     implementation project(":mvrx-mocking")
-    implementation project(":launcher")
-    implementation project(":view-binding-utils")
+    implementation project(":mvrx-launcher")
+    implementation project(":utils-view-binding")
 
     kapt libs.daggerCompiler
 
@@ -57,7 +57,7 @@ dependencies {
     androidTestImplementation libs.espresso
     androidTestImplementation libs.junit
 
-    testImplementation project(":testing")
+    testImplementation project(":mvrx-testing")
     testImplementation libs.junit
     testImplementation libs.mockk
 }
