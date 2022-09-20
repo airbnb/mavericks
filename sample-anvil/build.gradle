@@ -1,0 +1,57 @@
+apply plugin: "com.android.application"
+apply plugin: "com.squareup.anvil"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-kapt"
+
+android {
+
+    defaultConfig {
+        applicationId "com.airbnb.mvrx.helloDagger"
+        versionCode 1
+        versionName "0.0.1"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.debug
+        }
+    }
+
+    signingConfigs {
+        debug {
+            storeFile file("debug.keystore")
+            storePassword "testing"
+            keyAlias "helloDagger"
+            keyPassword "testing"
+        }
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+dependencies {
+    implementation project(":mvrx")
+    implementation project(":mvrx-mocking")
+    implementation project(":mvrx-launcher")
+    implementation project(":utils-view-binding")
+    implementation project(":sample-anvilannotations")
+
+    anvil project(':sample-anvilcodegen')
+
+    kapt libs.daggerCompiler
+
+    implementation libs.appcompat
+    implementation libs.constraintlayout
+    implementation libs.coreKtx
+    implementation libs.dagger
+    implementation libs.fragmentKtx
+    implementation libs.rxJava
+    implementation libs.viewModelKtx
+    implementation libs.multidex
+}
