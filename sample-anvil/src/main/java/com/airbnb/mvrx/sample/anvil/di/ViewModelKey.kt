@@ -1,4 +1,4 @@
-package com.airbnb.mvrx.hellodagger.di
+package com.airbnb.mvrx.sample.anvil.di
 
 import com.airbnb.mvrx.MavericksViewModel
 import dagger.MapKey

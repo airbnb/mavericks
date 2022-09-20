@@ -1,4 +1,4 @@
-package com.gpeal.droidconanvilsample.lib.daggerscopes
+package com.airbnb.mvrx.sample.anvil.annotation
 
 import kotlin.reflect.KClass
 

@@ -1,7 +1,6 @@
-package com.airbnb.mvrx.hellodagger
+package com.airbnb.mvrx.sample.anvil
 
 import android.os.Bundle
-import android.os.Parcelable
 import android.view.View
 import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.Async
@@ -12,16 +11,14 @@ import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.Uninitialized
+import com.airbnb.mvrx.anvil.AppScope
 import com.airbnb.mvrx.fragmentViewModel
-import com.airbnb.mvrx.hellodagger.databinding.HelloFragmentBinding
-import com.airbnb.mvrx.hellodagger.di.daggerMavericksViewModelFactory
-import com.airbnb.mvrx.mocking.MavericksViewMocks
+import com.airbnb.mvrx.sample.anvil.di.daggerMavericksViewModelFactory
 import com.airbnb.mvrx.mocking.MockableMavericksView
-import com.airbnb.mvrx.mocking.mockSingleViewModel
 import com.airbnb.mvrx.viewbinding.viewBinding
 import com.airbnb.mvrx.withState
-import com.gpeal.droidconanvilsample.lib.daggerscopes.AppScope
-import com.gpeal.droidconanvilsample.lib.daggerscopes.ContributesViewModel
+import com.airbnb.mvrx.sample.anvil.annotation.ContributesViewModel
+import com.airbnb.mvrx.sample.anvil.databinding.HelloFragmentBinding
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 

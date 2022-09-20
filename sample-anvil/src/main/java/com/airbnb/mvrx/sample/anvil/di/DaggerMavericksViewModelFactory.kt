@@ -1,10 +1,11 @@
-package com.airbnb.mvrx.hellodagger.di
+package com.airbnb.mvrx.sample.anvil.di
 
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.ViewModelContext
-import com.airbnb.mvrx.hellodagger.appComponent
+import com.airbnb.mvrx.anvil.AppScopeBindings
+import com.airbnb.mvrx.sample.anvil.appComponent
 
 /**
  * To connect Mavericks ViewModel creation with Hilt's dependency injection, add the following Factory and companion object to your MavericksViewModel.
@@ -53,7 +54,7 @@ class DaggerMavericksViewModelFactory<VM : MavericksViewModel<S>, S : MavericksS
 ) : MavericksViewModelFactory<VM, S> {
 
     override fun create(viewModelContext: ViewModelContext, state: S): VM {
-        val viewModelFactoryMap = viewModelContext.activity.appComponent().viewModelFactories()
+        val viewModelFactoryMap = (viewModelContext.activity.appComponent() as AppScopeBindings).viewModelFactories()
         val viewModelFactory = viewModelFactoryMap[viewModelClass]
 
         @Suppress("UNCHECKED_CAST")

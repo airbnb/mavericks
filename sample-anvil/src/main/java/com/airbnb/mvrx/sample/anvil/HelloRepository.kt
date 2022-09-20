@@ -1,7 +1,7 @@
-package com.airbnb.mvrx.hellodagger
+package com.airbnb.mvrx.sample.anvil
 
-import com.airbnb.mvrx.hellodagger.di.SingleIn
-import com.gpeal.droidconanvilsample.lib.daggerscopes.AppScope
+import com.airbnb.mvrx.anvil.AppScope
+import com.airbnb.mvrx.sample.anvil.di.SingleIn
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.flow
 import javax.inject.Inject

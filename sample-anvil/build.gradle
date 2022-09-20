@@ -6,7 +6,7 @@ apply plugin: "kotlin-kapt"
 android {
 
     defaultConfig {
-        applicationId "com.airbnb.mvrx.helloDagger"
+        applicationId "com.airbnb.mvrx.sample.anvil"
         versionCode 1
         versionName "0.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

@@ -1,7 +1,7 @@
-package com.gpeal.droidconanvilsample.anvilcompilers
+package com.airbnb.mvrx.sample.anvil.codegen
 
+import com.airbnb.mvrx.sample.anvil.annotation.ContributesViewModel
 import com.google.auto.service.AutoService
-import com.gpeal.droidconanvilsample.lib.daggerscopes.ContributesViewModel
 import com.squareup.anvil.annotations.ContributesTo
 import com.squareup.anvil.compiler.api.AnvilCompilationException
 import com.squareup.anvil.compiler.api.AnvilContext
@@ -62,7 +62,7 @@ class ContributesViewModelCodeGenerator : CodeGenerator {
                             .returns(tonalViewModelFactoryFqName.asClassName(module).parameterizedBy(STAR, STAR))
                             .addAnnotation(Binds::class)
                             .addAnnotation(IntoMap::class)
-                            .addAnnotation(AnnotationSpec.builder(viewModelKeyFqName.asClassName(module)).addMember("%T::class", vmClass.asClassName()).build())
+                            .addAnnotation(AnnotationSpec.Companion.builder(viewModelKeyFqName.asClassName(module)).addMember("%T::class", vmClass.asClassName()).build())
                             .build(),
                     )
                     .build(),
@@ -109,7 +109,7 @@ class ContributesViewModelCodeGenerator : CodeGenerator {
     }
 
     companion object {
-        private val tonalViewModelFactoryFqName = FqName("com.airbnb.mvrx.hellodagger.di.AssistedViewModelFactory")
-        private val viewModelKeyFqName = FqName("com.airbnb.mvrx.hellodagger.di.ViewModelKey")
+        private val tonalViewModelFactoryFqName = FqName("com.airbnb.mvrx.sample.anvil.di.AssistedViewModelFactory")
+        private val viewModelKeyFqName = FqName("com.airbnb.mvrx.sample.anvil.di.ViewModelKey")
     }
 }

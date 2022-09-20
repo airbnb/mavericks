@@ -1,4 +1,4 @@
-package com.airbnb.mvrx.hellodagger
+package com.airbnb.mvrx.sample.anvil
 
 import androidx.appcompat.app.AppCompatActivity
 
