@@ -1,9 +1,7 @@
 package com.airbnb.mvrx.sample.anvil
 
-import com.airbnb.mvrx.anvil.AppScope
 import com.airbnb.mvrx.sample.anvil.di.SingleIn
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import kotlin.random.Random
 
@@ -11,13 +9,14 @@ class DelayProvider @Inject constructor() {
     operator fun invoke() = Random.nextLong(from = 1000L, until = 2000L)
 }
 
-@SingleIn(AppScope::class)
-class HelloRepository @Inject constructor(
+@SingleIn(UserScope::class)
+class UserScopedRepository @Inject constructor(
     private val delayProvider: DelayProvider,
+    private val user: User,
 ) {
 
-    fun sayHello() = flow {
+    suspend fun helloWorld(): String {
         delay(delayProvider())
-        emit("Hello")
+        return "Hello World, ${user.name}!"
     }
 }
