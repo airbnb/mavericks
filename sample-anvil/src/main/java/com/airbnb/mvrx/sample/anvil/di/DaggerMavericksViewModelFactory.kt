@@ -59,8 +59,8 @@ class DaggerMavericksViewModelFactory<VM : MavericksViewModel<S>, S : MavericksS
  * These Anvil/Dagger bindings are used by [DaggerMavericksViewModelFactory]. The factory will find the nearest [DaggerComponentOwner]
  * that implements these bindings. It will then attempt to retrieve the [AssistedViewModelFactory] for the given ViewModel class.
  *
- * In this example, this bindings class is implemented by [com.airbnb.mvrx.sample.anvil.ExampleFeatureComponent] because
- * it provides the [com.airbnb.mvrx.sample.anvil.ExampleFeatureViewModel]. Any component that will generate ViewModels should
+ * In this example, this bindings class is implemented by [com.airbnb.mvrx.sample.anvil.feature.ExampleFeatureComponent] because
+ * it provides the [com.airbnb.mvrx.sample.anvil.feature.ExampleFeatureViewModel]. Any component that will generate ViewModels should
  * either implement this directly or have this added via `@ContributesTo(YourScope::class)`.
  */
 interface DaggerMavericksBindings {

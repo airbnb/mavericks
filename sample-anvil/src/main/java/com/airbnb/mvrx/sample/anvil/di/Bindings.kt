@@ -9,13 +9,16 @@ import androidx.fragment.app.Fragment
  * * an inject function: `inject(MyFragment frag)`
  * * an explicit getter: `fun myClass(): MyClass`
  *
- * Bindings will walk up the Fragment/Activity hierarchy and check for [DaggerComponentOwner] to see if any of its components provide the
+ * Anvil will make your Dagger component implement these bindings so that you can call any of these functions on an instance of your component.
+ *
+ * [bindings] will walk up the Fragment/Activity hierarchy and check for [DaggerComponentOwner] to see if any of its components implement the
  * specified bindings. Most of the time this will "just work" and you don't have to think about it.
  *
- * To inject [@Inject] properties:
- * 1) Add an inject function to YourModuleBindings
- * 2) Make sure your bindings interface is contributed to AppComponent, UserComponent, etc via `@ContributesTo(AppComponent::class)`.
- * 3) Call context.bindings<YourModuleBindings>().inject(this).
+ * For example, if your class has @Inject properties:
+ * 1) Create an bindings interface such as `YourModuleBindings`
+ * 1) Add an inject function like `fun inject(yourClass: YourClass)`
+ * 2) Contribute your interface to the correct component via `@ContributesTo(AppScope::class)`.
+ * 3) Call bindings<YourModuleBindings>().inject(this).
  */
 inline fun <reified T : Any> Context.bindings() = bindings(T::class.java)
 

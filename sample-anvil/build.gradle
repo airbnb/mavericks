@@ -16,7 +16,6 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             signingConfig signingConfigs.debug
         }
     }
@@ -37,8 +36,6 @@ android {
 
 dependencies {
     implementation project(":mvrx")
-    implementation project(":mvrx-mocking")
-    implementation project(":mvrx-launcher")
     implementation project(":utils-view-binding")
     implementation project(":sample-anvilannotations")
 
@@ -51,7 +48,6 @@ dependencies {
     implementation libs.coreKtx
     implementation libs.dagger
     implementation libs.fragmentKtx
-    implementation libs.rxJava
     implementation libs.viewModelKtx
     implementation libs.multidex
 }

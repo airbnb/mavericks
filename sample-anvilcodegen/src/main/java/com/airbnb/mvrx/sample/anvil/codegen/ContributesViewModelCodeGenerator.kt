@@ -33,6 +33,10 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtFile
 import java.io.File
 
+/**
+ * This is an anvil plugin that allows ViewModels to use [ContributesViewModel] alone and let this plugin automatically
+ * handle the rest of the Dagger wiring required for constructor injection.
+ */
 @AutoService(CodeGenerator::class)
 class ContributesViewModelCodeGenerator : CodeGenerator {
 

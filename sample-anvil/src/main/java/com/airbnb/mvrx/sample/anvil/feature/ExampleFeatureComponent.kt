@@ -1,6 +1,5 @@
 package com.airbnb.mvrx.sample.anvil.feature
 
-import com.airbnb.mvrx.sample.anvil.AppComponent
 import com.airbnb.mvrx.sample.anvil.UserComponent
 import com.airbnb.mvrx.sample.anvil.UserScope
 import com.airbnb.mvrx.sample.anvil.di.DaggerMavericksBindings
@@ -10,8 +9,6 @@ import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.BindsInstance
 import dagger.Subcomponent
 import kotlinx.coroutines.CoroutineScope
-
-interface ExampleFeatureScope
 
 /**
  * This should be used as the scope for any `@SingleIn(ExampleFeatureScope::class)` objects.
@@ -23,6 +20,12 @@ interface ExampleFeatureScope
  */
 class ExampleFeatureCoroutineScope(private val parentScope: CoroutineScope) : CoroutineScope by parentScope
 
+interface ExampleFeatureScope
+
+/**
+ * Any component that provides ViewModels via [com.airbnb.mvrx.sample.anvil.annotation.ContributesViewModel] should
+ * implement [DaggerMavericksBindings].
+ */
 @SingleIn(ExampleFeatureScope::class)
 @MergeSubcomponent(ExampleFeatureScope::class)
 interface ExampleFeatureComponent : DaggerMavericksBindings {

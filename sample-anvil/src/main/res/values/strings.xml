@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Hello Dagger</string>
+    <string name="app_name">Hello Anvil</string>
     <string name="hello_button_text">Say Hello</string>
     <string name="hello_fragment_loading_text">Loading…</string>
     <string name="hello_fragment_failure_text">Loading failed</string>

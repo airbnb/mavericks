@@ -6,9 +6,9 @@ import com.squareup.anvil.annotations.MergeSubcomponent
 import dagger.BindsInstance
 import dagger.Subcomponent
 
-interface UserScope
-
 data class User(val name: String)
+
+interface UserScope
 
 @SingleIn(UserScope::class)
 @MergeSubcomponent(UserScope::class)
