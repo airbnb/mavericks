@@ -20,6 +20,10 @@ interface UserComponent {
         fun build(): UserComponent
     }
 
+    /**
+     * This is a subcomponent of [AppComponent]. This tells [AppComponent] that it needs to be able to
+     * provide the builder for [UserComponent].
+     */
     @ContributesTo(AppScope::class)
     interface ParentBindings {
         fun userComponentBuilder(): Builder

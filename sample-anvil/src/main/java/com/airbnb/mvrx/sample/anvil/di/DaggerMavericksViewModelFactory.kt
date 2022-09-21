@@ -7,55 +7,43 @@ import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.ViewModelContext
 
 /**
- * To connect Mavericks ViewModel creation with Hilt's dependency injection, add the following Factory and companion object to your MavericksViewModel.
+ * To connect Mavericks ViewModel creation with Anvil's dependency injection, add the following to your MavericksViewModel.
  *
  * Example:
  *
- * class MyViewModel @AssistedInject constructor(@Assisted initialState: MyState, ...): MavericksViewModel<MyState>(...) {
+ * @ContributesViewModel(YourScope::class)
+ * class MyViewModel @AssistedInject constructor(
+ *     @Assisted initialState: MyState,
+ *     …,
+ * ): MavericksViewModel<MyState>(...) {
+ *     …
  *
- *   @AssistedFactory
- *   interface Factory : AssistedViewModelFactory<MyViewModel, MyState> {
- *     ...
- *   }
- *
- *   companion object : MavericksViewModelFactory<MyViewModel, MyState> by daggerMavericksViewModelFactory()
+ *     companion object : MavericksViewModelFactory<MyViewModel, MyState> by daggerMavericksViewModelFactory()
  * }
  */
 
 inline fun <reified VM : MavericksViewModel<S>, S : MavericksState> daggerMavericksViewModelFactory() = DaggerMavericksViewModelFactory<VM, S>(VM::class.java)
 
 /**
- * A [MavericksViewModelFactory] which makes it easy to create instances of a ViewModel
+ * A [MavericksViewModelFactory] makes it easy to create instances of a ViewModel
  * using its AssistedInject Factory. This class should be implemented by the companion object
- * of every ViewModel which uses AssistedInject.
+ * of every ViewModel which uses AssistedInject via [daggerMavericksViewModelFactory].
  *
  * @param viewModelClass The [Class] of the ViewModel being requested for creation
  *
- * This class accesses the map of [AssistedViewModelFactory]s from [AppComponent] and uses it to
- * retrieve the requested ViewModel's factory class. It then creates an instance of this ViewModel
+ * This class accesses the map of ViewModel class to [AssistedViewModelFactory]s from the nearest [DaggerComponentOwner] and
+ * uses it to retrieve the requested ViewModel's factory class. It then creates an instance of this ViewModel
  * using the retrieved factory and returns it.
- *
- * Example:
- *
- * class MyViewModel @AssistedInject constructor(...): BaseViewModel<MyState>(...) {
- *
- *   @AssistedFactory
- *   interface Factory : AssistedViewModelFactory<MyViewModel, MyState> {
- *     ...
- *   }
- *
- *   companion object : DaggerMavericksViewModelFactory<MyViewModel, MyState>(MyViewModel::class.java)
- *
- * }
+ * @see daggerMavericksViewModelFactory
  */
 class DaggerMavericksViewModelFactory<VM : MavericksViewModel<S>, S : MavericksState>(
     private val viewModelClass: Class<VM>
 ) : MavericksViewModelFactory<VM, S> {
 
     override fun create(viewModelContext: ViewModelContext, state: S): VM {
-        val bindings = when (viewModelContext) {
-            is FragmentViewModelContext -> viewModelContext.fragment.bindings<DaggerMavericksBindings>()
-            else -> viewModelContext.activity.bindings<DaggerMavericksBindings>()
+        val bindings: DaggerMavericksBindings = when (viewModelContext) {
+            is FragmentViewModelContext -> viewModelContext.fragment.bindings()
+            else -> viewModelContext.activity.bindings()
         }
         val viewModelFactoryMap = bindings.viewModelFactories()
         val viewModelFactory = viewModelFactoryMap[viewModelClass] ?: error("Cannot find ViewModelFactory for ${viewModelClass.name}.")
@@ -67,6 +55,14 @@ class DaggerMavericksViewModelFactory<VM : MavericksViewModel<S>, S : MavericksS
     }
 }
 
+/**
+ * These Anvil/Dagger bindings are used by [DaggerMavericksViewModelFactory]. The factory will find the nearest [DaggerComponentOwner]
+ * that implements these bindings. It will then attempt to retrieve the [AssistedViewModelFactory] for the given ViewModel class.
+ *
+ * In this example, this bindings class is implemented by [com.airbnb.mvrx.sample.anvil.ExampleFeatureComponent] because
+ * it provides the [com.airbnb.mvrx.sample.anvil.ExampleFeatureViewModel]. Any component that will generate ViewModels should
+ * either implement this directly or have this added via `@ContributesTo(YourScope::class)`.
+ */
 interface DaggerMavericksBindings {
     fun viewModelFactories(): Map<Class<out MavericksViewModel<*>>, AssistedViewModelFactory<*, *>>
 }

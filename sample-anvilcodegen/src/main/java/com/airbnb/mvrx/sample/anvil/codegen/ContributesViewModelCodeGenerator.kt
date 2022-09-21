@@ -59,7 +59,7 @@ class ContributesViewModelCodeGenerator : CodeGenerator {
                         FunSpec.builder("bind${vmClass.shortName}Factory")
                             .addModifiers(KModifier.ABSTRACT)
                             .addParameter("factory", ClassName(generatedPackage, "${vmClass.shortName}_AssistedFactory"))
-                            .returns(tonalViewModelFactoryFqName.asClassName(module).parameterizedBy(STAR, STAR))
+                            .returns(assistedViewModelFactoryFqName.asClassName(module).parameterizedBy(STAR, STAR))
                             .addAnnotation(Binds::class)
                             .addAnnotation(IntoMap::class)
                             .addAnnotation(AnnotationSpec.Companion.builder(viewModelKeyFqName.asClassName(module)).addMember("%T::class", vmClass.asClassName()).build())
@@ -93,7 +93,7 @@ class ContributesViewModelCodeGenerator : CodeGenerator {
         val content = FileSpec.buildFile(generatedPackage, assistedFactoryClassName) {
             addType(
                 TypeSpec.interfaceBuilder(assistedFactoryClassName)
-                    .addSuperinterface(tonalViewModelFactoryFqName.asClassName(module).parameterizedBy(vmClassName, stateClassName))
+                    .addSuperinterface(assistedViewModelFactoryFqName.asClassName(module).parameterizedBy(vmClassName, stateClassName))
                     .addAnnotation(AssistedFactory::class)
                     .addFunction(
                         FunSpec.builder("create")
@@ -109,7 +109,7 @@ class ContributesViewModelCodeGenerator : CodeGenerator {
     }
 
     companion object {
-        private val tonalViewModelFactoryFqName = FqName("com.airbnb.mvrx.sample.anvil.di.AssistedViewModelFactory")
+        private val assistedViewModelFactoryFqName = FqName("com.airbnb.mvrx.sample.anvil.di.AssistedViewModelFactory")
         private val viewModelKeyFqName = FqName("com.airbnb.mvrx.sample.anvil.di.ViewModelKey")
     }
 }

@@ -11,7 +11,7 @@ class AnvilSampleApplication : Application(), DaggerComponentOwner {
     // This can be set or unset as users log in and out.
     var userComponent: UserComponent? = null
 
-    override val daggerComponent get() = userComponent ?: appComponent
+    override val daggerComponent get() = listOfNotNull(appComponent, userComponent)
 
     override fun onCreate() {
         super.onCreate()

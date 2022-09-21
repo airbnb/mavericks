@@ -3,23 +3,21 @@ package com.airbnb.mvrx.sample.anvil.di
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksViewModel
 
-/*
+/**
+ * You do not need to use this type directly. It is used by DaggerMavericksViewModelFactory.
+ *
  * Serves as a supertype for AssistedInject factories in ViewModels.
  *
- * We can use this interface as a marker in a Multibinding Dagger setup to populate a Map
+ * We use this interface as a marker in a Multibinding Dagger setup to populate a Map
  * of ViewModel classes with their AssistedInject factories.
- *
- * This setup is needed because AssistedInject factories are isolated from each other, so this
- * interface provides a common parent type to facilitate grouping these factories into a collection.
- * When we use it correctly with Dagger, a Map of ViewModels and their factories can be created for us
- * automatically. This Map can then be used to retrieve for a ViewModel's factory using its class.
- *
- * Here's an example for such a setup:
  *
  * First we define our ViewModel with an @AssistedInject annotated constructor, and a Factory interface
  * implementing AssistedViewModelFactory.
  *
- * class MyViewModel @AssistedInject constructor(...): MavericksViewModel<MyState>(...) {
+ * class MyViewModel @AssistedInject constructor(
+ *     @Assisted initialState: MyState,
+ *     …
+ * ): MavericksViewModel<MyState>(...) {
  *   @AssistedFactory
  *   interface Factory : AssistedViewModelFactory<MyViewModel, MyState> {
  *     override fun create(state: MyState): MyViewModel

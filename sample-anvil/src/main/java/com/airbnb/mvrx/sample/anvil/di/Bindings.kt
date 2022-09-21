@@ -5,17 +5,17 @@ import android.content.ContextWrapper
 import androidx.fragment.app.Fragment
 
 /**
- * Use this to get the dagger "Bindings" for your module. Bindings are used if you need to directly interact with a dagger component such as:
+ * Use this to get the Dagger "Bindings" for your module. Bindings are used if you need to directly interact with a dagger component such as:
  * * an inject function: `inject(MyFragment frag)`
  * * an explicit getter: `fun myClass(): MyClass`
  *
- * Bindings will walk up the Fragment/Activity hierarchy and check for [DaggerComponentOwner] to see if any of its components provide the specified bindings.
- * Most of the time this will "just work" and you don't have to think about it.
+ * Bindings will walk up the Fragment/Activity hierarchy and check for [DaggerComponentOwner] to see if any of its components provide the
+ * specified bindings. Most of the time this will "just work" and you don't have to think about it.
  *
  * To inject [@Inject] properties:
  * 1) Add an inject function to YourModuleBindings
  * 2) Make sure your bindings interface is contributed to AppComponent, UserComponent, etc via `@ContributesTo(AppComponent::class)`.
- * 3) Call context.bindings<YourModuleBindings>().inject(this) (Kotlin)
+ * 3) Call context.bindings<YourModuleBindings>().inject(this).
  */
 inline fun <reified T : Any> Context.bindings() = bindings(T::class.java)
 

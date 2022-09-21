@@ -1,7 +1,5 @@
-package com.airbnb.mvrx.sample.anvil
+package com.airbnb.mvrx.sample.anvil.feature
 
-import android.os.Bundle
-import android.view.View
 import androidx.fragment.app.Fragment
 import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.Fail
@@ -12,39 +10,19 @@ import com.airbnb.mvrx.MavericksViewModelFactory
 import com.airbnb.mvrx.Success
 import com.airbnb.mvrx.Uninitialized
 import com.airbnb.mvrx.fragmentViewModel
-import com.airbnb.mvrx.sample.anvil.di.daggerMavericksViewModelFactory
 import com.airbnb.mvrx.mocking.MockableMavericksView
-import com.airbnb.mvrx.viewbinding.viewBinding
-import com.airbnb.mvrx.withState
+import com.airbnb.mvrx.sample.anvil.R
+import com.airbnb.mvrx.sample.anvil.UserScopedRepository
 import com.airbnb.mvrx.sample.anvil.annotation.ContributesViewModel
 import com.airbnb.mvrx.sample.anvil.databinding.HelloFragmentBinding
 import com.airbnb.mvrx.sample.anvil.di.DaggerComponentOwner
-import com.airbnb.mvrx.sample.anvil.di.DaggerMavericksBindings
-import com.airbnb.mvrx.sample.anvil.di.SingleIn
 import com.airbnb.mvrx.sample.anvil.di.bindings
+import com.airbnb.mvrx.sample.anvil.di.daggerMavericksViewModelFactory
 import com.airbnb.mvrx.sample.anvil.di.fragmentComponent
-import com.squareup.anvil.annotations.ContributesTo
-import com.squareup.anvil.annotations.MergeSubcomponent
+import com.airbnb.mvrx.viewbinding.viewBinding
+import com.airbnb.mvrx.withState
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import javax.inject.Inject
-
-interface ExampleFeatureScope
-
-@SingleIn(ExampleFeatureScope::class)
-@MergeSubcomponent(ExampleFeatureScope::class)
-interface ExampleFeatureComponent : DaggerMavericksBindings {
-    @ContributesTo(UserScope::class)
-    interface ParentBindings {
-        fun exampleFeatureComponent(): ExampleFeatureComponent
-    }
-}
-
-@SingleIn(ExampleFeatureScope::class)
-class ExampleFeatureScopedRepository @Inject constructor() {
-    @Suppress("FunctionOnlyReturningConstant")
-    operator fun invoke() = "Example Feature"
-}
 
 data class ExampleFeatureState(
     val title: Async<String> = Uninitialized,
@@ -71,12 +49,14 @@ class ExampleFeatureViewModel @AssistedInject constructor(
 }
 
 class ExampleFeatureFragment : Fragment(R.layout.hello_fragment), MockableMavericksView, DaggerComponentOwner {
-
-    override val daggerComponent by fragmentComponent { _, app ->
-        app.bindings<ExampleFeatureComponent.ParentBindings>().exampleFeatureComponent()
-    }
     private val binding: HelloFragmentBinding by viewBinding()
     private val viewModel: ExampleFeatureViewModel by fragmentViewModel()
+
+    override val daggerComponent by fragmentComponent { scope, app ->
+        app.bindings<ExampleFeatureComponent.ParentBindings>().exampleFeatureComponentBuilder()
+            .coroutineScope(ExampleFeatureCoroutineScope(scope))
+            .build()
+    }
 
     override fun invalidate() = withState(viewModel) { state ->
         requireActivity().title = state.description()

@@ -9,7 +9,7 @@ import kotlin.reflect.KClass
  *     @Binds
  *     @IntoMap
  *     @ViewModelKey(YourViewModel::class)
- *     public abstract fun bindYourViewModelFactory(factory: YourViewModel.Factory): TonalViewModelFactory<*, *>
+ *     public abstract fun bindYourViewModelFactory(factory: YourViewModel.Factory): AssistedViewModelFactory<*, *>
  */
 @Target(AnnotationTarget.CLASS)
 annotation class ContributesViewModel(
