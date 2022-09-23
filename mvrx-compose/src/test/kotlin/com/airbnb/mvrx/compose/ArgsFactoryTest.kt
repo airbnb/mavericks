@@ -1,12 +1,12 @@
 package com.airbnb.mvrx.compose
 
-import android.os.Bundle
-import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import com.airbnb.mvrx.Mavericks
@@ -19,7 +19,7 @@ import org.robolectric.RobolectricTestRunner
 @RunWith(RobolectricTestRunner::class)
 class ArgsFactoryTest {
     @get:Rule
-    val composeTestRule = createAndroidComposeRule<ArgsTestActivity>()
+    val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     @Before
     fun setUp() {
@@ -28,15 +28,7 @@ class ArgsFactoryTest {
 
     @Test
     fun argumentsAreProperlyUsedToInitializeState() {
-        composeTestRule.onNodeWithText("Counter value: 5").assertExists()
-    }
-}
-
-class ArgsTestActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        setContent {
+        composeTestRule.setContent {
             Column {
                 val viewModel: CounterViewModel = mavericksViewModel(argsFactory = { ArgumentsTest(5) })
 
@@ -47,5 +39,41 @@ class ArgsTestActivity : AppCompatActivity() {
                 }
             }
         }
+        composeTestRule.onNodeWithText("Counter value: 5").assertExists()
+    }
+
+    @Test
+    fun argumentsAreProperlyUsedToInitializeStateWithMapper() {
+        composeTestRule.setContent {
+            Column {
+                val viewModel: CounterViewModel = mavericksViewModel(argsFactory = { ArgumentsTest(5) })
+
+                val count by viewModel.collectAsState { it.count }
+                Text("Counter value: $count")
+                Button(onClick = viewModel::incrementCount) {
+                    Text(text = "Increment")
+                }
+            }
+        }
+        composeTestRule.onNodeWithText("Counter value: 5").assertExists()
+    }
+
+    @Test
+    fun argumentsAreProperlyUsedToInitializeStateWithMapperAndKey() {
+        var collectKey by mutableStateOf(0)
+        composeTestRule.setContent {
+            Column {
+                val viewModel: CounterViewModel = mavericksViewModel(argsFactory = { ArgumentsTest(5) })
+
+                val count by viewModel.collectAsState(collectKey) { if (collectKey == 0) it.count else it.count2 }
+                Text("Counter value: $count")
+                Button(onClick = viewModel::incrementCount) {
+                    Text(text = "Increment")
+                }
+            }
+        }
+        composeTestRule.onNodeWithText("Counter value: 5").assertExists()
+        collectKey = 1
+        composeTestRule.onNodeWithText("Counter value: 123").assertExists()
     }
 }

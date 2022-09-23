@@ -73,6 +73,7 @@ captures/
 .idea/deploymentTargetDropDown.xml
 .idea/androidTestResultsUserPreferences.xml
 .idea/detekt.xml
+.idea/inspectionProfiles/Project_Default.xml
 
 # Android Studio 3 in .gitignore file.
 .idea/caches

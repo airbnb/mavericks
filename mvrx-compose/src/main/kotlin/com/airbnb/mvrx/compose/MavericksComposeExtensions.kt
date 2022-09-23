@@ -1,6 +1,5 @@
 package com.airbnb.mvrx.compose
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.content.ContextWrapper
 import android.view.View
@@ -8,7 +7,9 @@ import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalView
@@ -141,12 +142,17 @@ fun <VM : MavericksViewModel<S>, S : MavericksState> VM.collectAsState(): State<
 /**
  * Creates a Compose State variable that will emit new values whenever this ViewModel's state mapped to the provided mapper changes.
  * Prefer the overload with a state property reference to ensure that your composable only recomposes when the properties it uses changes.
+ *
+ * @param key An optional key that should be changed if the mapper changes. If your mapper always does the same thing, you can leave this as Unit.
+ *            If your mapper changes (for example, reading a different state property) then, by default, you won't receive an updated state value
+ *            until either the ViewModel emits a new state or if you change the key.
+ *            This is analogous to `remember(key) { … }`.
  */
 @Composable
-@SuppressLint("FlowOperatorInvokedInComposition")
-fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectAsState(mapper: (S) -> O): State<O> {
-    // TODO(gpeal) fix this lint error.
-    return stateFlow.map { mapper(it) }.distinctUntilChanged().collectAsState(initial = withState(this) { mapper(it) })
+fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectAsState(key: Any? = Unit, mapper: (S) -> O): State<O> {
+    val updatedMapper by rememberUpdatedState(mapper)
+    val mappedFlow = remember(key) { stateFlow.map { updatedMapper(it) }.distinctUntilChanged() }
+    return mappedFlow.collectAsState(initial = withState(this) { updatedMapper(it) })
 }
 
 /**
@@ -155,8 +161,7 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectAsState(mapper
  * If you find yourself subscribing to many state properties in a single composable, consider breaking it up into smaller ones.
  */
 @Composable
-@SuppressLint("FlowOperatorInvokedInComposition")
 fun <VM : MavericksViewModel<S>, S : MavericksState, A> VM.collectAsState(prop1: KProperty1<S, A>): State<A> {
-    // TODO(gpeal) fix this lint error.
-    return stateFlow.map { prop1.get(it) }.distinctUntilChanged().collectAsState(initial = withState(this) { prop1.get(it) })
+    val mappedFlow = remember(prop1) { stateFlow.map { prop1.get(it) }.distinctUntilChanged() }
+    return mappedFlow.collectAsState(initial = withState(this) { prop1.get(it) })
 }
