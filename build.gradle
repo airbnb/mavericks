@@ -7,6 +7,7 @@ buildscript {
     }
     dependencies {
         classpath libs.androidGradle
+        classpath libs.anvilGradle
         classpath libs.kotlinGradle
         classpath libs.hiltGradle
 
