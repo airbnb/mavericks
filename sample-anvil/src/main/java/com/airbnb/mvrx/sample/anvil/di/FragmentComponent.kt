@@ -25,7 +25,9 @@ import java.util.concurrent.ConcurrentHashMap
  *
  * It may be convenient to bind the CoroutineScope as an instance in your Dagger component so it can be injected into singleton objects.
  */
-inline fun <reified T : Any> Fragment.fragmentComponent(crossinline factory: (CoroutineScope, AnvilSampleApplication) -> T) = lazy {
+inline fun <reified T : Any> Fragment.fragmentComponent(
+    crossinline factory: (CoroutineScope, AnvilSampleApplication) -> T
+) = lazy {
     ViewModelProvider(this)[DaggerComponentHolderViewModel::class.java].get(factory)
 }
 
