@@ -142,11 +142,16 @@ fun <VM : MavericksViewModel<S>, S : MavericksState> VM.collectAsState(): State<
 /**
  * Creates a Compose State variable that will emit new values whenever this ViewModel's state mapped to the provided mapper changes.
  * Prefer the overload with a state property reference to ensure that your composable only recomposes when the properties it uses changes.
+ *
+ * @param key An optional key that should be changed if the mapper changes. If your mapper always does the same thing, you can leave this as Unit.
+ *            If your mapper changes (for example, reading a different state property) then, by default, you won't receive an updated state value
+ *            until either the ViewModel emits a new state or if you change the key.
+ *            This is analogous to `remember(key) { … }`.
  */
 @Composable
-fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectAsState(mapper: (S) -> O): State<O> {
+fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectAsState(key: Any? = Unit, mapper: (S) -> O): State<O> {
     val updatedMapper by rememberUpdatedState(mapper)
-    val mappedFlow = remember { stateFlow.map { updatedMapper(it) }.distinctUntilChanged() }
+    val mappedFlow = remember(key) { stateFlow.map { updatedMapper(it) }.distinctUntilChanged() }
     return mappedFlow.collectAsState(initial = withState(this) { updatedMapper(it) })
 }
 

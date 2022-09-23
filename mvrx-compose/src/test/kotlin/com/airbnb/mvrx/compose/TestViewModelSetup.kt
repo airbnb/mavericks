@@ -7,6 +7,7 @@ import com.airbnb.mvrx.MavericksViewModel
 
 data class CounterState(
     val count: Int = 0,
+    val count2: Int = 123,
 ) : MavericksState {
     constructor(arguments: ArgumentsTest) : this(count = arguments.count)
 }
