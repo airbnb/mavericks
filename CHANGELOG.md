@@ -4,6 +4,7 @@
 - Experimental `mvrx-common` module with new abstraction `MavericksRepository` that behaves exactly like `MavericksViewModel` except it doesn't have any Android dependencies and can be used in pure Kotlin modules (#635)
 - Breaking changes: `MavericksViewModelConfig.BlockExecutions` is extracted into top level class `MavericksBlockExecutions` (#635)
 - New mavericks extension `argsOrNull` to handle optional (nullable) fragment args (#639)
+- New Anvil sample in the `sample-anvil` module
 
 ## 2.7.0
 - Add mockEightViewModels and mockNineViewModels to MockBuilder (#633)
