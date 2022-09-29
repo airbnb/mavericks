@@ -9,6 +9,7 @@ buildscript {
         classpath libs.androidGradle
         classpath libs.kotlinGradle
         classpath libs.hiltGradle
+        classpath libs.molecule
 
         // Upload with:
         // ./gradlew clean assemble uploadArchives --no-daemon --no-parallel
@@ -51,7 +52,7 @@ subprojects { project ->
 
         if (project.hasProperty("android")) {
             android {
-                compileSdkVersion  32
+                compileSdkVersion 32
 
                 defaultConfig {
                     // Allow projects to override this.

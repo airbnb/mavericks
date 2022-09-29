@@ -50,6 +50,10 @@ abstract class MavericksRepository<S : MavericksState>(
 
     protected val coroutineScope: CoroutineScope = config.coroutineScope
 
+    @Suppress("PropertyName")
+    @InternalMavericksApi
+    val _internalCoroutineScope: CoroutineScope = config.coroutineScope
+
     @InternalMavericksApi
     protected val stateStore: MavericksStateStore<S> = config.stateStore
 
@@ -144,6 +148,11 @@ abstract class MavericksRepository<S : MavericksState>(
         } else {
             stateStore.set(reducer)
         }
+    }
+
+    suspend fun setStateSuspended(reducer: S.() -> S): S {
+        setState(reducer)
+        return awaitState()
     }
 
     /**

@@ -12,6 +12,7 @@ include ':mvrx-hilt'
 include ':mvrx-rxjava2'
 include ':mvrx-launcher'
 include ':mvrx-testing'
+include ':mvrx-molecule'
 
 // Utils
 include ':utils-view-binding'

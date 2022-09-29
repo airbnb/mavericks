@@ -1,0 +1,31 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    id 'java-library'
+    id 'org.jetbrains.kotlin.jvm'
+    id 'app.cash.molecule'
+}
+
+tasks.withType(KotlinCompile).all {
+    kotlinOptions {
+        freeCompilerArgs += [
+                '-opt-in=kotlin.RequiresOptIn',
+                '-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi',
+                '-opt-in=com.airbnb.mvrx.InternalMavericksApi',
+                '-opt-in=com.airbnb.mvrx.ExperimentalMavericksApi',
+        ]
+    }
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+dependencies {
+    api project(':mvrx-common')
+    api libs.kotlinCoroutines
+
+    testImplementation libs.junit
+    testImplementation libs.kotlinCoroutinesTest
+}
