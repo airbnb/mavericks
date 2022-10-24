@@ -55,12 +55,12 @@ private fun <VM : MavericksViewModel<S>, S : MavericksState> createViewModel(
     }
     val viewModel = requireNotNull(factoryViewModel ?: createDefaultViewModel(viewModelClass, initialState)) {
         if (viewModelClass.constructors.firstOrNull()?.parameterTypes?.size?.let { it > 1 } == true) {
-            "${viewModelClass.simpleName} takes dependencies other than initialState. " +
-                "It must have companion object implementing ${MavericksViewModelFactory::class.java.simpleName} " +
+            "${viewModelClass.name} takes dependencies other than initialState. " +
+                "It must have companion object implementing ${MavericksViewModelFactory::class.java.name} " +
                 "with a create method returning a non-null ViewModel."
         } else {
-            "${viewModelClass::class.java.simpleName} must have primary constructor with a " +
-                "single non-optional parameter that takes initial state of ${stateClass.simpleName}."
+            "${viewModelClass::class.java.name} must have primary constructor with a " +
+                "single non-optional parameter that takes initial state of ${stateClass.name}."
         }
     }
     return MavericksViewModelWrapper(viewModel)
