@@ -69,7 +69,7 @@ private fun <T : MavericksState> Class<out T>.getComponentNFunction(componentInd
         declaredMethods.firstOrNull { it.name.startsWith("$functionName\$") }
     }
         ?.also { it.isAccessible = true }
-        ?: error("Unable to find function $functionName in ${this@getComponentNFunction::class.simpleName}")
+        ?: error("Unable to find function $functionName in ${this@getComponentNFunction::class.java.name}")
 }
 
 private fun assertCollectionPersistability(value: Any?) {
@@ -88,7 +88,7 @@ private fun assertCollectionPersistability(value: Any?) {
 }
 
 private fun assertPersistable(item: Any) {
-    if (item !is Serializable && item !is Parcelable) error("Cannot parcel ${item::class.java.simpleName}")
+    if (item !is Serializable && item !is Parcelable) error("Cannot parcel ${item::class.java.name}")
 }
 
 private fun <T : Any?> Bundle.putAny(key: String?, value: T): Bundle {

@@ -329,7 +329,7 @@ abstract class MavericksViewModel<S : MavericksState>(
         }
     }
 
-    override fun toString(): String = "${this::class.java.simpleName} $state"
+    override fun toString(): String = "${this::class.java.name} $state"
 
     private inner class Repository : MavericksRepository<S>(
         MavericksRepositoryConfig(

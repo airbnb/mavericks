@@ -95,10 +95,10 @@ internal fun <VM : MavericksViewModel<S>, S : MavericksState> createStateFromCon
         }
         // Throw this exception if we don't know which method to use to create the initial state.
         ?: throw IllegalStateException(
-            "Attempt to create the Mavericks state class ${stateClass.simpleName} has failed. One of the following must be true:" +
+            "Attempt to create the Mavericks state class ${stateClass.name} has failed. One of the following must be true:" +
                 "\n 1) The state class has default values for every constructor property." +
                 "\n 2) The state class has a secondary constructor for ${
-                args?.javaClass?.simpleName
+                args?.javaClass?.name
                     ?: "a fragment argument"
                 }." +
                 "\n 3) ${viewModelClass.simpleName} must have a companion object implementing MavericksViewModelFactory with an initialState " +
