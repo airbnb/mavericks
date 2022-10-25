@@ -15,6 +15,19 @@
     public static *** initialState(...);
 }
 
+# If a companion object of a class is implementing com.airbnb.mvrx.MavericksViewModelFactory it is used to 
+# instatiate ViewModels.
+# This is done by looking up classes defined as subclasses of the ViewModel class itself that implement
+# com.airbnb.mvrx.MavericksViewModelFactory and thus we need to ensure that the companion objects definition
+# stays within the ViewModel class during Proguard/Dexguard/R8 optimization. Which was not the case anymore with
+# R8 3.3.x with enabeld full mode 
+# We can however rename or even shrink away the ViewModel/Companion class if they are not used.
+# This ensures we keep the companion objectet implementing that interface
+-keep,allowshrinking,allowobfuscation class **$Companion implements com.airbnb.mvrx.MavericksViewModelFactory
+# This ensures we keep the class that conmtains the Companion object we kept one line up.
+-if class **$Companion implements com.airbnb.mvrx.MavericksViewModelFactory
+-keep,allowshrinking,allowobfuscation class <1>
+
 # If a MvRxViewModelFactory is used without JvmStatic, keep create and initalState methods which
 # are accessed via reflection.
 -keepclassmembers class ** implements com.airbnb.mvrx.MavericksViewModelFactory {
