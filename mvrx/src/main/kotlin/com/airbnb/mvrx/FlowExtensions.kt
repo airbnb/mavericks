@@ -43,7 +43,11 @@ internal fun <T : Any?> Flow<T>.collectLatest(
         // Coroutine is launched with start = CoroutineStart.UNDISPATCHED to perform dispatch only once.
         yield()
         flow.collectLatest {
-            lifecycleOwner.whenStarted { action(it) }
+            if (MavericksTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER) {
+                action(it)
+            } else {
+                lifecycleOwner.whenStarted { action(it) }
+            }
         }
     }
 }
