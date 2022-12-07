@@ -3,6 +3,7 @@ package com.airbnb.mvrx
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.whenStarted
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -41,7 +42,13 @@ internal fun <T : Any?> Flow<T>.collectLatest(
         // This is necessary when Dispatchers.Main.immediate is used in scope.
         // Coroutine is launched with start = CoroutineStart.UNDISPATCHED to perform dispatch only once.
         yield()
-        flow.collectLatest(action)
+        flow.collectLatest {
+            if (MavericksTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER) {
+                action(it)
+            } else {
+                lifecycleOwner.whenStarted { action(it) }
+            }
+        }
     }
 }
 
