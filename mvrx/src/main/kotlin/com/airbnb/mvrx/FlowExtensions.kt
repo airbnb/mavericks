@@ -3,7 +3,6 @@ package com.airbnb.mvrx
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.whenStarted
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -14,6 +13,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.plus
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 import java.util.concurrent.ConcurrentHashMap
 
@@ -42,11 +42,14 @@ internal fun <T : Any?> Flow<T>.collectLatest(
         // This is necessary when Dispatchers.Main.immediate is used in scope.
         // Coroutine is launched with start = CoroutineStart.UNDISPATCHED to perform dispatch only once.
         yield()
-        flow.collectLatest {
-            if (MavericksTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER) {
-                action(it)
-            } else {
-                lifecycleOwner.whenStarted { action(it) }
+        if (MavericksTestOverrides.FORCE_DISABLE_LIFECYCLE_AWARE_OBSERVER) {
+            flow.collectLatest { action(it) }
+        } else {
+            val lifeCycleAwareDispatcher = lifecycleOwner.lifecycle.lifeCycleAwareDispatcher()
+            flow.collectLatest { item ->
+                withContext(lifeCycleAwareDispatcher) {
+                    action(item)
+                }
             }
         }
     }
