@@ -1,5 +1,9 @@
 # Change Log
 
+## 3.0.2
+- Wrap subscription action with lifecycle whenStarted (#665)
+- Updated embedded Proguard/r8 rules to work with R8 full mode (#658)
+
 ## 3.0.1
 - Fix issue where `mavericks-common` module was not published to maven in 3.0.0
 
