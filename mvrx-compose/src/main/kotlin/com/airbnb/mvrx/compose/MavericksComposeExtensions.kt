@@ -2,6 +2,7 @@ package com.airbnb.mvrx.compose
 
 import android.content.Context
 import android.content.ContextWrapper
+import android.view.View
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -11,7 +12,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistryOwner
@@ -60,9 +63,14 @@ inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mave
     val savedStateRegistryOwner = scope as? SavedStateRegistryOwner ?: error("LifecycleOwner must be a SavedStateRegistryOwner!")
     val savedStateRegistry = savedStateRegistryOwner.savedStateRegistry
     val viewModelClass = VM::class
+    val view = LocalView.current
 
     val viewModelContext = remember(scope, activity, viewModelStoreOwner, savedStateRegistry) {
-        val parentFragment = scope as? Fragment
+        val parentFragment = when (scope) {
+            is Fragment -> scope as Fragment
+            is ComponentActivity -> null
+            else -> findFragmentFromView(view)
+        }
 
         if (parentFragment != null) {
             val args = argsFactory?.invoke() ?: parentFragment.arguments?.get(Mavericks.KEY_ARG)
@@ -96,6 +104,14 @@ fun extractActivityFromContext(context: Context): ComponentActivity? {
         }
     }
     return null
+}
+
+@InternalMavericksApi
+fun findFragmentFromView(view: View): Fragment? = try {
+    FragmentManager.findFragment(view)
+} catch (_: IllegalStateException) {
+    // current scope is NOT a fragment
+    null
 }
 
 /**
