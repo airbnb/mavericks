@@ -10,7 +10,6 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.selects.SelectBuilder
@@ -31,31 +30,32 @@ fun <T : Any?> Flow<T>.flowWhenStarted(owner: LifecycleOwner): Flow<T> = flow {
         val startedChannel = startedChannel(owner.lifecycle)
         val flowChannel = produce { collect { send(it) } }
 
-        val transform: suspend (Boolean, T) -> Unit = { started, value ->
-            if (started) {
-                emit(value)
-            }
-        }
-
         var started: Boolean? = null
-        var flowValue: T? = null
+        var flowResult: FlowResult<T>? = null
         var isClosed = false
 
         while (!isClosed) {
-            select<Unit> {
-                onReceive(startedChannel, { flowChannel.cancel(); isClosed = true }) {
-                    started = it
-                    if (flowValue !== null) {
-                        @Suppress("UNCHECKED_CAST")
-                        transform(it, flowValue as T)
+            val result: SelectResult<T>? = select {
+                onReceive(startedChannel, { flowChannel.cancel(); isClosed = true }) { value ->
+                    started = value
+                    val result = flowResult
+                    if (result != null && value) {
+                        SelectResult(result.payload)
+                    } else {
+                        null
                     }
                 }
-                onReceive(flowChannel, { isClosed = true }) {
-                    flowValue = it
-                    if (started !== null) {
-                        transform(started as Boolean, it)
+                onReceive(flowChannel, { isClosed = true }) { value ->
+                    flowResult = FlowResult(value)
+                    if (started == true) {
+                        SelectResult(value)
+                    } else {
+                        null
                     }
                 }
+            }
+            if (result != null) {
+                emit(result.payload)
             }
         }
     }
@@ -83,14 +83,22 @@ private fun startedChannel(owner: Lifecycle): Channel<Boolean> {
     return channel
 }
 
-private inline fun <T : Any?> SelectBuilder<Unit>.onReceive(
+private inline fun <T : Any?, R : Any?> SelectBuilder<SelectResult<R>?>.onReceive(
     channel: ReceiveChannel<T>,
     crossinline onClosed: () -> Unit,
-    noinline onReceive: suspend (value: T) -> Unit
+    noinline onReceive: suspend (value: T) -> SelectResult<R>?
 ) {
     channel.onReceiveCatching {
         val result = it.getOrNull()
-        if (result === null) onClosed()
-        else onReceive(result)
+        if (result === null) {
+            onClosed()
+            null
+        } else {
+            onReceive(result)
+        }
     }
 }
+
+private data class SelectResult<T : Any?>(val payload: T)
+
+private data class FlowResult<T : Any?>(val payload: T)
