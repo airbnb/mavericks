@@ -30,32 +30,34 @@ fun <T : Any?> Flow<T>.flowWhenStarted(owner: LifecycleOwner): Flow<T> = flow {
         val startedChannel = startedChannel(owner.lifecycle)
         val flowChannel = produce { collect { send(it) } }
 
+        @Suppress("LocalVariableName")
+        val NULL = Any()
         var started: Boolean? = null
-        var flowResult: FlowResult<T>? = null
+        var flowResult: Any? = NULL
         var isClosed = false
 
         while (!isClosed) {
-            val result: SelectResult<T>? = select {
-                onReceive(startedChannel, { flowChannel.cancel(); isClosed = true }) { value ->
+            val result = select {
+                onReceive(startedChannel, { flowChannel.cancel(); isClosed = true; NULL }) { value ->
                     started = value
-                    val result = flowResult
-                    if (result != null && value) {
-                        SelectResult(result.payload)
+                    if (flowResult != NULL && value) {
+                        flowResult
                     } else {
-                        null
+                        NULL
                     }
                 }
-                onReceive(flowChannel, { isClosed = true }) { value ->
-                    flowResult = FlowResult(value)
+                onReceive(flowChannel, { isClosed = true; NULL }) { value ->
+                    flowResult = value
                     if (started == true) {
-                        SelectResult(value)
+                        value
                     } else {
-                        null
+                        NULL
                     }
                 }
             }
-            if (result != null) {
-                emit(result.payload)
+            if (result != NULL) {
+                @Suppress("UNCHECKED_CAST")
+                emit(result as T)
             }
         }
     }
@@ -83,22 +85,17 @@ private fun startedChannel(owner: Lifecycle): Channel<Boolean> {
     return channel
 }
 
-private inline fun <T : Any?, R : Any?> SelectBuilder<SelectResult<R>?>.onReceive(
+private inline fun <T : Any?, R : Any?> SelectBuilder<R>.onReceive(
     channel: ReceiveChannel<T>,
-    crossinline onClosed: () -> Unit,
-    noinline onReceive: suspend (value: T) -> SelectResult<R>?
+    crossinline onClosed: () -> R,
+    noinline onReceive: suspend (value: T) -> R
 ) {
     channel.onReceiveCatching {
         val result = it.getOrNull()
         if (result === null) {
             onClosed()
-            null
         } else {
             onReceive(result)
         }
     }
 }
-
-private data class SelectResult<T : Any?>(val payload: T)
-
-private data class FlowResult<T : Any?>(val payload: T)
