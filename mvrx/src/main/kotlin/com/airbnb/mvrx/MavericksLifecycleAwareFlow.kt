@@ -30,32 +30,31 @@ fun <T : Any?> Flow<T>.flowWhenStarted(owner: LifecycleOwner): Flow<T> = flow {
         val startedChannel = startedChannel(owner.lifecycle)
         val flowChannel = produce { collect { send(it) } }
 
-        @Suppress("LocalVariableName")
-        val NULL = Any()
+        val nullValue = Any()
         var started: Boolean? = null
-        var flowResult: Any? = NULL
+        var flowResult: Any? = nullValue
         var isClosed = false
 
         while (!isClosed) {
             val result = select {
-                onReceive(startedChannel, { flowChannel.cancel(); isClosed = true; NULL }) { value ->
+                onReceive(startedChannel, { flowChannel.cancel(); isClosed = true; nullValue }) { value ->
                     started = value
-                    if (flowResult != NULL && value) {
+                    if (flowResult != nullValue && value) {
                         flowResult
                     } else {
-                        NULL
+                        nullValue
                     }
                 }
-                onReceive(flowChannel, { isClosed = true; NULL }) { value ->
+                onReceive(flowChannel, { isClosed = true; nullValue }) { value ->
                     flowResult = value
                     if (started == true) {
                         value
                     } else {
-                        NULL
+                        nullValue
                     }
                 }
             }
-            if (result != NULL) {
+            if (result != nullValue) {
                 @Suppress("UNCHECKED_CAST")
                 emit(result as T)
             }
@@ -90,12 +89,11 @@ private inline fun <T : Any?, R : Any?> SelectBuilder<R>.onReceive(
     crossinline onClosed: () -> R,
     noinline onReceive: suspend (value: T) -> R
 ) {
-    channel.onReceiveCatching {
-        val result = it.getOrNull()
-        if (result === null) {
+    channel.onReceiveCatching { result ->
+        if (result.isClosed) {
             onClosed()
         } else {
-            onReceive(result)
+            onReceive(result.getOrThrow())
         }
     }
 }
