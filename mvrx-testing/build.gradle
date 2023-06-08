@@ -37,8 +37,8 @@ dependencies {
     implementation libs.junit
     implementation libs.junit5
     implementation libs.kotlinReflect
-    implementation libs.rxAndroid
+    implementation libs.rxAndroid3
     implementation libs.multidex
     implementation libs.kotlinCoroutinesTest
-    implementation project(":mvrx-rxjava2")
+    implementation project(":mvrx-rxjava3")
 }

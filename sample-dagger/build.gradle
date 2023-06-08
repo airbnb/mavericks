@@ -47,7 +47,7 @@ dependencies {
     implementation libs.coreKtx
     implementation libs.dagger
     implementation libs.fragmentKtx
-    implementation libs.rxJava
+    implementation libs.rxJava2
     implementation libs.viewModelKtx
     implementation libs.multidex
 

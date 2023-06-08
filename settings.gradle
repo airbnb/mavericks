@@ -10,6 +10,7 @@ include ':mvrx-mocking'
 include ':mvrx-navigation'
 include ':mvrx-hilt'
 include ':mvrx-rxjava2'
+include ':mvrx-rxjava3'
 include ':mvrx-launcher'
 include ':mvrx-testing'
 

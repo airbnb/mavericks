@@ -49,9 +49,9 @@ dependencies {
     implementation libs.recyclerview
     implementation libs.retrofit
     implementation libs.retrofitMoshi
-    implementation libs.retrofitRxJava
-    implementation libs.rxAndroid
-    implementation libs.rxJava
+    implementation libs.retrofitRxJava2
+    implementation libs.rxAndroid2
+    implementation libs.rxJava2
 
     testImplementation libs.junit
 }
