@@ -146,4 +146,17 @@ class MavericksLifecycleAwareFlowKtTest : BaseTest() {
 
         flowOf(1).flowWhenStarted(owner).collect()
     }
+
+    @Test
+    fun testNullableFlow() = runTest(UnconfinedTestDispatcher()) {
+        val flow = flowOf<Int?>(null, null)
+        val owner = TestLifecycleOwner()
+        val values = mutableListOf<Int?>()
+        owner.lifecycle.currentState = Lifecycle.State.STARTED
+        val job = flow.flowWhenStarted(owner).onEach {
+            values += it
+        }.launchIn(this)
+        assertEquals(listOf(null, null), values)
+        job.cancel()
+    }
 }
