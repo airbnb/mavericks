@@ -236,6 +236,9 @@ fun <V : Any> args() = object : ReadOnlyProperty<Fragment, V> {
         if (value == null) {
             val args = thisRef.arguments
                 ?: throw IllegalArgumentException("There are no fragment arguments!")
+            // Sometimes the class loader of the arguments is java.lang.BootClassLoader and thus the args bundle
+            // cannot be loaded. Ensure that it has the same classloader as the Fragment.
+            args.classLoader = thisRef::class.java.classLoader
             val argUntyped = args.get(Mavericks.KEY_ARG)
             argUntyped
                 ?: throw IllegalArgumentException("Mavericks arguments not found at key _root_ide_package_.com.airbnb.mvrx.Mavericks.KEY_ARG!")
@@ -262,6 +265,9 @@ fun <V> argsOrNull() = object : ReadOnlyProperty<Fragment, V?> {
     override fun getValue(thisRef: Fragment, property: KProperty<*>): V? {
         if (!read) {
             val args = thisRef.arguments
+            // Sometimes the class loader of the arguments is java.lang.BootClassLoader and thus the args bundle
+            // cannot be loaded. Ensure that it has the same classloader as the Fragment.
+            args?.classLoader = thisRef::class.java.classLoader
             val argUntyped = args?.get(Mavericks.KEY_ARG)
             @Suppress("UNCHECKED_CAST")
             value = argUntyped as? V
