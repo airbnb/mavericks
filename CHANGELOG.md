@@ -1,5 +1,7 @@
 # Change Log
 
+For a full list of changes, see the [GitHub releases](https://github.com/airbnb/mavericks/releases)
+
 ## 3.0.3
 - Changed flowWhenStarted to emit value on flow coroutine context (#678)
 
