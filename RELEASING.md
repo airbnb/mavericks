@@ -14,4 +14,9 @@ Releasing
       3. The release will automatically generate release notes from the commits since last release. You may want to manually edit the release notes to add more details.
    4. The script will also open up the branch for a PR in github
       1. You can manually follow up with merging the branch changes when ready, but at this point the release is already public. 
-  
+
+
+Maven Local Installation
+=======================
+
+If testing changes locally, you can install to mavenLocal via `./gradlew publishToMavenLocal`

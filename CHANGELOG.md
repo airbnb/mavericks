@@ -1,5 +1,8 @@
 # Change Log
 
+## 3.0.3
+- Changed flowWhenStarted to emit value on flow coroutine context (#678)
+
 ## 3.0.2
 - Wrap subscription action with lifecycle whenStarted (#665)
 - Updated embedded Proguard/r8 rules to work with R8 full mode (#658)
