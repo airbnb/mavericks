@@ -67,7 +67,7 @@ inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mave
 
     val viewModelContext = remember(scope, activity, viewModelStoreOwner, savedStateRegistry) {
         val parentFragment = when (scope) {
-            is Fragment -> scope as Fragment
+            is Fragment -> scope
             is ComponentActivity -> null
             else -> findFragmentFromView(view)
         }
