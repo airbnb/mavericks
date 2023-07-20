@@ -66,7 +66,11 @@ inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mave
     val view = LocalView.current
 
     val viewModelContext = remember(scope, activity, viewModelStoreOwner, savedStateRegistry) {
-        val parentFragment = scope as? Fragment ?: findFragmentFromView(view)
+        val parentFragment = when (scope) {
+            is Fragment -> scope
+            is ComponentActivity -> null
+            else -> findFragmentFromView(view)
+        }
 
         if (parentFragment != null) {
             val args = argsFactory?.invoke() ?: parentFragment.arguments?.get(Mavericks.KEY_ARG)

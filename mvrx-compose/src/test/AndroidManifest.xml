@@ -8,6 +8,13 @@
         tools:ignore="GoogleAppIndexingWarning"
         android:theme="@style/Theme.AppCompat.NoActionBar"
         android:allowBackup="false">
+        <activity android:name="com.airbnb.mvrx.compose.LifecycleOwnerScopeTestActivity" android:exported="false" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity android:name="com.airbnb.mvrx.compose.FragmentArgsTestActivity" android:exported="false" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
