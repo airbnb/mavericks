@@ -582,6 +582,86 @@ V.mockTenViewModels(
     build(this@mockTenViewModels)
 }
 
+@Suppress("Detekt.ParameterListWrapping")
+@SuppressWarnings("Detekt.LongParameterList")
+fun <V : MockableMavericksView,
+    S1 : MavericksState,
+    VM1 : MavericksViewModel<S1>,
+    S2 : MavericksState,
+    VM2 : MavericksViewModel<S2>,
+    S3 : MavericksState,
+    VM3 : MavericksViewModel<S3>,
+    S4 : MavericksState,
+    VM4 : MavericksViewModel<S4>,
+    S5 : MavericksState,
+    VM5 : MavericksViewModel<S5>,
+    S6 : MavericksState,
+    VM6 : MavericksViewModel<S6>,
+    S7 : MavericksState,
+    VM7 : MavericksViewModel<S7>,
+    S8 : MavericksState,
+    VM8 : MavericksViewModel<S8>,
+    S9 : MavericksState,
+    VM9 : MavericksViewModel<S9>,
+    S10 : MavericksState,
+    VM10 : MavericksViewModel<S10>,
+    S11 : MavericksState,
+    VM11 : MavericksViewModel<S11>,
+    Args : Parcelable>
+V.mockElevenViewModels(
+    viewModel1Reference: KProperty1<V, VM1>,
+    defaultState1: S1,
+    viewModel2Reference: KProperty1<V, VM2>,
+    defaultState2: S2,
+    viewModel3Reference: KProperty1<V, VM3>,
+    defaultState3: S3,
+    viewModel4Reference: KProperty1<V, VM4>,
+    defaultState4: S4,
+    viewModel5Reference: KProperty1<V, VM5>,
+    defaultState5: S5,
+    viewModel6Reference: KProperty1<V, VM6>,
+    defaultState6: S6,
+    viewModel7Reference: KProperty1<V, VM7>,
+    defaultState7: S7,
+    viewModel8Reference: KProperty1<V, VM8>,
+    defaultState8: S8,
+    viewModel9Reference: KProperty1<V, VM9>,
+    defaultState9: S9,
+    viewModel10Reference: KProperty1<V, VM10>,
+    defaultState10: S10,
+    viewModel11Reference: KProperty1<V, VM11>,
+    defaultState11: S11,
+    defaultArgs: Args?,
+    mockBuilder: ElevenViewModelMockBuilder<V, VM1, S1, VM2, S2, VM3, S3, VM4, S4, VM5, S5, VM6, S6, VM7, S7, VM8, S8, VM9, S9, VM10, S10, VM11, S11, Args>.() -> Unit
+): MockBuilder<V, Args> = ElevenViewModelMockBuilder(
+    viewModel1Reference,
+    defaultState1,
+    viewModel2Reference,
+    defaultState2,
+    viewModel3Reference,
+    defaultState3,
+    viewModel4Reference,
+    defaultState4,
+    viewModel5Reference,
+    defaultState5,
+    viewModel6Reference,
+    defaultState6,
+    viewModel7Reference,
+    defaultState7,
+    viewModel8Reference,
+    defaultState8,
+    viewModel9Reference,
+    defaultState9,
+    viewModel10Reference,
+    defaultState10,
+    viewModel11Reference,
+    defaultState11,
+    defaultArgs
+).apply {
+    mockBuilder()
+    build(this@mockElevenViewModels)
+}
+
 /**
  * Defines a unique variation of a View's state for testing purposes.
  *
@@ -1760,7 +1840,7 @@ internal constructor(
     }
 
     /**
-     * Define a state to be used when mocking your seventh view model (as defined in the top level mock method).
+     * Define a state to be used when mocking your eighth view model (as defined in the top level mock method).
      * If this method isn't called, your default state will be used automatically.
      * For convenience, the receiver of the lambda is the default state.
      */
@@ -1929,7 +2009,7 @@ internal constructor(
     }
 
     /**
-     * Define a state to be used when mocking your seventh view model (as defined in the top level mock method).
+     * Define a state to be used when mocking your ninth view model (as defined in the top level mock method).
      * If this method isn't called, your default state will be used automatically.
      * For convenience, the receiver of the lambda is the default state.
      */
@@ -2111,12 +2191,207 @@ internal constructor(
     }
 
     /**
-     * Define a state to be used when mocking your seventh view model (as defined in the top level mock method).
+     * Define a state to be used when mocking your tenth view model (as defined in the top level mock method).
      * If this method isn't called, your default state will be used automatically.
      * For convenience, the receiver of the lambda is the default state.
      */
     fun viewModel10(stateBuilder: S10.() -> S10) {
         vm10 setStateTo defaultState10.stateBuilder()
+    }
+}
+
+class ElevenViewModelMockBuilder<
+    V : MockableMavericksView,
+    VM1 : MavericksViewModel<S1>,
+    S1 : MavericksState,
+    VM2 : MavericksViewModel<S2>,
+    S2 : MavericksState,
+    VM3 : MavericksViewModel<S3>,
+    S3 : MavericksState,
+    VM4 : MavericksViewModel<S4>,
+    S4 : MavericksState,
+    VM5 : MavericksViewModel<S5>,
+    S5 : MavericksState,
+    VM6 : MavericksViewModel<S6>,
+    S6 : MavericksState,
+    VM7 : MavericksViewModel<S7>,
+    S7 : MavericksState,
+    VM8 : MavericksViewModel<S8>,
+    S8 : MavericksState,
+    VM9 : MavericksViewModel<S9>,
+    S9 : MavericksState,
+    VM10 : MavericksViewModel<S10>,
+    S10 : MavericksState,
+    VM11 : MavericksViewModel<S11>,
+    S11 : MavericksState,
+    Args : Parcelable>
+internal constructor(
+    private val vm1: KProperty1<V, VM1>,
+    private val defaultState1: S1,
+    private val vm2: KProperty1<V, VM2>,
+    private val defaultState2: S2,
+    private val vm3: KProperty1<V, VM3>,
+    private val defaultState3: S3,
+    private val vm4: KProperty1<V, VM4>,
+    private val defaultState4: S4,
+    private val vm5: KProperty1<V, VM5>,
+    private val defaultState5: S5,
+    private val vm6: KProperty1<V, VM6>,
+    private val defaultState6: S6,
+    private val vm7: KProperty1<V, VM7>,
+    private val defaultState7: S7,
+    private val vm8: KProperty1<V, VM8>,
+    private val defaultState8: S8,
+    private val vm9: KProperty1<V, VM9>,
+    private val defaultState9: S9,
+    private val vm10: KProperty1<V, VM10>,
+    private val defaultState10: S10,
+    private val vm11: KProperty1<V, VM11>,
+    private val defaultState11: S11,
+    defaultArgs: Args?
+) : MockBuilder<V, Args>(
+    defaultArgs,
+    vm1.pairDefault(defaultState1),
+    vm2.pairDefault(defaultState2),
+    vm3.pairDefault(defaultState3),
+    vm4.pairDefault(defaultState4),
+    vm5.pairDefault(defaultState5),
+    vm6.pairDefault(defaultState6),
+    vm7.pairDefault(defaultState7),
+    vm8.pairDefault(defaultState8),
+    vm9.pairDefault(defaultState9),
+    vm10.pairDefault(defaultState10),
+    vm11.pairDefault(defaultState11)
+) {
+
+    /**
+     * Provide state objects for each view model in the view.
+     *
+     * @param name Describes the UI these states put the view in. Should be unique.
+     * @param args The arguments that should be provided to the view.
+     *             This is only used if the view accesses arguments directly to get data that is not provided in the view model state.
+     *             In other cases it should be omitted. This must be provided if the view accesses args directly.
+     * @param statesBuilder A lambda that is used to define state objects for each view model. See [ElevenStatesBuilder]
+     */
+    fun state(
+        name: String,
+        args: (Args.() -> Args)? = null,
+        statesBuilder: ElevenStatesBuilder<V, S1, VM1, S2, VM2, S3, VM3, S4, VM4, S5, VM5, S6, VM6, S7, VM7, S8, VM8, S9, VM9, S10, VM10, S11, VM11>.() -> Unit
+    ) {
+        addState(
+            name,
+            evaluateArgsLambda(args),
+            {
+                ElevenStatesBuilder(
+                    vm1,
+                    defaultState1,
+                    vm2,
+                    defaultState2,
+                    vm3,
+                    defaultState3,
+                    vm4,
+                    defaultState4,
+                    vm5,
+                    defaultState5,
+                    vm6,
+                    defaultState6,
+                    vm7,
+                    defaultState7,
+                    vm8,
+                    defaultState8,
+                    vm9,
+                    defaultState9,
+                    vm10,
+                    defaultState10,
+                    vm11,
+                    defaultState11
+                ).apply(statesBuilder).states
+            }
+        )
+    }
+}
+
+open class ElevenStatesBuilder<
+    V : MavericksView,
+    S1 : MavericksState,
+    VM1 : MavericksViewModel<S1>,
+    S2 : MavericksState,
+    VM2 : MavericksViewModel<S2>,
+    S3 : MavericksState,
+    VM3 : MavericksViewModel<S3>,
+    S4 : MavericksState,
+    VM4 : MavericksViewModel<S4>,
+    S5 : MavericksState,
+    VM5 : MavericksViewModel<S5>,
+    S6 : MavericksState,
+    VM6 : MavericksViewModel<S6>,
+    S7 : MavericksState,
+    VM7 : MavericksViewModel<S7>,
+    S8 : MavericksState,
+    VM8 : MavericksViewModel<S8>,
+    S9 : MavericksState,
+    VM9 : MavericksViewModel<S9>,
+    S10 : MavericksState,
+    VM10 : MavericksViewModel<S10>,
+    S11 : MavericksState,
+    VM11 : MavericksViewModel<S11>>
+internal constructor(
+    vm1: KProperty1<V, VM1>,
+    defaultState1: S1,
+    vm2: KProperty1<V, VM2>,
+    defaultState2: S2,
+    vm3: KProperty1<V, VM3>,
+    defaultState3: S3,
+    vm4: KProperty1<V, VM4>,
+    defaultState4: S4,
+    vm5: KProperty1<V, VM5>,
+    defaultState5: S5,
+    vm6: KProperty1<V, VM6>,
+    defaultState6: S6,
+    vm7: KProperty1<V, VM7>,
+    defaultState7: S7,
+    vm8: KProperty1<V, VM8>,
+    defaultState8: S8,
+    vm9: KProperty1<V, VM9>,
+    defaultState9: S9,
+    vm10: KProperty1<V, VM10>,
+    defaultState10: S10,
+    private val vm11: KProperty1<V, VM11>,
+    private val defaultState11: S11
+) : TenStatesBuilder<V, S1, VM1, S2, VM2, S3, VM3, S4, VM4, S5, VM5, S6, VM6, S7, VM7, S8, VM8, S9, VM9, S10, VM10>(
+    vm1,
+    defaultState1,
+    vm2,
+    defaultState2,
+    vm3,
+    defaultState3,
+    vm4,
+    defaultState4,
+    vm5,
+    defaultState5,
+    vm6,
+    defaultState6,
+    vm7,
+    defaultState7,
+    vm8,
+    defaultState8,
+    vm9,
+    defaultState9,
+    vm10,
+    defaultState10
+) {
+
+    init {
+        vm11 setStateTo defaultState11
+    }
+
+    /**
+     * Define a state to be used when mocking your eleventh view model (as defined in the top level mock method).
+     * If this method isn't called, your default state will be used automatically.
+     * For convenience, the receiver of the lambda is the default state.
+     */
+    fun viewModel11(stateBuilder: S11.() -> S11) {
+        vm11 setStateTo defaultState11.stateBuilder()
     }
 }
 

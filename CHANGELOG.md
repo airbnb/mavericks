@@ -1,5 +1,14 @@
 # Change Log
 
+For a full list of changes, see the [GitHub releases](https://github.com/airbnb/mavericks/releases)
+
+## 3.0.3
+- Changed flowWhenStarted to emit value on flow coroutine context (#678)
+
+## 3.0.2
+- Wrap subscription action with lifecycle whenStarted (#665)
+- Updated embedded Proguard/r8 rules to work with R8 full mode (#658)
+
 ## 3.0.1
 - Fix issue where `mavericks-common` module was not published to maven in 3.0.0
 

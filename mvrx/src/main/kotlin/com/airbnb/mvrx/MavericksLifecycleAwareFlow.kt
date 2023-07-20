@@ -10,7 +10,6 @@ import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.produce
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.selects.SelectBuilder
@@ -31,31 +30,33 @@ fun <T : Any?> Flow<T>.flowWhenStarted(owner: LifecycleOwner): Flow<T> = flow {
         val startedChannel = startedChannel(owner.lifecycle)
         val flowChannel = produce { collect { send(it) } }
 
-        val transform: suspend (Boolean, T) -> Unit = { started, value ->
-            if (started) {
-                emit(value)
-            }
-        }
-
+        val nullValue = Any()
         var started: Boolean? = null
-        var flowValue: T? = null
+        var flowResult: Any? = nullValue
         var isClosed = false
 
         while (!isClosed) {
-            select<Unit> {
-                onReceive(startedChannel, { flowChannel.cancel(); isClosed = true }) {
-                    started = it
-                    if (flowValue !== null) {
-                        @Suppress("UNCHECKED_CAST")
-                        transform(it, flowValue as T)
+            val result = select {
+                onReceive(startedChannel, { flowChannel.cancel(); isClosed = true; nullValue }) { value ->
+                    started = value
+                    if (flowResult != nullValue && value) {
+                        flowResult
+                    } else {
+                        nullValue
                     }
                 }
-                onReceive(flowChannel, { isClosed = true }) {
-                    flowValue = it
-                    if (started !== null) {
-                        transform(started as Boolean, it)
+                onReceive(flowChannel, { isClosed = true; nullValue }) { value ->
+                    flowResult = value
+                    if (started == true) {
+                        value
+                    } else {
+                        nullValue
                     }
                 }
+            }
+            if (result != nullValue) {
+                @Suppress("UNCHECKED_CAST")
+                emit(result as T)
             }
         }
     }
@@ -83,14 +84,16 @@ private fun startedChannel(owner: Lifecycle): Channel<Boolean> {
     return channel
 }
 
-private inline fun <T : Any?> SelectBuilder<Unit>.onReceive(
+private inline fun <T : Any?, R : Any?> SelectBuilder<R>.onReceive(
     channel: ReceiveChannel<T>,
-    crossinline onClosed: () -> Unit,
-    noinline onReceive: suspend (value: T) -> Unit
+    crossinline onClosed: () -> R,
+    noinline onReceive: suspend (value: T) -> R
 ) {
-    channel.onReceiveCatching {
-        val result = it.getOrNull()
-        if (result === null) onClosed()
-        else onReceive(result)
+    channel.onReceiveCatching { result ->
+        if (result.isClosed) {
+            onClosed()
+        } else {
+            onReceive(result.getOrThrow())
+        }
     }
 }
