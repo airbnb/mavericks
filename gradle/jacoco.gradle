@@ -1,5 +1,5 @@
 // Mostly from https://nolambda.stream/posts/jacoco-setup-for-multi-module-project/
-def coveredProjectNames = ["mvrx", "mvrx-compose", "mvrx-mocking", "mvrx-navigation", "mvrx-hilt", "mvrx-rxjava2"]
+def coveredProjectNames = ["mvrx", "mvrx-compose", "mvrx-mocking", "mvrx-navigation", "mvrx-hilt", "mvrx-rxjava2", "mvrx-rxjava3"]
 def coveredProjects = subprojects.findAll( project -> {
     coveredProjectNames.contains(project.name)
 })

@@ -37,8 +37,8 @@ dependencies {
     implementation libs.recyclerview
     implementation libs.roomRuntime
     implementation libs.roomRxJava
-    implementation libs.rxAndroid
-    implementation libs.rxJava
+    implementation libs.rxAndroid2
+    implementation libs.rxJava2
     implementation libs.multidex
 
     testImplementation libs.junit

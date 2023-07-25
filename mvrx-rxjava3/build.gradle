@@ -32,7 +32,7 @@ android {
 
 dependencies {
     api project(':mvrx')
-    api libs.rxJava2
+    api libs.rxJava3
 
     implementation libs.fragment
     implementation libs.lifecycleCommon
