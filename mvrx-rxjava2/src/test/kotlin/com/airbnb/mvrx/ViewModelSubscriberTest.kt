@@ -2,6 +2,7 @@ package com.airbnb.mvrx
 
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.testing.TestLifecycleOwner
 import io.reactivex.Completable
 import io.reactivex.Maybe
 import io.reactivex.Observable

@@ -53,4 +53,5 @@ dependencies {
     testImplementation libs.kotlinCoroutinesTest
     testImplementation libs.mockito
     testImplementation libs.roboeletric
+    testImplementation libs.lifecycleTest
 }

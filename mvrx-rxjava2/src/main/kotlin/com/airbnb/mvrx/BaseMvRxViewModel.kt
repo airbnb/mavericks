@@ -47,7 +47,10 @@ abstract class BaseMvRxViewModel<S : MavericksState>(
      * This is not publicly accessible as it should only be used to control subscriptions
      * between two view models.
      */
-    private val lifecycleOwner: LifecycleOwner = LifecycleOwner { lifecycleRegistry }
+    private val lifecycleOwner: LifecycleOwner = object : LifecycleOwner {
+        override val lifecycle: Lifecycle
+            get() = lifecycleRegistry
+    }
 
     /**
      * Since lifecycle 2.3.0, it enforces calls from the main thread. Mavericks owns this registry so it can enforce that to be the case.
