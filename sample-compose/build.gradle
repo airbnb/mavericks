@@ -35,13 +35,14 @@ android {
             signingConfig signingConfigs.debug
         }
     }
-
     packagingOptions {
-        exclude 'META-INF/LGPL2.1'
-        exclude 'META-INF/AL2.0'
-        pickFirst 'META-INF/LICENSE.md'
-        pickFirst 'META-INF/LICENSE-notice.md'
+        resources {
+            excludes += ['META-INF/LGPL2.1', 'META-INF/AL2.0']
+            pickFirsts += ['META-INF/LICENSE.md', 'META-INF/LICENSE-notice.md']
+        }
     }
+
+    namespace 'com.airbnb.mvrx.compose.sample'
 
     buildFeatures {
         viewBinding true

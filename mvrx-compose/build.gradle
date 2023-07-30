@@ -21,11 +21,12 @@ android {
         minSdkVersion 21
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
-
     packagingOptions {
-        exclude 'META-INF/LGPL2.1'
-        exclude 'META-INF/AL2.0'
+        resources {
+            excludes += ['META-INF/LGPL2.1', 'META-INF/AL2.0']
+        }
     }
+
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
@@ -50,6 +51,7 @@ android {
             includeAndroidResources = true
         }
     }
+    namespace 'com.airbnb.mvrx.compose'
 }
 
 dependencies {

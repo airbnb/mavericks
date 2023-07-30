@@ -28,6 +28,7 @@ android {
             }
         }
     }
+    namespace 'com.airbnb.mvrx.rxjava2'
 }
 
 dependencies {

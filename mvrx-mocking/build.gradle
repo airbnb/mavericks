@@ -34,6 +34,7 @@ android {
             }
         }
     }
+    namespace 'com.airbnb.mvrx.mocking'
 }
 
 dependencies {

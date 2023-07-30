@@ -25,6 +25,7 @@ android {
             includeAndroidResources = true
         }
     }
+    namespace 'com.airbnb.mvrx.launcher'
 }
 
 dependencies {

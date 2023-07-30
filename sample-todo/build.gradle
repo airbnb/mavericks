@@ -17,6 +17,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'com.airbnb.mvrx.todomvrx.todoapp'
 }
 
 

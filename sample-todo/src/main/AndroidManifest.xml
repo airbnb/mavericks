@@ -14,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<manifest package="com.airbnb.mvrx.todomvrx.todoapp"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
         android:name="com.airbnb.mvrx.todomvrx.ToDoApplication"

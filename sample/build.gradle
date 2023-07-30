@@ -23,6 +23,7 @@ android {
     viewBinding {
         enabled = true
     }
+    namespace 'com.airbnb.mvrx.sample'
 }
 
 
