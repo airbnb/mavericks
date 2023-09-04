@@ -2,7 +2,7 @@
 
 `MavericksViewModelFactory` can be combined with Dagger's [assisted injection](https://dagger.dev/dev-guide/assisted-injection) to provide seamless integration with Dagger.
 
-For more information and working example, check out our [hellodagger](https://github.com/airbnb/MvRx/tree/main/hellodagger) example on GitHub.
+For more information and working example, check out our [sample-dagger](https://github.com/airbnb/mavericks/tree/main/sample-dagger) example on GitHub.
 
 ```kotlin
 class HelloDaggerViewModel @AssistedInject constructor(
