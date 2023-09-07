@@ -1,6 +1,7 @@
 package com.airbnb.mvrx
 
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.testing.TestLifecycleOwner
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -14,13 +15,12 @@ class LifecycleAwareLazyTest : BaseTest() {
 
     @Before
     fun setup() {
-        owner = TestLifecycleOwner()
+        owner = TestLifecycleOwner(Lifecycle.State.INITIALIZED)
         lazyProp = lifecycleAwareLazy(owner) { "Hello World" }
     }
 
     @Test
     fun testNotInitializedBeforeOnCreate() {
-        owner.lifecycle.currentState = Lifecycle.State.INITIALIZED
         assertFalse(lazyProp.isInitialized())
     }
 
@@ -69,13 +69,12 @@ class LifecycleAwareLazyTest : BaseTest() {
         alreadyCreatedOwner.lifecycle.currentState = Lifecycle.State.CREATED
         val createdLazy = lifecycleAwareLazy(alreadyCreatedOwner) { "Hello World" }
         assertTrue(createdLazy.isInitialized())
-        assertEquals(0, alreadyCreatedOwner.observerAddedCount)
+        assertEquals(0, alreadyCreatedOwner.observerCount)
     }
 
     @Test
     fun testOneObserverIsAddedIfStateIsInitialized() {
-        owner.lifecycle.currentState = Lifecycle.State.INITIALIZED
         assertFalse(lazyProp.isInitialized())
-        assertEquals(1, owner.observerAddedCount)
+        assertEquals(1, owner.observerCount)
     }
 }

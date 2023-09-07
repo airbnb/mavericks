@@ -6,7 +6,7 @@
 # 5. Make sure it is using the version you want
 
 [plugins]
-ksp = { id = "com.google.devtools.ksp", version = "1.7.10-1.0.6" }
+ksp = { id = "com.google.devtools.ksp", version = "1.8.22-1.0.11" }
 
 [libraries]
 androidGradle = "com.android.tools.build:gradle:_"
@@ -43,10 +43,11 @@ fragmentKtx = "androidx.fragment:fragment-ktx:_"
 fragmentTesting = "androidx.fragment:fragment-testing:_"
 koin = "io.insert-koin:koin-android:_"
 kotlinGradle = "org.jetbrains.kotlin:kotlin-gradle-plugin:_"
-kotlin = "org.jetbrains.kotlin:kotlin-stdlib-jdk8:_"
+kotlin = "org.jetbrains.kotlin:kotlin-stdlib:_"
 kotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:_"
 kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:_"
 lifecycleCommon = "androidx.lifecycle:lifecycle-common-java8:_"
+lifecycleTest = "androidx.lifecycle:lifecycle-runtime-testing:_"
 lottie = "com.airbnb.android:lottie:_"
 moshi = "com.squareup.moshi:moshi:_"
 moshiCodegen = "com.squareup.moshi:moshi-kotlin-codegen:_"

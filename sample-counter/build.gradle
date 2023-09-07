@@ -11,6 +11,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'com.airbnb.mvrx.counter'
 }
 
 tasks.withType(Test) {

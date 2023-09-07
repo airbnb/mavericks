@@ -49,6 +49,7 @@ import kotlin.reflect.KProperty1
  * initialized. This will supersede any arguments from the fragment or activity.
  */
 @Composable
+@Suppress("DEPRECATION")
 inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mavericksViewModel(
     scope: LifecycleOwner = LocalLifecycleOwner.current,
     noinline keyFactory: (() -> String)? = null,

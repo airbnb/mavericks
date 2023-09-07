@@ -31,6 +31,7 @@ android {
     kotlinOptions {
         freeCompilerArgs += "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
     }
+    namespace 'com.airbnb.mvrx.hilt'
 }
 
 dependencies {

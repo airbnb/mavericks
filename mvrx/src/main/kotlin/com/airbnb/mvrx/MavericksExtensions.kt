@@ -14,7 +14,7 @@ import kotlin.reflect.KProperty
  *
  * Looks for [Mavericks.KEY_ARG] on the arguments of the fragments.
  */
-@Suppress("FunctionName")
+@Suppress("FunctionName", "DEPRECATION")
 @InternalMavericksApi
 fun <T : Fragment> T._fragmentArgsProvider(): Any? = arguments?.get(Mavericks.KEY_ARG)
 
@@ -208,6 +208,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
  * This is similar to [fragmentViewModel] and [actvityViewModel] but used when a view model
  * is accessed directly from an activity itself.
  */
+@Suppress("DEPRECATION")
 inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T.viewModel(
     viewModelClass: KClass<VM> = VM::class,
     crossinline keyFactory: () -> String = { viewModelClass.java.name }
@@ -232,6 +233,7 @@ inline fun <T, reified VM : MavericksViewModel<S>, reified S : MavericksState> T
 fun <V : Any> args() = object : ReadOnlyProperty<Fragment, V> {
     var value: V? = null
 
+    @Suppress("DEPRECATION")
     override fun getValue(thisRef: Fragment, property: KProperty<*>): V {
         if (value == null) {
             val args = thisRef.arguments
@@ -262,6 +264,7 @@ fun <V> argsOrNull() = object : ReadOnlyProperty<Fragment, V?> {
     var value: V? = null
     var read: Boolean = false
 
+    @Suppress("DEPRECATION")
     override fun getValue(thisRef: Fragment, property: KProperty<*>): V? {
         if (!read) {
             val args = thisRef.arguments

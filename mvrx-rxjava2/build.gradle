@@ -28,6 +28,7 @@ android {
             }
         }
     }
+    namespace 'com.airbnb.mvrx.rxjava2'
 }
 
 dependencies {
@@ -44,4 +45,5 @@ dependencies {
     testImplementation libs.kotlinCoroutinesTest
     testImplementation libs.mockito
     testImplementation libs.roboeletric
+    testImplementation libs.lifecycleTest
 }

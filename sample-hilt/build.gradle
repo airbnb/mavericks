@@ -21,6 +21,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'com.airbnb.mvrx.hellohilt'
 }
 
 dependencies {

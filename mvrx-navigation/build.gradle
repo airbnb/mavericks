@@ -31,6 +31,7 @@ android {
             }
         }
     }
+    namespace 'com.airbnb.mvrx.navigation'
 }
 
 dependencies {

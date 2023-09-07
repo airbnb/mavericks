@@ -32,6 +32,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'com.airbnb.mvrx.sample.anvil'
 }
 
 dependencies {

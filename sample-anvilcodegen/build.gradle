@@ -8,10 +8,15 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
     }
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
 dependencies {
-    api "com.squareup.anvil:compiler-api:2.4.0"
+    api "com.squareup.anvil:compiler-api:2.4.6"
     implementation project(':sample-anvilannotations')
-    implementation "com.squareup.anvil:compiler-utils:2.4.0"
+    implementation "com.squareup.anvil:compiler-utils:2.4.6"
     implementation "com.squareup:kotlinpoet:1.10.2"
     implementation 'com.google.dagger:dagger:2.42'
 

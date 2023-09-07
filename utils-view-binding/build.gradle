@@ -5,6 +5,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'com.airbnb.mvrx.viewbinding'
 }
 
 dependencies {

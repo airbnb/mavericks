@@ -11,7 +11,6 @@ import java.io.Serializable
  * Helper ViewModelProvider that has a single method for taking either a [Fragment] or [ComponentActivity] instead
  * of two separate ones. The logic for providing the correct scope is inside the method.
  */
-@InternalMavericksApi
 object MavericksViewModelProvider {
     /**
      * Mavericks specific ViewModelProvider used for creating a BaseMavericksViewModel scoped to either a [Fragment] or [ComponentActivity].
@@ -28,6 +27,7 @@ object MavericksViewModelProvider {
      * @param initialStateFactory A way to specify how to create the initial state, can be mocked out for testing.
      *
      */
+    @InternalMavericksApi
     fun <VM : MavericksViewModel<S>, S : MavericksState> get(
         viewModelClass: Class<out VM>,
         stateClass: Class<out S>,
