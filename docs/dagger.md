@@ -2,7 +2,7 @@
 
 `MavericksViewModelFactory` can be combined with Dagger's [assisted injection](https://dagger.dev/dev-guide/assisted-injection) to provide seamless integration with Dagger.
 
-For more information and working example, check out our [hellodagger](https://github.com/airbnb/MvRx/tree/main/hellodagger) example on GitHub.
+For more information and working example, check out our [sample-dagger](https://github.com/airbnb/mavericks/tree/main/sample-dagger) example on GitHub.
 
 ```kotlin
 class HelloDaggerViewModel @AssistedInject constructor(
@@ -24,7 +24,7 @@ class HelloDaggerViewModel @AssistedInject constructor(
 
 Mavericks also works great with Hilt. One difference from standard ViewModels is that instead of using the standard `ViewModelComponent` which is a subcomponent of `ActivityRetainedComponent`, you have to use `MavericksViewModelComponent` which is a child of `SingletonComponent`. However, this is functionally the same and you get all of the same benefits of a view model scoped component in which you can share dependencies between different components in the view model graph.
 
-For more information and working example, check out our [hellohilt](https://github.com/airbnb/MvRx/tree/main/hellohilt) example on GitHub.
+For more information and working example, check out our [sample-hilt](https://github.com/airbnb/mavericks/tree/main/sample-hilt) example on GitHub.
 
 ```kotlin
 import com.airbnb.mvrx.hilt.AssistedViewModelFactory
