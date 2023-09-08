@@ -31,7 +31,7 @@ fun setAndRetrieveState() {
 ```
 This would print: [A, C, E, B, D]
 
-You can view some more complex ordering situations [here](https://github.com/airbnb/mavericks/blob/release/2.0.0/mvrx/src/test/kotlin/com/airbnb/mvrx/SetStateWithStateOrderingTest.kt). However, most of the time it will be have as you would expect and you don't have to think about the threading model.
+You can view some more complex ordering situations [here](https://github.com/airbnb/mavericks/blob/release/2.0.0/mvrx/src/test/kotlin/com/airbnb/mvrx/SetStateWithStateOrderingTest.kt). However, most of the time it will behave as you would expect and you don't have to think about the threading model.
 
 However, it is sometimes necessary to get data synchronously for views so as a convenience, `withState` _is_ run synchronously when called from outside of the ViewModel.
 ```kotlin
