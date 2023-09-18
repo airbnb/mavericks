@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/airbnb/mavericks.svg?branch=main)](https://travis-ci.com/github/airbnb/mavericks)
+[![Build Status](https://github.com/airbnb/mavericks/actions/workflows/build_test.yml/badge.svg)](https://github.com/airbnb/mavericks/actions/workflows/build_test.yml)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.airbnb.android/mavericks)
 [![codecov.io](https://codecov.io/github/codecov/mavericks/branch/main/graph/badge.svg)](https://codecov.io/github/codecov/mavericks)
 
