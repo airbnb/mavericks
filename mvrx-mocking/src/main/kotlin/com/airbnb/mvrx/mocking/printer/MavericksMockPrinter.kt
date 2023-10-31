@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.AsyncTask
+import android.os.Build
 import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
@@ -204,6 +205,11 @@ internal abstract class MavericksPrintStateBroadcastReceiver : BroadcastReceiver
     fun register(context: Context) {
         check(!isRegistered) { "Already registered" }
         isRegistered = true
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(networkInfoReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            context.registerReceiver(networkInfoReceiver, filter)
+        }
         context.registerReceiver(this, IntentFilter(ACTION_COPY_MAVERICKS_STATE))
     }
 
