@@ -206,11 +206,10 @@ internal abstract class MavericksPrintStateBroadcastReceiver : BroadcastReceiver
         check(!isRegistered) { "Already registered" }
         isRegistered = true
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.registerReceiver(networkInfoReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+            context.registerReceiver(this, IntentFilter(ACTION_COPY_MAVERICKS_STATE), Context.RECEIVER_NOT_EXPORTED)
         } else {
-            context.registerReceiver(networkInfoReceiver, filter)
+            context.registerReceiver(this, IntentFilter(ACTION_COPY_MAVERICKS_STATE))
         }
-        context.registerReceiver(this, IntentFilter(ACTION_COPY_MAVERICKS_STATE))
     }
 
     fun unregister(context: Context) {
