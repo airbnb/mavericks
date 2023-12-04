@@ -9,6 +9,6 @@ abstract class BaseFragment(@LayoutRes containerLayoutId: Int = 0) : Fragment(co
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        registerMockPrinter()
+            registerMockPrinter()
     }
 }
