@@ -239,6 +239,58 @@ class PersistedStateTest : BaseTest() {
     }
 
     @Test
+    fun testClassWithExactly32Parameters() {
+        data class StateWith32Params(
+            val p0: Int = 0,
+            @PersistState val p1: Int = 0,
+            val p2: Int = 0,
+            @PersistState val p3: Int = 0,
+            val p4: Int = 0,
+            @PersistState val p5: Int = 0,
+            val p6: Int = 0,
+            @PersistState val p7: Int = 0,
+            val p8: Int = 0,
+            @PersistState val p9: Int = 0,
+            val p10: Int = 0,
+            @PersistState val p11: Int = 0,
+            val p12: Int = 0,
+            @PersistState val p13: Int = 0,
+            val p14: Int = 0,
+            @PersistState val p15: Int = 0,
+            val p16: Int = 0,
+            @PersistState val p17: Int = 0,
+            val p18: Int = 0,
+            @PersistState val p19: Int = 0,
+            val p20: Int = 0,
+            @PersistState val p21: Int = 0,
+            val p22: Int = 0,
+            @PersistState val p23: Int = 0,
+            val p24: Int = 0,
+            @PersistState val p25: Int = 0,
+            val p26: Int = 0,
+            @PersistState val p27: Int = 0,
+            val p28: Int = 0,
+            @PersistState val p29: Int = 0,
+            val p30: Int = 0,
+            @PersistState val p31: Int = 0,
+        ) : MavericksState
+
+        val bundle = persistMavericksState(
+            StateWith32Params(
+                p0 = 1,
+                p1 = 2,
+                p30 = 0,
+                p31 = 17,
+            )
+        )
+        val newState = restorePersistedMavericksState(bundle, StateWith32Params())
+        assertEquals(2, newState.p1)
+        assertEquals(17, newState.p31)
+        assertEquals(0, newState.p30)
+        assertEquals(17, newState.p31)
+    }
+
+    @Test
     fun testClassWithMoreThan32Parameters() {
         data class StateWithLotsOfParameters(
             val p0: Int = 0,

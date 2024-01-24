@@ -128,7 +128,7 @@ fun <T : MavericksState> restorePersistedMavericksState(
     val fieldCount = constructor.parameterTypes.size
 
     // There is 1 bitmask for each block of 32 parameters.
-    val parameterBitMasks = IntArray(fieldCount / 32 + 1) { 0 }
+    val parameterBitMasks = IntArray(fieldCount / 32 + if (fieldCount % 32 != 0) 1 else 0) { 0 }
     val parameters = arrayOfNulls<Any?>(fieldCount)
     parameters[0] = initialState
     for (i in 0 until fieldCount) {
