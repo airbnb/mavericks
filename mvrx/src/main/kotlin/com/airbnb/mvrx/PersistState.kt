@@ -7,6 +7,7 @@ import android.os.Parcelable
 import java.io.Serializable
 import java.lang.reflect.Constructor
 import java.lang.reflect.Method
+import kotlin.math.ceil
 
 /**
  * Annotate a field in your [MavericksViewModel] state with [PersistState] to have it automatically persisted when Android kills your process
@@ -128,7 +129,7 @@ fun <T : MavericksState> restorePersistedMavericksState(
     val fieldCount = constructor.parameterTypes.size
 
     // There is 1 bitmask for each block of 32 parameters.
-    val parameterBitMasks = IntArray(fieldCount / 32 + if (fieldCount % 32 != 0) 1 else 0) { 0 }
+    val parameterBitMasks = IntArray(ceil(fieldCount / 32.0).toInt())
     val parameters = arrayOfNulls<Any?>(fieldCount)
     parameters[0] = initialState
     for (i in 0 until fieldCount) {
