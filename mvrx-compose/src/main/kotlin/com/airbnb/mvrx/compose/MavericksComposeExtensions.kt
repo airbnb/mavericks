@@ -75,7 +75,7 @@ inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mave
 
         if (parentFragment != null) {
             val args = argsFactory?.invoke() ?: parentFragment.arguments?.get(Mavericks.KEY_ARG)
-            FragmentViewModelContext(activity, args, parentFragment)
+            FragmentViewModelContext(activity, args, parentFragment, viewModelStoreOwner, savedStateRegistry)
         } else {
             val args = argsFactory?.invoke() ?: activity.intent.extras?.get(Mavericks.KEY_ARG)
             ActivityViewModelContext(activity, args, viewModelStoreOwner, savedStateRegistry)
