@@ -22,6 +22,7 @@ import androidx.navigation.compose.rememberNavController
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.compose.collectAsState
+import com.airbnb.mvrx.compose.collectAsStateWithLifecycle
 import com.airbnb.mvrx.compose.mavericksActivityViewModel
 import com.airbnb.mvrx.compose.mavericksViewModel
 
@@ -94,7 +95,7 @@ class ComposeSampleActivity : AppCompatActivity() {
         val activityScopedViewModel: CounterViewModel = mavericksActivityViewModel()
 
         val navScopedCount by navScopedViewModel.collectAsState(CounterState::count)
-        val activityScopedCount by activityScopedViewModel.collectAsState(CounterState::count)
+        val activityScopedCount by activityScopedViewModel.collectAsStateWithLifecycle(CounterState::count)
 
         Column {
             Text(title)

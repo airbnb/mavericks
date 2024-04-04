@@ -62,6 +62,7 @@ dependencies {
     implementation libs.composeFoundation
     implementation libs.composeUi
     implementation libs.viewModelCompose
+    implementation libs.runtimeCompose
     debugImplementation libs.composeUiTestManifest
 
     testImplementation project(':mvrx-testing')
