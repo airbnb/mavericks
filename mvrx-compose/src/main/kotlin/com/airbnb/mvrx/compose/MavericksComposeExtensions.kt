@@ -15,8 +15,10 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.platform.LocalView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.savedstate.SavedStateRegistryOwner
 import com.airbnb.mvrx.ActivityViewModelContext
 import com.airbnb.mvrx.FragmentViewModelContext
@@ -145,6 +147,22 @@ fun <VM : MavericksViewModel<S>, S : MavericksState> VM.collectAsState(): State<
 }
 
 /**
+ * Creates a Compose State variable that will emit new values whenever this ViewModel's state changes in a lifecycle-aware manner.
+ * Prefer the overload with a state property reference to ensure that your composable only recomposes when the properties it uses changes.
+ */
+@Composable
+fun <VM : MavericksViewModel<S>, S : MavericksState> VM.collectAsStateWithLifecycle(
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+    minActiveState: Lifecycle.State = Lifecycle.State.STARTED
+): State<S> {
+    return stateFlow.collectAsStateWithLifecycle(
+        initialValue = withState(this) { it },
+        lifecycleOwner = lifecycleOwner,
+        minActiveState = minActiveState
+    )
+}
+
+/**
  * Creates a Compose State variable that will emit new values whenever this ViewModel's state mapped to the provided mapper changes.
  * Prefer the overload with a state property reference to ensure that your composable only recomposes when the properties it uses changes.
  *
@@ -161,6 +179,31 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectAsState(key: A
 }
 
 /**
+ * Creates a Compose State variable that will emit new values whenever this ViewModel's state mapped to the provided mapper changes in a lifecycle-aware manner.
+ * Prefer the overload with a state property reference to ensure that your composable only recomposes when the properties it uses changes.
+ *
+ * @param key An optional key that should be changed if the mapper changes. If your mapper always does the same thing, you can leave this as Unit.
+ *            If your mapper changes (for example, reading a different state property) then, by default, you won't receive an updated state value
+ *            until either the ViewModel emits a new state or if you change the key.
+ *            This is analogous to `remember(key) { … }`.
+ */
+@Composable
+fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectAsStateWithLifecycle(
+    key: Any? = Unit,
+    mapper: (S) -> O,
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+    minActiveState: Lifecycle.State = Lifecycle.State.STARTED
+): State<O> {
+    val updatedMapper by rememberUpdatedState(mapper)
+    val mappedFlow = remember(key) { stateFlow.map { updatedMapper(it) }.distinctUntilChanged() }
+    return mappedFlow.collectAsStateWithLifecycle(
+        initialValue = withState(this) { updatedMapper(it) },
+        lifecycleOwner = lifecycleOwner,
+        minActiveState = minActiveState
+    )
+}
+
+/**
  * Creates a Compose State variable that will only update when the value of this property changes.
  * Prefer this to subscribing to entire state classes which will trigger a recomposition whenever any state variable changes.
  * If you find yourself subscribing to many state properties in a single composable, consider breaking it up into smaller ones.
@@ -169,4 +212,23 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectAsState(key: A
 fun <VM : MavericksViewModel<S>, S : MavericksState, A> VM.collectAsState(prop1: KProperty1<S, A>): State<A> {
     val mappedFlow = remember(prop1) { stateFlow.map { prop1.get(it) }.distinctUntilChanged() }
     return mappedFlow.collectAsState(initial = withState(this) { prop1.get(it) })
+}
+
+/**
+ * Creates a Compose State variable that will only update when the value of this property changes that can be collected in a lifecycle-aware manner.
+ * Prefer this to subscribing to entire state classes which will trigger a recomposition whenever any state variable changes.
+ * If you find yourself subscribing to many state properties in a single composable, consider breaking it up into smaller ones.
+ */
+@Composable
+fun <VM : MavericksViewModel<S>, S : MavericksState, A> VM.collectAsStateWithLifecycle(
+    prop1: KProperty1<S, A>,
+    lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
+    minActiveState: Lifecycle.State = Lifecycle.State.STARTED
+): State<A> {
+    val mappedFlow = remember(prop1) { stateFlow.map { prop1.get(it) }.distinctUntilChanged() }
+    return mappedFlow.collectAsStateWithLifecycle(
+        initialValue = withState(this) { prop1.get(it) },
+        lifecycleOwner = lifecycleOwner,
+        minActiveState = minActiveState
+    )
 }
