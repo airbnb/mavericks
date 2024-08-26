@@ -6,6 +6,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import org.mockito.Mockito
 
@@ -44,12 +45,21 @@ class PersistedStateTest : BaseTest() {
         assertEquals(5, newState.count)
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test
     fun validatesMissingKeyInBundle() {
-        data class State(@PersistState val count: Int = 5) : MavericksState
+        val exception: IllegalStateException = assertThrows(
+            IllegalStateException::class.java
+        ) {
+            data class State(@PersistState val count: Int = 5) : MavericksState
 
-        val newState = restorePersistedMavericksState(Bundle(), State(), validation = true)
-        assertEquals(5, newState.count)
+            val newState = restorePersistedMavericksState(Bundle(), State(), validation = true)
+            assertEquals(5, newState.count)
+        }
+        assertEquals(
+            "savedInstanceState bundle should have a key for state property at position 0 but it was missing.",
+            // The mockito mock adds a random id string at the end.
+            exception.message?.substringBeforeLast("$")
+        )
     }
 
     @Test
@@ -188,11 +198,20 @@ class PersistedStateTest : BaseTest() {
         assertEquals(3, state.data[0].count)
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test()
     fun testNonParcelableList() {
-        data class State2(@PersistState val data: List<Context> = listOf(Mockito.mock(Context::class.java))) : MavericksState
+        val exception: IllegalStateException = assertThrows(
+            IllegalStateException::class.java
+        ) {
+            data class State2(@PersistState val data: List<Context> = listOf(Mockito.mock(Context::class.java))) : MavericksState
 
-        persistMavericksState(State2(), validation = true)
+            persistMavericksState(State2(), validation = true)
+        }
+        assertEquals(
+            "Cannot parcel android.content.Context\$MockitoMock",
+            // The mockito mock adds a random id string at the end.
+            exception.message?.substringBeforeLast("$")
+        )
     }
 
     @Test
@@ -204,11 +223,20 @@ class PersistedStateTest : BaseTest() {
         assertEquals(3, state.data.take(1).first().count)
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test()
     fun testNonParcelableSet() {
-        data class State2(@PersistState val data: Set<Context> = setOf(Mockito.mock(Context::class.java))) : MavericksState
+        val exception: IllegalStateException = assertThrows(
+            IllegalStateException::class.java
+        ) {
+            data class State2(@PersistState val data: Set<Context> = setOf(Mockito.mock(Context::class.java))) : MavericksState
 
-        persistMavericksState(State2(), validation = true)
+            persistMavericksState(State2(), validation = true)
+        }
+        assertEquals(
+            "Cannot parcel android.content.Context\$MockitoMock",
+            // The mockito mock adds a random id string at the end.
+            exception.message?.substringBeforeLast("$")
+        )
     }
 
     @Test
@@ -222,20 +250,37 @@ class PersistedStateTest : BaseTest() {
         assertEquals(3, state.data["foo"]?.count)
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test()
     fun testNonParcelableMap() {
-        data class State2(
-            @PersistState val data: Map<String, Context> = mapOf("foo" to Mockito.mock(Context::class.java))
-        ) : MavericksState
+        val exception: IllegalStateException = assertThrows(
+            IllegalStateException::class.java
+        ) {
+            data class State2(
+                @PersistState val data: Map<String, Context> = mapOf("foo" to Mockito.mock(Context::class.java))
+            ) : MavericksState
 
-        persistMavericksState(State2(), validation = true)
+            persistMavericksState(State2(), validation = true)
+        }
+        assertEquals(
+            "Cannot parcel android.content.Context\$MockitoMock",
+            // The mockito mock adds a random id string at the end.
+            exception.message?.substringBeforeLast("$")
+        )
     }
 
-    @Test(expected = IllegalStateException::class)
+    @Test()
     fun failOnNonParcelable() {
-        class NonParcelableClass
-        data class State(@PersistState val data: NonParcelableClass = NonParcelableClass()) : MavericksState
-        persistMavericksState(State())
+        val exception: IllegalStateException = assertThrows(
+            IllegalStateException::class.java
+        ) {
+            class NonParcelableClass
+            data class State(@PersistState val data: NonParcelableClass = NonParcelableClass()) : MavericksState
+            persistMavericksState(State())
+        }
+        assertEquals(
+            "Cannot persist '0': Class com.airbnb.mvrx.PersistedStateTest\$failOnNonParcelable\$exception\$1\$NonParcelableClass must be null, Serializable, or Parcelable.",
+            exception.message
+        )
     }
 
     @Test
