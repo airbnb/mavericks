@@ -97,7 +97,8 @@ private fun <T : Any?> Bundle.putAny(key: String?, value: T): Bundle {
         is Parcelable -> putParcelable(key, value)
         is Serializable -> putSerializable(key, value)
         null -> putString(key, null)
-        else -> error("Cannot persist $key. It must be null, Serializable, or Parcelable.")
+        // The null case is covered above so can avoid the null check here.
+        else -> error("Cannot persist '$key': Class ${value!!::class.java.name} must be null, Serializable, or Parcelable.")
     }
     return this
 }
