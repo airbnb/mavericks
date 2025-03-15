@@ -181,8 +181,8 @@ fun <VM : MavericksViewModel<S>, S : MavericksState> VM.collectAsStateWithLifecy
 fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectAsState(
     key: Any? = Unit,
     coroutineContext: CoroutineContext = EmptyCoroutineContext,
-    mapper: (S) -> O)
-: State<O> {
+    mapper: (S) -> O
+): State<O> {
     val updatedMapper by rememberUpdatedState(mapper)
     val mappedFlow = remember(key) { stateFlow.map { updatedMapper(it) }.distinctUntilChanged() }
     return mappedFlow.collectAsState(initial = withState(this) { updatedMapper(it) }, coroutineContext)
