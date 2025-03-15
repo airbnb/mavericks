@@ -200,10 +200,10 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectAsState(
 @Composable
 fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectAsStateWithLifecycle(
     key: Any? = Unit,
-    coroutineContext: CoroutineContext = EmptyCoroutineContext,
-    mapper: (S) -> O,
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
-    minActiveState: Lifecycle.State = Lifecycle.State.STARTED
+    minActiveState: Lifecycle.State = Lifecycle.State.STARTED,
+    coroutineContext: CoroutineContext = EmptyCoroutineContext,
+    mapper: (S) -> O
 ): State<O> {
     val updatedMapper by rememberUpdatedState(mapper)
     val mappedFlow = remember(key) { stateFlow.map { updatedMapper(it) }.distinctUntilChanged() }
