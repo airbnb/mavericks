@@ -76,4 +76,55 @@ class ArgsFactoryTest {
         collectKey = 1
         composeTestRule.onNodeWithText("Counter value: 123").assertExists()
     }
+
+    @Test
+    fun argumentsAreProperlyUsedToInitializeStateConsideringLifecycle() {
+        composeTestRule.setContent {
+            Column {
+                val viewModel: CounterViewModel = mavericksViewModel(argsFactory = { ArgumentsTest(5) })
+
+                val state by viewModel.collectAsStateWithLifecycle()
+                Text("Counter value: ${state.count}")
+                Button(onClick = viewModel::incrementCount) {
+                    Text(text = "Increment")
+                }
+            }
+        }
+        composeTestRule.onNodeWithText("Counter value: 5").assertExists()
+    }
+
+    @Test
+    fun argumentsAreProperlyUsedToInitializeStateWithMapperConsideringLifecycle() {
+        composeTestRule.setContent {
+            Column {
+                val viewModel: CounterViewModel = mavericksViewModel(argsFactory = { ArgumentsTest(5) })
+
+                val count by viewModel.collectAsStateWithLifecycle { it.count }
+                Text("Counter value: $count")
+                Button(onClick = viewModel::incrementCount) {
+                    Text(text = "Increment")
+                }
+            }
+        }
+        composeTestRule.onNodeWithText("Counter value: 5").assertExists()
+    }
+
+    @Test
+    fun argumentsAreProperlyUsedToInitializeStateWithMapperAndKeyConsideringLifecycle() {
+        var collectKey by mutableStateOf(0)
+        composeTestRule.setContent {
+            Column {
+                val viewModel: CounterViewModel = mavericksViewModel(argsFactory = { ArgumentsTest(5) })
+
+                val count by viewModel.collectAsStateWithLifecycle(collectKey) { if (collectKey == 0) it.count else it.count2 }
+                Text("Counter value: $count")
+                Button(onClick = viewModel::incrementCount) {
+                    Text(text = "Increment")
+                }
+            }
+        }
+        composeTestRule.onNodeWithText("Counter value: 5").assertExists()
+        collectKey = 1
+        composeTestRule.onNodeWithText("Counter value: 123").assertExists()
+    }
 }
