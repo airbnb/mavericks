@@ -8,7 +8,7 @@ configure(coveredProjects) { prj ->
     apply plugin: 'jacoco'
 
     jacoco {
-        toolVersion = "0.8.7"
+        toolVersion = "0.8.11"
     }
 
     task jacocoReport(type: JacocoReport, dependsOn: 'testDebugUnitTest') {
