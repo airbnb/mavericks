@@ -8,8 +8,6 @@ import kotlin.reflect.KClass
 
 private const val IMMUTABLE_LIST_MESSAGE =
     "Use the immutable listOf(...) method instead. You can append it with `val newList = listA + listB`"
-private const val IMMUTABLE_MAP_MESSAGE =
-    "Use the immutable mapOf(...) method instead. You can append it with `val newMap = mapA + mapB`"
 
 /**
  * Ensures that the state class is immutable.

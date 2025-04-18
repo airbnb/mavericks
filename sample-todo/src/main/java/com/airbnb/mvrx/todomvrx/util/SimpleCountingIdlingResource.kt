@@ -49,7 +49,7 @@ class SimpleCountingIdlingResource(private val resourceName: String) : IdlingRes
             // we've gone from non-zero to zero. That means we're idle now! Tell espresso.
             resourceCallback?.onTransitionToIdle()
         } else if (counterVal < 0) {
-            throw IllegalArgumentException("Counter has been corrupted!")
+            error("Counter has been corrupted!")
         }
     }
 }

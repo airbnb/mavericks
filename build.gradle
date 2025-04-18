@@ -43,6 +43,7 @@ allprojects {
 
 subprojects { project ->
     apply from: "$rootDir/detekt.gradle"
+    
     afterEvaluate {
         tasks.withType(KotlinCompile).configureEach { task ->
             kotlinOptions {

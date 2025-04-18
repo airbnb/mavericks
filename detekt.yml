@@ -97,7 +97,7 @@ complexity:
     active: false
     threshold: 10
     includeStaticDeclarations: false
-  ComplexMethod:
+  CyclomaticComplexMethod:
     active: false
     threshold: 20
     ignoreSingleWhenExpression: false
@@ -273,8 +273,7 @@ performance:
 
 potential-bugs:
   active: true
-  DuplicateCaseInWhenExpression:
-    active: true
+  # DuplicateCaseInWhenExpression is deprecated as compiler performs this check by default
   EqualsAlwaysReturnsTrueOrFalse:
     active: true
   EqualsWithHashCodeExist:
@@ -311,7 +310,7 @@ style:
     active: true
   DataClassContainsFunctions:
     active: false
-    conversionFunctionPrefix: 'to'
+    conversionFunctionPrefix: ['to']
   DestructuringDeclarationWithTooManyEntries:
     active: false
   EqualsNullCall:
@@ -320,14 +319,14 @@ style:
     active: false
   ForbiddenComment:
     active: false
-    values: ['TODO:', 'FIXME:', 'STOPSHIP:']
+    comments: ['TODO:', 'FIXME:', 'STOPSHIP:']
   ForbiddenImport:
     active: false
     imports: []
   FunctionOnlyReturningConstant:
     active: true
     ignoreOverridableFunction: true
-    excludedFunctions: 'describeContents'
+    excludedFunctions: ['describeContents']
   LoopWithTooManyJumpStatements:
     active: true
     maxJumpCount: 3
@@ -341,7 +340,7 @@ style:
     ignoreAnnotation: false
     ignoreNamedArgument: true
     ignoreEnums: false
-  MandatoryBracesIfStatements:
+  BracesOnIfStatements:
     active: false # TODO: consider this
   MaxLineLength:
     excludes: ['**/test/**', '.*Test.kt']
@@ -364,7 +363,7 @@ style:
     active: true
   OptionalUnit:
     active: false
-  OptionalWhenBraces:
+  BracesOnWhenStatements:
     active: false
   PreferToOverPairSyntax:
     active: true
@@ -375,7 +374,7 @@ style:
   ReturnCount:
     active: false
     max: 2
-    excludedFunctions: "equals"
+    excludedFunctions: ["equals"]
   SafeCast:
     active: true
   SerialVersionUIDInSerializableClass:

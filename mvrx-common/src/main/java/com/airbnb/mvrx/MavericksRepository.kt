@@ -53,8 +53,6 @@ abstract class MavericksRepository<S : MavericksState>(
     @InternalMavericksApi
     protected val stateStore: MavericksStateStore<S> = config.stateStore
 
-    private val tag by lazy { javaClass.simpleName }
-
     private val mutableStateChecker = if (config.performCorrectnessValidations) MutableStateChecker(config.stateStore.state) else null
 
     /**
