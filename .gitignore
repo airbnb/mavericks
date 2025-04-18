@@ -76,6 +76,7 @@ captures/
 .idea/inspectionProfiles/Project_Default.xml
 .idea/kotlinc.xml
 .idea/migrations.xml
+/.idea/AndroidProjectSystem.xml
 
 # Android Studio 3 in .gitignore file.
 .idea/caches
