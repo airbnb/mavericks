@@ -11,14 +11,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.platform.LocalView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistryOwner
 import com.airbnb.mvrx.ActivityViewModelContext
 import com.airbnb.mvrx.FragmentViewModelContext
@@ -64,8 +66,21 @@ inline fun <reified VM : MavericksViewModel<S>, reified S : MavericksState> mave
         "Composable is not hosted in a ComponentActivity!"
     }
 
-    val viewModelStoreOwner = scope as? ViewModelStoreOwner ?: error("LifecycleOwner must be a ViewModelStoreOwner!")
-    val savedStateRegistryOwner = scope as? SavedStateRegistryOwner ?: error("LifecycleOwner must be a SavedStateRegistryOwner!")
+    val localLifecycleOwner = LocalLifecycleOwner.current
+    val viewModelStoreOwner: ViewModelStoreOwner
+    val savedStateRegistryOwner: SavedStateRegistryOwner
+    if (scope === localLifecycleOwner) {
+        viewModelStoreOwner = checkNotNull(LocalViewModelStoreOwner.current) {
+            "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
+        }
+        savedStateRegistryOwner = checkNotNull(LocalSavedStateRegistryOwner.current) {
+            "No SavedStateRegistryOwner was provided via LocalSavedStateRegistryOwner"
+        }
+    } else {
+        viewModelStoreOwner = scope as? ViewModelStoreOwner ?: error("Provided scope must be a ViewModelStoreOwner!")
+        savedStateRegistryOwner = scope as? SavedStateRegistryOwner ?: error("Provided scope must be a SavedStateRegistryOwner!")
+    }
+
     val savedStateRegistry = savedStateRegistryOwner.savedStateRegistry
     val viewModelClass = VM::class
     val view = LocalView.current
