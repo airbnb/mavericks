@@ -52,12 +52,15 @@ fun <T : MavericksState> persistMavericksState(state: T, validation: Boolean = f
 
 private fun <T : MavericksState> Class<out T>.primaryConstructor(): Constructor<*>? {
     // Assumes that only the primary constructor has PersistState annotations.
-    // TODO - potentially throw if multiple constructors have PersistState as that is not supported.
-    return constructors.firstOrNull { constructor ->
+    // However, when a constructor has default values, a synthetic secondary constructor is generated.
+    // This synthetic constructor has two additional parameters - one for a bitmask to know which parameters to use a default value for,
+    // and a final parameter of DefaultConstructorMarker that is ignored and is used to avoid signature clashes.
+    // We want to ignore this synthetic constructor, which we can differentiate since it should have more parameters than the primary constructor.
+    return constructors.filter { constructor ->
         constructor.parameterAnnotations.any { paramAnnotations ->
             paramAnnotations.any { it is PersistState }
         }
-    }
+    }.minByOrNull { it.parameterTypes.size }
 }
 
 private fun <T : MavericksState> Class<out T>.getComponentNFunction(componentIndex: Int): Method {
@@ -80,6 +83,7 @@ private fun assertCollectionPersistability(value: Any?) {
                 .filterNotNull()
                 .forEach(::assertPersistable)
         }
+
         is Map<*, *> -> {
             value
                 .mapNotNull { it.value }
@@ -127,13 +131,18 @@ fun <T : MavericksState> restorePersistedMavericksState(
     //     There is 1 bitmask for every 32 parameters. If there are 48 parameters, there will be 2 bitmasks. Parameter 33 will be the first bit of the 2nd bitmask.
     // The last parameter is ignored. It can be null.
     val copyFunction = jvmClass.declaredMethods.first { it.name == "copy\$default" }
-    val fieldCount = constructor.parameterTypes.size
+    // We need to know how many parameters go to the copy function in order to invoke it.
+    // Note that this is not the same as the number of parameters in the constructor.
+    // The constructor can contain a "DefaultConstructorMarker" in some cases, such as if a value class type is present in the constructor,
+    // and in this case the number of parameters of the constructor is greater than the number of parameters in the copy function.
+    // For accuracy in all cases we use the copy function to determine the number of parameters.
+    val paramCount = calculateParameterCountOfCopyFunction(copyFunction)
 
     // There is 1 bitmask for each block of 32 parameters.
-    val parameterBitMasks = IntArray(ceil(fieldCount / 32.0).toInt())
-    val parameters = arrayOfNulls<Any?>(fieldCount)
+    val parameterBitMasks = IntArray(ceil(paramCount / 32.0).toInt())
+    val parameters = arrayOfNulls<Any?>(paramCount)
     parameters[0] = initialState
-    for (i in 0 until fieldCount) {
+    for (i in 0 until paramCount) {
         val bundleKey = i.toString()
         if (bundle.containsKey(bundleKey)) {
             // Copy the persisted value into the parameter array.
@@ -149,18 +158,30 @@ fun <T : MavericksState> restorePersistedMavericksState(
         // Set the bitmask for this parameter to 1 so it copies the value from the original object.
         parameterBitMasks[i / 32] = parameterBitMasks[i / 32] or (1 shl (i % 32))
         // These parameters will be ignored. We just need to put in something of the correct type to match the method signature.
+        // 1 is added to account for the first parameter, which is the object to copy from (ie, the initial state).
         parameters[i] = copyFunction.parameterTypes[i + 1].defaultParameterValue
     }
 
     // See the comment above for information on the parameters here.
     @Suppress("UNCHECKED_CAST")
     return copyFunction.invoke(
-        null,
+        null, // Indicates the object to invoke on. This is null for a static method.
         initialState,
         *parameters,
         *parameterBitMasks.toTypedArray(),
         null
     ) as T
+}
+
+internal fun calculateParameterCountOfCopyFunction(copyFunction: Method): Int {
+    // The copy function always has the first parameter as the object to copy from,
+    // and the last parameters as the ignored marker parameter.
+    // So we know to ignore those two parameters.
+    val baseParamCount = copyFunction.parameterTypes.size - 2
+
+    // A bitmask parameter is added for every 32 normal parameters.
+    val bitMaskCount = ceil(baseParamCount / 33.0).toInt()
+    return baseParamCount - bitMaskCount
 }
 
 private val Class<*>.defaultParameterValue: Any?

@@ -77,6 +77,7 @@ captures/
 .idea/kotlinc.xml
 .idea/migrations.xml
 /.idea/AndroidProjectSystem.xml
+/.idea/deploymentTargetSelector.xml
 
 # Android Studio 3 in .gitignore file.
 .idea/caches
