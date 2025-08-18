@@ -484,7 +484,7 @@ class PersistedStateTest : BaseTest() {
             val p62: Int = 0,
             @PersistState val p63: Int = 0,
 
-            ) : MavericksState
+        ) : MavericksState
 
         val bundle = persistMavericksState(
             StateWithLotsOfParameters(
