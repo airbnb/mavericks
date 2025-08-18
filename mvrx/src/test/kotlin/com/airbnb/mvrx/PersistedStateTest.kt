@@ -37,6 +37,23 @@ class PersistedStateTest : BaseTest() {
     data class StateWithInternalVal(@PersistState internal val count: Int = 5) : MavericksState
 
     @Test
+    fun saveValueClass() {
+        data class State(
+            @PersistState val baz: String = "",
+            @PersistState val valueClass: SomeValueClass,
+            val bar: Int = 0,
+        ) : MavericksState
+
+        val bundle = persistMavericksState(State(valueClass = SomeValueClass(10)))
+        val newState = restorePersistedMavericksState(bundle, State(valueClass = SomeValueClass(10)))
+        assertEquals(SomeValueClass(10), newState.valueClass)
+    }
+
+    @JvmInline
+    @Parcelize
+    value class SomeValueClass(val foo: Int) : Parcelable
+
+    @Test
     fun saveInternalInt() {
         // internal properties in data classes have different method names generated for them,
         // and our custom copy function needs to handle that.
@@ -378,6 +395,185 @@ class PersistedStateTest : BaseTest() {
             @PersistState val p37: Int = 0,
             val p38: Int = 0,
             @PersistState val p39: Int = 0
+        ) : MavericksState
+
+        val bundle = persistMavericksState(
+            StateWithLotsOfParameters(
+                p0 = 1,
+                p1 = 2,
+                p30 = 3,
+                p31 = 4,
+                p32 = 5,
+                p33 = 6,
+                p34 = 7,
+                p35 = 8
+            )
+        )
+        val newState = restorePersistedMavericksState(bundle, StateWithLotsOfParameters())
+        assertEquals(2, newState.p1)
+        assertEquals(4, newState.p31)
+        assertEquals(6, newState.p33)
+        assertEquals(8, newState.p35)
+    }
+
+    @Test
+    fun testClassWith64Parameters() {
+        data class StateWithLotsOfParameters(
+            val p0: Int = 0,
+            @PersistState val p1: Int = 0,
+            val p2: Int = 0,
+            @PersistState val p3: Int = 0,
+            val p4: Int = 0,
+            @PersistState val p5: Int = 0,
+            val p6: Int = 0,
+            @PersistState val p7: Int = 0,
+            val p8: Int = 0,
+            @PersistState val p9: Int = 0,
+            val p10: Int = 0,
+            @PersistState val p11: Int = 0,
+            val p12: Int = 0,
+            @PersistState val p13: Int = 0,
+            val p14: Int = 0,
+            @PersistState val p15: Int = 0,
+            val p16: Int = 0,
+            @PersistState val p17: Int = 0,
+            val p18: Int = 0,
+            @PersistState val p19: Int = 0,
+            val p20: Int = 0,
+            @PersistState val p21: Int = 0,
+            val p22: Int = 0,
+            @PersistState val p23: Int = 0,
+            val p24: Int = 0,
+            @PersistState val p25: Int = 0,
+            val p26: Int = 0,
+            @PersistState val p27: Int = 0,
+            val p28: Int = 0,
+            @PersistState val p29: Int = 0,
+            val p30: Int = 0,
+            @PersistState val p31: Int = 0,
+            val p32: Int = 0,
+            @PersistState val p33: Int = 0,
+            val p34: Int = 0,
+            @PersistState val p35: Int = 0,
+            val p36: Int = 0,
+            @PersistState val p37: Int = 0,
+            val p38: Int = 0,
+            @PersistState val p39: Int = 0,
+            val p40: Int = 0,
+            @PersistState val p41: Int = 0,
+            val p42: Int = 0,
+            @PersistState val p43: Int = 0,
+            val p44: Int = 0,
+            @PersistState val p45: Int = 0,
+            val p46: Int = 0,
+            @PersistState val p47: Int = 0,
+            val p48: Int = 0,
+            @PersistState val p49: Int = 0,
+            val p50: Int = 0,
+            @PersistState val p51: Int = 0,
+            val p52: Int = 0,
+            @PersistState val p53: Int = 0,
+            val p54: Int = 0,
+            @PersistState val p55: Int = 0,
+            val p56: Int = 0,
+            @PersistState val p57: Int = 0,
+            val p58: Int = 0,
+            @PersistState val p59: Int = 0,
+            val p60: Int = 0,
+            @PersistState val p61: Int = 0,
+            val p62: Int = 0,
+            @PersistState val p63: Int = 0,
+
+        ) : MavericksState
+
+        val bundle = persistMavericksState(
+            StateWithLotsOfParameters(
+                p0 = 1,
+                p1 = 2,
+                p30 = 3,
+                p31 = 4,
+                p32 = 5,
+                p33 = 6,
+                p34 = 7,
+                p35 = 8
+            )
+        )
+        val newState = restorePersistedMavericksState(bundle, StateWithLotsOfParameters())
+        assertEquals(2, newState.p1)
+        assertEquals(4, newState.p31)
+        assertEquals(6, newState.p33)
+        assertEquals(8, newState.p35)
+    }
+
+    @Test
+    fun testClassWithMoreThan64Parameters() {
+        data class StateWithLotsOfParameters(
+            val p0: Int = 0,
+            @PersistState val p1: Int = 0,
+            val p2: Int = 0,
+            @PersistState val p3: Int = 0,
+            val p4: Int = 0,
+            @PersistState val p5: Int = 0,
+            val p6: Int = 0,
+            @PersistState val p7: Int = 0,
+            val p8: Int = 0,
+            @PersistState val p9: Int = 0,
+            val p10: Int = 0,
+            @PersistState val p11: Int = 0,
+            val p12: Int = 0,
+            @PersistState val p13: Int = 0,
+            val p14: Int = 0,
+            @PersistState val p15: Int = 0,
+            val p16: Int = 0,
+            @PersistState val p17: Int = 0,
+            val p18: Int = 0,
+            @PersistState val p19: Int = 0,
+            val p20: Int = 0,
+            @PersistState val p21: Int = 0,
+            val p22: Int = 0,
+            @PersistState val p23: Int = 0,
+            val p24: Int = 0,
+            @PersistState val p25: Int = 0,
+            val p26: Int = 0,
+            @PersistState val p27: Int = 0,
+            val p28: Int = 0,
+            @PersistState val p29: Int = 0,
+            val p30: Int = 0,
+            @PersistState val p31: Int = 0,
+            val p32: Int = 0,
+            @PersistState val p33: Int = 0,
+            val p34: Int = 0,
+            @PersistState val p35: Int = 0,
+            val p36: Int = 0,
+            @PersistState val p37: Int = 0,
+            val p38: Int = 0,
+            @PersistState val p39: Int = 0,
+            val p40: Int = 0,
+            @PersistState val p41: Int = 0,
+            val p42: Int = 0,
+            @PersistState val p43: Int = 0,
+            val p44: Int = 0,
+            @PersistState val p45: Int = 0,
+            val p46: Int = 0,
+            @PersistState val p47: Int = 0,
+            val p48: Int = 0,
+            @PersistState val p49: Int = 0,
+            val p50: Int = 0,
+            @PersistState val p51: Int = 0,
+            val p52: Int = 0,
+            @PersistState val p53: Int = 0,
+            val p54: Int = 0,
+            @PersistState val p55: Int = 0,
+            val p56: Int = 0,
+            @PersistState val p57: Int = 0,
+            val p58: Int = 0,
+            @PersistState val p59: Int = 0,
+            val p60: Int = 0,
+            @PersistState val p61: Int = 0,
+            val p62: Int = 0,
+            @PersistState val p63: Int = 0,
+            @PersistState val p64: Int = 0,
+            @PersistState val p65: Int = 0,
         ) : MavericksState
 
         val bundle = persistMavericksState(
