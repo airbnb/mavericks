@@ -64,6 +64,9 @@ dependencies {
     implementation libs.viewModelCompose
     implementation libs.runtimeCompose
     debugImplementation libs.composeUiTestManifest
+    implementation libs.navigation3
+    implementation libs.navigation3Ui
+    implementation libs.navigation3Viewmodel
 
     testImplementation project(':mvrx-testing')
     testImplementation libs.junit

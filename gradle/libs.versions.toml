@@ -8,8 +8,17 @@
 [plugins]
 ksp = { id = "com.google.devtools.ksp", version = "1.8.22-1.0.11" }
 
+[versions]
+androidGradle = "8.9.1"
+activity = "1.12.0-alpha03"
+navigation3 = "1.0.0-alpha03"
+# androidx.lifecycle uses version 2.6.1, but androidx.lifecycle:lifecycle-viewmodel-navigation3-android requires 1.0.0-alpha03
+# so specifying this version
+# https://developer.android.com/jetpack/androidx/releases/lifecycle#lifecycle_viewmodel_navigation3_version_100_2
+navigation3ViewModel = "1.0.0-alpha03"
+
 [libraries]
-androidGradle = "com.android.tools.build:gradle:_"
+androidGradle = { module = "com.android.tools.build:gradle", version.ref = "androidGradle" }
 anvilGradle = "com.squareup.anvil:gradle-plugin:_"
 autoValue = "com.google.auto.value:auto-value:_"
 autoValueAnnotations = "com.google.auto.value:auto-value-annotations:_"
@@ -23,8 +32,8 @@ hiltTesting = "com.google.dagger:hilt-android-testing:_"
 hiltGradle = "com.google.dagger:hilt-android-gradle-plugin:_"
 lifecycle = "androidx.lifecycle:lifecycle-compiler:_"
 roomCompiler = "androidx.room:room-compiler:_"
-activity = "androidx.activity:activity:_"
-activityCompose = "androidx.activity:activity-compose:_"
+activity = { module = "androidx.activity:activity", version.ref = "activity" }
+activityCompose = { module = "androidx.activity:activity-compose", version.ref = "activity" }
 appcompat = "androidx.appcompat:appcompat:_"
 cardview = "androidx.cardview:cardview:_"
 constraintlayout = "androidx.constraintlayout:constraintlayout:_"
@@ -42,7 +51,7 @@ fragment = "androidx.fragment:fragment:_"
 fragmentKtx = "androidx.fragment:fragment-ktx:_"
 fragmentTesting = "androidx.fragment:fragment-testing:_"
 koin = "io.insert-koin:koin-android:_"
-kotlinGradle = "org.jetbrains.kotlin:kotlin-gradle-plugin:_"
+kotlinGradle = "org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.0"
 kotlin = "org.jetbrains.kotlin:kotlin-stdlib:_"
 kotlinCoroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:_"
 kotlinReflect = "org.jetbrains.kotlin:kotlin-reflect:_"
@@ -56,6 +65,9 @@ multidex = "androidx.multidex:multidex:_"
 navigationFragmentKtx = "androidx.navigation:navigation-fragment-ktx:_"
 navigationUiKtx = "androidx.navigation:navigation-ui-ktx:_"
 navigationCompose = "androidx.navigation:navigation-compose:_"
+navigation3 = { module = "androidx.navigation3:navigation3-runtime", version.ref = "navigation3" }
+navigation3Ui = { module = "androidx.navigation3:navigation3-ui", version.ref = "navigation3" }
+navigation3Viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-navigation3-android", version.ref = "navigation3ViewModel" }
 picasso = "com.squareup.picasso:picasso:_"
 recyclerview = "androidx.recyclerview:recyclerview:_"
 retrofit = "com.squareup.retrofit2:retrofit:_"
