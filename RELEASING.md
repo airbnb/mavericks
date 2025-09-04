@@ -1,8 +1,9 @@
 Releasing
 ========
 
-1. Bump the VERSION_NAME property in `gradle.properties` based on Major.Minor.Patch naming scheme
+1. On a new branch, bump the VERSION_NAME property in `gradle.properties` based on Major.Minor.Patch naming scheme
 2. Add your sonatype login information under gradle properties mavenCentralUsername and mavenCentralPassword in your local user gradle.properties file
+   1. Since the OSSRH sunset, this needs to be a user token created from https://central.sonatype.com/account
 3. Run `./gradlew publish` to build the artifacts and publish them to maven
 4. Then run `./commitAndTagRelease.sh Major.Minor.Patch` with your version number
    1. eg "./commitAndTagRelease.sh 3.0.1"
