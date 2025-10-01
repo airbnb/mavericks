@@ -66,13 +66,27 @@ fun assertMavericksDataClassImmutability(
  */
 internal val Class<*>.isData: Boolean
     get() {
-        if (!declaredMethods.any { it.name == "copy\$default" && it.isSynthetic }) {
-            return false
+        // When a value class is present in the constructor, Kotlin mangles the copy method name
+        // to avoid signature clashes (e.g., "copy-KtkBMb8$default" instead of "copy$default").
+        // We check for either the exact name "copy$default" or the pattern "copy-*$default".
+        val hasCopyDefault = declaredMethods.any { method ->
+            method.isSynthetic && method.name.let { name ->
+                name == "copy\$default" || (name.startsWith("copy-") && name.endsWith("\$default"))
+            }
         }
+        if (!hasCopyDefault) return false
 
-        // if the data class property is internal then kotlin appends '$module_name_debug' to the
-        // expected function name.
-        declaredMethods.firstOrNull { it.name.startsWith("component1") } ?: return false
+        // Similarly, component1 can be mangled when it's a value class type.
+        // It can also have module names appended for internal properties.
+        // Patterns: "component1", "component1$module", "component1-<hash>"
+        val hasComponent1 = declaredMethods.any { method ->
+            method.name.let { name ->
+                name == "component1" ||
+                    name.startsWith("component1\$") ||
+                    name.startsWith("component1-")
+            }
+        }
+        if (!hasComponent1) return false
 
         declaredMethods.firstOrNull { it.name == "equals" } ?: return false
         declaredMethods.firstOrNull { it.name == "hashCode" } ?: return false
