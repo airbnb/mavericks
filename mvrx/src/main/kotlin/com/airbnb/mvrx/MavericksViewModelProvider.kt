@@ -100,7 +100,7 @@ object MavericksViewModelProvider {
                 when (args) {
                     is Parcelable -> putParcelable(KEY_MVRX_SAVED_ARGS, args)
                     is Serializable -> putSerializable(KEY_MVRX_SAVED_ARGS, args)
-                    else -> error("Args must be parcelable or serializable")
+                    else -> error("Args must be parcelable or serializable. Class ${args::class.java.name} is neither.")
                 }
             }
         }
