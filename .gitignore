@@ -68,6 +68,7 @@ captures/
 .idea/workspace.xml
 .idea/jarRepositories.xml
 .idea/markdown-*.xml
+/.idea/markdown.xml
 .idea/sonarlint/
 .idea/checkstyle-idea.xml
 .idea/deploymentTargetDropDown.xml
@@ -123,3 +124,4 @@ lint/tmp/
 
 # Mocks
 /mvrx_temp_mocks/*
+

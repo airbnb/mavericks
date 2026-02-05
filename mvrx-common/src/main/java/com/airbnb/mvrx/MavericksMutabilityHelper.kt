@@ -61,39 +61,6 @@ fun assertMavericksDataClassImmutability(
 }
 
 /**
- * Since we can only use java reflection, this basically duck types a data class.
- * componentN methods are also used for @PersistState.
- */
-internal val Class<*>.isData: Boolean
-    get() {
-        // When a value class is present in the constructor, Kotlin mangles the copy method name
-        // to avoid signature clashes (e.g., "copy-KtkBMb8$default" instead of "copy$default").
-        // We check for either the exact name "copy$default" or the pattern "copy-*$default".
-        val hasCopyDefault = declaredMethods.any { method ->
-            method.isSynthetic && method.name.let { name ->
-                name == "copy\$default" || (name.startsWith("copy-") && name.endsWith("\$default"))
-            }
-        }
-        if (!hasCopyDefault) return false
-
-        // Similarly, component1 can be mangled when it's a value class type.
-        // It can also have module names appended for internal properties.
-        // Patterns: "component1", "component1$module", "component1-<hash>"
-        val hasComponent1 = declaredMethods.any { method ->
-            method.name.let { name ->
-                name == "component1" ||
-                    name.startsWith("component1\$") ||
-                    name.startsWith("component1-")
-            }
-        }
-        if (!hasComponent1) return false
-
-        declaredMethods.firstOrNull { it.name == "equals" } ?: return false
-        declaredMethods.firstOrNull { it.name == "hashCode" } ?: return false
-        return true
-    }
-
-/**
  * Checks that a state's value is not changed over its lifetime.
  */
 internal class MutableStateChecker<S : MavericksState>(val initialState: S) {

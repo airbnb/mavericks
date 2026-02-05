@@ -5,9 +5,11 @@ import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.Fail
 import com.airbnb.mvrx.Loading
 import com.airbnb.mvrx.Success
+import com.airbnb.mvrx.callCopy
+import com.airbnb.mvrx.getPropertyValue
+import com.airbnb.mvrx.isData
 import java.util.LinkedList
 import kotlin.reflect.KProperty0
-import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 
 /**
@@ -140,7 +142,11 @@ interface DataClassSetDsl {
                     "Cannot set ${clazz.simpleName} property ${property.nameForErrorMsg()}, the Async value it is in is not in the Success state"
                 }
             } else {
-                require(clazz.isData) {
+                // Use Java reflection to check if this is a data class.
+                // This avoids KClass.isData which reads Kotlin metadata and can fail
+                // in environments with incompatible kotlin-reflect (e.g., Android Studio's
+                // layoutlib with Kotlin 2.3+).
+                require(clazz.java.isData) {
                     "${clazz.simpleName} property '${property.nameForErrorMsg()}' must be a data class to change mock values with 'set'"
                 }
             }
@@ -162,17 +168,15 @@ interface DataClassSetDsl {
                 nextProp = (nextProp as? NestedProperty<*, *>)?.wrapperProperty
             }
 
+            // Use Java reflection to traverse the property chain.
+            // This avoids KClass.memberProperties which reads Kotlin metadata.
             return propertyChain.fold<KProperty0<Any?>, Any?>(dataClass) { data, kProp0 ->
                 checkNotNull(data) {
                     "Value of data class is null, cannot get property ${kProp0.name}"
                 }
 
-                val kProp1 = data::class.memberProperties.singleOrNull { it.name == kProp0.name }
-                    ?: error("Could not find property of name ${kProp0.name} on class ${data::class.simpleName}")
-
-                // it is valid for the final result to be null, but intermediate values in the chain
-                // cannot be null.
-                kProp1.call(data)
+                // Use Java reflection to get the property value
+                data.getPropertyValue(kProp0.name)
             } as PropType
         }
 
@@ -192,7 +196,10 @@ interface DataClassSetDsl {
             return if (instance is Success<*>) {
                 val successValue = instance.invoke()
                     ?: error("Success value is null - cannot set ${property.name}")
-                require(successValue::class.isData) { "${successValue::class.simpleName} must be a data class" }
+                // Use Java reflection to check data class and call copy
+                require(successValue::class.java.isData) {
+                    "${successValue::class.simpleName} must be a data class"
+                }
                 val updatedSuccess = successValue.callCopy(recursiveProperty.name to recursiveValue)
                 Success(updatedSuccess) as DataClass
             } else {
