@@ -60,38 +60,38 @@ class JavaReflectUtilsTest {
     @Test
     fun `getPropertyValue gets string property`() {
         val instance = SimpleDataClass(name = "test")
-        assertEquals("test", instance.getPropertyValue("name"))
+        assertEquals("test", getPropertyValue(instance, "name"))
     }
 
     @Test
     fun `getPropertyValue gets int property`() {
         val instance = SimpleDataClass(count = 42)
-        assertEquals(42, instance.getPropertyValue("count"))
+        assertEquals(42, getPropertyValue(instance, "count"))
     }
 
     @Test
     fun `getPropertyValue gets boolean property`() {
         val instance = SimpleDataClass(enabled = true)
-        assertEquals(true, instance.getPropertyValue("enabled"))
+        assertEquals(true, getPropertyValue(instance, "enabled"))
     }
 
     @Test
     fun `getPropertyValue gets nested object property`() {
         val nested = SimpleDataClass(name = "nested")
         val instance = NestedDataClass(simple = nested)
-        assertEquals(nested, instance.getPropertyValue("simple"))
+        assertEquals(nested, getPropertyValue(instance, "simple"))
     }
 
     @Test
     fun `getPropertyValue gets null property`() {
         val instance = NestedDataClass(nullableValue = null)
-        assertNull(instance.getPropertyValue("nullableValue"))
+        assertNull(getPropertyValue(instance, "nullableValue"))
     }
 
     @Test
     fun `getPropertyValue gets non-null nullable property`() {
         val instance = NestedDataClass(nullableValue = "value")
-        assertEquals("value", instance.getPropertyValue("nullableValue"))
+        assertEquals("value", getPropertyValue(instance, "nullableValue"))
     }
 
     // ==================== callCopy Tests ====================
@@ -99,7 +99,7 @@ class JavaReflectUtilsTest {
     @Test
     fun `callCopy copies with single property change`() {
         val original = SimpleDataClass(name = "original", count = 5)
-        val copied = original.callCopy("name" to "modified")
+        val copied = callCopy(original, "name" to "modified")
 
         assertEquals("modified", copied.name)
         assertEquals(5, copied.count) // Unchanged
@@ -109,7 +109,7 @@ class JavaReflectUtilsTest {
     @Test
     fun `callCopy copies with multiple property changes`() {
         val original = SimpleDataClass(name = "original", count = 5, enabled = false)
-        val copied = original.callCopy("name" to "modified", "enabled" to true)
+        val copied = callCopy(original, "enabled" to true)
 
         assertEquals("modified", copied.name)
         assertEquals(5, copied.count) // Unchanged
@@ -119,9 +119,8 @@ class JavaReflectUtilsTest {
     @Test
     fun `callCopy copies with all properties changed`() {
         val original = SimpleDataClass(name = "a", count = 1, enabled = false)
-        val copied = original.callCopy(
-            "name" to "b",
-            "count" to 2,
+        val copied = callCopy(
+            original,
             "enabled" to true
         )
 
@@ -138,7 +137,7 @@ class JavaReflectUtilsTest {
             nullableValue = "value"
         )
         val newSimple = SimpleDataClass(name = "modified")
-        val copied = original.callCopy("simple" to newSimple)
+        val copied = callCopy(original, "simple" to newSimple)
 
         assertEquals(1, copied.id) // Unchanged
         assertEquals("modified", copied.simple.name)
@@ -148,7 +147,7 @@ class JavaReflectUtilsTest {
     @Test
     fun `callCopy sets nullable to null`() {
         val original = NestedDataClass(nullableValue = "not null")
-        val copied = original.callCopy("nullableValue" to null)
+        val copied = callCopy(original, "nullableValue" to null)
 
         assertNull(copied.nullableValue)
     }
@@ -156,7 +155,7 @@ class JavaReflectUtilsTest {
     @Test
     fun `callCopy sets nullable to value`() {
         val original = NestedDataClass(nullableValue = null)
-        val copied = original.callCopy("nullableValue" to "now has value")
+        val copied = callCopy(original, "nullableValue" to "now has value")
 
         assertEquals("now has value", copied.nullableValue)
     }
@@ -165,7 +164,7 @@ class JavaReflectUtilsTest {
     fun `callCopy preserves object identity for unchanged properties`() {
         val nested = SimpleDataClass(name = "preserved")
         val original = NestedDataClass(id = 1, simple = nested)
-        val copied = original.callCopy("id" to 2)
+        val copied = callCopy(original, "id" to 2)
 
         // The nested object should be the same instance since it wasn't changed
         assertTrue(copied.simple === nested)
@@ -214,7 +213,7 @@ class JavaReflectUtilsTest {
         )
 
         // Try to set a field in the middle of the class
-        val copied = original.callCopy("itemResponse" to Result.success("new response"))
+        val copied = callCopy(original, "itemResponse" to Result.success("new response"))
 
         assertEquals(Result.success("new response"), copied.itemResponse)
         assertEquals("ABC123", copied.confirmationCode) // Should be unchanged
@@ -229,7 +228,7 @@ class JavaReflectUtilsTest {
         )
 
         // Try to set the last field
-        val copied = original.callCopy("closeResponse" to Result.success("closed"))
+        val copied = callCopy(original, "closeResponse" to Result.success("closed"))
 
         assertEquals(Result.success("closed"), copied.closeResponse)
         assertEquals("ABC123", copied.confirmationCode) // Should be unchanged
@@ -251,7 +250,7 @@ class JavaReflectUtilsTest {
         )
 
         // Set just one field
-        val copied = original.callCopy("referenceId" to "MODIFIED")
+        val copied = callCopy(original, "referenceId" to "MODIFIED")
 
         // Verify only the target field changed
         assertEquals("MODIFIED", copied.referenceId)
@@ -276,7 +275,7 @@ class JavaReflectUtilsTest {
             createType = "TYPE",
         )
 
-        val copied = original.callCopy("statusResponse" to Result.success("new status"))
+        val copied = callCopy(original, "statusResponse" to Result.success("new status"))
 
         // The Response field should be set
         assertEquals(Result.success("new status"), copied.statusResponse)
@@ -302,9 +301,8 @@ class JavaReflectUtilsTest {
         )
 
         // Verify setting fields at various positions works correctly
-        val copied = instance.callCopy(
-            "existingItems" to listOf("new"),
-            "createType" to "modified",
+        val copied = callCopy(
+            instance,
             "closeResponse" to Result.success("modified-close"),
         )
 
@@ -334,7 +332,7 @@ class JavaReflectUtilsTest {
     @Test
     fun `callCopy works with data class that has body properties`() {
         val original = DataClassWithBodyProperties()
-        val copied = original.callCopy("thirdBool" to true)
+        val copied = callCopy(original, "thirdBool" to true)
 
         assertEquals(false, copied.firstBool)
         assertEquals(false, copied.secondBool)
@@ -346,8 +344,8 @@ class JavaReflectUtilsTest {
     fun `callCopy sets multiple boolean constructor params with body properties present`() {
         val original = DataClassWithBodyProperties()
 
-        val copied = original.callCopy(
-            "firstBool" to true,
+        val copied = callCopy(
+            original,
             "thirdBool" to true,
         )
 
@@ -370,13 +368,13 @@ class JavaReflectUtilsTest {
         //    At this point, secondBool=true AND derivedBool=true (both Boolean, same value)
         //    Without proper disambiguation, derivedBool could steal secondBool's component slot
         val step1 = DataClassWithBodyProperties()
-        val step2 = step1.callCopy("secondBool" to true)
+        val step2 = callCopy(step1, "secondBool" to true)
 
         assertEquals(true, step2.secondBool)
         assertEquals(true, step2.derivedBool) // body prop is now also true
 
         // This callCopy should still correctly identify thirdBool
-        val step3 = step2.callCopy("thirdBool" to true)
+        val step3 = callCopy(step2, "thirdBool" to true)
 
         assertEquals(false, step3.firstBool)
         assertEquals(true, step3.secondBool)
@@ -407,12 +405,12 @@ class JavaReflectUtilsTest {
         // isLoading = true (body prop), buttonDisabled = true (body prop)
 
         // Simulate mock builder setting isRequired=true first
-        val step1 = original.callCopy("isRequired" to true)
+        val step1 = callCopy(original, "isRequired" to true)
         assertEquals(true, step1.isRequired)
         assertEquals(false, step1.showModal)
 
         // Then setting showModal=true (the field that was failing in CI)
-        val step2 = step1.callCopy("showModal" to true)
+        val step2 = callCopy(step1, "showModal" to true)
         assertEquals(true, step2.isRequired)
         assertEquals(true, step2.showModal)
         assertEquals(false, step2.dismissedAlert)
@@ -421,7 +419,7 @@ class JavaReflectUtilsTest {
     @Test
     fun `callCopy correctly handles multiple null reference fields`() {
         val original = StateWithAsyncAndBoolBodyProps()
-        val copied = original.callCopy("response2" to "updated")
+        val copied = callCopy(original, "response2" to "updated")
 
         assertNull(copied.response1)
         assertEquals("updated", copied.response2)
@@ -438,7 +436,7 @@ class JavaReflectUtilsTest {
             simple = SimpleDataClass(name = "inner"),
             nullableValue = "test",
         )
-        val copied = original.callCopy("nullableValue" to "changed")
+        val copied = callCopy(original, "nullableValue" to "changed")
 
         assertEquals(1L, copied.id)
         assertEquals("inner", copied.simple.name)
@@ -455,7 +453,7 @@ class JavaReflectUtilsTest {
         )
 
         val original = AllSameDefaults()
-        val copied = original.callCopy("c" to true)
+        val copied = callCopy(original, "c" to true)
 
         assertEquals(false, copied.a)
         assertEquals(false, copied.b)

@@ -176,7 +176,7 @@ interface DataClassSetDsl {
                 }
 
                 // Use Java reflection to get the property value
-                data.getPropertyValue(kProp0.name)
+                getPropertyValue(data, kProp0.name)
             } as PropType
         }
 
@@ -200,10 +200,10 @@ interface DataClassSetDsl {
                 require(successValue::class.java.isData) {
                     "${successValue::class.simpleName} must be a data class"
                 }
-                val updatedSuccess = successValue.callCopy(recursiveProperty.name to recursiveValue)
+                val updatedSuccess = callCopy(successValue, recursiveProperty.name to recursiveValue)
                 Success(updatedSuccess) as DataClass
             } else {
-                instance.callCopy(recursiveProperty.name to recursiveValue)
+                callCopy(instance, recursiveProperty.name to recursiveValue)
             }
         }
     }

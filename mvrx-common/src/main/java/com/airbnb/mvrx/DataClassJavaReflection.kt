@@ -64,8 +64,8 @@ val Class<*>.isData: Boolean
  */
 @InternalMavericksApi
 @Suppress("UNCHECKED_CAST")
-fun <T : Any> T.callCopy(vararg params: Pair<String, Any?>): T {
-    val jvmClass = this::class.java
+fun <T : Any> callCopy(targetObject: T, vararg params: Pair<String, Any?>): T {
+    val jvmClass = targetObject::class.java
     val paramMap = params.toMap()
 
     // Find copy$default - the synthetic method that handles default parameters
@@ -95,7 +95,7 @@ fun <T : Any> T.callCopy(vararg params: Pair<String, Any?>): T {
     // Build a mapping from property names to constructor parameter indices.
     // We use componentN methods to determine the correct order, since declaredFields
     // order is not guaranteed by the JVM and can be changed by R8/ProGuard.
-    val propertyIndexMap = buildPropertyIndexMap(jvmClass, this)
+    val propertyIndexMap = buildPropertyIndexMap(jvmClass, targetObject)
 
     // There is 1 bitmask for each block of 32 parameters.
     val parameterBitMasks = IntArray(ceil(paramCount / 32.0).toInt())
@@ -122,7 +122,7 @@ fun <T : Any> T.callCopy(vararg params: Pair<String, Any?>): T {
     copyFunction.isAccessible = true
     return copyFunction.invoke(
         null, // Indicates the object to invoke on. This is null for a static method.
-        this,
+        targetObject,
         *parameters,
         *parameterBitMasks.toTypedArray(),
         null
@@ -304,8 +304,7 @@ private fun isValidKotlinIdentifier(name: String): Boolean {
  * This is more accurate than counting constructor parameters because value classes
  * can cause additional synthetic parameters in the constructor.
  */
-@InternalMavericksApi
-fun calculateParameterCountOfCopyFunction(copyFunction: Method): Int {
+internal fun calculateParameterCountOfCopyFunction(copyFunction: Method): Int {
     // The copy function always has the first parameter as the object to copy from,
     // and the last parameter as the ignored marker parameter.
     // So we know to ignore those two parameters.
@@ -339,8 +338,8 @@ private val Class<*>.defaultParameterValue: Any?
  * This avoids using KClass.memberProperties which requires Kotlin reflection metadata.
  */
 @InternalMavericksApi
-fun Any.getPropertyValue(propertyName: String): Any? {
-    val clazz = this::class.java
+fun getPropertyValue(any: Any, propertyName: String): Any? {
+    val clazz = any::class.java
 
     // Try getter method: getXxx or isXxx (for booleans)
     val capitalizedName = propertyName.replaceFirstChar { it.uppercaseChar() }
@@ -350,14 +349,14 @@ fun Any.getPropertyValue(propertyName: String): Any? {
     }
     if (getter != null) {
         getter.isAccessible = true
-        return getter.invoke(this)
+        return getter.invoke(any)
     }
 
     // Try direct field access
     return try {
         val field = clazz.getDeclaredField(propertyName)
         field.isAccessible = true
-        field.get(this)
+        field.get(any)
     } catch (e: NoSuchFieldException) {
         error("Could not find property '$propertyName' on ${clazz.simpleName}")
     }
