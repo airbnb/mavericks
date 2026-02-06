@@ -292,7 +292,7 @@ class JavaReflectUtilsTest {
     // and explicitly verifying the componentN-based index lookup.
 
     @Test
-    fun `buildPropertyIndexMap correctly maps field names to indices`() {
+    fun `callCopy maps fields correctly across many properties`() {
         val instance = ManyFieldsDataClass(
             confirmationCode = "test-code",
             referenceId = "test-ref",
@@ -301,36 +301,32 @@ class JavaReflectUtilsTest {
             closeResponse = Result.success("test-close"),
         )
 
-        val indexMap = instance.buildPropertyIndexMapForTesting()
+        // Verify setting fields at various positions works correctly
+        val copied = instance.callCopy(
+            "existingItems" to listOf("new"),
+            "createType" to "modified",
+            "closeResponse" to Result.success("modified-close"),
+        )
 
-        // Verify that known properties map to their correct indices
-        // (indices match constructor parameter order)
-        assertEquals(0, indexMap["existingItems"])
-        assertEquals(1, indexMap["confirmationCode"])
-        assertEquals(2, indexMap["referenceId"])
-        assertEquals(3, indexMap["createType"])
-        assertEquals(4, indexMap["currentUserId"])
-        assertEquals(14, indexMap["itemResponse"])
-        assertEquals(24, indexMap["closeResponse"])
+        assertEquals(listOf("new"), copied.existingItems)
+        assertEquals("test-code", copied.confirmationCode) // unchanged
+        assertEquals("test-ref", copied.referenceId) // unchanged
+        assertEquals("modified", copied.createType)
+        assertEquals(42L, copied.currentUserId) // unchanged
+        assertEquals(Result.success("test-item"), copied.itemResponse) // unchanged
+        assertEquals(Result.success("modified-close"), copied.closeResponse)
     }
 
     // ==================== Body Property Tests ====================
     // Tests that body properties (non-constructor properties with backing fields)
     // don't interfere with constructor property mapping.
 
-    /**
-     * Data class with body properties that have the same type and default value
-     * as constructor parameters. This mimics the PayoutMethodManagementState issue
-     * where body properties like 'addPayoutMethodButtonLoadingState' could incorrectly
-     * "steal" the component slot from constructor property 'showTaxPayerInformationModal'.
-     */
     data class DataClassWithBodyProperties(
         val firstBool: Boolean = false,
         val secondBool: Boolean = false,
         val thirdBool: Boolean = false,
         val name: String = "default",
     ) {
-        // Body properties - these have backing fields but no componentN methods
         val derivedBool: Boolean = firstBool || secondBool
         val anotherDerivedBool: Boolean = name.isEmpty()
     }
@@ -338,9 +334,6 @@ class JavaReflectUtilsTest {
     @Test
     fun `callCopy works with data class that has body properties`() {
         val original = DataClassWithBodyProperties()
-
-        // All booleans start as false, including body properties
-        // Setting thirdBool should NOT affect other boolean fields
         val copied = original.callCopy("thirdBool" to true)
 
         assertEquals(false, copied.firstBool)
@@ -363,83 +356,110 @@ class JavaReflectUtilsTest {
         assertEquals(true, copied.thirdBool)
     }
 
+    // ==================== Sequential callCopy (Mock Builder Pattern) ====================
+    // The Mavericks mock builder calls callCopy repeatedly on successive state instances.
+    // After one callCopy sets a boolean to true, a body property that is also true can
+    // collide with the next callCopy's field matching if using pure value-based matching.
+
     @Test
-    fun `buildPropertyIndexMap excludes body properties`() {
-        val instance = DataClassWithBodyProperties()
-        val indexMap = instance.buildPropertyIndexMapForTesting()
+    fun `callCopy works after prior copy changes boolean - body property value collision`() {
+        // Simulates the PayoutMethodManagementState CI failure:
+        // 1. Initial state: all constructor bools false, body prop derivedBool = false
+        // 2. First callCopy sets secondBool=true → derivedBool becomes true
+        // 3. Second callCopy on the NEW instance tries to set thirdBool=true
+        //    At this point, secondBool=true AND derivedBool=true (both Boolean, same value)
+        //    Without proper disambiguation, derivedBool could steal secondBool's component slot
+        val step1 = DataClassWithBodyProperties()
+        val step2 = step1.callCopy("secondBool" to true)
 
-        // Should have 4 constructor parameters mapped
-        assertEquals(4, indexMap.size)
+        assertEquals(true, step2.secondBool)
+        assertEquals(true, step2.derivedBool) // body prop is now also true
 
-        // Constructor parameters should be mapped
-        assertEquals(0, indexMap["firstBool"])
-        assertEquals(1, indexMap["secondBool"])
-        assertEquals(2, indexMap["thirdBool"])
-        assertEquals(3, indexMap["name"])
+        // This callCopy should still correctly identify thirdBool
+        val step3 = step2.callCopy("thirdBool" to true)
 
-        // Body properties should NOT be in the map
-        assertNull(indexMap["derivedBool"])
-        assertNull(indexMap["anotherDerivedBool"])
+        assertEquals(false, step3.firstBool)
+        assertEquals(true, step3.secondBool)
+        assertEquals(true, step3.thirdBool)
     }
 
     /**
-     * Test helper to expose the internal index map building.
+     * Mimics PayoutMethodManagementState structure more closely: multiple Async-like
+     * fields with the same default value, plus boolean fields with body properties.
      */
-    private fun <T : Any> T.buildPropertyIndexMapForTesting(): Map<String, Int> {
-        return buildPropertyIndexMap(this::class.java, this)
+    data class StateWithAsyncAndBoolBodyProps(
+        val response1: String? = null,
+        val response2: String? = null,
+        val dismissedAlert: Boolean = false,
+        val isRequired: Boolean = false,
+        val showModal: Boolean = false,
+        val info: String? = null,
+        val response3: String? = null,
+        val items: Map<String, String?> = emptyMap(),
+    ) {
+        val isLoading: Boolean = response1 == null
+        val buttonDisabled: Boolean = response1 == null || response3 != null
     }
 
-    /**
-     * Builds a mapping from property names to their constructor parameter index.
-     * Uses componentN methods which preserve constructor order even when fields are reordered.
-     * Iterates componentN methods first to ensure body properties are excluded.
-     */
-    private fun <T : Any> buildPropertyIndexMap(jvmClass: Class<*>, instance: T): Map<String, Int> {
-        // componentN methods are named component1, component2, etc.
-        // N corresponds to constructor parameter position (1-indexed)
-        // These may have suffixes like "component1-abc" for value classes or "component1$module" for internal
-        val componentRegex = Regex("""component(\d+).*""")
-        val componentMethods = jvmClass.declaredMethods
-            .mapNotNull { method ->
-                if (method.parameterCount != 0) return@mapNotNull null
-                val match = componentRegex.matchEntire(method.name) ?: return@mapNotNull null
-                val n = match.groupValues[1].toIntOrNull() ?: return@mapNotNull null
-                n to method
-            }
-            .sortedBy { it.first }
+    @Test
+    fun `callCopy on state with multiple same-type fields and body properties`() {
+        val original = StateWithAsyncAndBoolBodyProps()
+        // isLoading = true (body prop), buttonDisabled = true (body prop)
 
-        // Get all instance fields
-        val fields = jvmClass.declaredFields
-            .filter { !java.lang.reflect.Modifier.isStatic(it.modifiers) && !it.isSynthetic }
+        // Simulate mock builder setting isRequired=true first
+        val step1 = original.callCopy("isRequired" to true)
+        assertEquals(true, step1.isRequired)
+        assertEquals(false, step1.showModal)
 
-        val result = mutableMapOf<String, Int>()
-        val usedFields = mutableSetOf<String>()
+        // Then setting showModal=true (the field that was failing in CI)
+        val step2 = step1.callCopy("showModal" to true)
+        assertEquals(true, step2.isRequired)
+        assertEquals(true, step2.showModal)
+        assertEquals(false, step2.dismissedAlert)
+    }
 
-        // For each componentN method, find the field that matches its value.
-        // This ensures we only map constructor parameters (which have componentN methods)
-        // and not body properties (which don't have componentN methods).
-        for ((n, componentMethod) in componentMethods) {
-            val index = n - 1 // componentN is 1-indexed, parameters are 0-indexed
-            componentMethod.isAccessible = true
-            val componentValue = componentMethod.invoke(instance)
+    @Test
+    fun `callCopy correctly handles multiple null reference fields`() {
+        val original = StateWithAsyncAndBoolBodyProps()
+        val copied = original.callCopy("response2" to "updated")
 
-            for (field in fields) {
-                if (field.name in usedFields) continue
+        assertNull(copied.response1)
+        assertEquals("updated", copied.response2)
+        assertNull(copied.info)
+        assertNull(copied.response3)
+    }
 
-                // Type must match to avoid ambiguity with same-value fields of different types
-                if (field.type != componentMethod.returnType) continue
+    // ==================== toString Parsing Tests ====================
 
-                field.isAccessible = true
-                val fieldValue = field.get(instance)
+    @Test
+    fun `callCopy works when toString has nested data class values`() {
+        val original = NestedDataClass(
+            id = 1,
+            simple = SimpleDataClass(name = "inner"),
+            nullableValue = "test",
+        )
+        val copied = original.callCopy("nullableValue" to "changed")
 
-                if (fieldValue == componentValue) {
-                    result[field.name] = index
-                    usedFields.add(field.name)
-                    break
-                }
-            }
-        }
+        assertEquals(1L, copied.id)
+        assertEquals("inner", copied.simple.name)
+        assertEquals("changed", copied.nullableValue)
+    }
 
-        return result
+    @Test
+    fun `callCopy works with data class where all fields have same type and value`() {
+        data class AllSameDefaults(
+            val a: Boolean = false,
+            val b: Boolean = false,
+            val c: Boolean = false,
+            val d: Boolean = false,
+        )
+
+        val original = AllSameDefaults()
+        val copied = original.callCopy("c" to true)
+
+        assertEquals(false, copied.a)
+        assertEquals(false, copied.b)
+        assertEquals(true, copied.c)
+        assertEquals(false, copied.d)
     }
 }
