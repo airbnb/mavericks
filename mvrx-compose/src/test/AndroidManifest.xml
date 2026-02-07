@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- Allow test dependencies that require minSdk 21 to work with our minSdk 16 library.
+         This is safe because Robolectric tests run on JVM, not actual Android devices. -->
+    <uses-sdk tools:overrideLibrary="androidx.test.monitor,androidx.test.espresso.idling.resource" />
+
     <application
         android:name="com.airbnb.mvrx.compose.TestComposeApplication"
         tools:ignore="GoogleAppIndexingWarning"

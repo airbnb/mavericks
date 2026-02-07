@@ -21,3 +21,13 @@ Maven Local Installation
 =======================
 
 If testing changes locally, you can install to mavenLocal via `./gradlew publishToMavenLocal`
+
+Publishing to Custom Artifactory Repository
+========================
+
+To push to a custom artifactory repository, use the command `publishAllPublicationsToCustomArtifactoryRepository` and set the following properties:
+- `ARTIFACTORY_RELEASE_URL` (or `ARTIFACTORY_SNAPSHOT_URL` if snapshot version)
+- `ARTIFACTORY_USERNAME`
+- `ARTIFACTORY_PASSWORD`
+
+See `publishing.gradle` file for more details.      

@@ -3,7 +3,8 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'com.vanniktech.maven.publish'
+
+apply from: '../publishing.gradle'
 
 tasks.withType(KotlinCompile).all {
     kotlinOptions {

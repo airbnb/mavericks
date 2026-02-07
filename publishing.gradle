@@ -1,0 +1,17 @@
+apply plugin: "com.vanniktech.maven.publish"
+
+// https://vanniktech.github.io/gradle-maven-publish-plugin/other/
+publishing {
+    repositories {
+        maven {
+            // The "name" value creates a task like `publishAllPublicationsTo[Name]Repository
+            // In this case, publishAllPublicationsToCustomArtifactoryRepository
+            name = 'customArtifactory'
+            url = version.toString().endsWith("SNAPSHOT") ? findProperty("ARTIFACTORY_SNAPSHOT_URL") : findProperty("ARTIFACTORY_RELEASE_URL")
+            credentials {
+                username = findProperty("ARTIFACTORY_USERNAME")
+                password = findProperty("ARTIFACTORY_PASSWORD")
+            }
+        }
+    }
+}

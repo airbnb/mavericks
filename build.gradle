@@ -39,6 +39,7 @@ allprojects {
         google()
         mavenCentral()
     }
+
 }
 
 subprojects { project ->

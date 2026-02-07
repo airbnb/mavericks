@@ -4,7 +4,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-parcelize'
-apply plugin: "com.vanniktech.maven.publish"
+apply from: '../publishing.gradle'
 
 tasks.withType(KotlinCompile).all {
     kotlinOptions {
