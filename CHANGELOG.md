@@ -2,6 +2,11 @@
 
 For a full list of changes, see the [GitHub releases](https://github.com/airbnb/mavericks/releases)
 
+## 3.1.0
+
+Update mavericks-mocking tools and the Setter DSL to use java reflection instead of kotlin reflection,
+to reduce limitations on where it can be used.
+
 ## 3.0.9
 - Fix crash in state restoration with multiple of 32 fields (#707)
 
