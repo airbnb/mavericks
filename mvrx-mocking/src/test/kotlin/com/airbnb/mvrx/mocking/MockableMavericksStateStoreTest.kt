@@ -180,6 +180,22 @@ class MockableMavericksStateStoreTest : BaseTest() {
         store.get { state -> assertEquals(6, state.num) }
     }
 
+    @Test
+    fun concurrentSetsAreNotLostWhenSynchronous() {
+        val store = createStore(StateStoreBehavior.Synchronous)
+        var listenerCalls = 0
+        store.addOnStateSetListener { _, _ -> listenerCalls++ }
+
+        val threadCount = 8
+        val setsPerThread = 5_000
+        runConcurrently(threadCount) {
+            repeat(setsPerThread) { store.set { copy(num = num + 1) } }
+        }
+
+        assertEquals(threadCount * setsPerThread, store.state.num)
+        assertEquals(threadCount * setsPerThread, listenerCalls)
+    }
+
     private fun createStore(
         storeBehavior: StateStoreBehavior = StateStoreBehavior.Scriptable
     ): MockableMavericksStateStore<TestState> {
