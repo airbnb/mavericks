@@ -2,6 +2,11 @@
 
 For a full list of changes, see the [GitHub releases](https://github.com/airbnb/mavericks/releases)
 
+## 3.1.1
+
+Make `SynchronousMavericksStateStore` and `MockableMavericksStateStore` thread-safe, so concurrent
+`setState` calls in tests can no longer drop each other's updates (#739).
+
 ## 3.1.0
 
 Update mavericks-mocking tools and the Setter DSL to use java reflection instead of kotlin reflection,
