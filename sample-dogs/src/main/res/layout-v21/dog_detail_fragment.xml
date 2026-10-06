@@ -19,6 +19,30 @@
         android:layout_height="match_parent"
         android:background="@color/colorPrimary">
 
+        <androidx.core.widget.ContentLoadingProgressBar
+            android:id="@+id/progress_bar"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@android:color/white"
+            android:textSize="24sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="An error will be shown here"
+            tools:visibility="visible" />
+
         <com.airbnb.mvrx.dogs.views.DogImageView
             android:id="@+id/image"
             android:layout_width="0dp"
@@ -60,11 +84,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:text="@{dog.breeds}"
             android:textColor="@android:color/white"
             android:textSize="24sp"
             app:layout_constraintStart_toStartOf="@id/nameView"
             app:layout_constraintTop_toBottomOf="@id/nameView"
-            android:text="@{dog.breeds}"
             tools:text="Terrier, Pit Bull Mix" />
 
         <TextView
@@ -74,9 +98,9 @@
             android:layout_marginStart="16dp"
 
             android:layout_marginTop="16dp"
+            android:text="@{dog.name}"
             android:textColor="@android:color/white"
             android:textSize="32sp"
-            android:text="@{dog.name}"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/image"
             tools:text="Clover" />
@@ -91,12 +115,12 @@
             android:background="@drawable/adopt_button_background"
             android:elevation="8dp"
             android:gravity="center"
+            android:onClick="@{() -> handler.onLoveClicked()}"
             android:text="@string/love_dog"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:onClick="@{() -> handler.onLoveClicked()}" />
+            app:layout_constraintStart_toStartOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

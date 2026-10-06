@@ -16,7 +16,7 @@ import kotlin.reflect.KProperty
  */
 @Suppress("FunctionName", "DEPRECATION")
 @InternalMavericksApi
-fun <T : Fragment> T._fragmentArgsProvider(): Any? = arguments?.get(Mavericks.KEY_ARG)
+fun <T : Fragment> T._fragmentArgsProvider(): Any? = arguments?.get(Mavericks.KEY_ARG) ?: arguments
 
 /**
  * Gets or creates a ViewModel scoped to this Fragment. You will get the same instance every time for this Fragment, even
