@@ -196,6 +196,34 @@ class MockableMavericksStateStoreTest : BaseTest() {
         assertEquals(threadCount * setsPerThread, listenerCalls)
     }
 
+    @Test
+    fun setStateInvokesReducerOnceWhenNormal() {
+        val store = createStore(StateStoreBehavior.Normal)
+        var reducerInvocations = 0
+        store.set {
+            reducerInvocations++
+            copy(num = num + 1)
+        }
+        store.get { state ->
+            assertEquals(1, state.num)
+        }
+        assertEquals(1, reducerInvocations)
+    }
+
+    @Test
+    fun setStateInvokesReducerOnceWhenSynchronous() {
+        val store = createStore(StateStoreBehavior.Synchronous)
+        var reducerInvocations = 0
+        store.set {
+            reducerInvocations++
+            copy(num = num + 1)
+        }
+        store.get { state ->
+            assertEquals(1, state.num)
+        }
+        assertEquals(1, reducerInvocations)
+    }
+
     private fun createStore(
         storeBehavior: StateStoreBehavior = StateStoreBehavior.Scriptable
     ): MockableMavericksStateStore<TestState> {

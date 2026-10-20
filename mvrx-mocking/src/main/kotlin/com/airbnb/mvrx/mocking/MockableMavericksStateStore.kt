@@ -9,6 +9,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.isActive
+import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -32,7 +33,7 @@ interface MockableStateStore<S : Any> : ScriptableStateStore<S> {
  */
 class MockableMavericksStateStore<S : MavericksState>(
     initialState: S,
-    override var mockBehavior: MockBehavior,
+    @Volatile override var mockBehavior: MockBehavior,
     val coroutineScope: CoroutineScope,
     contextOverride: CoroutineContext = EmptyCoroutineContext
 ) : MockableStateStore<S> {
@@ -40,7 +41,7 @@ class MockableMavericksStateStore<S : MavericksState>(
     private val realStore = CoroutinesStateStore(initialState, coroutineScope, contextOverride)
     private val realImmediateStore = SynchronousMavericksStateStore(initialState)
 
-    private val onStateSetListeners = mutableListOf<(previousState: S, newState: S) -> Unit>()
+    private val onStateSetListeners = CopyOnWriteArrayList<(previousState: S, newState: S) -> Unit>()
 
     /**
      * Guards [set] and [next]. The synchronous store takes its own lock inside this one, and never
@@ -76,16 +77,31 @@ class MockableMavericksStateStore<S : MavericksState>(
     }
 
     override fun set(stateReducer: S.() -> S) {
+        if (mockBehavior.stateStoreBehavior == StateStoreBehavior.Normal && onStateSetListeners.isEmpty()) {
+            realStore.set {
+                val newState = this.stateReducer()
+                synchronized(lock) {
+                    if (mockBehavior.stateStoreBehavior == StateStoreBehavior.Normal) {
+                        realImmediateStore.set { newState }
+                        scriptableStore.next(newState)
+                    }
+                }
+                newState
+            }
+            return
+        }
+
         synchronized(lock) {
-            val newState = state.stateReducer()
-            onStateSetListeners.forEach { it.invoke(state, newState) }
+            val previousState = state
+            val newState = previousState.stateReducer()
+            onStateSetListeners.forEach { it.invoke(previousState, newState) }
 
             // Setting state only takes effect is "scriptable" mode is not enabled.
             if (mockBehavior.stateStoreBehavior != StateStoreBehavior.Scriptable) {
                 // States are updated on all stores, so if we switch to any other in the future
                 // it will be correctly up to date.
-                realImmediateStore.set(stateReducer)
-                realStore.set(stateReducer)
+                realImmediateStore.set { newState }
+                realStore.set { newState }
                 scriptableStore.next(newState)
             }
         }

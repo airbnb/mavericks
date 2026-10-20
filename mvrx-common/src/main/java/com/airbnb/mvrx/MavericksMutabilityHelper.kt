@@ -65,15 +65,8 @@ fun assertMavericksDataClassImmutability(
  */
 internal class MutableStateChecker<S : MavericksState>(val initialState: S) {
 
-    data class StateWrapper<S : MavericksState>(val state: S) {
-        private val originalHashCode = hashCode()
-
-        fun validate() = require(originalHashCode == hashCode()) {
-            "${state::class.java.simpleName} was mutated. State classes should be immutable."
-        }
-    }
-
-    private var previousState = StateWrapper(initialState)
+    private var previousState: S = initialState
+    private var previousHashCode: Int = initialState.hashCode()
 
     /**
      * Should be called whenever state changes. This validates that the hashcode of each state
@@ -81,7 +74,12 @@ internal class MutableStateChecker<S : MavericksState>(val initialState: S) {
      * If it does change it means different state instances share some mutable data structure.
      */
     fun onStateChanged(newState: S) {
-        previousState.validate()
-        previousState = StateWrapper(newState)
+        require(previousHashCode == previousState.hashCode()) {
+            "${previousState::class.java.simpleName} was mutated. State classes should be immutable."
+        }
+        if (newState !== previousState) {
+            previousState = newState
+            previousHashCode = newState.hashCode()
+        }
     }
 }

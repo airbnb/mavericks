@@ -80,11 +80,15 @@ class CoroutinesStateStore<S : MavericksState>(
      */
     private suspend fun flushQueuesOnce() {
         select<Unit> {
-            setStateChannel.onReceive { reducer ->
-                val newState = state.reducer()
-                if (newState != state) {
-                    state = newState
-                    stateSharedFlow.emit(newState)
+            setStateChannel.onReceive { firstReducer ->
+                var reducer = firstReducer
+                while (scope.isActive) {
+                    val newState = state.reducer()
+                    if (newState != state) {
+                        state = newState
+                        stateSharedFlow.emit(newState)
+                    }
+                    reducer = setStateChannel.tryReceive().getOrNull() ?: break
                 }
             }
             withStateChannel.onReceive { block ->
