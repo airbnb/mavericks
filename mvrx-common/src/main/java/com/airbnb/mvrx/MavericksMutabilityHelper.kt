@@ -73,13 +73,14 @@ internal class MutableStateChecker<S : MavericksState>(val initialState: S) {
      * instance does not change between when it is first set and when the next state is set.
      * If it does change it means different state instances share some mutable data structure.
      */
+    @Synchronized
     fun onStateChanged(newState: S) {
         require(previousHashCode == previousState.hashCode()) {
             "${previousState::class.java.simpleName} was mutated. State classes should be immutable."
         }
         if (newState !== previousState) {
-            previousState = newState
             previousHashCode = newState.hashCode()
+            previousState = newState
         }
     }
 }

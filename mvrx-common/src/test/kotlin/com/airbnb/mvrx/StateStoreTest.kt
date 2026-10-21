@@ -82,4 +82,30 @@ class StateStoreTest : BaseTest() {
         job1.cancel()
         assertEquals(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), values)
     }
+
+    @Test(timeout = 5_000)
+    fun testConcurrentSetWhenForceSynchronousDoesNotDeadlock() = runBlocking {
+        val store = CoroutinesStateStore(MavericksStateStoreTestState(), this)
+        val firstReducerEntered = java.util.concurrent.CountDownLatch(1)
+        val secondThreadReady = java.util.concurrent.CountDownLatch(1)
+
+        val thread = Thread {
+            firstReducerEntered.await()
+            store.set {
+                copy(count = count + 1)
+            }
+        }
+        thread.start()
+
+        store.set {
+            firstReducerEntered.countDown()
+            // Give the second thread a brief moment to enqueue its reducer via trySend
+            // before this first reducer returns.
+            secondThreadReady.await(50, java.util.concurrent.TimeUnit.MILLISECONDS)
+            copy(count = count + 1)
+        }
+
+        thread.join(2_000)
+        assertEquals(3, store.state.count)
+    }
 }

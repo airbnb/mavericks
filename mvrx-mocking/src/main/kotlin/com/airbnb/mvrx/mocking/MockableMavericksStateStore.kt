@@ -33,7 +33,7 @@ interface MockableStateStore<S : Any> : ScriptableStateStore<S> {
  */
 class MockableMavericksStateStore<S : MavericksState>(
     initialState: S,
-    @Volatile override var mockBehavior: MockBehavior,
+    mockBehavior: MockBehavior,
     val coroutineScope: CoroutineScope,
     contextOverride: CoroutineContext = EmptyCoroutineContext
 ) : MockableStateStore<S> {
@@ -42,12 +42,24 @@ class MockableMavericksStateStore<S : MavericksState>(
     private val realImmediateStore = SynchronousMavericksStateStore(initialState)
 
     private val onStateSetListeners = CopyOnWriteArrayList<(previousState: S, newState: S) -> Unit>()
+    private val pendingNormalReducers = ArrayDeque<S.() -> S>()
 
     /**
      * Guards [set] and [next]. The synchronous store takes its own lock inside this one, and never
      * the other way around, so the two cannot deadlock.
      */
     private val lock = Any()
+
+    @Volatile
+    override var mockBehavior: MockBehavior = mockBehavior
+        set(value) {
+            synchronized(lock) {
+                field = value
+                if (value.stateStoreBehavior != StateStoreBehavior.Normal) {
+                    drainPendingNormalReducersLocked()
+                }
+            }
+        }
 
     private val currentStore
         get() = when (mockBehavior.stateStoreBehavior) {
@@ -57,7 +69,7 @@ class MockableMavericksStateStore<S : MavericksState>(
         }
 
     override val state: S
-        get() = currentStore.state
+        get() = realImmediateStore.state
 
     override fun next(state: S) {
         check(mockBehavior.stateStoreBehavior == StateStoreBehavior.Scriptable) {
@@ -65,11 +77,12 @@ class MockableMavericksStateStore<S : MavericksState>(
         }
 
         synchronized(lock) {
+            drainPendingNormalReducersLocked()
             scriptableStore.next(state)
             // Update the real stores too, so if we switch to them they are already up to date.
-            realStore.set { state }
             realImmediateStore.set { state }
         }
+        syncRealStore()
     }
 
     override fun get(block: (S) -> Unit) {
@@ -77,34 +90,58 @@ class MockableMavericksStateStore<S : MavericksState>(
     }
 
     override fun set(stateReducer: S.() -> S) {
-        if (mockBehavior.stateStoreBehavior == StateStoreBehavior.Normal && onStateSetListeners.isEmpty()) {
-            realStore.set {
-                val newState = this.stateReducer()
-                synchronized(lock) {
-                    if (mockBehavior.stateStoreBehavior == StateStoreBehavior.Normal) {
-                        realImmediateStore.set { newState }
-                        scriptableStore.next(newState)
-                    }
-                }
-                newState
-            }
-            return
-        }
-
+        val shouldSyncRealStore: Boolean
         synchronized(lock) {
-            val previousState = state
-            val newState = previousState.stateReducer()
-            onStateSetListeners.forEach { it.invoke(previousState, newState) }
+            if (mockBehavior.stateStoreBehavior == StateStoreBehavior.Normal) {
+                pendingNormalReducers.addLast(stateReducer)
+                shouldSyncRealStore = true
+            } else {
+                drainPendingNormalReducersLocked()
+                val previousState = state
+                val newState = previousState.stateReducer()
+                onStateSetListeners.forEach { it.invoke(previousState, newState) }
 
-            // Setting state only takes effect is "scriptable" mode is not enabled.
-            if (mockBehavior.stateStoreBehavior != StateStoreBehavior.Scriptable) {
-                // States are updated on all stores, so if we switch to any other in the future
-                // it will be correctly up to date.
-                realImmediateStore.set { newState }
-                realStore.set { newState }
-                scriptableStore.next(newState)
+                // Setting state only takes effect is "scriptable" mode is not enabled.
+                if (mockBehavior.stateStoreBehavior != StateStoreBehavior.Scriptable) {
+                    // States are updated on all stores, so if we switch to any other in the future
+                    // it will be correctly up to date.
+                    realImmediateStore.set { newState }
+                    scriptableStore.next(newState)
+                    shouldSyncRealStore = true
+                } else {
+                    shouldSyncRealStore = false
+                }
             }
         }
+        if (shouldSyncRealStore) {
+            syncRealStore()
+        }
+    }
+
+    private fun syncRealStore() {
+        realStore.set {
+            synchronized(lock) {
+                val reducer = pendingNormalReducers.removeFirstOrNull()
+                if (reducer != null) {
+                    applyNormalReducerLocked(reducer)
+                }
+                realImmediateStore.state
+            }
+        }
+    }
+
+    private fun drainPendingNormalReducersLocked() {
+        while (pendingNormalReducers.isNotEmpty()) {
+            applyNormalReducerLocked(pendingNormalReducers.removeFirst())
+        }
+    }
+
+    private fun applyNormalReducerLocked(stateReducer: S.() -> S) {
+        val previousState = realImmediateStore.state
+        val newState = previousState.stateReducer()
+        realImmediateStore.set { newState }
+        scriptableStore.next(newState)
+        onStateSetListeners.forEach { it.invoke(previousState, newState) }
     }
 
     /**
