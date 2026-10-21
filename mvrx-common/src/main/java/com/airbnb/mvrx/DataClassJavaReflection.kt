@@ -1,5 +1,6 @@
 package com.airbnb.mvrx
 
+import java.lang.reflect.Field
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 import kotlin.math.ceil
@@ -164,10 +165,8 @@ private fun <T : Any> buildPropertyIndexMap(jvmClass: Class<*>, instance: T): Ma
     // literals in declaration order. These names survive R8 field reordering since they're
     // embedded as constants in the bytecode.
     val toStringNames = parseDataClassConstructorParamNames(instance.toString())
-    if (toStringNames != null && toStringNames.size == componentMethods.size) {
-        if (toStringNames.all { it in fieldNames }) {
-            return toStringNames.mapIndexed { index, name -> name to index }.toMap()
-        }
+    if (toStringNames != null && toStringNames.size == componentMethods.size && toStringNames.all { it in fieldNames }) {
+        return toStringNames.mapIndexed { index, name -> name to index }.toMap()
     }
 
     // Strategy 2: ComponentN + value matching with mutation-probe disambiguation.
@@ -186,42 +185,56 @@ private fun <T : Any> buildPropertyIndexMap(jvmClass: Class<*>, instance: T): Ma
             field.get(instance) == componentValue
         }
 
-        when {
-            candidates.size == 1 -> {
-                result[candidates[0].name] = index
-                usedFields.add(candidates[0].name)
-            }
-            candidates.size > 1 -> {
-                // Ambiguous: temporarily change each candidate's value to identify which
-                // field actually backs the componentN method.
-                var matched = false
-                for (field in candidates) {
-                    field.isAccessible = true
-                    val originalValue = field.get(instance)
-                    val probeValue = getProbeValue(field.type, originalValue) ?: continue
-                    try {
-                        field.set(instance, probeValue)
-                        val probeResult = componentMethod.invoke(instance)
-                        field.set(instance, originalValue)
-                        if (probeResult != componentValue) {
-                            result[field.name] = index
-                            usedFields.add(field.name)
-                            matched = true
-                            break
-                        }
-                    } catch (_: Exception) {
-                        try { field.set(instance, originalValue) } catch (_: Exception) {}
-                    }
-                }
-                if (!matched) {
-                    result[candidates[0].name] = index
-                    usedFields.add(candidates[0].name)
-                }
-            }
+        val matchedField = when {
+            candidates.size == 1 -> candidates[0]
+            candidates.size > 1 -> disambiguateCandidateField(instance, componentMethod, componentValue, candidates)
+            else -> null
+        }
+        if (matchedField != null) {
+            result[matchedField.name] = index
+            usedFields.add(matchedField.name)
         }
     }
 
     return result
+}
+
+private fun <T : Any> disambiguateCandidateField(
+    instance: T,
+    componentMethod: Method,
+    componentValue: Any?,
+    candidates: List<Field>
+): Field {
+    // Ambiguous: temporarily change each candidate's value to identify which
+    // field actually backs the componentN method.
+    for (field in candidates) {
+        field.isAccessible = true
+        val originalValue = field.get(instance)
+        val probeValue = getProbeValue(field.type, originalValue) ?: continue
+        if (doesFieldBackComponent(instance, field, originalValue, probeValue, componentMethod, componentValue)) {
+            return field
+        }
+    }
+    return candidates[0]
+}
+
+private fun <T : Any> doesFieldBackComponent(
+    instance: T,
+    field: Field,
+    originalValue: Any?,
+    probeValue: Any,
+    componentMethod: Method,
+    componentValue: Any?
+): Boolean {
+    return try {
+        field.set(instance, probeValue)
+        val probeResult = componentMethod.invoke(instance)
+        field.set(instance, originalValue)
+        probeResult != componentValue
+    } catch (_: Exception) {
+        try { field.set(instance, originalValue) } catch (_: Exception) {}
+        false
+    }
 }
 
 /**
@@ -272,25 +285,29 @@ private fun parseDataClassConstructorParamNames(toStringOutput: String): List<St
         val name = toStringOutput.substring(nameStart, i)
         if (!isValidKotlinIdentifier(name)) return null
         names.add(name)
-        i++ // skip '='
-
-        // Skip the value, tracking nested brackets/parens
-        var depth = 0
-        while (i < end) {
-            when (toStringOutput[i]) {
-                '(', '[', '{' -> depth++
-                ')', ']', '}' -> depth--
-                ',' -> if (depth == 0) {
-                    i++
-                    if (i < end && toStringOutput[i] == ' ') i++
-                    break
-                }
-            }
-            i++
-        }
+        i = skipParameterValue(toStringOutput, i + 1, end)
     }
 
     return names.ifEmpty { null }
+}
+
+private fun skipParameterValue(toStringOutput: String, startIndex: Int, end: Int): Int {
+    // Skip the value, tracking nested brackets/parens
+    var i = startIndex
+    var depth = 0
+    while (i < end) {
+        val ch = toStringOutput[i]
+        if (ch == ',' && depth == 0) {
+            val next = i + 1
+            return if (next < end && toStringOutput[next] == ' ') next + 1 else next
+        }
+        when (ch) {
+            '(', '[', '{' -> depth++
+            ')', ']', '}' -> depth--
+        }
+        i++
+    }
+    return i
 }
 
 private fun isValidKotlinIdentifier(name: String): Boolean {
