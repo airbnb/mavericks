@@ -88,10 +88,13 @@ class StateStoreTest : BaseTest() {
         val store = CoroutinesStateStore(MavericksStateStoreTestState(), this)
         val firstReducerEntered = java.util.concurrent.CountDownLatch(1)
         val secondThreadReady = java.util.concurrent.CountDownLatch(1)
+        val secondReducerThread = java.util.concurrent.atomic.AtomicReference<Thread>()
 
         val thread = Thread {
             firstReducerEntered.await()
+            secondThreadReady.countDown()
             store.set {
+                secondReducerThread.set(Thread.currentThread())
                 copy(count = count + 1)
             }
         }
@@ -99,12 +102,14 @@ class StateStoreTest : BaseTest() {
 
         store.set {
             firstReducerEntered.countDown()
-            // Give the second thread a brief moment to enqueue its reducer via trySend
-            // before this first reducer returns.
-            secondThreadReady.await(50, java.util.concurrent.TimeUnit.MILLISECONDS)
+            assertTrue(secondThreadReady.await(5, java.util.concurrent.TimeUnit.SECONDS))
+            while (thread.state != Thread.State.BLOCKED && thread.isAlive) {
+                Thread.yield()
+            }
             copy(count = count + 1)
         }
 
+        assertEquals(Thread.currentThread(), secondReducerThread.get())
         thread.join(2_000)
         assertEquals(3, store.state.count)
     }
