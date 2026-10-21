@@ -27,9 +27,13 @@ interface MockableStateStore<S : Any> : ScriptableStateStore<S> {
  *
  * The mode can be dynamically changed to modify behavior at runtime.
  *
- * [set] and [next] are safe to call from several threads at once. Each call holds a lock while it
- * reads the current state and updates every underlying store, so concurrent updates cannot
- * overwrite each other or leave the stores disagreeing.
+ * [set] and [next] are safe to call from several threads at once. In [StateStoreBehavior.Synchronous]
+ * and [StateStoreBehavior.Scriptable] modes, each call holds a lock while it reads the current state
+ * and updates the synchronous and scriptable stores (and queues an update on the coroutine store).
+ * In [StateStoreBehavior.Normal] mode, [set] queues the reducer under the lock and applies it later
+ * on the coroutine store's flush thread (or when draining before a mode switch or [next]), still
+ * holding the lock while reading the current state and updating the stores so concurrent updates
+ * cannot overwrite each other or leave the stores disagreeing.
  */
 class MockableMavericksStateStore<S : MavericksState>(
     initialState: S,
@@ -147,6 +151,12 @@ class MockableMavericksStateStore<S : MavericksState>(
     /**
      * Add a listener that will be called each time a state is set on this state store via
      * the [set] function.
+     *
+     * In [StateStoreBehavior.Synchronous] and [StateStoreBehavior.Scriptable] modes, the callback
+     * is invoked synchronously on the caller's thread before [set] returns. In
+     * [StateStoreBehavior.Normal] mode, the reducer is queued and the callback is invoked later on
+     * the store's flush thread when the reducer is applied (or on the thread that switches modes or
+     * calls [next], if pending reducers are drained first).
      */
     fun addOnStateSetListener(callback: (previousState: S, newState: S) -> Unit) {
         onStateSetListeners.add(callback)

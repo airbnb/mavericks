@@ -7,6 +7,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import com.airbnb.mvrx.Mavericks
+import com.airbnb.mvrx.MavericksViewModelConfigFactory
+import kotlinx.coroutines.Dispatchers
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Rule
@@ -22,7 +24,10 @@ class CollectAsStateTest {
 
     @Before
     fun setUp() {
-        Mavericks.initialize(composeTestRule.activity)
+        Mavericks.initialize(
+            composeTestRule.activity,
+            MavericksViewModelConfigFactory(composeTestRule.activity, storeContextOverride = Dispatchers.Unconfined)
+        )
     }
 
     @Test
