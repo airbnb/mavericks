@@ -254,7 +254,7 @@ open class MockMavericksViewModelConfigFactory(
             initialState = initialState,
             mockBehavior = mockBehavior,
             coroutineScope = coroutineScope,
-            contextOverride = contextOverride
+            contextOverride = storeContextOverride
         )
 
         return MockableMavericksViewModelConfig(

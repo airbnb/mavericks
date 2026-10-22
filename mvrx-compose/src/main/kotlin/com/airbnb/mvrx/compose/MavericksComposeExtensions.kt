@@ -184,8 +184,9 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectAsState(
     mapper: (S) -> O
 ): State<O> {
     val updatedMapper by rememberUpdatedState(mapper)
-    val mappedFlow = remember(key) { stateFlow.map { updatedMapper(it) }.distinctUntilChanged() }
-    return mappedFlow.collectAsState(initial = withState(this) { updatedMapper(it) }, coroutineContext)
+    val mappedFlow = remember(this, key) { stateFlow.map { updatedMapper(it) }.distinctUntilChanged() }
+    val initialValue = remember(this, key) { withState(this) { mapper(it) } }
+    return mappedFlow.collectAsState(initial = initialValue, coroutineContext)
 }
 
 /**
@@ -206,9 +207,10 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, O> VM.collectAsStateWithLif
     mapper: (S) -> O
 ): State<O> {
     val updatedMapper by rememberUpdatedState(mapper)
-    val mappedFlow = remember(key) { stateFlow.map { updatedMapper(it) }.distinctUntilChanged() }
+    val mappedFlow = remember(this, key) { stateFlow.map { updatedMapper(it) }.distinctUntilChanged() }
+    val initialValue = remember(this, key) { withState(this) { mapper(it) } }
     return mappedFlow.collectAsStateWithLifecycle(
-        initialValue = withState(this) { updatedMapper(it) },
+        initialValue = initialValue,
         lifecycleOwner = lifecycleOwner,
         minActiveState = minActiveState,
         context = coroutineContext
@@ -225,8 +227,9 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, A> VM.collectAsState(
     prop1: KProperty1<S, A>,
     coroutineContext: CoroutineContext = EmptyCoroutineContext
 ): State<A> {
-    val mappedFlow = remember(prop1) { stateFlow.map { prop1.get(it) }.distinctUntilChanged() }
-    return mappedFlow.collectAsState(initial = withState(this) { prop1.get(it) }, context = coroutineContext)
+    val mappedFlow = remember(this, prop1) { stateFlow.map { prop1.get(it) }.distinctUntilChanged() }
+    val initialValue = remember(this, prop1) { withState(this) { prop1.get(it) } }
+    return mappedFlow.collectAsState(initial = initialValue, context = coroutineContext)
 }
 
 /**
@@ -241,9 +244,10 @@ fun <VM : MavericksViewModel<S>, S : MavericksState, A> VM.collectAsStateWithLif
     lifecycleOwner: LifecycleOwner = LocalLifecycleOwner.current,
     minActiveState: Lifecycle.State = Lifecycle.State.STARTED,
 ): State<A> {
-    val mappedFlow = remember(prop1) { stateFlow.map { prop1.get(it) }.distinctUntilChanged() }
+    val mappedFlow = remember(this, prop1) { stateFlow.map { prop1.get(it) }.distinctUntilChanged() }
+    val initialValue = remember(this, prop1) { withState(this) { prop1.get(it) } }
     return mappedFlow.collectAsStateWithLifecycle(
-        initialValue = withState(this) { prop1.get(it) },
+        initialValue = initialValue,
         lifecycleOwner = lifecycleOwner,
         minActiveState = minActiveState,
         context = coroutineContext

@@ -82,4 +82,35 @@ class StateStoreTest : BaseTest() {
         job1.cancel()
         assertEquals(listOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10), values)
     }
+
+    @Test(timeout = 5_000)
+    fun testConcurrentSetWhenForceSynchronousDoesNotDeadlock() = runBlocking {
+        val store = CoroutinesStateStore(MavericksStateStoreTestState(), this)
+        val firstReducerEntered = java.util.concurrent.CountDownLatch(1)
+        val secondThreadReady = java.util.concurrent.CountDownLatch(1)
+        val secondReducerThread = java.util.concurrent.atomic.AtomicReference<Thread>()
+
+        val thread = Thread {
+            firstReducerEntered.await()
+            secondThreadReady.countDown()
+            store.set {
+                secondReducerThread.set(Thread.currentThread())
+                copy(count = count + 1)
+            }
+        }
+        thread.start()
+
+        store.set {
+            firstReducerEntered.countDown()
+            assertTrue(secondThreadReady.await(5, java.util.concurrent.TimeUnit.SECONDS))
+            while (thread.state != Thread.State.BLOCKED && thread.isAlive) {
+                Thread.yield()
+            }
+            copy(count = count + 1)
+        }
+
+        assertEquals(Thread.currentThread(), secondReducerThread.get())
+        thread.join(2_000)
+        assertEquals(3, store.state.count)
+    }
 }

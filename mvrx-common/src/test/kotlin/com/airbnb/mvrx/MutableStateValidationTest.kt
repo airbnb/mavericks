@@ -36,4 +36,20 @@ class MutableStateValidationTest : BaseTest() {
         }
         Repository(StateWithImmutableMap()).addKeyToMap()
     }
+
+    @Test
+    fun concurrentOnStateChangedWithImmutableStateShouldNotFail() {
+        val checker = MutableStateChecker(StateWithImmutableMap(mapOf("init" to "0")))
+        val threads = (1..8).map { threadIndex ->
+            Thread {
+                repeat(1_000) { iteration ->
+                    checker.onStateChanged(
+                        StateWithImmutableMap(mapOf("t$threadIndex" to "$iteration"))
+                    )
+                }
+            }
+        }
+        threads.forEach { it.start() }
+        threads.forEach { it.join() }
+    }
 }

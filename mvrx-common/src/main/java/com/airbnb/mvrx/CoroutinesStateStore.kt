@@ -23,6 +23,7 @@ class CoroutinesStateStore<S : MavericksState>(
 
     private val setStateChannel = Channel<S.() -> S>(capacity = Channel.UNLIMITED)
     private val withStateChannel = Channel<(S) -> Unit>(capacity = Channel.UNLIMITED)
+    private val flushLock = Any()
 
     private val stateSharedFlow = MutableSharedFlow<S>(
         replay = 1,
@@ -80,11 +81,15 @@ class CoroutinesStateStore<S : MavericksState>(
      */
     private suspend fun flushQueuesOnce() {
         select<Unit> {
-            setStateChannel.onReceive { reducer ->
-                val newState = state.reducer()
-                if (newState != state) {
-                    state = newState
-                    stateSharedFlow.emit(newState)
+            setStateChannel.onReceive { firstReducer ->
+                var reducer = firstReducer
+                while (scope.isActive) {
+                    val newState = state.reducer()
+                    if (newState != state) {
+                        state = newState
+                        stateSharedFlow.emit(newState)
+                    }
+                    reducer = setStateChannel.tryReceive().getOrNull() ?: break
                 }
             }
             withStateChannel.onReceive { block ->
@@ -95,7 +100,30 @@ class CoroutinesStateStore<S : MavericksState>(
 
     private fun flushQueuesOnceBlocking() {
         if (scope.isActive) {
-            runBlocking { flushQueuesOnce() }
+            synchronized(flushLock) {
+                runBlocking { flushQueuesBlocking() }
+            }
+        }
+    }
+
+    private suspend fun flushQueuesBlocking() {
+        while (scope.isActive) {
+            var didWork = false
+            while (scope.isActive) {
+                val reducer = setStateChannel.tryReceive().getOrNull() ?: break
+                didWork = true
+                val newState = state.reducer()
+                if (newState != state) {
+                    state = newState
+                    stateSharedFlow.emit(newState)
+                }
+            }
+            val block = withStateChannel.tryReceive().getOrNull()
+            if (block != null) {
+                didWork = true
+                block(state)
+            }
+            if (!didWork) break
         }
     }
 
