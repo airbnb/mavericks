@@ -28,7 +28,7 @@ abstract class MavericksViewModel<S : MavericksState>(
 ) {
     // Use the same factory for the life of the viewmodel, as it might change after this viewmodel is created (especially during tests)
     @PublishedApi
-    internal val configFactory = Mavericks.viewModelConfigFactory
+    internal val configFactory = configFactory
 
     @Suppress("LeakingThis")
     @InternalMavericksApi

@@ -21,6 +21,9 @@ data class BaseMavericksViewModelTestState(
     val int: Int = 0
 ) : MavericksState
 
+private class ConfiguredMavericksViewModel(configFactory: MavericksViewModelConfigFactory) :
+    MavericksViewModel<BaseMavericksViewModelTestState>(BaseMavericksViewModelTestState(), configFactory)
+
 class MavericksViewModelTestViewModel : MavericksViewModel<BaseMavericksViewModelTestState>(BaseMavericksViewModelTestState()) {
     suspend fun runInViewModel(block: suspend MavericksViewModelTestViewModel.() -> Unit) {
         block()
@@ -65,6 +68,15 @@ class MavericksViewModelTest : BaseTest() {
     @Before
     fun setup() {
         viewModel = MavericksViewModelTestViewModel()
+    }
+
+    @Test
+    fun usesTheConfigFactoryPassedToTheViewModel() {
+        val customFactory = MavericksViewModelConfigFactory(debugMode = false)
+        val customViewModel = ConfiguredMavericksViewModel(customFactory)
+
+        assertEquals(customFactory.debugMode, customViewModel.config.debugMode)
+        customViewModel.onCleared()
     }
 
     @Test
